@@ -1,7 +1,15 @@
 (function configurePlatformApi() {
   if (window.api) return;
 
+  const nativeLgr = window.Capacitor?.isNativePlatform?.()
+    ? window.Capacitor.Plugins?.LgrPython
+    : null;
+
   async function request(action, payload = {}) {
+    if (nativeLgr) {
+      return nativeLgr.dispatch({ payload: { action, ...payload } });
+    }
+
     const response = await fetch('/api', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -52,7 +60,7 @@
     copyImageToClipboard,
   };
 
-  if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+  if (!nativeLgr && 'serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
   }
 }());

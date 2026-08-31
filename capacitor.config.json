@@ -1,0 +1,9 @@
+{
+  "appId": "br.com.enthony.lgrstudio",
+  "appName": "LGR Studio",
+  "webDir": "src/renderer",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#0f172a"
+  }
+}

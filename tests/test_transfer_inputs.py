@@ -1,4 +1,5 @@
 import os
+import json
 import unittest
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/lgr-matplotlib")
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from lgr_engine import lgr_completo, parse_tf_expression, parse_tf_parts
 from python_bridge import handle_preview
+from android_bridge import dispatch_json
 
 
 class TransferFunctionInputTests(unittest.TestCase):
@@ -42,6 +44,21 @@ class TransferFunctionInputTests(unittest.TestCase):
     def test_preview_does_not_run_plot(self):
         response = handle_preview(
             {"mode": "parts", "numerator": "s + 2", "denominator": "s(s+1)"}
+        )
+        self.assertTrue(response["success"])
+        self.assert_coefficients(response["den"], [1, 1, 0])
+
+    def test_android_bridge_uses_same_dispatcher(self):
+        response = json.loads(
+            dispatch_json(
+                json.dumps(
+                    {
+                        "action": "preview",
+                        "mode": "expr",
+                        "expr": "G(s) = 1/(s(s+1))",
+                    }
+                )
+            )
         )
         self.assertTrue(response["success"])
         self.assert_coefficients(response["den"], [1, 1, 0])

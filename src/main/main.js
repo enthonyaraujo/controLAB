@@ -5,6 +5,17 @@ const { spawn } = require('child_process');
 
 let mainWindow = null;
 
+if (process.platform === 'linux' && app.isPackaged) {
+  const sandboxPath = path.join(path.dirname(process.execPath), 'chrome-sandbox');
+  try {
+    const stat = fs.statSync(sandboxPath);
+    const configured = stat.uid === 0 && (stat.mode & 0o4000) !== 0;
+    if (!configured) app.commandLine.appendSwitch('no-sandbox');
+  } catch {
+    app.commandLine.appendSwitch('no-sandbox');
+  }
+}
+
 function getPythonPath() {
   if (process.env.LGR_PYTHON) {
     return process.env.LGR_PYTHON;
@@ -19,12 +30,19 @@ function getPythonPath() {
     || (process.platform === 'win32' ? 'python' : 'python3');
 }
 
+function getPackagedBridgePath() {
+  const executable = process.platform === 'win32' ? 'lgr-bridge.exe' : 'lgr-bridge';
+  return path.join(process.resourcesPath, 'python', executable);
+}
+
 function runPythonBridge(payload) {
   return new Promise((resolve, reject) => {
-    const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '..', '..', 'python_bridge.py');
-    
-    const pyProcess = spawn(pythonPath, [scriptPath]);
+    const command = app.isPackaged ? getPackagedBridgePath() : getPythonPath();
+    const args = app.isPackaged
+      ? []
+      : [path.join(__dirname, '..', '..', 'python_bridge.py')];
+
+    const pyProcess = spawn(command, args);
 
     let stdoutData = '';
     let stderrData = '';
