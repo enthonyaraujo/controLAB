@@ -26,11 +26,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
+
+def lgrBuildPython = System.getenv("LGR_ANDROID_PYTHON")
 
 chaquopy {
     defaultConfig {
         version = "3.10"
+        if (lgrBuildPython) {
+            buildPython(lgrBuildPython)
+        }
         pip {
             install "-r", "requirements-android.txt"
         }

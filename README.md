@@ -84,6 +84,33 @@ A aplicação possui parser tolerante e inteligente via SymPy:
 
 ---
 
+## 📦 Compilação e instalação
+
+Instale Node.js 22.12+, JDK 17+, Android SDK 36 e Android Platform Tools. O build Android usa Python 3.10 por compatibilidade com o Chaquopy: o script detecta `python3.10` e, se necessário, instala uma cópia gerenciada pelo `uv`.
+
+```bash
+# Gerar o APK de depuração
+npm run mobile:apk
+
+# Gerar e instalar no tablet conectado por USB
+npm run mobile:install
+```
+
+O APK é salvo em `android/app/build/outputs/apk/debug/app-debug.apk`. Para indicar manualmente o interpretador:
+
+```bash
+LGR_ANDROID_PYTHON=/caminho/para/python3.10 npm run mobile:apk
+```
+
+Para desktop, instale `requirements-build.txt` e execute no próprio sistema de destino:
+
+```bash
+python -m pip install -r requirements-build.txt
+npm run package:linux
+```
+
+No Windows, use `npm run package:windows`. Os artefatos desktop são gravados em `release/`.
+
 ## 📁 Estrutura do Projeto
 
 ```text
