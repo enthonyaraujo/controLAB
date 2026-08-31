@@ -104,7 +104,7 @@ A aplicação possui parser tolerante e inteligente via SymPy:
 
 ## 💻 Requisitos do Sistema
 
-- **Node.js:** `v20.0` ou superior (recomendado `v22+`)
+- **Node.js:** `v22.12` ou superior
 - **Python:** `v3.10` ou superior (recomendado `v3.12+`)
 - **Sistemas Operacionais:** Linux (Ubuntu, Debian, Fedora, Arch), Windows 10/11, macOS
 
@@ -176,6 +176,53 @@ npm run gui
 # ou: ./run.sh --gui
 ```
 
+## 📦 Gerar APK e executáveis
+
+Os artefatos são autocontidos: o APK leva o motor Python pelo Chaquopy e os pacotes Electron levam um executável do motor criado pelo PyInstaller. O mesmo `lgr_engine.py` é sincronizado antes de cada empacotamento, sem alterar os sete passos do LGR.
+
+### Android — APK e instalação no tablet
+
+Requisitos adicionais: Android Studio/SDK 36, JDK 17 ou mais recente e `adb` no `PATH`. Ative a depuração USB no tablet e autorize o computador.
+
+```bash
+# Gera android/app/build/outputs/apk/debug/app-debug.apk
+npm run mobile:apk
+
+# Gera e instala o APK no dispositivo USB conectado
+npm run mobile:install
+
+# Opcional: abre o projeto no Android Studio
+npm run mobile:open
+```
+
+O APK é compatível com tablets e celulares Android 7.0/API 24 ou mais recentes, em `arm64-v8a`. O emulador `x86_64` também está habilitado. O cálculo é local e não exige que o desktop esteja ligado.
+
+O Chaquopy 17 é mantido e, para Android, disponibiliza wheels próprios das bibliotecas científicas. A wheel SciPy 1.8.1 ainda aparece no PyPA como `PYSEC-2023-102`; o aviso descreve um possível vazamento de memória e foi retirado no GitHub Advisory. Essa versão é isolada ao APK porque ainda é a última wheel Android compatível fornecida pelo repositório Chaquopy; desktop e web continuam usando SciPy atual.
+
+### Linux — AppImage e DEB
+
+Execute em Linux:
+
+```bash
+source .venv/bin/activate
+python -m pip install -r requirements-build.txt
+npm run package:linux
+```
+
+Os arquivos são gerados em `release/`.
+
+### Windows — instalador e executável portátil
+
+Execute no próprio Windows, pois o motor PyInstaller é específico do sistema operacional:
+
+```powershell
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-build.txt
+npm run package:windows
+```
+
+O comando gera em `release/` um instalador NSIS e um executável portátil. Não tente gerar o pacote Windows no Linux: o script interrompe com uma explicação para impedir que um binário Python incompatível seja incluído.
+
 ---
 
 ## 📁 Estrutura do Projeto
@@ -197,7 +244,9 @@ lgr/
 │       └── vendor/katex/        # KaTeX e fontes 100% offline
 ├── scripts/
 │   ├── start-electron.js        # Inicializador seguro do Electron
-│   └── run-python.js            # Wrapper para o interpretador Python virtualenv
+│   ├── run-python.js            # Wrapper para o interpretador Python virtualenv
+│   └── sync-mobile.js           # Sincroniza o motor canônico com o Android
+├── android/                     # Projeto Capacitor, plugin Chaquopy e Gradle
 ├── tests/
 │   └── test_transfer_inputs.py  # Testes de regressão matemática e parser
 ├── lgr_engine.py                # Motor de cálculo dos 7 passos clássicos
@@ -208,6 +257,9 @@ lgr/
 ├── main.py                      # Launcher unificado em Python
 ├── package.json                 # Manifesto Node.js e scripts
 ├── requirements.txt             # Dependências científicas Python
+├── requirements-build.txt       # PyInstaller usado no empacotamento desktop
+├── capacitor.config.json        # Configuração do aplicativo Android
+├── electron-builder.config.cjs  # Configuração dos pacotes Linux/Windows
 └── run.sh                       # Script bash de execução rápida
 ```
 
