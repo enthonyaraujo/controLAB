@@ -5,6 +5,7 @@ const pythonExecutable = process.platform === 'win32' ? 'lgr-bridge.exe' : 'lgr-
 module.exports = {
   appId: 'br.com.enthony.lgrstudio',
   productName: 'LGR Studio',
+  publish: null,
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   directories: {
     output: 'release',
