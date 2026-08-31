@@ -1,0 +1,179 @@
+name: Multiplatform Build & Release (Android, Windows, Linux)
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # =========================================================================
+  # 1. BUILD LINUX (.deb, .rpm, .AppImage)
+  # =========================================================================
+  build-linux:
+    name: Build Linux (deb, rpm, AppImage)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar ferramentas do sistema (rpm)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm
+
+      - name: Instalar dependências Node e Python
+        run: |
+          npm ci
+          python -m pip install --upgrade pip uv
+          uv pip install -r requirements.txt -r requirements-build.txt --system
+
+      - name: Testar suíte de integridade
+        run: npm test
+
+      - name: Compilar pacotes Linux (deb, rpm, AppImage)
+        run: npm run package:linux
+
+      - name: Salvar artefatos Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: LGR-Studio-Linux
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+          if-no-files-found: error
+
+  # =========================================================================
+  # 2. BUILD WINDOWS (.exe NSIS & Portable)
+  # =========================================================================
+  build-windows:
+    name: Build Windows (exe NSIS & Portable)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências Node e Python
+        shell: pwsh
+        run: |
+          npm ci
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-build.txt
+
+      - name: Compilar executáveis Windows (.exe)
+        shell: pwsh
+        run: npm run package:windows
+
+      - name: Salvar artefatos Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: LGR-Studio-Windows
+          path: release/*.exe
+          if-no-files-found: error
+
+  # =========================================================================
+  # 3. BUILD ANDROID (.apk com Chaquopy)
+  # =========================================================================
+  build-android:
+    name: Build Android (APK com Chaquopy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configurar Python 3.10 (Chaquopy)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Instalar dependências Node
+        run: npm ci
+
+      - name: Dar permissão de execução ao gradlew
+        run: chmod +x android/gradlew
+
+      - name: Compilar APK Android
+        run: npm run mobile:apk
+
+      - name: Renomear APK para distribuição
+        run: |
+          mkdir -p release-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/LGR-Studio-android-debug.apk
+
+      - name: Salvar artefatos Android (APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: LGR-Studio-Android-APK
+          path: release-apk/LGR-Studio-android-debug.apk
+          if-no-files-found: error
+
+  # =========================================================================
+  # 4. CRIAR RELEASE AUTOMÁTICO NO GITHUB (QUANDO CRIADA UMA TAG v*)
+  # =========================================================================
+  publish-release:
+    name: Publicar GitHub Release
+    needs: [build-linux, build-windows, build-android]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar todos os artefatos
+        uses: actions/download-artifact@v4
+        with:
+          path: all-releases
+
+      - name: Agrupar arquivos
+        run: |
+          mkdir -p dist
+          find all-releases -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o -name "*.exe" -o -name "*.apk" \) -exec cp {} dist/ \;
+          ls -lh dist/
+
+      - name: Criar GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

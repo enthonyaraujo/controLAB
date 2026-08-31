@@ -15,7 +15,7 @@
     "mobile:apk": "npm run mobile:sync && node scripts/run-gradle.js assembleDebug",
     "mobile:install": "npm run mobile:apk && node scripts/install-apk.js",
     "package:python": "node scripts/build-python.js",
-    "package:linux": "node scripts/assert-platform.js linux && npm run package:python && electron-builder --config electron-builder.config.cjs --linux AppImage deb",
+    "package:linux": "node scripts/assert-platform.js linux && npm run package:python && electron-builder --config electron-builder.config.cjs --linux AppImage deb rpm",
     "package:windows": "node scripts/assert-platform.js win32 && npm run package:python && electron-builder --config electron-builder.config.cjs --win nsis portable",
     "test": "npm run test:js && npm run test:python",
     "test:js": "node --check scripts/start-electron.js && node --check scripts/run-python.js && node --check scripts/sync-mobile.js && node --check scripts/run-gradle.js && node --check scripts/install-apk.js && node --check scripts/build-python.js && node --check scripts/assert-platform.js && node --check scripts/validate-packaging.js && node --check electron-builder.config.cjs && node --check src/main/main.js && node --check src/preload/preload.js && node --check src/renderer/app.js && node --check src/renderer/web-api.js && node --check src/renderer/sw.js && node scripts/validate-packaging.js",

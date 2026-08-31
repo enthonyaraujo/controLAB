@@ -24,7 +24,7 @@ module.exports = {
   linux: {
     category: 'Education;Science',
     executableName: 'lgr-studio',
-    target: ['AppImage', 'deb'],
+    target: ['AppImage', 'deb', 'rpm'],
   },
   win: {
     executableName: 'LGR Studio',

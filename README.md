@@ -38,9 +38,10 @@ O motor científico é executado integralmente em **Python** (`control`, `NumPy`
   - Botão de **Copiar Gráfico** para a Área de Transferência.
 - **📑 Memorial de Cálculo dos 7 Passos:**
   - Detalhamento analítico completo de cada etapa do método clássico.
-- **📱 Suporte Multiplataforma:**
-  - Aplicativo Android offline por Capacitor e Chaquopy.
-  - Aplicativo desktop por Electron, com AppImage/DEB para Linux e NSIS/portátil para Windows.
+- **📱 Suporte Multiplataforma & CI/CD Automatizado:**
+  - Aplicativo Android offline via Capacitor e Chaquopy (`.apk`).
+  - Aplicativo desktop via Electron: **Linux** (`.deb`, `.rpm`, `.AppImage`) e **Windows** (`.exe` instalador NSIS e portátil).
+  - Workflow do **GitHub Actions** para compilar automaticamente todos os executáveis e APK a cada push ou tag de release.
   - Interface web responsiva e PWA para acesso rápido pelo navegador.
 
 ---
