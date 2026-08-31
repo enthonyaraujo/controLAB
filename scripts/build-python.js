@@ -12,6 +12,15 @@ if (!fs.existsSync(python)) {
   process.exit(1);
 }
 
+const checkPyinstaller = spawnSync(python, ['-c', 'import PyInstaller']);
+if (checkPyinstaller.status !== 0) {
+  console.log('[LGR Studio] PyInstaller não encontrado na .venv. Instalando automaticamente...');
+  const uvInstall = spawnSync('uv', ['pip', 'install', '-r', 'requirements-build.txt', '--python', python], { cwd: projectRoot, stdio: 'inherit' });
+  if (uvInstall.status !== 0) {
+    spawnSync(python, ['-m', 'pip', 'install', '-r', 'requirements-build.txt'], { cwd: projectRoot, stdio: 'inherit' });
+  }
+}
+
 const result = spawnSync(python, [
   '-m', 'PyInstaller',
   '--noconfirm',
