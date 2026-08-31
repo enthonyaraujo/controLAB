@@ -6,7 +6,7 @@
 [![Electron](https://img.shields.io/badge/Electron-44.1.0-47848F.svg?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![KaTeX](https://img.shields.io/badge/KaTeX-Offline%20Math-00d1b2.svg)](https://katex.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey.svg)]()
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Linux%20%7C%20Windows%20%7C%20Web-lightgrey.svg)]()
 
 ---
 
@@ -23,6 +23,10 @@
   - [2. Navegador Local Privado (127.0.0.1)](#2-navegador-local-privado-127001)
   - [3. Acesso Móvel na Rede Local (Wi-Fi)](#3-acesso-móvel-na-rede-local-wi-fi)
   - [4. Interfaces Alternativas (Streamlit / Tkinter)](#4-interfaces-alternativas-streamlit--tkinter)
+- [Gerar APK e Executáveis](#-gerar-apk-e-executáveis)
+  - [Android — APK e instalação no tablet](#android--apk-e-instalação-no-tablet)
+  - [Linux — AppImage e DEB](#linux--appimage-e-deb)
+  - [Windows — instalador e executável portátil](#windows--instalador-e-executável-portátil)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 - [Validação e Testes Automatizados](#-validação-e-testes-automatizados)
 - [Privacidade e Execução 100% Local](#-privacidade-e-execução-100-local)
@@ -58,8 +62,10 @@ O motor científico é executado integralmente em **Python** (`control`, `NumPy`
   - Botão de **Copiar Gráfico** para a Área de Transferência.
 - **📑 Memorial de Cálculo dos 7 Passos:**
   - Detalhamento analítico completo de cada etapa do método clássico.
-- **📱 PWA & Suporte Multiplataforma:**
-  - Funciona nativamente no desktop via Electron e no navegador (com *Service Worker* para cache do shell visual).
+- **📱 Suporte Multiplataforma:**
+  - Aplicativo Android offline por Capacitor e Chaquopy.
+  - Aplicativo desktop por Electron, com AppImage/DEB para Linux e NSIS/portátil para Windows.
+  - Interface web responsiva e PWA para acesso rápido pelo navegador.
 
 ---
 
@@ -105,8 +111,10 @@ A aplicação possui parser tolerante e inteligente via SymPy:
 ## 💻 Requisitos do Sistema
 
 - **Node.js:** `v22.12` ou superior
-- **Python:** `v3.10` ou superior (recomendado `v3.12+`)
-- **Sistemas Operacionais:** Linux (Ubuntu, Debian, Fedora, Arch), Windows 10/11, macOS
+- **Python para desenvolvimento desktop/web:** `v3.12` ou superior
+- **Sistemas Operacionais:** Linux, Windows 10/11 e Android 7.0 ou superior
+
+Para gerar APK também são necessários JDK 17+, Android Studio ou Android SDK 36 e Android Platform Tools (`adb`). O Python 3.10 usado dentro do APK é fornecido pelo Chaquopy e não precisa ser instalado no tablet.
 
 ---
 
@@ -124,7 +132,7 @@ npm install
 # 3. Criar e ativar ambiente virtual Python
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### Windows (PowerShell):
@@ -135,7 +143,7 @@ cd lgr
 npm install
 py -3.12 -m venv .venv
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ---
@@ -185,6 +193,9 @@ Os artefatos são autocontidos: o APK leva o motor Python pelo Chaquopy e os pac
 Requisitos adicionais: Android Studio/SDK 36, JDK 17 ou mais recente e `adb` no `PATH`. Ative a depuração USB no tablet e autorize o computador.
 
 ```bash
+# Sincroniza interface e motor Python sem gerar APK
+npm run mobile:sync
+
 # Gera android/app/build/outputs/apk/debug/app-debug.apk
 npm run mobile:apk
 
@@ -193,6 +204,12 @@ npm run mobile:install
 
 # Opcional: abre o projeto no Android Studio
 npm run mobile:open
+```
+
+Para instalar manualmente um APK já gerado:
+
+```bash
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 O APK é compatível com tablets e celulares Android 7.0/API 24 ou mais recentes, em `arm64-v8a`. O emulador `x86_64` também está habilitado. O cálculo é local e não exige que o desktop esteja ligado.
@@ -209,7 +226,7 @@ python -m pip install -r requirements-build.txt
 npm run package:linux
 ```
 
-Os arquivos são gerados em `release/`.
+São gerados em `release/` um AppImage portátil e um pacote DEB. O empacotamento Linux deve ser executado no Linux porque o motor Python incluído é específico da plataforma.
 
 ### Windows — instalador e executável portátil
 
@@ -222,6 +239,17 @@ npm run package:windows
 ```
 
 O comando gera em `release/` um instalador NSIS e um executável portátil. Não tente gerar o pacote Windows no Linux: o script interrompe com uma explicação para impedir que um binário Python incompatível seja incluído.
+
+### Resumo dos comandos de empacotamento
+
+| Plataforma | Comando | Resultado |
+| :--- | :--- | :--- |
+| Android | `npm run mobile:apk` | `android/app/build/outputs/apk/debug/app-debug.apk` |
+| Android + USB | `npm run mobile:install` | Gera e instala no dispositivo autorizado |
+| Linux | `npm run package:linux` | AppImage e DEB em `release/` |
+| Windows | `npm run package:windows` | NSIS e portátil em `release/` |
+
+Os comandos desktop exigem previamente `python -m pip install -r requirements-build.txt`. Cada pacote desktop deve ser gerado no próprio sistema operacional de destino.
 
 ---
 
@@ -245,7 +273,10 @@ lgr/
 ├── scripts/
 │   ├── start-electron.js        # Inicializador seguro do Electron
 │   ├── run-python.js            # Wrapper para o interpretador Python virtualenv
-│   └── sync-mobile.js           # Sincroniza o motor canônico com o Android
+│   ├── sync-mobile.js           # Sincroniza o motor canônico com o Android
+│   ├── build-python.js          # Empacota o motor desktop com PyInstaller
+│   ├── run-gradle.js            # Executa tarefas Gradle de forma multiplataforma
+│   └── install-apk.js           # Instala o APK por adb
 ├── android/                     # Projeto Capacitor, plugin Chaquopy e Gradle
 ├── tests/
 │   └── test_transfer_inputs.py  # Testes de regressão matemática e parser
