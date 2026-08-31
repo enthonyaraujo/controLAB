@@ -24,6 +24,7 @@ module.exports = {
   linux: {
     category: 'Education;Science',
     executableName: 'lgr-studio',
+    maintainer: 'Enthony Araujo <contato@enthony.com.br>',
     target: ['AppImage', 'deb', 'rpm'],
   },
   win: {

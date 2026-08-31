@@ -28,7 +28,7 @@
     "electron",
     "python"
   ],
-  "author": "Enthony Araujo",
+  "author": "Enthony Araujo <contato@enthony.com.br>",
   "license": "MIT",
   "dependencies": {
     "@capacitor/core": "8.5.1",
