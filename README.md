@@ -13,7 +13,6 @@
 ## Instalação
 
 Para instalar acesse os [Releases](https://github.com/enthonyaraujo/lgr/releases) e escolha seu sistema operacional desejado.
-)
 
 ---
 ## Visão Geral
