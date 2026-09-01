@@ -381,8 +381,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
-  // ZOOM E PAN INTERATIVO NA IMAGEM (SOMENTE AMPLIAR, MÍNIMO 1.0)
+  // ZOOM E PAN INTERATIVO (MOUSE, PINCH-TO-ZOOM TOUCH E SCROLL MOBILE)
   // =========================================================================
+  const btnScrollTop = document.getElementById('btn-scroll-top');
+  let initialPinchDistance = 0;
+  let initialPinchZoom = 1.0;
+  let initialPinchMidX = 0;
+  let initialPinchMidY = 0;
+  let startPinchPanX = 0;
+  let startPinchPanY = 0;
+  let lastTapTime = 0;
+
   function updateImageTransform() {
     if (zoomLevel <= 1.0) {
       zoomLevel = 1.0;
@@ -393,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isZoomed = zoomLevel > 1.0;
     plotViewport.classList.toggle('zoomed', isZoomed);
+    plotViewport.style.touchAction = isZoomed ? 'none' : 'pan-y';
 
     const btnZoomOut = document.getElementById('btn-zoom-out');
     if (btnZoomOut) {
@@ -425,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-zoom-reset').addEventListener('click', resetZoom);
 
+  // Scroll do Mouse para Zoom
   plotViewport.addEventListener('wheel', (e) => {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.15 : 0.85;
@@ -434,10 +445,11 @@ document.addEventListener('DOMContentLoaded', () => {
       panY = 0;
     }
     updateImageTransform();
-  });
+  }, { passive: false });
 
+  // Pan com Mouse no Desktop
   plotViewport.addEventListener('mousedown', (e) => {
-    if (zoomLevel <= 1.0) return;
+    if (zoomLevel <= 1.0 || e.button !== 0) return;
     isPanning = true;
     startX = e.clientX - panX;
     startY = e.clientY - panY;
@@ -454,27 +466,101 @@ document.addEventListener('DOMContentLoaded', () => {
     isPanning = false;
   });
 
-  plotViewport.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'mouse' || zoomLevel <= 1.0) return;
-    isPanning = true;
-    startX = event.clientX - panX;
-    startY = event.clientY - panY;
-    plotViewport.setPointerCapture(event.pointerId);
-  });
+  // GESTOS TOUCH (MOBILE / TABLET: PINCH TO ZOOM, PAN & SCROLL)
+  plotViewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      // Início do Pinch-to-zoom com 2 dedos
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      initialPinchDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      initialPinchZoom = zoomLevel;
+      initialPinchMidX = (t1.clientX + t2.clientX) / 2;
+      initialPinchMidY = (t1.clientY + t2.clientY) / 2;
+      startPinchPanX = panX;
+      startPinchPanY = panY;
+    } else if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      startX = touch.clientX - panX;
+      startY = touch.clientY - panY;
 
-  plotViewport.addEventListener('pointermove', (event) => {
-    if (!isPanning || event.pointerType === 'mouse' || zoomLevel <= 1.0) return;
-    panX = event.clientX - startX;
-    panY = event.clientY - startY;
-    updateImageTransform();
-  });
+      // Duplo-toque rápido para alternar zoom 2x / reset
+      const now = Date.now();
+      if (now - lastTapTime < 300) {
+        if (zoomLevel > 1.0) {
+          resetZoom();
+        } else {
+          zoomLevel = 2.0;
+          const rect = plotViewport.getBoundingClientRect();
+          panX = (rect.width / 2 - (touch.clientX - rect.left)) * 0.6;
+          panY = (rect.height / 2 - (touch.clientY - rect.top)) * 0.6;
+          updateImageTransform();
+        }
+        lastTapTime = 0;
+      } else {
+        lastTapTime = now;
+      }
+    }
+  }, { passive: true });
 
-  plotViewport.addEventListener('pointerup', (event) => {
-    isPanning = false;
-    if (plotViewport.hasPointerCapture(event.pointerId)) {
-      plotViewport.releasePointerCapture(event.pointerId);
+  plotViewport.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      // Gesto de Pinça (Pinch-to-zoom)
+      e.preventDefault();
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      if (initialPinchDistance > 0) {
+        const factor = currentDist / initialPinchDistance;
+        zoomLevel = Math.min(Math.max(initialPinchZoom * factor, 1.0), 5.0);
+        if (zoomLevel > 1.0) {
+          const currentMidX = (t1.clientX + t2.clientX) / 2;
+          const currentMidY = (t1.clientY + t2.clientY) / 2;
+          panX = startPinchPanX + (currentMidX - initialPinchMidX);
+          panY = startPinchPanY + (currentMidY - initialPinchMidY);
+        } else {
+          panX = 0;
+          panY = 0;
+        }
+        updateImageTransform();
+      }
+    } else if (e.touches.length === 1 && zoomLevel > 1.0) {
+      // Pan com 1 dedo quando ampliado
+      e.preventDefault();
+      const touch = e.touches[0];
+      panX = touch.clientX - startX;
+      panY = touch.clientY - startY;
+      updateImageTransform();
+    }
+    // Quando zoomLevel === 1.0 e 1 dedo: NÃO chama preventDefault -> permite o scroll natural da página!
+  }, { passive: false });
+
+  plotViewport.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      if (zoomLevel <= 1.05) {
+        resetZoom();
+      }
+    } else if (e.touches.length === 1) {
+      // Transição de 2 dedos para 1 dedo
+      const touch = e.touches[0];
+      startX = touch.clientX - panX;
+      startY = touch.clientY - panY;
     }
   });
+
+  // Botão Flutuante de Retorno ao Topo no Mobile
+  function checkScrollTop() {
+    const scrollPos = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    if (btnScrollTop) {
+      btnScrollTop.classList.toggle('visible', scrollPos > 280);
+    }
+  }
+
+  window.addEventListener('scroll', checkScrollTop, { passive: true });
+  if (btnScrollTop) {
+    btnScrollTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 
   // =========================================================================
   // EXPORTAÇÃO E DOWNLOAD
