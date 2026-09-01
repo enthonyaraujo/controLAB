@@ -275,7 +275,8 @@ def lgr_completo(num, den, titulo="Lugar Geométrico das Raízes", show_plot=Fal
     }
     
     # Gera os dados exatos do LGR (lista de raízes e ganhos K)
-    kvect = np.logspace(-3, 3, 5000)
+    # Aumentamos o limite para 10^4 e os pontos para 10000 para manter a alta precisão
+    kvect = np.logspace(-3, 4, 10000)
     kvect = np.insert(kvect, 0, 0)
     rlist, klist = ct.root_locus(sys, kvect=kvect, plot=False)
     

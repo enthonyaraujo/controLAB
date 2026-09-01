@@ -11,6 +11,8 @@ warnings.filterwarnings("ignore")
 import matplotlib
 
 matplotlib.use("Agg")
+import matplotlib.backends.backend_agg
+import matplotlib.backends.backend_svg
 import matplotlib.pyplot as plt
 import numpy as np
 

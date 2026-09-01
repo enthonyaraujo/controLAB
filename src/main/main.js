@@ -7,15 +7,9 @@ Menu.setApplicationMenu(null);
 
 let mainWindow = null;
 
-if (process.platform === 'linux' && app.isPackaged) {
-  const sandboxPath = path.join(path.dirname(process.execPath), 'chrome-sandbox');
-  try {
-    const stat = fs.statSync(sandboxPath);
-    const configured = stat.uid === 0 && (stat.mode & 0o4000) !== 0;
-    if (!configured) app.commandLine.appendSwitch('no-sandbox');
-  } catch {
-    app.commandLine.appendSwitch('no-sandbox');
-  }
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('no-sandbox');
+  app.commandLine.appendSwitch('disable-gpu-sandbox');
 }
 
 function getPythonPath() {
@@ -91,7 +85,7 @@ function createWindow() {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
     },
   });
 

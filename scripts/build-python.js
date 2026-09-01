@@ -49,6 +49,11 @@ const result = spawnSync(python, [
   '--distpath', path.join('build', 'python'),
   '--workpath', path.join('build', 'pyinstaller'),
   '--specpath', path.join('build', 'pyinstaller'),
+  '--hidden-import', 'matplotlib.backends.backend_svg',
+  '--hidden-import', 'matplotlib.backends.backend_agg',
+  '--hidden-import', 'matplotlib.backends.backend_pdf',
+  '--collect-all', 'matplotlib',
+  '--collect-all', 'control',
   'python_bridge.py',
 ], { cwd: projectRoot, stdio: 'inherit' });
 
