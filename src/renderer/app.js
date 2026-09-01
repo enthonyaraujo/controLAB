@@ -572,8 +572,8 @@ document.addEventListener('DOMContentLoaded', () => {
         base64: currentImageData,
         defaultName: 'lugar_geometrico_das_raizes.png',
       });
-      if (res.success) {
-        showToast('💾 Imagem PNG salva com sucesso!');
+      if (res && res.success !== false) {
+        showToast(res.message || '💾 Imagem PNG salva com sucesso!');
       }
     } catch (err) {
       showToast(`Erro ao salvar: ${err.message}`, 3500);
@@ -587,8 +587,8 @@ document.addEventListener('DOMContentLoaded', () => {
         svg: currentSVGData,
         defaultName: 'lugar_geometrico_das_raizes.svg',
       });
-      if (res.success) {
-        showToast('📐 Gráfico Vetorial SVG salvo com sucesso!');
+      if (res && res.success !== false) {
+        showToast(res.message || '📐 Gráfico Vetorial SVG salvo com sucesso!');
       }
     } catch (err) {
       showToast(`Erro ao salvar SVG: ${err.message}`, 3500);

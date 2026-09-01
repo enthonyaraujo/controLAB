@@ -47,16 +47,24 @@
     calculateLGR: (payload) => request('calculate', payload),
     previewTransferFunction: (payload) => request('preview', payload),
     getPresets: () => request('presets'),
-    saveImage: ({ base64, defaultName }) => {
+    saveImage: async ({ base64, defaultName }) => {
+      if (nativeLgr) {
+        return nativeLgr.saveImage({ base64, defaultName: defaultName || 'lgr_grafico.png' });
+      }
       const parts = base64.split(',');
       const binary = atob(parts[1]);
       const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
       return downloadBlob(new Blob([bytes], { type: 'image/png' }), defaultName);
     },
-    saveSVG: ({ svg, defaultName }) => downloadBlob(
-      new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }),
-      defaultName,
-    ),
+    saveSVG: async ({ svg, defaultName }) => {
+      if (nativeLgr) {
+        return nativeLgr.saveSVG({ svg, defaultName: defaultName || 'lgr_grafico.svg' });
+      }
+      return downloadBlob(
+        new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }),
+        defaultName,
+      );
+    },
     copyImageToClipboard,
   };
 
