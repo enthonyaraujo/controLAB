@@ -1,4 +1,4 @@
-# 📈 LGR Studio — Lugar Geométrico das Raízes (Root Locus)
+# <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>LGR Studio — Lugar Geométrico das Raízes (Root Locus)</strong>
 
 > **Interface moderna, interativa e 100% offline para cálculo analítico e traçado didático do Lugar Geométrico das Raízes (LGR) com renderização matemática em tempo real.**
 
