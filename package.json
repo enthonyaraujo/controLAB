@@ -1,6 +1,6 @@
 {
   "name": "lgr-studio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "LGR Studio - Interface responsiva em Electron e navegador para os 7 passos clássicos do Lugar Geométrico das Raízes",
   "main": "src/main/main.js",
   "scripts": {

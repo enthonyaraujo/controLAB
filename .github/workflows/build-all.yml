@@ -27,10 +27,10 @@ jobs:
       - name: Checkout repositório
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js
+      - name: Configurar Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Configurar Python
@@ -42,6 +42,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm
+
+      - name: Sincronizar versão com a Git Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$TAG_VERSION" --no-git-tag-version --allow-same-version
 
       - name: Instalar dependências Node e Python
         run: |
@@ -76,16 +82,23 @@ jobs:
       - name: Checkout repositório
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js
+      - name: Configurar Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Sincronizar versão com a Git Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $tagVersion = $env:GITHUB_REF_NAME.TrimStart('v')
+          npm version $tagVersion --no-git-tag-version --allow-same-version
 
       - name: Instalar dependências Node e Python
         shell: pwsh
@@ -117,22 +130,28 @@ jobs:
       - name: Checkout repositório
         uses: actions/checkout@v4
 
-      - name: Configurar Java 17
+      - name: Configurar Java 21
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Configurar Python 3.10 (Chaquopy)
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Configurar Node.js
+      - name: Configurar Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
+
+      - name: Sincronizar versão com a Git Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$TAG_VERSION" --no-git-tag-version --allow-same-version
 
       - name: Instalar dependências Node
         run: npm ci
@@ -146,13 +165,14 @@ jobs:
       - name: Renomear APK para distribuição
         run: |
           mkdir -p release-apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/LGR-Studio-android-debug.apk
+          VERSION="${GITHUB_REF_NAME:-v1.0.1}"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "release-apk/LGR-Studio-${VERSION}-android.apk"
 
       - name: Salvar artefatos Android (APK)
         uses: actions/upload-artifact@v4
         with:
           name: LGR-Studio-Android-APK
-          path: release-apk/LGR-Studio-android-debug.apk
+          path: release-apk/*.apk
           if-no-files-found: error
 
   # =========================================================================
@@ -176,8 +196,10 @@ jobs:
           find all-releases -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o -name "*.exe" -o -name "*.apk" \) -exec cp {} dist/ \;
           ls -lh dist/
 
-      - name: Criar GitHub Release
+      - name: Criar ou Atualizar GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          name: "LGR Studio ${{ github.ref_name }}"
+          tag_name: ${{ github.ref_name }}
           files: dist/*
           generate_release_notes: true
