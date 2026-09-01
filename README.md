@@ -16,7 +16,7 @@ Para instalar acesse os [Releases](https://github.com/enthonyaraujo/lgr/releases
 )
 
 ---
-## 🌟 Visão Geral
+## Visão Geral
 
 O **LGR Studio** é uma aplicação desktop e web projetada para estudantes, engenheiros e pesquisadores de **Engenharia de Controle** e **Sistemas Dinâmicos**. 
 
@@ -28,23 +28,23 @@ O motor científico é executado integralmente em **Python** (`control`, `NumPy`
 
 ---
 
-## ✨ Recursos Principais
+##  Recursos Principais
 
-- **🎨 Design Moderno & Acessível:**
+- **Design Moderno & Acessível:**
   - Tema Escuro (*Dark Mode*) com tipografia branca de alto contraste e realces em azul.
   - Alternador dinâmico para Tema Claro (*Light Mode*).
   - Layout totalmente responsivo para desktop, tablet e celular.
-- **📐 Fórmulas em Tempo Real (KaTeX 100% Offline):**
+- **Fórmulas em Tempo Real (KaTeX 100% Offline):**
   - Pré-visualização da função de transferência enquanto você digita.
   - Exibição simultânea da forma polinomial expandida e da forma fatorada (polos e zeros).
-- **🔍 Visualizador Gráfico Interativo:**
+- **Visualizador Gráfico Interativo:**
   - **Zoom inteligente:** ampliação de até `6.0x` com trava de limite mínimo em `100%` (não diminui além do tamanho visível original).
   - Arraste livre (*pan*) ativado automaticamente ao ampliar.
   - Exportação direta em **PNG de Alta Resolução (300 DPI)** e **Vetorial SVG**.
   - Botão de **Copiar Gráfico** para a Área de Transferência.
-- **📑 Memorial de Cálculo dos 7 Passos:**
+- **Memorial de Cálculo dos 7 Passos:**
   - Detalhamento analítico completo de cada etapa do método clássico.
-- **📱 Suporte Multiplataforma & CI/CD Automatizado:**
+- **Suporte Multiplataforma & CI/CD Automatizado:**
   - Aplicativo Android offline via Capacitor e Chaquopy (`.apk`).
   - Aplicativo desktop via Electron: **Linux** (`.deb`, `.rpm`, `.AppImage`) e **Windows** (`.exe` instalador NSIS e portátil).
   - Workflow do **GitHub Actions** para compilar automaticamente todos os executáveis e APK a cada push ou tag de release.
@@ -52,7 +52,7 @@ O motor científico é executado integralmente em **Python** (`control`, `NumPy`
 
 ---
 
-## 📚 Os 7 Passos Clássicos do LGR
+## Os 7 Passos Clássicos do LGR
 
 O algoritmo calcula e ilustra rigorosamente os 7 passos clássicos da teoria de controle (Ogata, Nise, Dorf):
 
@@ -77,7 +77,7 @@ O algoritmo calcula e ilustra rigorosamente os 7 passos clássicos da teoria de 
 
 ---
 
-## 🎯 Formatos de Entrada Suportados
+## Formatos de Entrada Suportados
 
 A aplicação possui parser tolerante e inteligente via SymPy:
 
@@ -91,34 +91,7 @@ A aplicação possui parser tolerante e inteligente via SymPy:
 
 ---
 
-## 📦 Compilação e instalação
-
-Instale Node.js 22.12+, JDK 17+, Android SDK 36 e Android Platform Tools. O build Android usa Python 3.10 por compatibilidade com o Chaquopy: o script detecta `python3.10` e, se necessário, instala uma cópia gerenciada pelo `uv`.
-
-```bash
-# Gerar o APK de depuração
-npm run mobile:apk
-
-# Gerar e instalar no tablet conectado por USB
-npm run mobile:install
-```
-
-O APK é salvo em `android/app/build/outputs/apk/debug/app-debug.apk`. Para indicar manualmente o interpretador:
-
-```bash
-LGR_ANDROID_PYTHON=/caminho/para/python3.10 npm run mobile:apk
-```
-
-Para desktop, instale `requirements-build.txt` e execute no próprio sistema de destino:
-
-```bash
-python -m pip install -r requirements-build.txt
-npm run package:linux
-```
-
-No Windows, use `npm run package:windows`. Os artefatos desktop são gravados em `release/`.
-
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```text
 lgr/
