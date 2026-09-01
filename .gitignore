@@ -13,12 +13,23 @@ htmlcov/
 dist/
 build/
 release/
+release-apk/
 *.AppImage
 *.dmg
 *.exe
 *.msi
 *.deb
 *.rpm
+*.apk
+*.aab
+
+# Android & Gradle
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/
+android/capacitor-cordova-android-plugins/
 
 .DS_Store
 Thumbs.db
