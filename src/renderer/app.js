@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentMode = 'expr';
   let currentImageData = null;
   let currentSVGData = null;
-  let presetsData = [];
   let previewTimer = null;
   let previewRequestId = 0;
 
@@ -34,8 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputK = document.getElementById('input-k');
   const inputZeros = document.getElementById('input-zeros');
   const inputPoles = document.getElementById('input-poles');
-  const selectPreset = document.getElementById('select-preset');
-  const presetDescEl = document.getElementById('preset-description');
   const inputTitle = document.getElementById('input-title');
   const btnCalculate = document.getElementById('btn-calculate');
   const latexPreview = document.getElementById('latex-preview');
@@ -119,42 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =========================================================================
-  // CARREGAR PRESETS
-  // =========================================================================
-  async function loadPresets() {
-    try {
-      const res = await window.api.getPresets();
-      if (res.success && res.presets) {
-        presetsData = res.presets;
-        selectPreset.innerHTML = '';
-        presetsData.forEach((p) => {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.title;
-          selectPreset.appendChild(opt);
-        });
-
-        updatePresetDescription();
-      }
-    } catch (err) {
-      console.error('Erro ao carregar presets:', err);
-    }
-  }
-
-  function updatePresetDescription() {
-    const selectedId = selectPreset.value;
-    const preset = presetsData.find((p) => p.id === selectedId);
-    if (preset) {
-      presetDescEl.innerHTML = `<strong>${preset.title}:</strong><br>${preset.desc}`;
-    }
-  }
-
-  selectPreset.addEventListener('change', () => {
-    updatePresetDescription();
-    calculate();
-  });
-
-  // =========================================================================
   // CÁLCULO E PLOTAGEM DO LGR
   // =========================================================================
   function getPayload() {
@@ -186,12 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         k: Number.isFinite(Number.parseFloat(inputK.value)) ? Number.parseFloat(inputK.value) : 1.0,
         zeros: inputZeros.value.trim(),
         poles: inputPoles.value.trim(),
-        title,
-      };
-    } else if (currentMode === 'presets') {
-      return {
-        mode: 'preset',
-        preset_key: selectPreset.value,
         title,
       };
     }
@@ -612,9 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderMathInContainer(document.body);
 
-  // Inicialização
-  loadPresets().then(() => {
-    schedulePreview();
-    calculate();
-  });
+  // Inicialização imediata
+  schedulePreview();
+  calculate();
 });
