@@ -6,6 +6,7 @@ module.exports = {
   appId: 'br.com.enthony.lgrstudio',
   productName: 'LGR Studio',
   publish: null,
+  icon: 'build/icon.png',
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
   directories: {
     output: 'release',
