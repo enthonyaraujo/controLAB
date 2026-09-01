@@ -251,13 +251,24 @@ else:
 
             # Passo 7
             with st.expander("📌 **Passo 7: Ângulos de Partida ($\theta_d$) e Chegada ($\theta_a$)**", expanded=True):
-                st.markdown(r"Calculados pela condição angular: $\theta_d = 180^\circ + \sum \angle(p - z_i) - \sum \angle(p - p_j)$.")
-                if detalhes['angulos_partida']:
-                    for ap in detalhes['angulos_partida']:
-                        p_str = format_complex(ap['polo'])
-                        st.info(f"📐 Para o polo complexo $p = {p_str}$, o ângulo de partida é: **$\\theta_d = {ap['angulo']:.1f}^\\circ$**")
+                tem_partida = bool(detalhes.get('angulos_partida'))
+                tem_chegada = bool(detalhes.get('angulos_chegada'))
+
+                if tem_partida or tem_chegada:
+                    if tem_partida:
+                        st.markdown(r"**Ângulo de Partida em Polos Complexos ($\theta_d$):**")
+                        st.caption(r"Condição angular: $\theta_d = 180^\circ + \sum \angle(p - z_i) - \sum \angle(p - p_j)$")
+                        for ap in detalhes['angulos_partida']:
+                            p_str = format_complex(ap['polo'])
+                            st.info(f"📐 Polo $p = {p_str}$: **$\\theta_d = {ap['angulo']:.1f}^\\circ$**")
+                    if tem_chegada:
+                        st.markdown(r"**Ângulo de Chegada em Zeros Complexos ($\theta_a$):**")
+                        st.caption(r"Condição angular: $\theta_a = 180^\circ + \sum \angle(z - p_i) - \sum \angle(z - z_j)$")
+                        for ac in detalhes['angulos_chegada']:
+                            z_str = format_complex(ac['zero'])
+                            st.success(f"🎯 Zero $z = {z_str}$: **$\\theta_a = {ac['angulo']:.1f}^\\circ$**")
                 else:
-                    st.write("A função de transferência não possui polos complexos conjugados (apenas polos reais).")
+                    st.write("A função de transferência não possui polos ou zeros complexos conjugados (todas as singularidades são reais).")
 
     except Exception as e:
         st.error(f"Erro no cálculo do Lugar Geométrico das Raízes: {e}")

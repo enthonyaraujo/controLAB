@@ -270,7 +270,8 @@ def lgr_completo(num, den, titulo="Lugar Geométrico das Raízes", show_plot=Fal
         "angulos_assintotas": [],
         "break_points": [],
         "jw_cruzamentos": [],
-        "angulos_partida": []
+        "angulos_partida": [],
+        "angulos_chegada": []
     }
     
     # Gera os dados exatos do LGR (lista de raízes e ganhos K)
@@ -385,14 +386,17 @@ def lgr_completo(num, den, titulo="Lugar Geométrico das Raízes", show_plot=Fal
                     cruz_adicionado = True
 
     # ========================================================
-    # PASSO 7: Ângulos de Partida/Chegada
+    # PASSO 7: Ângulos de Partida (Polos) e Chegada (Zeros)
     # ========================================================
+    # Ângulos de Partida para Polos Complexos
     for p in polos:
         if np.imag(p) > 1e-4:
             angulo = 180
-            for z in zeros: angulo += np.degrees(np.angle(p - z))
+            for z in zeros:
+                angulo += np.degrees(np.angle(p - z))
             for p_outro in polos:
-                if np.abs(p - p_outro) > 1e-4: angulo -= np.degrees(np.angle(p - p_outro))
+                if np.abs(p - p_outro) > 1e-4:
+                    angulo -= np.degrees(np.angle(p - p_outro))
             
             angulo = (angulo + 180) % 360 - 180
             detalhes["angulos_partida"].append({
@@ -404,6 +408,27 @@ def lgr_completo(num, den, titulo="Lugar Geométrico das Raízes", show_plot=Fal
             ax.add_patch(arco)
             ax.plot([np.real(p)-1, np.real(p)+1], [np.imag(p), np.imag(p)], 'k:', alpha=0.5)
             ax.text(np.real(p) + 1.2, np.imag(p), rf'$\theta_d={angulo:.1f}^\circ$', color='purple')
+
+    # Ângulos de Chegada para Zeros Complexos
+    for z in zeros:
+        if np.imag(z) > 1e-4:
+            angulo = 180
+            for p in polos:
+                angulo += np.degrees(np.angle(z - p))
+            for z_outro in zeros:
+                if np.abs(z - z_outro) > 1e-4:
+                    angulo -= np.degrees(np.angle(z - z_outro))
+            
+            angulo = (angulo + 180) % 360 - 180
+            detalhes["angulos_chegada"].append({
+                "zero": z,
+                "angulo": angulo
+            })
+            
+            arco = Arc((np.real(z), np.imag(z)), 2, 2, angle=0, theta1=min(0, angulo), theta2=max(0, angulo), color='teal', lw=1.5)
+            ax.add_patch(arco)
+            ax.plot([np.real(z)-1, np.real(z)+1], [np.imag(z), np.imag(z)], 'k:', alpha=0.5)
+            ax.text(np.real(z) + 1.2, np.imag(z), rf'$\theta_a={angulo:.1f}^\circ$', color='teal')
 
     # ========================================================
     # AJUSTES FINAIS DE ESTÉTICA E LEGENDA

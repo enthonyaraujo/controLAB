@@ -388,18 +388,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Passo 7: Ângulos de Partida e Chegada
     const el7 = document.getElementById('step-content-7');
-    if (det.angulos_partida && det.angulos_partida.length > 0) {
-      const partidaItems = det.angulos_partida.map(
-        (ap) => `<div class="step-item-box info">📐 Para o polo complexo <b>p = ${ap.polo_str}</b>: Ângulo de partida <b>\\theta_d = ${ap.angulo.toFixed(1)}°</b></div>`
-      ).join('');
-      el7.innerHTML = `
-        <p>Condição angular: $\\theta_d = 180^\\circ + \\sum \\angle(p - z) - \\sum \\angle(p - p_{outros})$:</p>
-        ${partidaItems}
-      `;
+    const temPartida = det.angulos_partida && det.angulos_partida.length > 0;
+    const temChegada = det.angulos_chegada && det.angulos_chegada.length > 0;
+
+    if (temPartida || temChegada) {
+      let html = '';
+      if (temPartida) {
+        const partidaItems = det.angulos_partida.map(
+          (ap) => `<div class="step-item-box info">📐 Para o polo complexo <b>p = ${ap.polo_str}</b>: Ângulo de partida <b>\\theta_d = ${ap.angulo.toFixed(1)}°</b></div>`
+        ).join('');
+        html += `
+          <p>• <strong>Ângulo de Partida em Polos Complexos ($\theta_d$):</strong></p>
+          <p class="input-help" style="margin-bottom: 6px;">Condição angular: $\\theta_d = 180^\\circ + \\sum \\angle(p - z) - \\sum \\angle(p - p_{outros})$</p>
+          ${partidaItems}
+        `;
+      }
+      if (temChegada) {
+        const chegadaItems = det.angulos_chegada.map(
+          (ac) => `<div class="step-item-box success">🎯 Para o zero complexo <b>z = ${ac.zero_str}</b>: Ângulo de chegada <b>\\theta_a = ${ac.angulo.toFixed(1)}°</b></div>`
+        ).join('');
+        html += `
+          <p style="margin-top: ${temPartida ? '14px' : '0'};">• <strong>Ângulo de Chegada em Zeros Complexos ($\theta_a$):</strong></p>
+          <p class="input-help" style="margin-bottom: 6px;">Condição angular: $\\theta_a = 180^\\circ + \\sum \\angle(z - p) - \\sum \\angle(z - z_{outros})$</p>
+          ${chegadaItems}
+        `;
+      }
+      el7.innerHTML = html;
     } else {
       el7.innerHTML = `
         <div class="step-item-box">
-          Não há polos complexos conjugados nesta função de transferência (todos os polos são reais).
+          Não há polos ou zeros complexos conjugados nesta função de transferência (todas as singularidades são puramente reais).
         </div>
       `;
     }

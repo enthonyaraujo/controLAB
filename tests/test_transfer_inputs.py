@@ -79,6 +79,21 @@ class ClassicalLGRRegressionTests(unittest.TestCase):
         finally:
             plt.close(fig)
 
+    def test_complex_zeros_arrival_angle(self):
+        # G(s) = (s^2 + 6s + 12) / (s(s+2)^2) = (s^2 + 6s + 12) / (s^3 + 4s^2 + 4s)
+        fig, _ax, details = lgr_completo([1, 6, 12], [1, 4, 4, 0], show_plot=False)
+        try:
+            self.assertEqual(details["P"], 3)
+            self.assertEqual(details["Z"], 2)
+            self.assertEqual(details["ramos"], 3)
+            self.assertAlmostEqual(details["centroide"], 2.0)
+            self.assertEqual(len(details["angulos_assintotas"]), 1)
+            self.assertAlmostEqual(float(details["angulos_assintotas"][0]["graus"]), 180.0)
+            self.assertEqual(len(details["angulos_chegada"]), 1)
+            self.assertAlmostEqual(round(details["angulos_chegada"][0]["angulo"]), 120)
+        finally:
+            plt.close(fig)
+
 
 if __name__ == "__main__":
     unittest.main()

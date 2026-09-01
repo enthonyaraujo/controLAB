@@ -304,11 +304,17 @@ class LGRExplorerApp(tk.Tk):
         # Passo 7
         lines.append("PASSO 7: Ângulos de Partida (theta_d) e Chegada (theta_a)")
         lines.append("-" * 55)
-        if det['angulos_partida']:
-            for ap in det['angulos_partida']:
-                lines.append(f"  -> Polo {format_complex(ap['polo'])}: Ângulo de partida theta_d = {ap['angulo']:.1f}°")
+        tem_partida = bool(det.get('angulos_partida'))
+        tem_chegada = bool(det.get('angulos_chegada'))
+        if tem_partida or tem_chegada:
+            if tem_partida:
+                for ap in det['angulos_partida']:
+                    lines.append(f"  -> Polo {format_complex(ap['polo'])}: Ângulo de partida theta_d = {ap['angulo']:.1f}°")
+            if tem_chegada:
+                for ac in det['angulos_chegada']:
+                    lines.append(f"  -> Zero {format_complex(ac['zero'])}: Ângulo de chegada theta_a = {ac['angulo']:.1f}°")
         else:
-            lines.append("  Apenas polos reais presentes (sem polos complexos).")
+            lines.append("  Apenas singularidades reais presentes (sem polos/zeros complexos).")
         lines.append("")
 
         self.txt_steps.insert(tk.END, "\n".join(lines))

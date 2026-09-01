@@ -121,7 +121,11 @@ def handle_calculate(payload):
     ]
     angulos_partida_serializados = [
         {"polo_str": format_complex(ap["polo"]), "angulo": float(ap["angulo"])}
-        for ap in detalhes["angulos_partida"]
+        for ap in detalhes.get("angulos_partida", [])
+    ]
+    angulos_chegada_serializados = [
+        {"zero_str": format_complex(ac["zero"]), "angulo": float(ac["angulo"])}
+        for ac in detalhes.get("angulos_chegada", [])
     ]
 
     return {
@@ -145,6 +149,7 @@ def handle_calculate(payload):
             "break_points": detalhes["break_points"],
             "jw_cruzamentos": detalhes["jw_cruzamentos"],
             "angulos_partida": angulos_partida_serializados,
+            "angulos_chegada": angulos_chegada_serializados,
         },
     }
 
