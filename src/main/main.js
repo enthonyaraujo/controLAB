@@ -1,7 +1,9 @@
-const { app, BrowserWindow, ipcMain, dialog, clipboard, nativeImage } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog, clipboard, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
+
+Menu.setApplicationMenu(null);
 
 let mainWindow = null;
 
@@ -82,6 +84,7 @@ function createWindow() {
     height: 880,
     minWidth: 360,
     minHeight: 640,
+    autoHideMenuBar: true,
     title: 'LGR Studio - Lugar Geométrico das Raízes',
     backgroundColor: '#0f172a',
     webPreferences: {
@@ -92,6 +95,7 @@ function createWindow() {
     },
   });
 
+  mainWindow.setMenuBarVisibility(false);
   mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
 
   mainWindow.on('closed', () => {
