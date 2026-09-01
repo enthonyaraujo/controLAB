@@ -10,6 +10,12 @@
 
 ---
 
+## Instalação
+
+Para instalar acesse os [Releases](https://github.com/enthonyaraujo/lgr/releases) e escolha seu sistema operacional desejado.
+)
+
+---
 ## 🌟 Visão Geral
 
 O **LGR Studio** é uma aplicação desktop e web projetada para estudantes, engenheiros e pesquisadores de **Engenharia de Controle** e **Sistemas Dinâmicos**. 
