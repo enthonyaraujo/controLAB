@@ -1049,7 +1049,7 @@ body.is-android-device #card-android {
 }
 
 body.is-android-device #card-android::before {
-  content: '📲 Recomendado para seu Android';
+  content: 'Recomendado para seu Android';
   background: #10b981;
   color: #060913;
 }
