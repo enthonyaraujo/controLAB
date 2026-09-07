@@ -241,14 +241,54 @@ def format_complex(val, decimals=2):
     return f"{re:.{decimals}f} {im:+.{decimals}f}j"
 
 
-def lgr_completo(num, den, titulo="Lugar Geométrico das Raízes", show_plot=False):
+def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plot=False):
     """
     Gera um gráfico do LGR autossuficiente com cálculos automáticos 
     para todos os 7 passos clássicos da análise, incluindo legendas dinâmicas.
     
+    Aceita múltiplos formatos de entrada:
+      1. String única: lgr_completo("(s+1)/(s+2)") ou lgr_completo("1/(s*(s+3)*(s^2+6s+64))")
+      2. Objeto TransferFunction direto: lgr_completo(sys)
+      3. Listas ou arrays numéricos: lgr_completo([1, 2], [1, 5, 4, 0])
+      4. Strings separadas para numerador e denominador: lgr_completo("s+2", "s^3 + 5s^2 + 4s")
+    
     Retorna: (fig, ax, detalhes_dos_passos)
     """
-    sys = ct.tf(num, den)
+
+    # --------------------------------------------------------
+    # TRATAMENTO DE ENTRADA (Múltiplos formatos)
+    # --------------------------------------------------------
+    if isinstance(num, str) and isinstance(den, str):
+        # CASO 0: Strings separadas para numerador e denominador
+        n_coeffs, d_coeffs, _, _ = parse_tf_parts(num, den)
+        sys = ct.tf(n_coeffs, d_coeffs)
+
+    elif isinstance(num, str):
+        # CASO 1: Passou uma string (ex: "(s+1)/(s+2)")
+        try:
+            s = ct.tf('s')
+            sys = eval(num)
+            if not isinstance(sys, ct.TransferFunction):
+                raise ValueError("A expressão não resultou em TransferFunction.")
+        except Exception:
+            # Fallback para parser algébrico simbólico (suporta ^, potências Unicode, multiplicação implícita)
+            n_coeffs, d_coeffs, _, _ = parse_tf_expression(num)
+            sys = ct.tf(n_coeffs, d_coeffs)
+
+    elif isinstance(num, ct.TransferFunction):
+        # CASO 2: Passou o sistema direto (ex: sys_algebrico)
+        sys = num
+        
+    elif den is not None:
+        # CASO 3: Passou as listas para num e den
+        sys = ct.tf(num, den)
+
+    else:
+        raise ValueError("Entrada inválida! Faltou passar o denominador, ou passe a Função de Transferência direto.")
+
+    # Sobrescreve as variáveis 'num' e 'den' para que elas voltem a ser listas numéricas
+    num = [float(c) for c in sys.num[0][0]]
+    den = [float(c) for c in sys.den[0][0]]
     
     # 1. PREPARAÇÃO E EXTRAÇÃO DE DADOS
     polos = ct.poles(sys)
@@ -509,13 +549,13 @@ def lgr_completo(num, den, titulo="Lugar Geométrico das Raízes", show_plot=Fal
                 "angulo": angulo
             })
             
-            arco = Arc((np.real(z), np.imag(z)), 2*arc_r, 2*arc_r, angle=0, theta1=min(0, angulo), theta2=max(0, angulo), color='#0f766e', lw=1.6)
+            arco = Arc((np.real(z), np.imag(z)), 2*arc_r, 2*arc_r, angle=0, theta1=min(0, angulo), theta2=max(0, angulo), color='green', lw=1.6)
             ax.add_patch(arco)
             ax.plot([np.real(z)-arc_r*1.2, np.real(z)+arc_r*1.2], [np.imag(z), np.imag(z)], color='#6b7280', linestyle=':', alpha=0.6)
             ax.annotate(rf"$\theta_a={angulo:.1f}^\circ$", xy=(np.real(z), np.imag(z)),
                         xytext=(arc_r*14, 10), textcoords="offset points",
-                        ha="left", va="bottom", fontsize=8.5, color="#0f766e", fontweight="bold",
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0fdfa", edgecolor="#14b8a6", alpha=0.95, lw=0.8))
+                        ha="left", va="bottom", fontsize=8.5, color="#15803d", fontweight="bold",
+                        bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0fdf4", edgecolor="#16a34a", alpha=0.95, lw=0.8))
 
     # ========================================================
     # TÍTULOS E LEGENDA FINAL

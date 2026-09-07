@@ -95,5 +95,35 @@ class ClassicalLGRRegressionTests(unittest.TestCase):
             plt.close(fig)
 
 
+    def test_multiple_input_formats(self):
+        import control as ct
+
+        # Formato 1: String única clássica
+        fig1, _ax, det1 = lgr_completo("(s+1)/(s+2)", show_plot=False)
+        plt.close(fig1)
+        self.assertEqual(det1["P"], 1)
+        self.assertEqual(det1["Z"], 1)
+
+        # Formato 2: String com sintaxe Sympy avançada
+        fig2, _ax, det2 = lgr_completo("1 / (s * (s+3) * (s^2 + 6s + 64))", show_plot=False)
+        plt.close(fig2)
+        self.assertEqual(det2["P"], 4)
+        self.assertEqual(det2["Z"], 0)
+
+        # Formato 3: Objeto control.TransferFunction direto
+        s = ct.tf("s")
+        sys = (s + 2) / (s * (s + 1) * (s + 4))
+        fig3, _ax, det3 = lgr_completo(sys, show_plot=False)
+        plt.close(fig3)
+        self.assertEqual(det3["P"], 3)
+        self.assertEqual(det3["Z"], 1)
+
+        # Formato 4: Strings separadas para numerador e denominador
+        fig4, _ax, det4 = lgr_completo("s + 2", "s^3 + 5s^2 + 4s", show_plot=False)
+        plt.close(fig4)
+        self.assertEqual(det4["P"], 3)
+        self.assertEqual(det4["Z"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()
