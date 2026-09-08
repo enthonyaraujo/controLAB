@@ -152,6 +152,7 @@ def handle_calculate(payload):
             "jw_cruzamentos": detalhes["jw_cruzamentos"],
             "angulos_partida": angulos_partida_serializados,
             "angulos_chegada": angulos_chegada_serializados,
+            "passo_a_passo": detalhes.get("passo_a_passo", {}),
         },
     }
 

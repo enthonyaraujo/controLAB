@@ -241,6 +241,336 @@ def format_complex(val, decimals=2):
     return f"{re:.{decimals}f} {im:+.{decimals}f}j"
 
 
+def gerar_passo_a_passo(
+    num,
+    den,
+    polos,
+    zeros,
+    centroide,
+    angulos_assintotas,
+    break_points,
+    jw_cruzamentos,
+    angulos_partida,
+    angulos_chegada,
+):
+    """Gera o memorial algébrico formal com desenvolvimento analítico passo a passo."""
+    s = sp.Symbol("s")
+    poly_N = sp.Poly.from_list([float(c) for c in num], gens=s)
+    poly_D = sp.Poly.from_list([float(c) for c in den], gens=s)
+
+    P = int(len(polos))
+    Z = int(len(zeros))
+    ramos = int(max(P, Z))
+
+    # --- PASSOS 1, 2 e 3: Singularidades e Segmentos Reais ---
+    expr_N_latex = sp.latex(poly_N.as_expr())
+    expr_D_latex = sp.latex(poly_D.as_expr())
+    fact_N_latex = sp.latex(sp.factor(poly_N.as_expr()))
+    fact_D_latex = sp.latex(sp.factor(poly_D.as_expr()))
+
+    sing_reais = []
+    for p in polos:
+        if abs(np.imag(p)) < 1e-4:
+            sing_reais.append((float(np.real(p)), "polo"))
+    for z in zeros:
+        if abs(np.imag(z)) < 1e-4:
+            sing_reais.append((float(np.real(z)), "zero"))
+
+    sing_reais.sort(key=lambda item: item[0], reverse=True)
+
+    segmentos = []
+    if sing_reais:
+        segmentos.append({
+            "intervalo": f"({sing_reais[0][0]:.2g}, +\\infty)",
+            "contagem_direita": 0,
+            "pertence": False,
+            "motivo": "0 singularidades reais à direita (quantidade par)",
+        })
+        for i in range(len(sing_reais) - 1):
+            val_esq = sing_reais[i + 1][0]
+            val_dir = sing_reais[i][0]
+            count_dir = i + 1
+            pertence = bool(count_dir % 2 == 1)
+            segmentos.append({
+                "intervalo": f"({val_esq:.2g}, {val_dir:.2g})",
+                "contagem_direita": count_dir,
+                "pertence": pertence,
+                "motivo": (
+                    f"{count_dir} singularidade(s) real(is) à direita (ímpar: no LGR)"
+                    if pertence
+                    else f"{count_dir} singularidade(s) real(is) à direita (par: fora do LGR)"
+                ),
+            })
+        count_final = len(sing_reais)
+        pertence_final = bool(count_final % 2 == 1)
+        segmentos.append({
+            "intervalo": f"(-\\infty, {sing_reais[-1][0]:.2g})",
+            "contagem_direita": count_final,
+            "pertence": pertence_final,
+            "motivo": (
+                f"{count_final} singularidade(s) real(is) à direita (ímpar: no LGR)"
+                if pertence_final
+                else f"{count_final} singularidade(s) real(is) à direita (par: fora do LGR)"
+            ),
+        })
+
+    passo_1_2_3 = {
+        "eq_malha_aberta": rf"G(s) = \frac{{{expr_N_latex}}}{{{expr_D_latex}}}",
+        "eq_fatorada": rf"G(s) = \frac{{{fact_N_latex}}}{{{fact_D_latex}}}",
+        "eq_caracteristica": rf"1 + K \, G(s) = 0 \iff ({expr_D_latex}) + K ({expr_N_latex}) = 0",
+        "P": P,
+        "Z": Z,
+        "ramos": ramos,
+        "segmentos_eixo_real": segmentos,
+        "simetria_justificativa": (
+            "Como os coeficientes de N(s) e D(s) são estritamente reais, "
+            "as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente "
+            "em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        ),
+    }
+
+    # --- PASSO 4: Assíntotas e Centroide ---
+    passo_4 = {
+        "tem_assintotas": bool(P > Z),
+        "n_assintotas": int(max(0, P - Z)),
+        "formula_centroide": r"\sigma_a = \frac{\sum_{i=1}^P p_i - \sum_{j=1}^Z z_j}{P - Z}",
+        "formula_angulos": r"\theta_k = \frac{(2k + 1) \cdot 180^\circ}{P - Z}, \quad k = 0, \dots, (P - Z - 1)",
+        "soma_polos_num": float(np.real(np.sum(polos))) if P > 0 else 0.0,
+        "soma_zeros_num": float(np.real(np.sum(zeros))) if Z > 0 else 0.0,
+        "substituicao_centroide": "",
+        "angulos_deduzidos": [],
+    }
+    if P > Z:
+        diff_order = P - Z
+        s_p = passo_4["soma_polos_num"]
+        s_z = passo_4["soma_zeros_num"]
+        s_p_str = f"{s_p:.2f}".rstrip("0").rstrip(".")
+        s_z_str = f"{s_z:.2f}".rstrip("0").rstrip(".")
+        cent_val = (
+            float(centroide)
+            if centroide is not None
+            else float((s_p - s_z) / diff_order)
+        )
+        passo_4["substituicao_centroide"] = (
+            rf"\sigma_a = \frac{{({s_p_str}) - ({s_z_str})}}{{{diff_order}}} = "
+            rf"\frac{{{s_p - s_z:.2f}}}{{{diff_order}}} = {cent_val:.3f}"
+        )
+        for k in range(diff_order):
+            deg = ((2 * k + 1) * 180.0) / diff_order
+            passo_4["angulos_deduzidos"].append({
+                "k": int(k),
+                "formula": (
+                    rf"\theta_{{{k}}} = \frac{{(2({k}) + 1) \cdot 180^\circ}}{{{diff_order}}} = "
+                    rf"\frac{{{ (2*k+1)*180 }^\circ}}{{{diff_order}}} = {deg:.1f}^\circ"
+                ),
+                "graus": float(deg % 360),
+            })
+
+    # --- PASSO 5: Pontos de Quebra no Eixo Real ---
+    dN = poly_N.diff(s)
+    dD = poly_D.diff(s)
+    break_poly_expr = sp.expand(
+        dN.as_expr() * poly_D.as_expr() - poly_N.as_expr() * dD.as_expr()
+    )
+
+    N_func = np.poly1d(num)
+    D_func = np.poly1d(den)
+    eq_break_np = np.polysub(
+        np.polymul(np.polyder(N_func), D_func),
+        np.polymul(N_func, np.polyder(D_func)),
+    )
+    raizes_break = np.roots(eq_break_np) if len(eq_break_np) > 0 else []
+
+    raizes_analisadas = []
+    for r in raizes_break:
+        r_re = float(np.real(r))
+        r_im = float(np.imag(r))
+        if abs(r_im) > 1e-4:
+            raizes_analisadas.append({
+                "s_str": f"{r_re:.2f} ± j{abs(r_im):.2f}",
+                "tipo": "complexa",
+                "valido": False,
+                "motivo": "Raiz com parte imaginária (fora do eixo real)",
+            })
+        else:
+            val_N = float(N_func(r_re))
+            if abs(val_N) < 1e-8:
+                K_calc = None
+                valido = False
+                motivo = "Raiz coincide com zero finito do numerador"
+            else:
+                K_calc = float(-D_func(r_re) / val_N)
+                count_dir = sum(1 for s_val, _ in sing_reais if s_val > r_re)
+                no_segmento = bool(count_dir % 2 == 1)
+                if K_calc > 0 and no_segmento:
+                    valido = True
+                    motivo = f"Ponto de Quebra Válido (K = {K_calc:.2f} > 0 e pertence ao LGR)"
+                elif K_calc <= 0:
+                    valido = False
+                    motivo = f"Descartado: K = {K_calc:.2f} <= 0 (requer ganho positivo)"
+                else:
+                    valido = False
+                    motivo = f"Descartado: ponto s = {r_re:.2f} fora dos ramos reais do LGR"
+
+            raizes_analisadas.append({
+                "s_str": f"{r_re:.3f}",
+                "s_val": r_re,
+                "tipo": "real",
+                "K": K_calc,
+                "valido": valido,
+                "motivo": motivo,
+            })
+
+    passo_5 = {
+        "formula_derivada": (
+            r"K(s) = -\frac{D(s)}{N(s)} \implies "
+            r"\frac{dK}{ds} = -\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0"
+        ),
+        "condicao": r"N'(s)D(s) - N(s)D'(s) = 0",
+        "derivada_N": sp.latex(dN.as_expr()),
+        "derivada_D": sp.latex(dD.as_expr()),
+        "polinomio_break": sp.latex(break_poly_expr) + " = 0",
+        "raizes_analisadas": raizes_analisadas,
+    }
+
+    # --- PASSO 6: Cruzamento com o Eixo Imaginário (jw) ---
+    w = sp.Symbol("w", real=True)
+    K_sym = sp.Symbol("K", real=True)
+    eq_char_sym = sp.expand(poly_D.as_expr() + K_sym * poly_N.as_expr())
+    eq_jw_sym = eq_char_sym.subs(s, sp.I * w)
+    re_part = sp.re(eq_jw_sym)
+    im_part = sp.im(eq_jw_sym)
+
+    cruzamentos_deduzidos = []
+    seen = set()
+    for item in jw_cruzamentos:
+        w_val = abs(float(item["w"]))
+        k_val = float(item["K"])
+        key = f"{w_val:.2f}_{k_val:.2f}"
+        if key not in seen:
+            seen.add(key)
+            cruzamentos_deduzidos.append({
+                "w": w_val,
+                "K": k_val,
+                "s_str": rf"s = \pm j{w_val:.2f}",
+                "K_str": f"K_{{crit}} = {k_val:.2f}",
+            })
+
+    passo_6 = {
+        "eq_caracteristica": sp.latex(eq_char_sym) + " = 0",
+        "substituicao_jw": r"s = j\omega \implies D(j\omega) + K N(j\omega) = 0",
+        "parte_real_eq": sp.latex(re_part) + " = 0",
+        "parte_imaginaria_eq": sp.latex(im_part) + " = 0",
+        "tem_cruzamento": bool(len(cruzamentos_deduzidos) > 0),
+        "cruzamentos": cruzamentos_deduzidos,
+    }
+
+    # --- PASSO 7: Ângulos de Partida e Chegada ---
+    polos_complexos_sup = [p for p in polos if np.imag(p) > 1e-4]
+    zeros_complexos_sup = [z for z in zeros if np.imag(z) > 1e-4]
+
+    deducoes_partida = []
+    for p in polos_complexos_sup:
+        termos_zeros = []
+        soma_zeros_ang = 0.0
+        for z in zeros:
+            diff = p - z
+            ang = float(np.degrees(np.angle(diff)))
+            termos_zeros.append({
+                "zero_str": format_complex(z),
+                "vetor_str": format_complex(diff),
+                "angulo": float(ang),
+            })
+            soma_zeros_ang += ang
+
+        termos_polos = []
+        soma_polos_ang = 0.0
+        for p_outro in polos:
+            if abs(p - p_outro) > 1e-4:
+                diff = p - p_outro
+                ang = float(np.degrees(np.angle(diff)))
+                termos_polos.append({
+                    "polo_str": format_complex(p_outro),
+                    "vetor_str": format_complex(diff),
+                    "angulo": float(ang),
+                })
+                soma_polos_ang += ang
+
+        ang_total = 180.0 + soma_zeros_ang - soma_polos_ang
+        ang_norm = float((ang_total + 180.0) % 360.0 - 180.0)
+
+        deducoes_partida.append({
+            "polo_str": format_complex(p),
+            "termos_zeros": termos_zeros,
+            "termos_polos": termos_polos,
+            "soma_zeros_graus": float(soma_zeros_ang),
+            "soma_polos_graus": float(soma_polos_ang),
+            "formula_aplicada": r"\theta_d = 180^\circ + \sum \phi_z - \sum \theta_p",
+            "calculo_substituicao": (
+                rf"\theta_d = 180^\circ + ({soma_zeros_ang:.1f}^\circ) - ({soma_polos_ang:.1f}^\circ) = {ang_norm:.1f}^\circ"
+            ),
+            "angulo_final": ang_norm,
+        })
+
+    deducoes_chegada = []
+    for z in zeros_complexos_sup:
+        termos_polos = []
+        soma_polos_ang = 0.0
+        for p in polos:
+            diff = z - p
+            ang = float(np.degrees(np.angle(diff)))
+            termos_polos.append({
+                "polo_str": format_complex(p),
+                "vetor_str": format_complex(diff),
+                "angulo": float(ang),
+            })
+            soma_polos_ang += ang
+
+        termos_zeros = []
+        soma_zeros_ang = 0.0
+        for z_outro in zeros:
+            if abs(z - z_outro) > 1e-4:
+                diff = z - z_outro
+                ang = float(np.degrees(np.angle(diff)))
+                termos_zeros.append({
+                    "zero_str": format_complex(z_outro),
+                    "vetor_str": format_complex(diff),
+                    "angulo": float(ang),
+                })
+                soma_zeros_ang += ang
+
+        ang_total = 180.0 + soma_polos_ang - soma_zeros_ang
+        ang_norm = float((ang_total + 180.0) % 360.0 - 180.0)
+
+        deducoes_chegada.append({
+            "zero_str": format_complex(z),
+            "termos_polos": termos_polos,
+            "termos_zeros": termos_zeros,
+            "soma_polos_graus": float(soma_polos_ang),
+            "soma_zeros_graus": float(soma_zeros_ang),
+            "formula_aplicada": r"\theta_a = 180^\circ + \sum \phi_p - \sum \theta_z",
+            "calculo_substituicao": (
+                rf"\theta_a = 180^\circ + ({soma_polos_ang:.1f}^\circ) - ({soma_zeros_ang:.1f}^\circ) = {ang_norm:.1f}^\circ"
+            ),
+            "angulo_final": ang_norm,
+        })
+
+    passo_7 = {
+        "tem_partida": bool(len(deducoes_partida) > 0),
+        "tem_chegada": bool(len(deducoes_chegada) > 0),
+        "deducoes_partida": deducoes_partida,
+        "deducoes_chegada": deducoes_chegada,
+    }
+
+    return {
+        "passo_1_2_3": passo_1_2_3,
+        "passo_4": passo_4,
+        "passo_5": passo_5,
+        "passo_6": passo_6,
+        "passo_7": passo_7,
+    }
+
+
 def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plot=False):
     """
     Gera um gráfico do LGR autossuficiente com cálculos automáticos 
@@ -570,6 +900,19 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     plt.tight_layout()
     if show_plot:
         plt.show()
+
+    detalhes["passo_a_passo"] = gerar_passo_a_passo(
+        num,
+        den,
+        polos,
+        zeros,
+        centroide,
+        detalhes["angulos_assintotas"],
+        detalhes["break_points"],
+        detalhes["jw_cruzamentos"],
+        detalhes["angulos_partida"],
+        detalhes["angulos_chegada"],
+    )
     return fig, ax, detalhes
 
 

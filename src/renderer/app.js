@@ -190,8 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
         : `Centroide: <b>N/A</b>`;
       renderMathInContainer(badgeCentroid);
 
-      // 4. Preencher o Memorial de Cálculo dos 7 Passos
+      // 4. Preencher o Memorial de Cálculo dos 7 Passos e Deduções
       populateMemorialSteps(det);
+      populateMemorialDeductions(det.passo_a_passo);
 
       showToast('LGR calculado e traçado com sucesso!', 'success');
 
@@ -413,6 +414,347 @@ document.addEventListener('DOMContentLoaded', () => {
       [el1, el4, el5, el6, el7].forEach(renderMathInContainer);
     }
   }
+
+  // =========================================================================
+  // DEDUÇÕES MATEMÁTICAS ANALÍTICAS PASSO A PASSO
+  // =========================================================================
+  function populateMemorialDeductions(pap) {
+    const container = document.getElementById('sidebar-deductions-content');
+    if (!container) return;
+    if (!pap || Object.keys(pap).length === 0) {
+      container.innerHTML = `
+        <div class="deduction-empty">
+          <span>Nenhuma dedução calculada ainda. Clique em Traçar LGR para processar.</span>
+        </div>
+      `;
+      return;
+    }
+
+    const p1 = pap.passo_1_2_3;
+    const p4 = pap.passo_4;
+    const p5 = pap.passo_5;
+    const p6 = pap.passo_6;
+    const p7 = pap.passo_7;
+
+    let html = '';
+
+    // ==========================================
+    // DEDUÇÃO PASSOS 1, 2 e 3
+    // ==========================================
+    html += `
+      <div class="deduction-section" id="deduction-step-1" data-step-nav="1">
+        <div class="deduction-section-header">
+          <span class="deduction-badge">1, 2, 3</span>
+          <h4>Polos, Zeros, Ramos e Eixo Real</h4>
+        </div>
+        <div class="deduction-section-body">
+          <div class="deduction-item">
+            <div class="deduction-item-title">1. Equação Característica em Malha Fechada</div>
+            <p>A condição fundamental de malha fechada $1 + K G(s) = 0$ resulta na equação característica polinomial:</p>
+            <div class="math-display-box">$$${p1.eq_caracteristica}$$</div>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">2. Fatoração e Singularidades de Malha Aberta</div>
+            <p>Forma fatorada da função de malha aberta $G(s)$:</p>
+            <div class="math-display-box">$$${p1.eq_fatorada}$$</div>
+            <p>• Polos ($K = 0$): $P = ${p1.P}$ raiz(es) de $D(s) = 0$</p>
+            <p>• Zeros ($K \\to \\infty$): $Z = ${p1.Z}$ raiz(es) de $N(s) = 0$</p>
+            <p>• Total de Ramos do LGR: $n = \\max(P, Z) = ${p1.ramos}$ ramo(s)</p>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">3. Segmentos no Eixo Real (Regra da Contagem Ímpar)</div>
+            <p>Um ponto sobre o eixo real pertence ao LGR se o total de polos e zeros reais à sua direita for <strong>ímpar</strong>:</p>
+            <table class="deduction-table">
+              <thead>
+                <tr>
+                  <th>Intervalo Real</th>
+                  <th>À Direita</th>
+                  <th>Status no LGR</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${p1.segmentos_eixo_real && p1.segmentos_eixo_real.length > 0 ? p1.segmentos_eixo_real.map((s) => `
+                  <tr>
+                    <td><code>${s.intervalo}</code></td>
+                    <td>${s.contagem_direita}</td>
+                    <td><span class="${s.pertence ? 'badge-valid' : 'badge-invalid'}">${s.pertence ? 'Pertence ao LGR' : 'Fora do LGR'}</span></td>
+                  </tr>
+                `).join('') : '<tr><td colspan="3">Nenhuma singularidade real para delimitar intervalos.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">4. Simetria Reflexiva do LGR</div>
+            <p>${p1.simetria_justificativa}</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ==========================================
+    // DEDUÇÃO PASSO 4: Assíntotas e Centroide
+    // ==========================================
+    html += `
+      <div class="deduction-section" id="deduction-step-4" data-step-nav="4">
+        <div class="deduction-section-header">
+          <span class="deduction-badge">Passo 4</span>
+          <h4>Assíntotas e Centroide</h4>
+        </div>
+        <div class="deduction-section-body">
+          ${p4.tem_assintotas ? `
+            <div class="deduction-item">
+              <div class="deduction-item-title">1. Centroide das Assíntotas ($\\sigma_a$)</div>
+              <p>Fórmula analítica fundamental baseada na conservação da soma das raízes:</p>
+              <div class="math-display-box">$$${p4.formula_centroide}$$</div>
+              <p>Substituição numérica com soma dos polos e soma dos zeros:</p>
+              <div class="math-display-box">$$${p4.substituicao_centroide}$$</div>
+            </div>
+
+            <div class="deduction-item">
+              <div class="deduction-item-title">2. Ângulos das Assíntotas ($\\theta_k$)</div>
+              <p>Condição angular para $k = 0, 1, \\dots, ${p4.n_assintotas - 1}$:</p>
+              <div class="math-display-box">$$${p4.formula_angulos}$$</div>
+              <p>Desenvolvimento analítico de cada ramo assintótico que tende ao infinito:</p>
+              ${p4.angulos_deduzidos.map((a) => `
+                <div class="math-display-box" style="margin: 4px 0;">$$${a.formula}$$</div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="step-item-box">
+              Como $P \\le Z$, todos os ramos terminam nos zeros finitos. Não há assíntotas direcionadas ao infinito.
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+
+    // ==========================================
+    // DEDUÇÃO PASSO 5: Break-in / Breakaway
+    // ==========================================
+    html += `
+      <div class="deduction-section" id="deduction-step-5" data-step-nav="5">
+        <div class="deduction-section-header">
+          <span class="deduction-badge">Passo 5</span>
+          <h4>Break-in / Breakaway (Pontos de Quebra)</h4>
+        </div>
+        <div class="deduction-section-body">
+          <div class="deduction-item">
+            <div class="deduction-item-title">1. Condição de Raiz Múltipla ($\\frac{dK}{ds} = 0$)</div>
+            <p>Expressão do ganho $K$ em função de $s$ na malha fechada:</p>
+            <div class="math-display-box">$$${p5.formula_derivada}$$</div>
+            <p>Anulando o numerador da derivada, obtém-se a condição polinomial:</p>
+            <div class="math-display-box">$$${p5.condicao}$$</div>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">2. Derivação dos Polinômios</div>
+            <p>• $N'(s) = \\frac{d}{ds} N(s) =$ $${p5.derivada_N}$$</p>
+            <p>• $D'(s) = \\frac{d}{ds} D(s) =$ $${p5.derivada_D}$$</p>
+            <p>Polinômio de quebra expandido $P_{break}(s) = 0$:</p>
+            <div class="math-display-box">$$${p5.polinomio_break}$$</div>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">3. Resolução das Raízes e Verificação de Validade</div>
+            <p>Critérios de aceitação: $s \\in \\mathbb{R}$, ganho positivo $K(s) > 0$ e pertencimento aos ramos reais do LGR:</p>
+            <table class="deduction-table">
+              <thead>
+                <tr>
+                  <th>Raiz Candidata</th>
+                  <th>Ganho $K(s)$</th>
+                  <th>Validação e Justificativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${p5.raizes_analisadas && p5.raizes_analisadas.length > 0 ? p5.raizes_analisadas.map((r) => `
+                  <tr>
+                    <td><code>s = ${r.s_str}</code></td>
+                    <td>${r.K !== undefined && r.K !== null ? `<code>K = ${r.K.toFixed(2)}</code>` : 'N/A'}</td>
+                    <td>
+                      <span class="${r.valido ? 'badge-valid' : 'badge-invalid'}">
+                        ${r.valido ? 'Válido' : 'Descartado'}
+                      </span>
+                      <div style="font-size: 0.74rem; margin-top: 2px;">${r.motivo}</div>
+                    </td>
+                  </tr>
+                `).join('') : '<tr><td colspan="3">Nenhuma raiz candidata encontrada.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ==========================================
+    // DEDUÇÃO PASSO 6: Cruzamento do Eixo jw
+    // ==========================================
+    html += `
+      <div class="deduction-section" id="deduction-step-6" data-step-nav="6">
+        <div class="deduction-section-header">
+          <span class="deduction-badge">Passo 6</span>
+          <h4>Cruzamento com o Eixo Imaginário ($j\\omega$)</h4>
+        </div>
+        <div class="deduction-section-body">
+          <div class="deduction-item">
+            <div class="deduction-item-title">1. Substituição de Frequência Limite ($s = j\\omega$)</div>
+            <p>Equação característica em malha fechada:</p>
+            <div class="math-display-box">$$${p6.eq_caracteristica}$$</div>
+            <p>Substituindo $s = j\\omega$ com potências de $j$ ($j^2 = -1$, $j^3 = -j$, $j^4 = 1$):</p>
+            <div class="math-display-box">$$${p6.substituicao_jw}$$</div>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">2. Decomposição Algébrica (Parte Real e Imaginária)</div>
+            <p>Equações desacopladas que devem anular-se simultaneamente:</p>
+            <div class="math-display-box">$$\\text{Re}(\\omega, K): \\quad ${p6.parte_real_eq}$$</div>
+            <div class="math-display-box">$$\\text{Im}(\\omega, K): \\quad ${p6.parte_imaginaria_eq}$$</div>
+          </div>
+
+          <div class="deduction-item">
+            <div class="deduction-item-title">3. Soluções Reais de Cruzamento ($K_{crit} > 0, \\omega > 0$)</div>
+            ${p6.tem_cruzamento ? `
+              <p>Resolvendo o sistema algébrico para frequências críticas no limiar de estabilidade:</p>
+              ${p6.cruzamentos.map((c) => `
+                <div class="step-item-box warning" style="margin: 6px 0;">
+                  Ponto crítico detectado em: $${c.s_str}$ com ganho limite $${c.K_str}$
+                </div>
+              `).join('')}
+            ` : `
+              <p>Não há soluções reais com $\\omega > 0$ e $K > 0$ satisfazendo simultaneamente a parte real e imaginária. O sistema não cruza o eixo imaginário na faixa analisada.</p>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ==========================================
+    // DEDUÇÃO PASSO 7: Ângulos de Partida e Chegada
+    // ==========================================
+    html += `
+      <div class="deduction-section" id="deduction-step-7" data-step-nav="7">
+        <div class="deduction-section-header">
+          <span class="deduction-badge">Passo 7</span>
+          <h4>Ângulos de Partida ($\\theta_d$) e Chegada ($\\theta_a$)</h4>
+        </div>
+        <div class="deduction-section-body">
+          ${(p7.tem_partida || p7.tem_chegada) ? `
+            ${p7.deducoes_partida && p7.deducoes_partida.length > 0 ? p7.deducoes_partida.map((dp) => `
+              <div class="deduction-item">
+                <div class="deduction-item-title">• Polo Complexo: $p = ${formatComplexToLatex(dp.polo_str)}$</div>
+                <p>Condição angular de partida:</p>
+                <div class="math-display-box">$$${dp.formula_aplicada}$$</div>
+                <p>Vetores angulares para cada zero $\\phi_z$:</p>
+                <p style="font-size: 0.8rem;">${dp.termos_zeros.length > 0 ? dp.termos_zeros.map((tz) => `$\\angle(p - (${formatComplexToLatex(tz.zero_str)})) = ${tz.angulo.toFixed(1)}^\\circ$`).join(', ') : 'Nenhum zero finito'}</p>
+                <p>Vetores angulares para os outros polos $\\theta_p$:</p>
+                <p style="font-size: 0.8rem;">${dp.termos_polos.map((tp) => `$\\angle(p - (${formatComplexToLatex(tp.polo_str)})) = ${tp.angulo.toFixed(1)}^\\circ$`).join(', ')}</p>
+                <p>Substituição vetorial:</p>
+                <div class="math-display-box">$$${dp.calculo_substituicao}$$</div>
+              </div>
+            `).join('') : ''}
+            ${p7.deducoes_chegada && p7.deducoes_chegada.length > 0 ? p7.deducoes_chegada.map((dc) => `
+              <div class="deduction-item">
+                <div class="deduction-item-title">• Zero Complexo: $z = ${formatComplexToLatex(dc.zero_str)}$</div>
+                <p>Condição angular de chegada:</p>
+                <div class="math-display-box">$$${dc.formula_aplicada}$$</div>
+                <p>Vetores angulares para cada polo $\\phi_p$:</p>
+                <p style="font-size: 0.8rem;">${dc.termos_polos.map((tp) => `$\\angle(z - (${formatComplexToLatex(tp.polo_str)})) = ${tp.angulo.toFixed(1)}^\\circ$`).join(', ')}</p>
+                <p>Substituição vetorial:</p>
+                <div class="math-display-box">$$${dc.calculo_substituicao}$$</div>
+              </div>
+            `).join('') : ''}
+          ` : `
+            <div class="step-item-box">
+              Não há singularidades complexas conjugadas nesta função. Todas as singularidades são puramente reais, não se aplicando ângulos tangenciais de partida ou chegada.
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    renderMathInContainer(container);
+  }
+
+  // =========================================================================
+  // TOGGLE E NAVEGAÇÃO DA SIDEBAR DE DEDUÇÕES DO MEMORIAL
+  // =========================================================================
+  const btnToggleDeductions = document.getElementById('btn-toggle-deductions');
+  const memorialSidebar = document.getElementById('memorial-sidebar');
+  const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  const viewMemorial = document.getElementById('view-memorial');
+
+  function toggleMemorialSidebar(forceOpen = null) {
+    if (!memorialSidebar) return;
+    const shouldOpen = forceOpen !== null ? forceOpen : !memorialSidebar.classList.contains('open');
+    memorialSidebar.classList.toggle('open', shouldOpen);
+    memorialSidebar.setAttribute('aria-hidden', String(!shouldOpen));
+    if (viewMemorial) {
+      viewMemorial.classList.toggle('sidebar-open', shouldOpen);
+    }
+    if (btnToggleDeductions) {
+      btnToggleDeductions.setAttribute('aria-expanded', String(shouldOpen));
+    }
+  }
+
+  function filterSidebarStep(navStep) {
+    const pills = document.querySelectorAll('.step-nav-pill');
+    pills.forEach((p) => {
+      p.classList.toggle('active', p.getAttribute('data-nav') === navStep);
+    });
+
+    const sections = document.querySelectorAll('.deduction-section');
+    sections.forEach((sec) => {
+      if (navStep === 'all' || sec.getAttribute('data-step-nav') === navStep) {
+        sec.style.display = '';
+      } else {
+        sec.style.display = 'none';
+      }
+    });
+  }
+
+  function openSidebarAtStep(stepNum) {
+    toggleMemorialSidebar(true);
+    filterSidebarStep(String(stepNum));
+    const targetEl = document.getElementById(`deduction-step-${stepNum}`);
+    if (targetEl) {
+      setTimeout(() => {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }
+
+  if (btnToggleDeductions) {
+    btnToggleDeductions.addEventListener('click', () => toggleMemorialSidebar());
+  }
+  if (btnCloseSidebar) {
+    btnCloseSidebar.addEventListener('click', () => toggleMemorialSidebar(false));
+  }
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', () => toggleMemorialSidebar(false));
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && memorialSidebar && memorialSidebar.classList.contains('open')) {
+      toggleMemorialSidebar(false);
+    }
+  });
+
+  document.querySelectorAll('.btn-step-breakdown').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const step = btn.getAttribute('data-step');
+      openSidebarAtStep(step);
+    });
+  });
+
+  document.querySelectorAll('.step-nav-pill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      filterSidebarStep(pill.getAttribute('data-nav'));
+    });
+  });
 
   // =========================================================================
   // ZOOM E PAN INTERATIVO (MOUSE, PINCH-TO-ZOOM TOUCH E SCROLL MOBILE)
