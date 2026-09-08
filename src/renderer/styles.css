@@ -146,23 +146,55 @@ body {
   letter-spacing: 0.5px;
 }
 
-.icon-btn {
-  background: transparent;
+.theme-toggle-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
-  color: var(--text-main);
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  cursor: pointer;
+  background: var(--bg-input);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.icon-btn:hover {
+.theme-toggle-btn:hover {
   background-color: var(--bg-card);
-  border-color: var(--border-focus);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+  transform: scale(1.05);
+}
+
+.theme-toggle-btn .theme-icon {
+  position: absolute;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+[data-theme="dark"] .theme-toggle-btn .sun-icon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .theme-toggle-btn .moon-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  color: #38bdf8;
+}
+
+[data-theme="light"] .theme-toggle-btn .sun-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+  color: #f59e0b;
+}
+
+[data-theme="light"] .theme-toggle-btn .moon-icon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+  pointer-events: none;
 }
 
 .sidebar-content {
@@ -190,14 +222,27 @@ body {
   padding: 8px 10px;
   font-size: 0.82rem;
   font-weight: 600;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mode-tab .tab-svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
 .mode-tab:hover {
   color: var(--text-main);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mode-tab:hover .tab-svg {
+  transform: scale(1.1);
 }
 
 .mode-tab.active {
@@ -395,7 +440,7 @@ button {
   border-radius: 10px;
   cursor: pointer;
   border: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary {
@@ -404,20 +449,81 @@ button {
   box-shadow: var(--shadow-glow);
 }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.1);
-  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+/* Botão Animado Moderno (Inspirado em Vengeance UI e Uiverse) */
+.btn-animated-cta {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 20px -3px rgba(37, 99, 235, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35);
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, filter 0.2s ease;
 }
 
-.btn-primary:active {
-  transform: translateY(0);
+.btn-animated-cta .btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.btn-animated-cta .btn-svg-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.btn-animated-cta .btn-shine {
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: linear-gradient(
+    60deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.24) 50%,
+    transparent 65%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-animated-cta:hover .btn-shine {
+  transform: translateX(100%);
+}
+
+.btn-animated-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.6), 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-animated-cta:hover .btn-svg-icon {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.btn-animated-cta:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .shortcut-badge {
   background: rgba(255, 255, 255, 0.2);
   padding: 2px 6px;
   border-radius: 4px;
+  z-index: 2;
   font-size: 0.72rem;
   font-family: var(--font-code);
   font-weight: 600;
@@ -524,18 +630,31 @@ button {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 6px 6px 0 0;
+}
+
+.view-tab .view-tab-svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease, stroke 0.2s ease;
 }
 
 .view-tab:hover {
   color: var(--text-main);
 }
 
+.view-tab:hover .view-tab-svg {
+  transform: translateY(-1px);
+}
+
 .view-tab.active {
   color: var(--accent-primary);
   background-color: var(--bg-app);
+}
+
+.view-tab.active .view-tab-svg {
+  stroke: var(--accent-primary);
 }
 
 .view-tab.active::after {
@@ -761,9 +880,13 @@ button {
 .step-item-box {
   background-color: var(--bg-input);
   border-left: 3px solid var(--accent-primary);
-  padding: 8px 12px;
-  border-radius: 0 6px 6px 0;
-  margin: 6px 0;
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .step-item-box.success {
@@ -779,6 +902,33 @@ button {
 .step-item-box.info {
   border-left-color: var(--accent-purple);
   background-color: rgba(168, 85, 247, 0.08);
+}
+
+.step-badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  margin-right: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.badge-icon-emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.badge-icon-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.badge-icon-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+.badge-icon-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+.math-pill {
+  display: inline-block;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin: 2px 4px 2px 0;
+  font-size: 0.86rem;
 }
 
 /* Theory Card */
@@ -843,28 +993,33 @@ button {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background-color: var(--bg-card);
+  background: color-mix(in srgb, var(--bg-card) 92%, #000000 8%);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 0 15px rgba(56, 189, 248, 0.12);
+  backdrop-filter: blur(12px);
   padding: 12px 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.88rem;
   font-weight: 600;
-  display: none;
+  display: flex;
   align-items: center;
   gap: 10px;
   z-index: 1000;
-  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px) scale(0.96);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toast.active {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.toast-svg {
+  flex-shrink: 0;
 }
 
 /* Custom Scrollbars */

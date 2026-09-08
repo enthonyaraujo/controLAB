@@ -56,7 +56,7 @@ class LGRExplorerApp(tk.Tk):
         # -------------------------------------------------------------
         lbl_title = ttk.Label(
             left_frame, 
-            text="📈 Configuração da FT", 
+            text="Configuração da FT", 
             font=("Helvetica", 14, "bold")
         )
         lbl_title.pack(anchor="w", pady=(0, 10))
@@ -135,7 +135,7 @@ class LGRExplorerApp(tk.Tk):
         # Botão Principal de Cálculo
         btn_calc = ttk.Button(
             left_frame, 
-            text="🚀 Traçar LGR (7 Passos)", 
+            text="Traçar LGR (7 Passos)", 
             command=self.calculate_and_plot
         )
         btn_calc.pack(fill=tk.X, pady=(0, 15), ipady=5)
@@ -155,11 +155,11 @@ class LGRExplorerApp(tk.Tk):
 
         # Aba de Gráfico
         self.tab_plot = ttk.Frame(self.right_notebook)
-        self.right_notebook.add(self.tab_plot, text="📊 Gráfico do LGR")
+        self.right_notebook.add(self.tab_plot, text="Gráfico do LGR")
 
         # Aba de Memorial dos 7 Passos
         self.tab_steps = ttk.Frame(self.right_notebook)
-        self.right_notebook.add(self.tab_steps, text="📑 Memorial dos 7 Passos")
+        self.right_notebook.add(self.tab_steps, text="Memorial dos 7 Passos")
 
         self.txt_steps = tk.Text(self.tab_steps, wrap=tk.WORD, font=("Helvetica", 10))
         scroll_steps = ttk.Scrollbar(self.tab_steps, command=self.txt_steps.yview)

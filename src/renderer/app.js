@@ -71,8 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateThemeIcon(theme) {
-    const icon = themeToggleBtn.querySelector('.theme-icon');
-    icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+    const isDark = theme === 'dark';
+    themeToggleBtn.setAttribute('title', isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro');
+    themeToggleBtn.setAttribute('aria-label', isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro');
   }
 
   themeToggleBtn.addEventListener('click', toggleTheme);
@@ -101,7 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tab.classList.add('active');
       const targetView = document.getElementById(`view-${tab.dataset.view}`);
-      if (targetView) targetView.classList.add('active');
+      if (targetView) {
+        targetView.classList.add('active');
+        renderMathInContainer(targetView);
+      }
     });
   });
 
@@ -161,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await window.api.calculateLGR(payload);
 
       if (!res.success) {
-        showToast(`❌ Erro: ${res.error}`, 4000);
+        showToast(`Erro: ${res.error}`, 'error', 4000);
         showLoading(false);
         return;
       }
@@ -189,10 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // 4. Preencher o Memorial de Cálculo dos 7 Passos
       populateMemorialSteps(det);
 
-      showToast('✅ LGR calculado e traçado com sucesso!');
+      showToast('LGR calculado e traçado com sucesso!', 'success');
 
     } catch (err) {
-      showToast(`❌ Erro inesperado: ${err.message}`, 4000);
+      showToast(`Erro inesperado: ${err.message}`, 'error', 4000);
     } finally {
       showLoading(false);
     }
@@ -266,6 +270,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // PREENCHIMENTO DO MEMORIAL DE CÁLCULO DOS 7 PASSOS
   // =========================================================================
+  function formatComplexToLatex(str) {
+    if (!str) return '';
+    return str.replace(/([+-]?\s*\d+(?:\.\d+)?)j/g, (match, val) => {
+      const trimmed = val.replace(/\s+/g, '');
+      const sign = trimmed.startsWith('-') ? '-' : (trimmed.startsWith('+') ? '+' : '');
+      const num = trimmed.replace(/^[+-]/, '');
+      return `${sign ? sign + ' ' : ''}j${num}`;
+    }).trim();
+  }
+
   function populateMemorialSteps(det) {
     // Passo 1, 2 e 3
     const el1 = document.getElementById('step-content-1');
@@ -278,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <p>• <strong>Polos de Malha Aberta ($K=0$):</strong> <code>${polosStr}</code></p>
       <p>• <strong>Zeros de Malha Aberta ($K\\to\\infty$):</strong> <code>${zerosStr}</code></p>
-      <p>• <strong>Total de Ramos do LGR ($n = \\max(P, Z)$):</strong> <code>${det.ramos}</code></p>
+      <p>• <strong>Total de Ramos do LGR ($n = \\max(P, Z)$):</strong> ${det.ramos}</p>
       <p>• <strong>Simetria:</strong> O LGR é perfeitamente simétrico em relação ao Eixo Real ($\\sigma$).</p>
     `;
 
@@ -287,14 +301,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (det.P > det.Z) {
       const numAssintotas = det.P - det.Z;
       const angulosTexto = det.angulos_assintotas
-        .map((a) => `<code>k=${a.k}: ${a.graus.toFixed(1)}°</code>`)
-        .join(', ');
+        .map((a) => `<span class="math-pill">$\\theta_{${a.k}} = ${a.graus.toFixed(1)}^\\circ$</span>`)
+        .join(' ');
 
       el4.innerHTML = `
         <div class="step-item-box info">
           <strong>Ramos que tendem ao infinito ($P - Z$):</strong> ${numAssintotas} ramo(s)
         </div>
-        <p>• <strong>Centroide das Assíntotas ($\\sigma_a$):</strong> <code>${det.centroide.toFixed(3)}</code></p>
+        <p>• <strong>Centroide das Assíntotas ($\\sigma_a$):</strong> $\\sigma_a = ${det.centroide.toFixed(3)}$</p>
         <p>• <strong>Ângulos das Assíntotas ($\\theta_k = \\frac{(2k+1)180^\\circ}{P-Z}$):</strong> ${angulosTexto}</p>
       `;
     } else {
@@ -308,8 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Passo 5: Break-in / Breakaway
     const el5 = document.getElementById('step-content-5');
     if (det.break_points && det.break_points.length > 0) {
+      const iconPin = `<span class="step-badge-icon badge-icon-emerald"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>`;
       const breakItems = det.break_points.map(
-        (bp) => `<div class="step-item-box success">📍 Ponto no Eixo Real: <b>s = ${bp.s.toFixed(3)}</b> &nbsp;|&nbsp; Ganho Crítico: <b>K = ${bp.K.toFixed(2)}</b></div>`
+        (bp) => `<div class="step-item-box success">${iconPin} Ponto no Eixo Real: $s = ${bp.s.toFixed(3)}$ &nbsp;|&nbsp; Ganho Crítico: $K = ${bp.K.toFixed(2)}$</div>`
       ).join('');
       el5.innerHTML = `
         <p>Pontos onde $\\frac{dK}{ds} = 0 \\iff N'(s)D(s) - N(s)D'(s) = 0$:</p>
@@ -326,8 +341,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Passo 6: Cruzamento do Eixo jw
     const el6 = document.getElementById('step-content-6');
     if (det.jw_cruzamentos && det.jw_cruzamentos.length > 0) {
-      const jwItems = det.jw_cruzamentos.map(
-        (jw) => `<div class="step-item-box warning">⚡ Cruzamento detectado em: <b>s = ± j${Math.abs(jw.w).toFixed(2)}</b> &nbsp;|&nbsp; Ganho Limite de Estabilidade: <b>K_crit = ${jw.K.toFixed(2)}</b></div>`
+      // Deduplicar pares simetricos (+w e -w) para nao duplicar informacao identica de conjugados
+      const seenFrequencies = new Set();
+      const uniqueJw = det.jw_cruzamentos.filter((jw) => {
+        const absW = Math.abs(jw.w).toFixed(2);
+        const kStr = jw.K.toFixed(2);
+        const key = `${absW}_${kStr}`;
+        if (seenFrequencies.has(key)) return false;
+        seenFrequencies.add(key);
+        return true;
+      });
+
+      const iconStability = `<span class="step-badge-icon badge-icon-amber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>`;
+      const jwItems = uniqueJw.map(
+        (jw) => `<div class="step-item-box warning">${iconStability} Cruzamento detectado em: $s = \\pm j${Math.abs(jw.w).toFixed(2)}$ &nbsp;|&nbsp; Ganho Limite de Estabilidade: $K_{crit} = ${jw.K.toFixed(2)}$</div>`
       ).join('');
       el6.innerHTML = `
         <p>Cruzamentos com o eixo imaginário ($j\\omega$):</p>
@@ -349,21 +376,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (temPartida || temChegada) {
       let html = '';
       if (temPartida) {
+        const iconPartida = `<span class="step-badge-icon badge-icon-purple"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg></span>`;
         const partidaItems = det.angulos_partida.map(
-          (ap) => `<div class="step-item-box info">📐 Para o polo complexo <b>p = ${ap.polo_str}</b>: Ângulo de partida <b>\\theta_d = ${ap.angulo.toFixed(1)}°</b></div>`
+          (ap) => `<div class="step-item-box info">${iconPartida} Para o polo complexo $p = ${formatComplexToLatex(ap.polo_str)}$: Ângulo de partida $\\theta_d = ${ap.angulo.toFixed(1)}^\\circ$</div>`
         ).join('');
         html += `
-          <p>• <strong>Ângulo de Partida em Polos Complexos ($\theta_d$):</strong></p>
+          <p>• <strong>Ângulo de Partida em Polos Complexos ($\\theta_d$):</strong></p>
           <p class="input-help" style="margin-bottom: 6px;">Condição angular: $\\theta_d = 180^\\circ + \\sum \\angle(p - z) - \\sum \\angle(p - p_{outros})$</p>
           ${partidaItems}
         `;
       }
       if (temChegada) {
+        const iconChegada = `<span class="step-badge-icon badge-icon-emerald"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>`;
         const chegadaItems = det.angulos_chegada.map(
-          (ac) => `<div class="step-item-box success">🎯 Para o zero complexo <b>z = ${ac.zero_str}</b>: Ângulo de chegada <b>\\theta_a = ${ac.angulo.toFixed(1)}°</b></div>`
+          (ac) => `<div class="step-item-box success">${iconChegada} Para o zero complexo $z = ${formatComplexToLatex(ac.zero_str)}$: Ângulo de chegada $\\theta_a = ${ac.angulo.toFixed(1)}^\\circ$</div>`
         ).join('');
         html += `
-          <p style="margin-top: ${temPartida ? '14px' : '0'};">• <strong>Ângulo de Chegada em Zeros Complexos ($\theta_a$):</strong></p>
+          <p style="margin-top: ${temPartida ? '14px' : '0'};">• <strong>Ângulo de Chegada em Zeros Complexos ($\\theta_a$):</strong></p>
           <p class="input-help" style="margin-bottom: 6px;">Condição angular: $\\theta_a = 180^\\circ + \\sum \\angle(z - p) - \\sum \\angle(z - z_{outros})$</p>
           ${chegadaItems}
         `;
@@ -377,7 +406,12 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
 
-    [el1, el4, el5, el6, el7].forEach(renderMathInContainer);
+    const memorialContainer = document.getElementById('view-memorial');
+    if (memorialContainer) {
+      renderMathInContainer(memorialContainer);
+    } else {
+      [el1, el4, el5, el6, el7].forEach(renderMathInContainer);
+    }
   }
 
   // =========================================================================
@@ -573,10 +607,10 @@ document.addEventListener('DOMContentLoaded', () => {
         defaultName: 'lugar_geometrico_das_raizes.png',
       });
       if (res && res.success !== false) {
-        showToast(res.message || '💾 Imagem PNG salva com sucesso!');
+        showToast(res.message || 'Imagem PNG salva com sucesso!', 'success');
       }
     } catch (err) {
-      showToast(`Erro ao salvar: ${err.message}`, 3500);
+      showToast(`Erro ao salvar: ${err.message}`, 'error', 3500);
     }
   });
 
@@ -588,10 +622,10 @@ document.addEventListener('DOMContentLoaded', () => {
         defaultName: 'lugar_geometrico_das_raizes.svg',
       });
       if (res && res.success !== false) {
-        showToast(res.message || '📐 Gráfico Vetorial SVG salvo com sucesso!');
+        showToast(res.message || 'Gráfico Vetorial SVG salvo com sucesso!', 'success');
       }
     } catch (err) {
-      showToast(`Erro ao salvar SVG: ${err.message}`, 3500);
+      showToast(`Erro ao salvar SVG: ${err.message}`, 'error', 3500);
     }
   });
 
@@ -600,12 +634,12 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await window.api.copyImageToClipboard(currentImageData);
       if (res.success) {
-        showToast('📋 Gráfico copiado para a Área de Transferência!');
+        showToast('Gráfico copiado para a Área de Transferência!', 'success');
       } else if (res.error) {
-        showToast(`Não foi possível copiar: ${res.error}`, 4000);
+        showToast(`Não foi possível copiar: ${res.error}`, 'error', 4000);
       }
     } catch (err) {
-      showToast(`Erro ao copiar: ${err.message}`, 3500);
+      showToast(`Erro ao copiar: ${err.message}`, 'error', 3500);
     }
   });
 
@@ -622,10 +656,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function showToast(msg, duration = 2800) {
-    toastEl.textContent = msg;
-    toastEl.classList.add('active');
-    setTimeout(() => {
+  function showToast(msg, type = 'info', duration = 2800) {
+    let iconSvg = '';
+    if (type === 'success') {
+      iconSvg = '<svg class="toast-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else if (type === 'error') {
+      iconSvg = '<svg class="toast-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    } else {
+      iconSvg = '<svg class="toast-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+    }
+    toastEl.innerHTML = `${iconSvg}<span>${msg}</span>`;
+    toastEl.className = `toast active toast-${type}`;
+    if (toastEl._timer) clearTimeout(toastEl._timer);
+    toastEl._timer = setTimeout(() => {
       toastEl.classList.remove('active');
     }, duration);
   }

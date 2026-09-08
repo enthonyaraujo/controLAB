@@ -32,18 +32,43 @@
             <span>Root Locus Explorer</span>
           </div>
         </div>
-        <button id="theme-toggle" class="icon-btn" title="Alternar Tema Claro/Escuro">
-          <span class="theme-icon">🌙</span>
+        <button id="theme-toggle" class="theme-toggle-btn" title="Alternar Tema Claro/Escuro" aria-label="Alternar Tema">
+          <svg class="theme-icon sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2"/>
+            <path d="M12 20v2"/>
+            <path d="M4.93 4.93l1.41 1.41"/>
+            <path d="M17.66 17.66l1.41 1.41"/>
+            <path d="M2 12h2"/>
+            <path d="M20 12h2"/>
+            <path d="M6.34 17.66l-1.41 1.41"/>
+            <path d="M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg class="theme-icon moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
         </button>
       </div>
 
       <div class="sidebar-content">
         <!-- Seleção de Modo de Entrada -->
         <div class="input-mode-tabs">
-          <button class="mode-tab active" data-mode="expr">✍️ Expressão</button>
-          <button class="mode-tab" data-mode="parts">➗ Fração</button>
-          <button class="mode-tab" data-mode="coeffs">🔢 Coeficientes</button>
-          <button class="mode-tab" data-mode="zpk">🎯 Polos/Zeros</button>
+          <button class="mode-tab active" data-mode="expr">
+            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M9 10h6"/><path d="M12 7v6"/></svg>
+            <span>Expressão</span>
+          </button>
+          <button class="mode-tab" data-mode="parts">
+            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="6" r="2"/><circle cx="12" cy="18" r="2"/></svg>
+            <span>Fração</span>
+          </button>
+          <button class="mode-tab" data-mode="coeffs">
+            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/></svg>
+            <span>Coeficientes</span>
+          </button>
+          <button class="mode-tab" data-mode="zpk">
+            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
+            <span>Polos/Zeros</span>
+          </button>
         </div>
 
         <!-- Formulários Dinâmicos por Modo -->
@@ -168,9 +193,15 @@
 
       <!-- Rodapé da Sidebar: Botão de Ação Principal -->
       <div class="sidebar-footer">
-        <button id="btn-calculate" class="btn btn-primary">
-          <span class="btn-icon">⚡</span>
-          <span class="btn-text">Traçar LGR (7 Passos)</span>
+        <button id="btn-calculate" class="btn btn-animated-cta" type="button">
+          <span class="btn-shine"></span>
+          <span class="btn-content">
+            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span class="btn-text">Traçar LGR (7 Passos)</span>
+          </span>
+          <span class="shortcut-badge">↵</span>
         </button>
       </div>
     </aside>
@@ -206,13 +237,16 @@
       <!-- Abas Principais: Gráfico x Memorial dos 7 Passos -->
       <div class="view-tabs">
         <button class="view-tab active" data-view="plot">
-          <span class="tab-icon">📊</span> Gráfico do LGR
+          <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Gráfico do LGR</span>
         </button>
         <button class="view-tab" data-view="memorial">
-          <span class="tab-icon">📑</span> Memorial de Cálculo (7 Passos)
+          <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Memorial de Cálculo (7 Passos)</span>
         </button>
         <button class="view-tab" data-view="theory">
-          <span class="tab-icon">💡</span> Regras Clássicas
+          <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Regras Clássicas</span>
         </button>
       </div>
 
@@ -225,14 +259,32 @@
             <!-- Barra de Ferramentas do Gráfico -->
             <div class="plot-toolbar">
               <div class="toolbar-left">
-                <button class="tool-btn" id="btn-zoom-in" title="Aumentar Zoom">🔍 +</button>
-                <button class="tool-btn" id="btn-zoom-out" title="Diminuir Zoom">🔍 -</button>
-                <button class="tool-btn" id="btn-zoom-reset" title="Ajustar ao Tamanho">↺ Ajustar</button>
+                <button class="tool-btn" id="btn-zoom-in" title="Aumentar Zoom">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                  <span>Zoom +</span>
+                </button>
+                <button class="tool-btn" id="btn-zoom-out" title="Diminuir Zoom">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                  <span>Zoom -</span>
+                </button>
+                <button class="tool-btn" id="btn-zoom-reset" title="Ajustar ao Tamanho">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                  <span>Ajustar</span>
+                </button>
               </div>
               <div class="toolbar-right">
-                <button class="tool-btn" id="btn-copy-img" title="Copiar Gráfico para Área de Transferência">📋 Copiar</button>
-                <button class="tool-btn tool-btn-accent" id="btn-download-svg" title="Exportar como Vetorial SVG">📐 Vetorial SVG</button>
-                <button class="tool-btn tool-btn-primary" id="btn-download-png" title="Exportar Imagem em Alta Resolução">💾 Baixar PNG</button>
+                <button class="tool-btn" id="btn-copy-img" title="Copiar Gráfico para Área de Transferência">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <span>Copiar</span>
+                </button>
+                <button class="tool-btn tool-btn-accent" id="btn-download-svg" title="Exportar como Vetorial SVG">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <span>Vetorial SVG</span>
+                </button>
+                <button class="tool-btn tool-btn-primary" id="btn-download-png" title="Exportar Imagem em Alta Resolução">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Baixar PNG</span>
+                </button>
               </div>
             </div>
 
@@ -317,7 +369,7 @@
         <!-- VISUALIZAÇÃO 3: REGRAS TEÓRICAS -->
         <section id="view-theory" class="view-panel">
           <div class="theory-card">
-            <h2>📚 Os 7 Passos Clássicos do Lugar Geométrico das Raízes (LGR)</h2>
+            <h2>Os 7 Passos Clássicos do Lugar Geométrico das Raízes (LGR)</h2>
             <div class="theory-list">
               <div class="theory-item">
                 <span class="theory-num">Passo 1</span>
@@ -377,7 +429,7 @@
 
   <!-- Botão Flutuante de Retorno ao Topo no Mobile -->
   <button id="btn-scroll-top" class="floating-top-btn" title="Voltar ao início da página" aria-label="Voltar ao topo">
-    <span class="btn-icon">⬆️</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
     <span class="btn-text">Topo</span>
   </button>
 

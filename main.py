@@ -11,14 +11,14 @@ import argparse
 
 def launch_web():
     """Inicia a interface web interativa do Streamlit."""
-    print("🌐 Iniciando a Interface Web (Streamlit)...")
+    print("Iniciando a Interface Web (Streamlit)...")
     app_path = os.path.join(os.path.dirname(__file__), "app.py")
     subprocess.run([sys.executable, "-m", "streamlit", "run", app_path])
 
 
 def launch_gui():
     """Inicia a interface gráfica desktop (Tkinter)."""
-    print("🖥️ Iniciando a Interface Desktop (Tkinter)...")
+    print("Iniciando a Interface Desktop (Tkinter)...")
     from gui import run_gui
     run_gui()
 
@@ -47,7 +47,7 @@ def main():
     else:
         # Modo padrão: Se executado diretamente sem flags, inicia a Web UI
         print("=" * 60)
-        print("📈 LGR Explorer - Lugar Geométrico das Raízes")
+        print("LGR Explorer - Lugar Geométrico das Raízes")
         print("=" * 60)
         print("1. Iniciar Interface Web Moderna (Streamlit)")
         print("2. Iniciar Interface Desktop Nativa (Tkinter)")

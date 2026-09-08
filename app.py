@@ -22,7 +22,7 @@ from lgr_engine import (
 # Configuração da página Streamlit
 st.set_page_config(
     page_title="LGR Explorer - Lugar Geométrico das Raízes",
-    page_icon="📈",
+    page_icon="src/renderer/app-icon.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -65,21 +65,21 @@ st.markdown("""
 # Cabeçalho Principal
 col_title, col_badge = st.columns([3, 1])
 with col_title:
-    st.markdown('<div class="main-title">📈 Lugar Geométrico das Raízes (LGR)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">Lugar Geométrico das Raízes (LGR)</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Calculadora e visualizador interativo completo com execução rigorosa dos 7 passos clássicos da teoria de controle.</div>', unsafe_allow_html=True)
 
 # ==============================================================================
 # SIDEBAR - ENTRADA DE DADOS
 # ==============================================================================
-st.sidebar.header("⚙️ Configuração da Função")
+st.sidebar.header("Configuração da Função")
 
 input_mode = st.sidebar.radio(
     "Modo de Entrada da Função de Transferência:",
     [
-        "✍️ Expressão Algébrica",
-        "🔢 Coeficientes Polinomiais",
-        "🎯 Polos, Zeros e Ganho",
-        "📚 Exemplos Clássicos",
+        "Expressão Algébrica",
+        "Coeficientes Polinomiais",
+        "Polos, Zeros e Ganho",
+        "Exemplos Clássicos",
     ],
     index=0,
 )
@@ -91,7 +91,7 @@ latex_fac = ""
 error_msg = None
 preset_desc = ""
 
-if input_mode == "✍️ Expressão Algébrica":
+if input_mode == "Expressão Algébrica":
     st.sidebar.markdown("**Digite a função $G(s)$ em função da variável `s`:**")
     expr_default = "(s + 2) / (s * (s + 1) * (s + 4))"
     expr_input = st.sidebar.text_input(
@@ -104,7 +104,7 @@ if input_mode == "✍️ Expressão Algébrica":
     except Exception as e:
         error_msg = f"Erro na expressão: {e}"
 
-elif input_mode == "🔢 Coeficientes Polinomiais":
+elif input_mode == "Coeficientes Polinomiais":
     st.sidebar.markdown("**Digite os coeficientes em ordem decrescente de potência ($s^n, \dots, s^0$):**")
     num_input = st.sidebar.text_input("Numerador N(s):", value="1, 2", help="Ex: 1, 2 para (s + 2)")
     den_input = st.sidebar.text_input("Denominador D(s):", value="1, 5, 4, 0", help="Ex: 1, 5, 4, 0 para s³ + 5s² + 4s")
@@ -120,7 +120,7 @@ elif input_mode == "🔢 Coeficientes Polinomiais":
     except Exception as e:
         error_msg = f"Erro nos coeficientes: {e}"
 
-elif input_mode == "🎯 Polos, Zeros e Ganho":
+elif input_mode == "Polos, Zeros e Ganho":
     st.sidebar.markdown("**Forma Fatorada $K \cdot \\frac{\\prod (s - z_i)}{\\prod (s - p_i)}$:**")
     k_val = st.sidebar.number_input("Ganho K:", value=1.0, step=0.5)
     zeros_input = st.sidebar.text_input("Zeros (separados por vírgula):", value="-2", help="Ex: -2 ou -1+2j, -1-2j")
@@ -135,11 +135,11 @@ elif input_mode == "🎯 Polos, Zeros e Ganho":
     except Exception as e:
         error_msg = f"Erro em zeros/polos: {e}"
 
-elif input_mode == "📚 Exemplos Clássicos":
+elif input_mode == "Exemplos Clássicos":
     preset_choice = st.sidebar.selectbox("Selecione um caso de estudo clássico:", list(PRESETS.keys()))
     chosen = PRESETS[preset_choice]
     preset_desc = chosen["desc"]
-    st.sidebar.info(f"ℹ️ **Descrição do caso:**\n{preset_desc}")
+    st.sidebar.info(f"**Descrição do caso:**\n{preset_desc}")
     num_coeffs = chosen["num"]
     den_coeffs = chosen["den"]
     try:
@@ -158,11 +158,11 @@ custom_title = st.sidebar.text_input("Título do Gráfico:", value="Lugar Geomé
 # ÁREA PRINCIPAL
 # ==============================================================================
 if error_msg:
-    st.error(f"❌ {error_msg}")
+    st.error(f"Erro: {error_msg}")
 else:
     # Card de Visualização da Função de Transferência
     with st.container():
-        st.markdown("#### 📐 Função de Transferência em Malha Aberta:")
+        st.markdown("#### Função de Transferência em Malha Aberta:")
         c1, c2 = st.columns(2)
         with c1:
             st.markdown("**Forma Polinomial Expandida:**")
@@ -178,7 +178,7 @@ else:
         fig, ax, detalhes = lgr_completo(num_coeffs, den_coeffs, titulo=custom_title, show_plot=False)
         
         # Layout em duas colunas: Gráfico na Esquerda, Resumo dos Passos na Direita
-        tab_grafico, tab_passos = st.tabs(["📊 Gráfico do LGR (7 Passos)", "📑 Memorial de Cálculo Passo a Passo"])
+        tab_grafico, tab_passos = st.tabs(["Gráfico do LGR (7 Passos)", "Memorial de Cálculo Passo a Passo"])
 
         with tab_grafico:
             st.pyplot(fig, use_container_width=True)
@@ -187,17 +187,17 @@ else:
             buf = io.BytesIO()
             fig.savefig(buf, format="png", dpi=300, bbox_inches="tight")
             st.download_button(
-                label="💾 Baixar Gráfico em Alta Resolução (PNG 300 DPI)",
+                label="Baixar Gráfico em Alta Resolução (PNG 300 DPI)",
                 data=buf.getvalue(),
                 file_name="lugar_geometrico_das_raizes.png",
                 mime="image/png",
             )
 
         with tab_passos:
-            st.markdown("### 🔍 Memorial de Cálculo Completo dos 7 Passos")
+            st.markdown("### Memorial de Cálculo Completo dos 7 Passos")
             
             # Passo 1, 2 e 3
-            with st.expander("📌 **Passo 1, 2 e 3: Ramos, Polos, Zeros e Simetria**", expanded=True):
+            with st.expander("**Passo 1, 2 e 3: Ramos, Polos, Zeros e Simetria**", expanded=True):
                 c_p1, c_p2, c_p3 = st.columns(3)
                 with c_p1:
                     st.markdown(f"**Número de Polos ($P$):** `{detalhes['P']}`")
@@ -218,7 +218,7 @@ else:
                 st.markdown("**Simetria:** O LGR é perfeitamente simétrico em relação ao Eixo Real ($\sigma$), pois polos e zeros complexos sempre ocorrem em pares conjugados.")
 
             # Passo 4
-            with st.expander("📌 **Passo 4: Assíntotas e Centroide**", expanded=True):
+            with st.expander("**Passo 4: Assíntotas e Centroide**", expanded=True):
                 P, Z = detalhes['P'], detalhes['Z']
                 if P > Z:
                     st.markdown(f"Como $P > Z$, existem **{P - Z} ramo(s)** que terminam no infinito ao longo de assíntotas.")
@@ -232,25 +232,30 @@ else:
                     st.info("Como $P \le Z$, todos os ramos terminam nos zeros finitos. Não há assíntotas para o infinito.")
 
             # Passo 5
-            with st.expander("📌 **Passo 5: Pontos de Partida e Retorno (Break-in / Breakaway)**", expanded=True):
+            with st.expander("**Passo 5: Pontos de Partida e Retorno (Break-in / Breakaway)**", expanded=True):
                 st.markdown(r"Obtidos a partir da derivada do ganho: $\frac{dK}{ds} = 0 \iff N'(s)D(s) - N(s)D'(s) = 0$.")
                 if detalhes['break_points']:
                     for bp in detalhes['break_points']:
-                        st.success(f"📍 **Ponto no eixo real:** $s = {bp['s']:.3f}$ com ganho correspondente **$K = {bp['K']:.2f}$**")
+                        st.success(f"**Ponto no eixo real:** $s = {bp['s']:.3f}$ com ganho correspondente **$K = {bp['K']:.2f}$**")
                 else:
                     st.write("Nenhum ponto de break-in ou breakaway válido com $K > 0$ no eixo real.")
 
             # Passo 6
-            with st.expander("📌 **Passo 6: Cruzamento do Eixo Imaginário ($j\omega$)**", expanded=True):
+            with st.expander("**Passo 6: Cruzamento do Eixo Imaginário ($j\omega$)**", expanded=True):
                 st.markdown(r"Determina o limite de estabilidade do sistema em malha fechada (frequência de oscilação crítica $\omega_{cruz}$ e ganho crítico $K_{crit}$).")
                 if detalhes['jw_cruzamentos']:
+                    seen_jw = set()
                     for jw in detalhes['jw_cruzamentos']:
-                        st.warning(f"⚡ **Cruzamento detectado em:** $s = \pm j{abs(jw['w']):.2f}$ para o Ganho Crítico **$K_{crit} = {jw['K']:.2f}$**")
+                        key = (round(abs(jw['w']), 2), round(jw['K'], 2))
+                        if key in seen_jw:
+                            continue
+                        seen_jw.add(key)
+                        st.warning(f"**Cruzamento detectado em:** $s = \pm j{abs(jw['w']):.2f}$ para o Ganho Crítico **$K_{crit} = {jw['K']:.2f}$**")
                 else:
                     st.write("Nenhum cruzamento com o eixo imaginário encontrado na faixa de ganho analisada.")
 
             # Passo 7
-            with st.expander("📌 **Passo 7: Ângulos de Partida ($\theta_d$) e Chegada ($\theta_a$)**", expanded=True):
+            with st.expander("**Passo 7: Ângulos de Partida ($\theta_d$) e Chegada ($\theta_a$)**", expanded=True):
                 tem_partida = bool(detalhes.get('angulos_partida'))
                 tem_chegada = bool(detalhes.get('angulos_chegada'))
 
@@ -260,13 +265,13 @@ else:
                         st.caption(r"Condição angular: $\theta_d = 180^\circ + \sum \angle(p - z_i) - \sum \angle(p - p_j)$")
                         for ap in detalhes['angulos_partida']:
                             p_str = format_complex(ap['polo'])
-                            st.info(f"📐 Polo $p = {p_str}$: **$\\theta_d = {ap['angulo']:.1f}^\\circ$**")
+                            st.info(f"Polo $p = {p_str}$: **$\\theta_d = {ap['angulo']:.1f}^\\circ$**")
                     if tem_chegada:
                         st.markdown(r"**Ângulo de Chegada em Zeros Complexos ($\theta_a$):**")
                         st.caption(r"Condição angular: $\theta_a = 180^\circ + \sum \angle(z - p_i) - \sum \angle(z - z_j)$")
                         for ac in detalhes['angulos_chegada']:
                             z_str = format_complex(ac['zero'])
-                            st.success(f"🎯 Zero $z = {z_str}$: **$\\theta_a = {ac['angulo']:.1f}^\\circ$**")
+                            st.success(f"Zero $z = {z_str}$: **$\\theta_a = {ac['angulo']:.1f}^\\circ$**")
                 else:
                     st.write("A função de transferência não possui polos ou zeros complexos conjugados (todas as singularidades são reais).")
 
