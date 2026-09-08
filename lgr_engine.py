@@ -241,6 +241,14 @@ def format_complex(val, decimals=2):
     return f"{re:.{decimals}f} {im:+.{decimals}f}j"
 
 
+def format_real_num(val, decimals=2):
+    """Formata número real sem notação científica desnecessária e sem zeros supérfluos."""
+    val_f = float(val)
+    if abs(val_f - round(val_f)) < 1e-5:
+        return f"{int(round(val_f))}"
+    return f"{val_f:.{decimals}f}".rstrip("0").rstrip(".")
+
+
 def gerar_passo_a_passo(
     num,
     den,
@@ -280,19 +288,20 @@ def gerar_passo_a_passo(
 
     segmentos = []
     if sing_reais:
+        v_max = format_real_num(sing_reais[0][0])
         segmentos.append({
-            "intervalo": f"({sing_reais[0][0]:.2g}, +\\infty)",
+            "intervalo": f"({v_max}, +\\infty)",
             "contagem_direita": 0,
             "pertence": False,
             "motivo": "0 singularidades reais à direita (quantidade par)",
         })
         for i in range(len(sing_reais) - 1):
-            val_esq = sing_reais[i + 1][0]
-            val_dir = sing_reais[i][0]
+            val_esq = format_real_num(sing_reais[i + 1][0])
+            val_dir = format_real_num(sing_reais[i][0])
             count_dir = i + 1
             pertence = bool(count_dir % 2 == 1)
             segmentos.append({
-                "intervalo": f"({val_esq:.2g}, {val_dir:.2g})",
+                "intervalo": f"({val_esq}, {val_dir})",
                 "contagem_direita": count_dir,
                 "pertence": pertence,
                 "motivo": (
@@ -303,8 +312,9 @@ def gerar_passo_a_passo(
             })
         count_final = len(sing_reais)
         pertence_final = bool(count_final % 2 == 1)
+        v_min = format_real_num(sing_reais[-1][0])
         segmentos.append({
-            "intervalo": f"(-\\infty, {sing_reais[-1][0]:.2g})",
+            "intervalo": f"(-\\infty, {v_min})",
             "contagem_direita": count_final,
             "pertence": pertence_final,
             "motivo": (
@@ -404,13 +414,13 @@ def gerar_passo_a_passo(
                 no_segmento = bool(count_dir % 2 == 1)
                 if K_calc > 0 and no_segmento:
                     valido = True
-                    motivo = f"Ponto de Quebra Válido (K = {K_calc:.2f} > 0 e pertence ao LGR)"
+                    motivo = f"Ponto de Quebra Válido ($K = {K_calc:.2f} > 0$ e pertence ao LGR)"
                 elif K_calc <= 0:
                     valido = False
-                    motivo = f"Descartado: K = {K_calc:.2f} <= 0 (requer ganho positivo)"
+                    motivo = f"Descartado: $K = {K_calc:.2f} \\le 0$ (requer ganho positivo)"
                 else:
                     valido = False
-                    motivo = f"Descartado: ponto s = {r_re:.2f} fora dos ramos reais do LGR"
+                    motivo = f"Descartado: ponto $s = {r_re:.2f}$ fora dos ramos reais do LGR"
 
             raizes_analisadas.append({
                 "s_str": f"{r_re:.3f}",

@@ -1172,20 +1172,34 @@ button {
   width: 100%;
   border-collapse: collapse;
   margin-top: 8px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
 .deduction-table th,
 .deduction-table td {
-  padding: 6px 10px;
+  padding: 8px 12px;
   border: 1px solid var(--border-color);
   text-align: left;
+  vertical-align: middle;
 }
 
 .deduction-table th {
   background: var(--bg-sidebar);
   color: var(--text-main);
   font-weight: 600;
+}
+
+.deduction-table td:first-child {
+  white-space: nowrap;
+}
+
+.deduction-table td:first-child .katex {
+  font-size: 0.95em;
+}
+
+.deduction-table th:nth-child(2),
+.deduction-table td:nth-child(2) {
+  text-align: center;
 }
 
 .badge-valid {

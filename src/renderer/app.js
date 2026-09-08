@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       throwOnError: false,
       strict: 'warn',
       trust: false,
-      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
     });
   }
 
@@ -287,15 +287,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function populateMemorialSteps(det) {
     // Passo 1, 2 e 3
     const el1 = document.getElementById('step-content-1');
-    const polosStr = det.polos.map((p) => p.str).join(', ');
-    const zerosStr = det.Z > 0 ? det.zeros.map((z) => z.str).join(', ') : 'Nenhum zero finito';
+    const polosStr = det.polos.length > 0
+      ? det.polos.map((p) => `$${formatComplexToLatex(p.str)}$`).join(', ')
+      : 'Nenhum polo finito';
+    const zerosStr = det.Z > 0
+      ? det.zeros.map((z) => `$${formatComplexToLatex(z.str)}$`).join(', ')
+      : 'Nenhum zero finito';
 
     el1.innerHTML = `
       <div class="step-item-box">
         <strong>Número de Polos ($P$):</strong> ${det.P} &nbsp;|&nbsp; <strong>Número de Zeros ($Z$):</strong> ${det.Z}
       </div>
-      <p>• <strong>Polos de Malha Aberta ($K=0$):</strong> <code>${polosStr}</code></p>
-      <p>• <strong>Zeros de Malha Aberta ($K\\to\\infty$):</strong> <code>${zerosStr}</code></p>
+      <p>• <strong>Polos de Malha Aberta ($K=0$):</strong> ${polosStr}</p>
+      <p>• <strong>Zeros de Malha Aberta ($K\\to\\infty$):</strong> ${zerosStr}</p>
       <p>• <strong>Total de Ramos do LGR ($n = \\max(P, Z)$):</strong> ${det.ramos}</p>
       <p>• <strong>Simetria:</strong> O LGR é perfeitamente simétrico em relação ao Eixo Real ($\\sigma$).</p>
     `;
@@ -480,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <tbody>
                 ${p1.segmentos_eixo_real && p1.segmentos_eixo_real.length > 0 ? p1.segmentos_eixo_real.map((s) => `
                   <tr>
-                    <td><code>${s.intervalo}</code></td>
+                    <td>$${s.intervalo}$</td>
                     <td>${s.contagem_direita}</td>
                     <td><span class="${s.pertence ? 'badge-valid' : 'badge-invalid'}">${s.pertence ? 'Pertence ao LGR' : 'Fora do LGR'}</span></td>
                   </tr>
@@ -554,8 +558,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div class="deduction-item">
             <div class="deduction-item-title">2. Derivação dos Polinômios</div>
-            <p>• $N'(s) = \\frac{d}{ds} N(s) =$ $${p5.derivada_N}$$</p>
-            <p>• $D'(s) = \\frac{d}{ds} D(s) =$ $${p5.derivada_D}$$</p>
+            <p>Derivadas analíticas de $N(s)$ e $D(s)$:</p>
+            <div class="math-display-box">$$N'(s) = \\frac{d}{ds} N(s) = ${p5.derivada_N}$$</div>
+            <div class="math-display-box">$$D'(s) = \\frac{d}{ds} D(s) = ${p5.derivada_D}$$</div>
             <p>Polinômio de quebra expandido $P_{break}(s) = 0$:</p>
             <div class="math-display-box">$$${p5.polinomio_break}$$</div>
           </div>
@@ -574,8 +579,8 @@ document.addEventListener('DOMContentLoaded', () => {
               <tbody>
                 ${p5.raizes_analisadas && p5.raizes_analisadas.length > 0 ? p5.raizes_analisadas.map((r) => `
                   <tr>
-                    <td><code>s = ${r.s_str}</code></td>
-                    <td>${r.K !== undefined && r.K !== null ? `<code>K = ${r.K.toFixed(2)}</code>` : 'N/A'}</td>
+                    <td>$s = ${formatComplexToLatex(r.s_str)}$</td>
+                    <td>${r.K !== undefined && r.K !== null ? `$K = ${r.K.toFixed(2)}$` : 'N/A'}</td>
                     <td>
                       <span class="${r.valido ? 'badge-valid' : 'badge-invalid'}">
                         ${r.valido ? 'Válido' : 'Descartado'}
