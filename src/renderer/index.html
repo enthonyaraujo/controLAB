@@ -53,22 +53,10 @@
       <div class="sidebar-content">
         <!-- Seleção de Modo de Entrada -->
         <div class="input-mode-tabs">
-          <button class="mode-tab active" data-mode="expr">
-            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M9 10h6"/><path d="M12 7v6"/></svg>
-            <span>Expressão</span>
-          </button>
-          <button class="mode-tab" data-mode="parts">
-            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="6" r="2"/><circle cx="12" cy="18" r="2"/></svg>
-            <span>Fração</span>
-          </button>
-          <button class="mode-tab" data-mode="coeffs">
-            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/></svg>
-            <span>Coeficientes</span>
-          </button>
-          <button class="mode-tab" data-mode="zpk">
-            <svg class="tab-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>
-            <span>Polos/Zeros</span>
-          </button>
+          <button class="mode-tab active" data-mode="expr">Expressão</button>
+          <button class="mode-tab" data-mode="parts">Fração</button>
+          <button class="mode-tab" data-mode="coeffs">Coeficientes</button>
+          <button class="mode-tab" data-mode="zpk">Polos/Zeros</button>
         </div>
 
         <!-- Formulários Dinâmicos por Modo -->
@@ -196,9 +184,6 @@
         <button id="btn-calculate" class="btn btn-animated-cta" type="button">
           <span class="btn-shine"></span>
           <span class="btn-content">
-            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
             <span class="btn-text">Traçar LGR (7 Passos)</span>
           </span>
           <span class="shortcut-badge">↵</span>
