@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         targetView.classList.add('active');
         renderMathInContainer(targetView);
       }
+      if (tab.dataset.view !== 'memorial') {
+        toggleMemorialSidebar(false);
+      }
     });
   });
 
@@ -692,6 +695,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const shouldOpen = forceOpen !== null ? forceOpen : !memorialSidebar.classList.contains('open');
     memorialSidebar.classList.toggle('open', shouldOpen);
     memorialSidebar.setAttribute('aria-hidden', String(!shouldOpen));
+    if (sidebarBackdrop) {
+      sidebarBackdrop.classList.toggle('active', shouldOpen);
+    }
     if (viewMemorial) {
       viewMemorial.classList.toggle('sidebar-open', shouldOpen);
     }
@@ -714,6 +720,11 @@ document.addEventListener('DOMContentLoaded', () => {
         sec.style.display = 'none';
       }
     });
+
+    const contentContainer = document.getElementById('sidebar-deductions-content');
+    if (contentContainer) {
+      contentContainer.scrollTop = 0;
+    }
   }
 
   function openSidebarAtStep(stepNum) {
