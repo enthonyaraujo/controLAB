@@ -127,7 +127,6 @@ body {
 .global-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
   user-select: none;
 }
@@ -136,26 +135,13 @@ body {
   color: var(--accent-primary);
 }
 
-.global-brand-logo {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.global-brand-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
 .global-brand-title {
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.2px;
   transition: color 0.15s ease;
+  white-space: nowrap;
 }
 
 .global-navbar-right {
