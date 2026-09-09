@@ -137,6 +137,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
       - name: Configurar Python 3.10 (Chaquopy)
         uses: actions/setup-python@v5
         with:
@@ -157,8 +162,14 @@ jobs:
       - name: Instalar dependências Node
         run: npm ci
 
-      - name: Dar permissão de execução ao gradlew
-        run: chmod +x android/gradlew
+      - name: Dar permissão e inicializar Gradle Wrapper com retentativas
+        run: |
+          chmod +x android/gradlew
+          cd android
+          for i in 1 2 3 4 5; do
+            echo "Tentativa $i de inicializar Gradle Wrapper..."
+            ./gradlew --version && break || sleep 5
+          done
 
       - name: Compilar APK Android
         run: npm run mobile:apk
