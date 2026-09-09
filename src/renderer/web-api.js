@@ -79,6 +79,16 @@
       window.open(url, '_blank', 'noopener,noreferrer');
       return { success: true };
     },
+    checkUpdates: async (token) => {
+      const headers = { Accept: 'application/vnd.github.v3+json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const response = await fetch('https://api.github.com/repos/enthonyaraujo/lgr/releases/latest', { headers });
+      if (!response.ok) {
+        return { success: false, status: response.status, error: `GitHub retornou status HTTP ${response.status}` };
+      }
+      const release = await response.json();
+      return { success: true, release };
+    },
   };
 
   if (!nativeLgr && 'serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

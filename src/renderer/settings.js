@@ -230,16 +230,26 @@
       const platform = detectPlatform();
 
       try {
-        const response = await fetch(GITHUB_RELEASES_API, { headers });
-
-        if (!response.ok) {
-          if (response.status === 403) {
-            throw new Error('Limite de requisições da API atingido. Configure um GitHub Token abaixo.');
+        let release = null;
+        if (global.api?.checkUpdates) {
+          const result = await global.api.checkUpdates(token);
+          if (!result.success) {
+            if (result.status === 403) {
+              throw new Error('Limite de requisições da API atingido. Configure um GitHub Token abaixo.');
+            }
+            throw new Error(result.error || `Erro HTTP ${result.status}`);
           }
-          throw new Error(`O GitHub retornou HTTP ${response.status}`);
+          release = result.release;
+        } else {
+          const response = await fetch(GITHUB_RELEASES_API, { headers });
+          if (!response.ok) {
+            if (response.status === 403) {
+              throw new Error('Limite de requisições da API atingido. Configure um GitHub Token abaixo.');
+            }
+            throw new Error(`O GitHub retornou HTTP ${response.status}`);
+          }
+          release = await response.json();
         }
-
-        const release = await response.json();
         const latestTag = (release.tag_name || '').replace(/^v/, '');
         const releaseUrl = release.html_url || `${GITHUB_REPO_URL}/releases`;
         const publishDate = formatDate(release.published_at);

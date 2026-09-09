@@ -8,4 +8,5 @@ contextBridge.exposeInMainWorld('api', {
   saveSVG: (payload) => ipcRenderer.invoke('save-svg', payload),
   copyImageToClipboard: (base64) => ipcRenderer.invoke('copy-image', base64),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
+  checkUpdates: (token) => ipcRenderer.invoke('check-github-updates', token),
 });

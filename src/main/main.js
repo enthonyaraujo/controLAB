@@ -188,6 +188,26 @@ ipcMain.handle('open-external', async (event, url) => {
   return { success: false };
 });
 
+ipcMain.handle('check-github-updates', async (event, token) => {
+  try {
+    const headers = {
+      'User-Agent': 'ControLAB-Desktop',
+      'Accept': 'application/vnd.github.v3+json',
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    const response = await fetch('https://api.github.com/repos/enthonyaraujo/lgr/releases/latest', { headers });
+    if (!response.ok) {
+      return { success: false, status: response.status, error: `GitHub retornou status HTTP ${response.status}` };
+    }
+    const release = await response.json();
+    return { success: true, release };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 app.whenReady().then(() => {
   createWindow();
 
