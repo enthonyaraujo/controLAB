@@ -1,6 +1,6 @@
 # <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>ControLAB — Suíte de Sistemas de Controle</strong>
 
-> **Interface moderna, interativa e 100% offline para cálculo analítico e simulação em Sistemas de Controle com renderização matemática em tempo real.**
+> **Interface moderna, interativa e 100% offline para cálculo analítico, simulação e ensino de Sistemas de Controle com renderização matemática em tempo real.**
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Electron](https://img.shields.io/badge/Electron-44.1.0-47848F.svg?logo=electron&logoColor=white)](https://www.electronjs.org/)
@@ -10,83 +10,110 @@
 
 ---
 
-## Instalação
+## Instalação e Download
 
-Para instalar acesse os [Releases](https://github.com/enthonyaraujo/lgr/releases) e escolha seu sistema operacional desejado.
+Para obter a versão mais recente, acesse a seção de [Releases no GitHub](https://github.com/enthonyaraujo/lgr/releases) e baixe o pacote correspondente ao seu sistema operacional:
+
+- **Windows:** Instalador local único (`.exe` NSIS). Instala a aplicação diretamente no sistema operacional, criando atalhos oficiais na Área de Trabalho e no Menu Iniciar, com suporte nativo a desinstalação pelo Painel de Controle.
+- **Linux:** Pacotes nativos Debian/Ubuntu (`.deb`), Fedora/RedHat/openSUSE (`.rpm`) e pacote universal autônomo (`.AppImage`).
+- **Android:** Aplicativo nativo compilado em pacote (`.apk`) com motor Python embutido via Chaquopy, funcionando 100% offline no celular ou tablet.
+- **Web / PWA:** Execução direta no navegador com suporte a Progressive Web App (PWA) e cache local completo via Service Worker.
 
 ---
+
 ## Visão Geral
 
-O **ControLAB** é uma aplicação desktop e web projetada para estudantes, engenheiros e pesquisadores de **Engenharia de Controle** e **Sistemas Dinâmicos**. 
+O **ControLAB** é uma plataforma educacional e analítica de Engenharia de Controle e Sistemas Dinâmicos. A ferramenta combina o rigor matemático do ecossistema científico em **Python** (`control`, `NumPy`, `SciPy`, `Matplotlib` e `SymPy`) com a agilidade de uma interface moderna em **Electron/HTML5/CSS3**.
 
-Ele automatiza e explica visualmente o traçado do **Lugar Geométrico das Raízes (Root Locus)** para qualquer função de transferência em malha aberta:
-
-$$G(s)H(s) = \frac{N(s)}{D(s)} = K \frac{\prod_{j=1}^{Z} (s - z_j)}{\prod_{i=1}^{P} (s - p_i)}$$
-
-O motor científico é executado integralmente em **Python** (`control`, `NumPy`, `SciPy`, `Matplotlib` e `SymPy`), enquanto a interface em **Electron/HTML5/CSS3** oferece uma experiência moderna com visual escuro/claro, pré-visualização LaTeX instantânea e memorial de cálculo passo a passo.
+A aplicação organiza os domínios clássicos e modernos de controle a partir de um Hub Central e oferece memorial passo a passo, equações renderizadas e gráficos vetoriais interativos.
 
 ---
 
-##  Recursos Principais
+## Módulos do Sistema
 
-- **Design Moderno & Acessível:**
-  - Tema Escuro (*Dark Mode*) com tipografia branca de alto contraste e realces em azul.
-  - Alternador dinâmico para Tema Claro (*Light Mode*).
-  - Layout totalmente responsivo para desktop, tablet e celular.
-- **Fórmulas em Tempo Real (KaTeX 100% Offline):**
-  - Pré-visualização da função de transferência enquanto você digita.
-  - Exibição simultânea da forma polinomial expandida e da forma fatorada (polos e zeros).
-- **Visualizador Gráfico Interativo:**
-  - **Zoom inteligente:** ampliação de até `6.0x` com trava de limite mínimo em `100%` (não diminui além do tamanho visível original).
-  - Arraste livre (*pan*) ativado automaticamente ao ampliar.
-  - Exportação direta em **PNG de Alta Resolução (300 DPI)** e **Vetorial SVG**.
-  - Botão de **Copiar Gráfico** para a Área de Transferência.
-- **Memorial de Cálculo dos 7 Passos:**
-  - Detalhamento analítico completo de cada etapa do método clássico.
-- **Suporte Multiplataforma & CI/CD Automatizado:**
-  - Aplicativo Android offline via Capacitor e Chaquopy (`.apk`).
-  - Aplicativo desktop via Electron: **Linux** (`.deb`, `.rpm`, `.AppImage`) e **Windows** (`.exe` instalador NSIS e portátil).
-  - Workflow do **GitHub Actions** para compilar automaticamente todos os executáveis e APK a cada push ou tag de release.
-  - Interface web responsiva e PWA para acesso rápido pelo navegador.
+A partir da Página Inicial (Hub Central), o usuário pode acessar os módulos especializados:
+
+1. **Lugar Geométrico das Raízes (LGR):**
+   - Cálculo analítico e traçado em tempo real das trajetórias de polos em malha fechada para ganhos $0 \le K < \infty$.
+   - Memorial passo a passo dos 7 passos clássicos (Ogata, Nise, Dorf).
+   - Manipulação gráfica com zoom até 6.0x, pan livre, exportação em SVG vetorial e PNG a 300 DPI.
+2. **Análise de Estabilidade:**
+   - Construção analítica da tabela do Critério de Routh-Hurwitz.
+   - Tratamento de casos especiais: primeiro elemento nulo ($\epsilon \to 0$) e linha inteiramente nula.
+   - Determinação da faixa de ganho estável $K_{min} < K < K_{max}$ e frequências de oscilação crítica.
+3. **Resposta no Domínio do Tempo:**
+   - Simulação transitória e regime permanente para entradas degrau, impulso e rampa.
+   - Extração automática de métricas: sobressinal percentual ($\%OS$), tempo de acomodação ($t_s$), tempo de pico ($t_p$), tempo de subida ($t_r$), fator de amortecimento ($\zeta$) e frequência natural ($\omega_n$).
+   - Coeficientes de erro estático ($K_p$, $K_v$, $K_a$) e erro em regime permanente ($e_{ss}$).
+4. **Resposta em Frequência:**
+   - Diagramas de Bode de magnitude (dB) e fase (graus) com escalas logarítmicas assintóticas e reais.
+   - Diagrama polar de Nyquist e contorno de estabilidade.
+   - Cálculo das margens de ganho ($MG$) e de fase ($MF$), além das frequências de cruzamento.
+5. **Projeto de Controladores:**
+   - Sintonia de controladores PID pelos métodos clássicos de Ziegler-Nichols (resposta ao degrau e ganho crítico).
+   - Síntese de compensadores por avanço de fase (Lead) e atraso de fase (Lag) via LGR.
+   - Comparativo de desempenho em malha fechada antes e após a compensação.
+6. **Espaço de Estados:**
+   - Modelagem matricial contínua $(\mathbf{A}, \mathbf{B}, \mathbf{C}, \mathbf{D})$ e conversão para função de transferência.
+   - Testes de controlabilidade ($\mathcal{C}$) e observabilidade ($\mathcal{O}$).
+   - Alocação de polos por realimentação de estados via fórmula de Ackermann e síntese de observadores de Luenberger.
+
+---
+
+## Recursos Principais
+
+- **Detecção Inteligente do Sistema e Atualizações Condicionais:**
+  - Identificação automática do sistema operacional e do tipo de pacote em execução (`.deb`, `.rpm`, `.AppImage`, `.exe`, `.apk`).
+  - Verificador de atualizações integrado via GitHub Releases: **só exibe botões de download e instaladores se houver de fato uma versão mais recente disponível** para a plataforma do usuário.
+  - Indicador luminoso discreto na barra superior ao identificar atualizações publicadas.
+  - Suporte opcional a Token Pessoal do GitHub para limites estendidos de requisições.
+- **Fórmulas Matemáticas em Tempo Real (KaTeX Offline):**
+  - Renderização tipográfica de equações, intervalos do eixo real, singularidades complexas e derivadas sem necessidade de conexão à internet.
+- **Visualizador Gráfico do LGR:**
+  - Gráficos científicos com zoom inteligente até 6.0x e arrasto livre (pan).
+  - Exportação direta em PNG de alta resolução (300 DPI) e formato vetorial SVG.
+  - Cópia instantânea do gráfico para a área de transferência do sistema.
+- **Design System Acessível:**
+  - Tema Escuro (*Dark Mode*) de alto contraste e Tema Claro (*Light Mode*) com alternância em tempo real.
+  - Interface responsiva adaptada para desktop, tablet e celular.
 
 ---
 
 ## Os 7 Passos Clássicos do LGR
 
-O algoritmo calcula e ilustra rigorosamente os 7 passos clássicos da teoria de controle (Ogata, Nise, Dorf):
+O módulo do LGR detalha cada uma das etapas teóricas consagradas:
 
 1. **Passos 1, 2 e 3 (Ramos, Polos, Zeros e Simetria):**
-   - Início dos ramos nos polos de malha aberta ($K = 0$) e término nos zeros finitos ou no infinito ($K \to \infty$).
-   - Total de ramos: $n = \max(P, Z)$.
-   - Simetria do LGR em relação ao Eixo Real ($\sigma$).
-   - Segmentos no eixo real à esquerda de um número ímpar de polos e zeros reais.
+   - Ponto de partida dos ramos nos polos ($K = 0$) e término nos zeros ou infinito ($K \to \infty$).
+   - Contagem total de ramos: $n = \max(P, Z)$.
+   - Simetria do traçado em relação ao Eixo Real ($\sigma$).
+   - Segmentos reais à esquerda de contagem ímpar de singularidades reais.
 2. **Passo 4 (Assíntotas e Centroide):**
-   - Centroide das assíntotas:
+   - Centroide no eixo real:
      $$\sigma_a = \frac{\sum_{i=1}^P \text{Re}(p_i) - \sum_{j=1}^Z \text{Re}(z_j)}{P - Z}$$
    - Ângulos das assíntotas:
      $$\theta_k = \frac{(2k + 1) \cdot 180^\circ}{P - Z}, \quad k = 0, \dots, P - Z - 1$$
 3. **Passo 5 (Pontos de Partida e Retorno - Breakaway / Break-in):**
-   - Raízes da derivada: $\frac{dK}{ds} = 0 \iff N'(s)D(s) - N(s)D'(s) = 0$.
-   - Verificação de raízes reais sobre o LGR com ganho $K_{break} = -\frac{D(s)}{N(s)} > 0$.
+   - Solução analítica da equação: $\frac{dK}{ds} = 0 \iff N'(s)D(s) - N(s)D'(s) = 0$.
+   - Validação de raízes reais sobre o LGR com ganho real positivo $K > 0$.
 4. **Passo 6 (Cruzamento do Eixo Imaginário $j\omega$):**
-   - Limite de estabilidade em malha fechada ($s = \pm j\omega_{cruz}$) e ganho crítico $K_{crit}$.
+   - Verificação de oscilação sustentada e ganho crítico de estabilidade $K_{crit}$.
 5. **Passo 7 (Ângulos de Partida e Chegada):**
-   - Ângulo de partida em polos complexos: $\theta_d = 180^\circ + \sum \angle(p - z_j) - \sum_{k \neq p} \angle(p - p_k)$.
-   - Ângulo de chegada em zeros complexos: $\theta_a = 180^\circ - \sum_{j \neq z} \angle(z - z_j) + \sum \angle(z - p_k)$.
+   - Ângulos de saída em polos complexos e chegada em zeros complexos por somatório de fases.
 
 ---
 
-## Formatos de Entrada Suportados
+## Formatos de Entrada
 
-A aplicação possui parser tolerante e inteligente via SymPy:
+O parser simbólico aceita múltiplos métodos de definição do sistema:
 
-| Modo | Exemplo de Sintaxe | Descrição |
+| Modo | Exemplo de Entrada | Descrição |
 | :--- | :--- | :--- |
-| **Expressão Completa** | `(s + 2) / (s * (s + 1) * (s + 4))` | Digitação livre com `*`, `^`, `s²`, `s³`, `÷`, `×` |
-| **Numerador / Denominador** | Num: `s + 2` <br> Den: `s(s + 1)(s + 4)` | Campos separados para numerador e denominador |
-| **Coeficientes Polinomiais** | $N(s)$: `1, 2` <br> $D(s)$: `1, 5, 4, 0` | Listas de coeficientes em ordem decrescente de potência |
-| **Forma Fatorada (ZPK)** | Zeros: `-2` <br> Polos: `0, -1, -4` <br> Ganho: `1.0` | Inserção direta de polos/zeros reais e complexos (`-1+2j`) |
-| **Biblioteca de Presets** | Menu suspenso de casos clássicos | Presets de livros consagrados (Ogata, Nise, Dorf) |
+| **Expressão Completa** | `(s + 2) / (s * (s + 1) * (s + 4))` | Entrada com multiplicação explícita ou implícita, potências `^` e Unicode (`s²`, `s³`) |
+| **Fração (Num / Den)** | Num: `s + 2` <br> Den: `s(s + 1)(s + 4)` | Campos dedicados para numerador e denominador |
+| **Coeficientes Polinomiais** | $N(s)$: `1, 2` <br> $D(s)$: `1, 5, 4, 0` | Listas de coeficientes ordenados por potências decrescentes de $s$ |
+| **Polos e Zeros (ZPK)** | Zeros: `-2` <br> Polos: `0, -1, -4` <br> Ganho: `1.0` | Entrada direta de raízes reais e complexas (`-1+2j`) |
+| **Presets Clássicos** | Menu de sistemas predefinidos | Exemplos clássicos da literatura técnica |
 
 ---
 
@@ -96,53 +123,53 @@ A aplicação possui parser tolerante e inteligente via SymPy:
 lgr/
 ├── src/
 │   ├── main/
-│   │   └── main.js              # Processo Principal do Electron e IPC
+│   │   └── main.js              # Processo Principal do Electron, IPC e detecção de sistema
 │   ├── preload/
-│   │   └── preload.js           # ContextBridge isolado e seguro
+│   │   └── preload.js           # ContextBridge seguro (APIs expostas para o renderer)
 │   └── renderer/
-│       ├── index.html           # Interface visual compartilhada
+│       ├── index.html           # Interface visual estruturada (Hub e LGR)
 │       ├── styles.css           # Design System responsivo (Dark/Light mode)
-│       ├── app.js               # Lógica do renderer (KaTeX, Zoom, Pan, Memorial)
-│       ├── navigation.js        # Navegação entre o hub e o módulo LGR
-│       ├── web-api.js           # Adaptador de API para navegadores
+│       ├── app.js               # Controlador do LGR (KaTeX, Zoom, Pan, Memorial)
+│       ├── navigation.js        # Gerenciador de navegação entre páginas
+│       ├── settings.js          # Modal de configurações, detecção de OS e atualizações
+│       ├── web-api.js           # Adaptador de API para navegadores e Capacitor
 │       ├── manifest.webmanifest # Manifesto PWA
-│       ├── sw.js                # Service Worker para cache local offline
-│       └── vendor/katex/        # KaTeX e fontes 100% offline
+│       ├── sw.js                # Service Worker para funcionamento 100% offline
+│       └── vendor/katex/        # Biblioteca KaTeX e fontes matemáticas locais
 ├── scripts/
 │   ├── start-electron.js        # Inicializador seguro do Electron
-│   ├── run-python.js            # Wrapper para o interpretador Python virtualenv
-│   ├── sync-mobile.js           # Sincroniza o motor canônico com o Android
-│   ├── build-python.js          # Empacota o motor desktop com PyInstaller
-│   ├── run-gradle.js            # Executa tarefas Gradle de forma multiplataforma
-│   └── install-apk.js           # Instala o APK por adb
-├── android/                     # Projeto Capacitor, plugin Chaquopy e Gradle
-├── tests/
-│   └── test_transfer_inputs.py  # Testes de regressão matemática e parser
+│   ├── run-python.js            # Executor do interpretador Python no ambiente virtual
+│   ├── sync-mobile.js           # Sincronização do motor científico com o Android
+│   ├── build-python.js          # Empacotamento do motor desktop via PyInstaller
+│   ├── run-gradle.js            # Execução de rotinas Gradle de compilação
+│   ├── install-apk.js           # Instalação automatizada via adb
+│   ├── validate-packaging.js    # Verificação de configurações de empacotamento
+│   └── check-javascript.js     # Checagem estática de integridade do código JavaScript
+├── android/                     # Projeto Android nativo (Capacitor e Chaquopy)
+├── tests/                       # Suíte de testes unitários e de integração
 ├── lgr_engine.py                # Motor de cálculo dos 7 passos clássicos
-├── python_bridge.py             # Ponte de comunicação IPC JSON stdio
-├── web_server.py                # Servidor HTTP local nativo
-├── app.py                       # Interface alternativa Streamlit
-├── gui.py                       # Interface alternativa Tkinter
-├── main.py                      # Launcher unificado em Python
-├── package.json                 # Manifesto Node.js e scripts
-├── requirements.txt             # Dependências científicas Python
-├── requirements-build.txt       # PyInstaller usado no empacotamento desktop
-├── capacitor.config.json        # Configuração do aplicativo Android
-├── electron-builder.config.cjs  # Configuração dos pacotes Linux/Windows
-└── run.sh                       # Script bash de execução rápida
+├── python_bridge.py             # Ponte IPC JSON stdio
+├── web_server.py                # Servidor HTTP local para modo navegador
+├── package.json                 # Manifesto do projeto e comandos de build
+├── requirements.txt             # Dependências científicas em Python
+├── requirements-build.txt       # Dependências de compilação (PyInstaller)
+├── capacitor.config.json        # Configuração do aplicativo móvel Android
+├── electron-builder.config.cjs  # Configuração de empacotamento desktop (Linux e Windows NSIS)
+└── run.sh                       # Script de inicialização rápida em ambiente Unix
 ```
 
-## Organização e validação
+---
 
-O menu, a interface do LGR e o acesso ao motor científico ficam separados. O
-`navigation.js` controla apenas a troca de páginas; o `app.js` mantém os campos,
-o gráfico e o memorial; e o `web-api.js` encaminha as operações ao Python pela
-ponte adequada para Electron, navegador ou Android. No modo web, os arquivos do
-aplicativo usam atualização pela rede antes do cache para evitar misturar versões
-antigas do menu e do backend.
+## Validação e Testes
 
-Para validar o código sem gerar executáveis ou APKs:
+Para rodar a suíte completa de testes de integridade de JavaScript e testes unitários de controle em Python:
 
 ```bash
 npm test
+```
+
+Para sincronizar o motor Python e os recursos da interface com o projeto Android:
+
+```bash
+npm run mobile:sync
 ```
