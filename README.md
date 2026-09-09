@@ -103,6 +103,7 @@ lgr/
 │       ├── index.html           # Interface visual compartilhada
 │       ├── styles.css           # Design System responsivo (Dark/Light mode)
 │       ├── app.js               # Lógica do renderer (KaTeX, Zoom, Pan, Memorial)
+│       ├── navigation.js        # Navegação entre o hub e o módulo LGR
 │       ├── web-api.js           # Adaptador de API para navegadores
 │       ├── manifest.webmanifest # Manifesto PWA
 │       ├── sw.js                # Service Worker para cache local offline
@@ -129,4 +130,19 @@ lgr/
 ├── capacitor.config.json        # Configuração do aplicativo Android
 ├── electron-builder.config.cjs  # Configuração dos pacotes Linux/Windows
 └── run.sh                       # Script bash de execução rápida
+```
+
+## Organização e validação
+
+O menu, a interface do LGR e o acesso ao motor científico ficam separados. O
+`navigation.js` controla apenas a troca de páginas; o `app.js` mantém os campos,
+o gráfico e o memorial; e o `web-api.js` encaminha as operações ao Python pela
+ponte adequada para Electron, navegador ou Android. No modo web, os arquivos do
+aplicativo usam atualização pela rede antes do cache para evitar misturar versões
+antigas do menu e do backend.
+
+Para validar o código sem gerar executáveis ou APKs:
+
+```bash
+npm test
 ```
