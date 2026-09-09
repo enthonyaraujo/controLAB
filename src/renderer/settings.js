@@ -55,7 +55,7 @@
         os: 'windows',
         osName: 'Windows',
         packageType: 'exe',
-        packageLabel: 'Windows 64-bit (.exe)',
+        packageLabel: 'Instalador Windows (.exe)',
       };
     }
     if (ua.includes('linux')) {
@@ -185,7 +185,7 @@
     if (name.endsWith('.AppImage')) label = `Linux Universal (.AppImage) - ${sizeStr}`;
     else if (name.endsWith('.deb')) label = `Debian / Ubuntu (.deb) - ${sizeStr}`;
     else if (name.endsWith('.rpm')) label = `Fedora / RedHat (.rpm) - ${sizeStr}`;
-    else if (name.endsWith('.exe')) label = `Windows 64-bit (.exe) - ${sizeStr}`;
+    else if (name.endsWith('.exe')) label = `Instalador Windows (.exe) - ${sizeStr}`;
     else if (name.endsWith('.apk')) label = `Android Nativo (.apk) - ${sizeStr}`;
 
     return `

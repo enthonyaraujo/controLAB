@@ -73,10 +73,10 @@ jobs:
           if-no-files-found: error
 
   # =========================================================================
-  # 2. BUILD WINDOWS (.exe NSIS & Portable)
+  # 2. BUILD WINDOWS (Instalador .exe NSIS)
   # =========================================================================
   build-windows:
-    name: Build Windows (exe NSIS & Portable)
+    name: Build Windows (Instalador .exe NSIS)
     runs-on: windows-latest
 
     steps:
@@ -109,14 +109,14 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-build.txt
 
-      - name: Compilar executáveis Windows (.exe)
+      - name: Compilar instalador Windows (.exe)
         shell: pwsh
         run: npm run package:windows
 
       - name: Salvar artefatos Windows
         uses: actions/upload-artifact@v4
         with:
-          name: LGR-Studio-Windows
+          name: ControLAB-Windows
           path: release/*.exe
           if-no-files-found: error
 

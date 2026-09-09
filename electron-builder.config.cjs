@@ -31,12 +31,16 @@ module.exports = {
   },
   win: {
     executableName: 'ControLAB',
-    target: ['nsis', 'portable'],
+    target: ['nsis'],
   },
   nsis: {
     oneClick: false,
+    perMachine: false,
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
+    shortcutName: 'ControLAB',
+    uninstallDisplayName: 'ControLAB',
+    runAfterFinish: true,
   },
 };

@@ -198,7 +198,7 @@ function getSystemInfo() {
       os: 'windows',
       osName: 'Windows',
       packageType: 'exe',
-      packageLabel: 'Windows 64-bit (.exe)',
+      packageLabel: 'Instalador Windows (.exe)',
       arch,
       appVersion,
     };

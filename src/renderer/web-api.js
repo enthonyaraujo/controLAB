@@ -116,7 +116,7 @@
           os: 'windows',
           osName: 'Windows',
           packageType: 'exe',
-          packageLabel: 'Windows 64-bit (.exe)',
+          packageLabel: 'Instalador Windows (.exe)',
           arch: 'x64',
           appVersion: '1.2.0',
         };
