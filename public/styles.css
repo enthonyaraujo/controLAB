@@ -430,6 +430,48 @@ body {
   white-space: nowrap;
 }
 
+.mockup-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #070b14;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mockup-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.mockup-tab {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+}
+
+.mockup-tab.active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.mockup-tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+}
+
 .mockup-body {
   padding: 0;
   line-height: 0;
@@ -707,6 +749,115 @@ body {
   padding: 8px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   margin-top: auto;
+}
+
+/* ========================================================= */
+/* Pilares de Sistemas de Controle (Landing Page)           */
+/* ========================================================= */
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.pillar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 30px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.pillar-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-highlight);
+  transform: translateY(-3px);
+}
+
+.pillar-card.full-width {
+  grid-column: span 2;
+}
+
+.pillar-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pillar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pillar-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pillar-title {
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.pillar-tag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-cyan);
+}
+
+.pillar-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.pillar-formula {
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  text-align: center;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pillar-subitems {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin-top: 4px;
+}
+
+.pillar-subitems li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.pillar-subitems li svg {
+  color: var(--accent-cyan);
+  flex-shrink: 0;
 }
 
 /* Steps Grid */
@@ -1170,13 +1321,16 @@ body {
   .steps-grid,
   .features-grid,
   .downloads-grid,
-  .modules-grid-landing {
+  .modules-grid-landing,
+  .pillars-grid {
     grid-template-columns: 1fr;
   }
-  .full-width-card {
+  .full-width-card,
+  .pillar-card.full-width {
     grid-column: span 1;
   }
-  .step-formula-duo {
+  .step-formula-duo,
+  .pillar-subitems {
     grid-template-columns: 1fr;
   }
   .footer-container {
