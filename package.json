@@ -2,6 +2,11 @@
   "name": "controlab",
   "version": "1.2.0",
   "description": "ControLAB - Suíte interativa e didática de Engenharia e Sistemas de Controle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enthonyaraujo/controlab.git"
+  },
+  "homepage": "https://github.com/enthonyaraujo/controlab",
   "main": "src/main/main.js",
   "scripts": {
     "start": "node scripts/start-electron.js",

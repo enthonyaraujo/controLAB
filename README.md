@@ -12,7 +12,7 @@
 
 ## Instalação e Download
 
-Para obter a versão mais recente, acesse a seção de [Releases no GitHub](https://github.com/enthonyaraujo/lgr/releases) e baixe o pacote correspondente ao seu sistema operacional:
+Para obter a versão mais recente, acesse a seção de [Releases no GitHub](https://github.com/enthonyaraujo/controlab/releases) e baixe o pacote correspondente ao seu sistema operacional:
 
 - **Windows:** Instalador local único (`.exe` NSIS). Instala a aplicação diretamente no sistema operacional, criando atalhos oficiais na Área de Trabalho e no Menu Iniciar, com suporte nativo a desinstalação pelo Painel de Controle.
 - **Linux:** Pacotes nativos Debian/Ubuntu (`.deb`), Fedora/RedHat/openSUSE (`.rpm`) e pacote universal autônomo (`.AppImage`).

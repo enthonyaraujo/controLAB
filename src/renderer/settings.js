@@ -4,8 +4,8 @@
 
 (function registerSettings(global) {
   const CURRENT_VERSION = '1.2.0';
-  const GITHUB_REPO_URL = 'https://github.com/enthonyaraujo/lgr';
-  const GITHUB_RELEASES_API = 'https://api.github.com/repos/enthonyaraujo/lgr/releases/latest';
+  const GITHUB_REPO_URL = 'https://github.com/enthonyaraujo/controlab';
+  const GITHUB_RELEASES_API = 'https://api.github.com/repos/enthonyaraujo/controlab/releases/latest';
   const STORAGE_TOKEN_KEY = 'controlab_github_token';
 
   function optionalElement(id) {

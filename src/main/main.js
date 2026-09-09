@@ -307,7 +307,7 @@ ipcMain.handle('check-github-updates', async (event, token) => {
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
-    const response = await fetch('https://api.github.com/repos/enthonyaraujo/lgr/releases/latest', { headers });
+    const response = await fetch('https://api.github.com/repos/enthonyaraujo/controlab/releases/latest', { headers });
     if (!response.ok) {
       return { success: false, status: response.status, error: `GitHub retornou status HTTP ${response.status}` };
     }
