@@ -16,39 +16,434 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app-container">
-    
-    <!-- ========================================================= -->
-    <!-- SIDEBAR DE ENTRADA E CONTROLE                             -->
-    <!-- ========================================================= -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo-box">
-          <div class="logo-icon">
-            <img src="app-icon.svg" class="logo-icon-img" alt="Logo" />
-          </div>
-          <div class="logo-text">
-            <h2>LGR Studio</h2>
-            <span>Root Locus Explorer</span>
-          </div>
+  <!-- ========================================================= -->
+  <!-- BARRA SUPERIOR GLOBAL                                     -->
+  <!-- ========================================================= -->
+  <header class="global-navbar">
+    <div class="global-navbar-left">
+      <button id="btn-nav-home" class="btn-nav-back" title="Voltar à Página Inicial" aria-label="Voltar à Página Inicial" style="display: none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span>Início</span>
+      </button>
+
+      <div class="global-brand" id="global-brand" role="button" tabindex="0" title="Ir para Página Inicial">
+        <img src="app-icon.svg" class="global-brand-logo" alt="LGR Studio Logo" />
+        <div class="global-brand-text">
+          <span class="global-brand-title">LGR Studio</span>
+          <span class="global-brand-sep">•</span>
+          <span class="global-brand-subtitle">Sistemas de Controle</span>
         </div>
-        <button id="theme-toggle" class="theme-toggle-btn" title="Alternar Tema Claro/Escuro" aria-label="Alternar Tema">
-          <svg class="theme-icon sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 2v2"/>
-            <path d="M12 20v2"/>
-            <path d="M4.93 4.93l1.41 1.41"/>
-            <path d="M17.66 17.66l1.41 1.41"/>
-            <path d="M2 12h2"/>
-            <path d="M20 12h2"/>
-            <path d="M6.34 17.66l-1.41 1.41"/>
-            <path d="M19.07 4.93l-1.41 1.41"/>
-          </svg>
-          <svg class="theme-icon moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-          </svg>
-        </button>
       </div>
+
+      <div id="nav-module-pill" class="nav-module-pill" style="display: none;">
+        <span class="nav-module-dot"></span>
+        <span id="nav-module-name">Lugar Geométrico das Raízes (LGR)</span>
+      </div>
+    </div>
+
+    <div class="global-navbar-right">
+      <button id="theme-toggle" class="theme-toggle-btn" title="Alternar Tema Claro/Escuro" aria-label="Alternar Tema">
+        <svg class="theme-icon sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2"/>
+          <path d="M12 20v2"/>
+          <path d="M4.93 4.93l1.41 1.41"/>
+          <path d="M17.66 17.66l1.41 1.41"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+          <path d="M6.34 17.66l-1.41 1.41"/>
+          <path d="M19.07 4.93l-1.41 1.41"/>
+        </svg>
+        <svg class="theme-icon moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- PÁGINA INICIAL: HUB CENTRAL DE SISTEMAS DE CONTROLE       -->
+  <!-- ========================================================= -->
+  <main id="page-home" class="app-page active">
+    <div class="hub-container">
+      
+      <!-- Seção Hero -->
+      <section class="hub-hero">
+        <div class="hub-pill">
+          <span class="hub-pill-dot"></span>
+          <span>Engenharia de Controle Clássica e Moderna</span>
+        </div>
+        <h1 class="hub-title">Sistemas de Controle</h1>
+        <p class="hub-subtitle">Selecione um tópico para análise analítica e computacional passo a passo.</p>
+      </section>
+
+      <!-- Grid de Módulos (6 Cards) -->
+      <section class="modules-grid">
+        
+        <!-- CARD 1: LUGAR GEOMÉTRICO DAS RAÍZES (ATIVO) -->
+        <article class="module-card card-active" id="card-module-lgr">
+          <div class="card-top">
+            <div class="module-icon-box icon-lgr">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <line x1="12" y1="2" x2="12" y2="22"/>
+                <path d="M5 5c3 7 7 7 14 0"/>
+                <path d="M5 19c3-7 7-7 14 0"/>
+                <line x1="4" y1="11" x2="6" y2="13"/>
+                <line x1="4" y1="13" x2="6" y2="11"/>
+                <circle cx="16" cy="12" r="1.5"/>
+              </svg>
+            </div>
+            <span class="module-status-badge badge-active">
+              <span class="status-dot"></span>
+              Disponível
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-heading">
+              <h2 class="module-title">Lugar Geométrico das Raízes</h2>
+              <span class="module-tag">Método de Evans • Domínio s</span>
+            </div>
+            <p class="module-desc">
+              Trajetória analítica das raízes da equação característica em malha fechada $1 + K G(s)H(s) = 0$ com a variação do ganho $K \ge 0$.
+            </p>
+            <ul class="module-features">
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Memorial com os 7 Passos clássicos deduzidos</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Gráfico interativo com zoom, pan e exportação</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Dedução passo a passo com fórmulas algébricas</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Assíntotas, centroide, dispersão e cruzamento $j\omega$</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-footer">
+            <button id="btn-open-lgr" class="btn-module-action btn-module-primary" type="button">
+              <span>Abrir Módulo</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 2: ANÁLISE DE ESTABILIDADE (ROUTH-HURWITZ) -->
+        <article class="module-card card-soon" data-module="Análise de Estabilidade">
+          <div class="card-top">
+            <div class="module-icon-box icon-stability">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+            </div>
+            <span class="module-status-badge badge-soon">
+              <span class="status-dot"></span>
+              Em breve
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-heading">
+              <h2 class="module-title">Análise de Estabilidade</h2>
+              <span class="module-tag">Critério de Routh-Hurwitz</span>
+            </div>
+            <p class="module-desc">
+              Determinação analítica da estabilidade absoluta e relativa de malha fechada sem necessidade de fatoração polinomial direta.
+            </p>
+            <ul class="module-features">
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Tabela de Routh-Hurwitz construída passo a passo</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Casos especiais: primeiro elemento nulo ($\epsilon \to 0$)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Linha inteiramente nula (raízes imaginárias puras)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Faixa analítica de ganho estável $K_{min} < K < K_{max}$</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-footer">
+            <button class="btn-module-action btn-module-soon" type="button" data-module="Análise de Estabilidade">
+              <span>Em breve</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 3: RESPOSTA NO DOMÍNIO DO TEMPO -->
+        <article class="module-card card-soon" data-module="Resposta no Domínio do Tempo">
+          <div class="card-top">
+            <div class="module-icon-box icon-time">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="20" x2="21" y2="20"/>
+                <line x1="3" y1="4" x2="3" y2="20"/>
+                <path d="M3 18c3 0 4-13 7-13 3 0 4 5 6 5 2 0 3-1 5-1"/>
+              </svg>
+            </div>
+            <span class="module-status-badge badge-soon">
+              <span class="status-dot"></span>
+              Em breve
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-heading">
+              <h2 class="module-title">Resposta no Domínio do Tempo</h2>
+              <span class="module-tag">Transitório & Regime Permanente</span>
+            </div>
+            <p class="module-desc">
+              Comportamento temporal dinâmico para entradas canônicas degrau, impulso e rampa com métricas clássicas de desempenho.
+            </p>
+            <ul class="module-features">
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Curvas analíticas para Degrau $y(t)$ e Impulso</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Parâmetros transitórios: $\%OS$, $t_s$, $t_p$, $t_r$, $\zeta$, $\omega_n$</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Erro em regime permanente ($e_{ss}$) por tipo de sistema</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Constantes de erro de posição ($K_p$), velocidade ($K_v$) e aceleração ($K_a$)</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-footer">
+            <button class="btn-module-action btn-module-soon" type="button" data-module="Resposta no Domínio do Tempo">
+              <span>Em breve</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 4: RESPOSTA EM FREQUÊNCIA -->
+        <article class="module-card card-soon" data-module="Resposta em Frequência">
+          <div class="card-top">
+            <div class="module-icon-box icon-freq">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="20" x2="21" y2="20"/>
+                <line x1="3" y1="4" x2="3" y2="20"/>
+                <path d="M3 6h7l8 12h3"/>
+                <circle cx="10" cy="6" r="2"/>
+              </svg>
+            </div>
+            <span class="module-status-badge badge-soon">
+              <span class="status-dot"></span>
+              Em breve
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-heading">
+              <h2 class="module-title">Resposta em Frequência</h2>
+              <span class="module-tag">Bode & Nyquist</span>
+            </div>
+            <p class="module-desc">
+              Caracterização em regime senoidal permanente $s = j\omega$ para avaliação de robustez e margens de estabilidade.
+            </p>
+            <ul class="module-features">
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Diagramas de Bode (Magnitude em dB e Fase em graus)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Diagrama polar de Nyquist com contorno complexo</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Margem de Ganho ($MG$) e Margem de Fase ($MF$)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Frequências de cruzamento $\omega_{cg}$ e $\omega_{cp}$</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-footer">
+            <button class="btn-module-action btn-module-soon" type="button" data-module="Resposta em Frequência">
+              <span>Em breve</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 5: PROJETO DE CONTROLADORES -->
+        <article class="module-card card-soon" data-module="Projeto de Controladores">
+          <div class="card-top">
+            <div class="module-icon-box icon-controllers">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"/>
+                <line x1="4" y1="10" x2="4" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12" y2="3"/>
+                <line x1="20" y1="21" x2="20" y2="16"/>
+                <line x1="20" y1="12" x2="20" y2="3"/>
+                <line x1="1" y1="14" x2="7" y2="14"/>
+                <line x1="9" y1="8" x2="15" y2="8"/>
+                <line x1="17" y1="16" x2="23" y2="16"/>
+              </svg>
+            </div>
+            <span class="module-status-badge badge-soon">
+              <span class="status-dot"></span>
+              Em breve
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-heading">
+              <h2 class="module-title">Projeto de Controladores</h2>
+              <span class="module-tag">PID & Compensadores Lead-Lag</span>
+            </div>
+            <p class="module-desc">
+              Síntese e sintonia de ações de controle proporcional, integral e derivativo e compensadores por avanço e atraso de fase.
+            </p>
+            <ul class="module-features">
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Sintonia PID por Ziegler-Nichols (Métodos 1 e 2)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Compensadores por Avanço (Lead) e Atraso (Lag) no LGR</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Ajuste analítico de ganhos $K_p$, $T_i$, $T_d$</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Comparativo antes e após compensação em malha fechada</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-footer">
+            <button class="btn-module-action btn-module-soon" type="button" data-module="Projeto de Controladores">
+              <span>Em breve</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 6: ESPAÇO DE ESTADOS -->
+        <article class="module-card card-soon" data-module="Espaço de Estados">
+          <div class="card-top">
+            <div class="module-icon-box icon-statespace">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="20" x2="20" y2="20"/>
+                <line x1="4" y1="20" x2="4" y2="4"/>
+                <line x1="4" y1="20" x2="15" y2="9"/>
+                <polyline points="19 16 20 20 16 20"/>
+                <polyline points="4 8 4 4 8 4"/>
+                <polyline points="12 9 15 9 15 12"/>
+              </svg>
+            </div>
+            <span class="module-status-badge badge-soon">
+              <span class="status-dot"></span>
+              Em breve
+            </span>
+          </div>
+
+          <div class="card-content">
+            <div class="card-heading">
+              <h2 class="module-title">Espaço de Estados</h2>
+              <span class="module-tag">Modelagem Matricial & Alocação</span>
+            </div>
+            <p class="module-desc">
+              Representação matricial moderna no domínio do tempo para sistemas multivariáveis (MIMO) de ordem arbitrária.
+            </p>
+            <ul class="module-features">
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Matrizes de estado $(\mathbf{A}, \mathbf{B}, \mathbf{C}, \mathbf{D})$ e FCT</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Testes de Controlabilidade ($\mathcal{C}$) e Observabilidade ($\mathcal{O}$)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Alocação de Polos por Realimentação de Estados (Ackermann)</span>
+              </li>
+              <li>
+                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Projeto de Observador de Estados de Luenberger</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-footer">
+            <button class="btn-module-action btn-module-soon" type="button" data-module="Espaço de Estados">
+              <span>Em breve</span>
+            </button>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Rodapé do Hub -->
+      <footer class="hub-footer">
+        <span>LGR Studio v1.2.0 • Plataforma Educacional e Analítica de Engenharia de Controle</span>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MÓDULO 1: LUGAR GEOMÉTRICO DAS RAÍZES (WORKSPACE)         -->
+  <!-- ========================================================= -->
+  <div id="page-lgr" class="app-page">
+    <div class="app-container">
+      
+      <!-- ========================================================= -->
+      <!-- SIDEBAR DE ENTRADA E CONTROLE                             -->
+      <!-- ========================================================= -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-box">
+            <div class="logo-icon">
+              <img src="app-icon.svg" class="logo-icon-img" alt="Logo" />
+            </div>
+            <div class="logo-text">
+              <h2>LGR Studio</h2>
+              <span>Root Locus Explorer</span>
+            </div>
+          </div>
+          <button id="btn-sidebar-back-home" class="btn-sidebar-back" title="Voltar para a Página Inicial" aria-label="Voltar para a Página Inicial">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            <span>Início</span>
+          </button>
+        </div>
 
       <div class="sidebar-content">
         <!-- Seleção de Modo de Entrada -->
@@ -443,6 +838,8 @@
 
       </div>
     </main>
+    </div>
+  </div>
 
   <!-- Backdrop translúcido da Sidebar de Deduções -->
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>

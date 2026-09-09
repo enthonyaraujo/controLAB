@@ -80,6 +80,93 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
 
   // =========================================================================
+  // NAVEGAÇÃO ENTRE PÁGINAS (HUB / MÓDULOS)
+  // =========================================================================
+  const pageHome = document.getElementById('page-home');
+  const pageLgr = document.getElementById('page-lgr');
+  const btnNavHome = document.getElementById('btn-nav-home');
+  const navModulePill = document.getElementById('nav-module-pill');
+  const navModuleName = document.getElementById('nav-module-name');
+  const btnSidebarBackHome = document.getElementById('btn-sidebar-back-home');
+  const btnOpenLgr = document.getElementById('btn-open-lgr');
+  const cardModuleLgr = document.getElementById('card-module-lgr');
+  const globalBrand = document.getElementById('global-brand');
+
+  function navigateTo(pageId) {
+    if (pageId === 'lgr') {
+      if (pageHome) pageHome.classList.remove('active');
+      if (pageLgr) pageLgr.classList.add('active');
+      if (btnNavHome) btnNavHome.style.display = 'inline-flex';
+      if (navModulePill) {
+        navModulePill.style.display = 'inline-flex';
+        if (navModuleName) navModuleName.textContent = 'Lugar Geométrico das Raízes (LGR)';
+      }
+      renderMathInContainer(pageLgr);
+    } else {
+      if (pageLgr) pageLgr.classList.remove('active');
+      if (pageHome) {
+        pageHome.classList.add('active');
+        pageHome.scrollTop = 0;
+      }
+      if (btnNavHome) btnNavHome.style.display = 'none';
+      if (navModulePill) navModulePill.style.display = 'none';
+      renderMathInContainer(pageHome);
+    }
+  }
+
+  if (btnOpenLgr) {
+    btnOpenLgr.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigateTo('lgr');
+    });
+  }
+
+  if (cardModuleLgr) {
+    cardModuleLgr.addEventListener('click', () => {
+      navigateTo('lgr');
+    });
+  }
+
+  if (btnNavHome) {
+    btnNavHome.addEventListener('click', () => navigateTo('home'));
+  }
+
+  if (btnSidebarBackHome) {
+    btnSidebarBackHome.addEventListener('click', () => navigateTo('home'));
+  }
+
+  if (globalBrand) {
+    globalBrand.addEventListener('click', () => navigateTo('home'));
+    globalBrand.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigateTo('home');
+      }
+    });
+  }
+
+  // Cards e botões com aviso de módulo em desenvolvimento
+  const soonCards = document.querySelectorAll('.module-card.card-soon');
+  soonCards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const moduleName = card.dataset.module || 'selecionado';
+      showToast(`O módulo "${moduleName}" está em desenvolvimento e estará disponível nas próximas atualizações.`, 'info', 3200);
+    });
+  });
+
+  const soonButtons = document.querySelectorAll('.btn-module-soon');
+  soonButtons.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const moduleName = btn.dataset.module || 'selecionado';
+      showToast(`O módulo "${moduleName}" está em desenvolvimento e estará disponível nas próximas atualizações.`, 'info', 3200);
+    });
+  });
+
+  // Inicializa na Página Inicial (Hub)
+  navigateTo('home');
+
+  // =========================================================================
   // NAVEGAÇÃO POR ABAS (MODO DE ENTRADA & VIEWS)
   // =========================================================================
   modeTabs.forEach((tab) => {
