@@ -42,15 +42,6 @@
     btnNavHome?.addEventListener('click', () => navigateTo('home'));
     optionalElement('btn-sidebar-back-home')?.addEventListener('click', () => navigateTo('home'));
 
-    const globalBrand = optionalElement('global-brand');
-    globalBrand?.addEventListener('click', () => navigateTo('home'));
-    globalBrand?.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        navigateTo('home');
-      }
-    });
-
     document.querySelectorAll('.module-card.card-soon').forEach((card) => {
       card.addEventListener('click', () => {
         const moduleName = card.dataset.module || 'selecionado';

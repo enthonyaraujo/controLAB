@@ -127,12 +127,7 @@ body {
 .global-brand {
   display: flex;
   align-items: center;
-  cursor: pointer;
   user-select: none;
-}
-
-.global-brand:hover .global-brand-title {
-  color: var(--accent-primary);
 }
 
 .global-brand-title {
@@ -140,7 +135,6 @@ body {
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.2px;
-  transition: color 0.15s ease;
   white-space: nowrap;
 }
 
