@@ -55,6 +55,13 @@
           <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
         </svg>
       </button>
+
+      <button id="btn-open-settings" class="nav-icon-btn" title="Configurações e Atualizações" aria-label="Abrir Configurações">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -853,10 +860,148 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
+  <!-- ========================================================= -->
+  <!-- MODAL DE CONFIGURAÇÕES, ATUALIZAÇÕES E SOBRE               -->
+  <!-- ========================================================= -->
+  <div id="modal-settings" class="modal-overlay" aria-hidden="true">
+    <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-settings-title">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 id="modal-settings-title" class="modal-title">Configurações & Sobre</h2>
+            <span class="modal-subtitle">ControLAB v1.2.0 • Engenharia de Controle</span>
+          </div>
+        </div>
+        <button id="btn-close-settings" class="modal-close-btn" title="Fechar" aria-label="Fechar configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Corpo do Modal -->
+      <div class="modal-body">
+        
+        <!-- SEÇÃO: ATUALIZAÇÕES -->
+        <section class="modal-section">
+          <div class="section-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span>Atualizações do Aplicativo</span>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div>
+                <div class="settings-version-tag">
+                  <span class="version-label">Versão Instalada</span>
+                  <span class="version-value">v1.2.0</span>
+                </div>
+                <p id="update-status-text" class="settings-card-desc">Consulte a versão estável mais recente publicada no GitHub Releases.</p>
+              </div>
+              <button id="btn-check-updates" class="btn-action-primary" type="button">
+                <svg id="icon-update-refresh" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                <span id="btn-check-updates-text">Verificar Atualizações</span>
+              </button>
+            </div>
+            
+            <div id="update-result-box" class="update-result-box" style="display: none;"></div>
+
+            <div class="settings-card-footer">
+              <a href="https://github.com/enthonyaraujo/lgr/releases" target="_blank" rel="noopener noreferrer" class="external-link-row">
+                <span>Ver histórico completo de versões e notas de lançamento (Releases)</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7"/>
+                  <polyline points="7 7 17 7 17 17"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: GITHUB & CÓDIGO ABERTO -->
+        <section class="modal-section">
+          <div class="section-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+            <span>Repositório no GitHub</span>
+          </div>
+
+          <div class="settings-card">
+            <div class="github-repo-info">
+              <div class="repo-meta">
+                <span class="repo-name">enthonyaraujo/lgr</span>
+                <span class="repo-badge">Open Source • MIT</span>
+              </div>
+              <p class="repo-desc">Código-fonte oficial, documentação, rastreamento de melhorias e instaladores para Linux, Windows e Android.</p>
+            </div>
+
+            <div class="github-action-links">
+              <a href="https://github.com/enthonyaraujo/lgr" target="_blank" rel="noopener noreferrer" class="btn-github-link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span>Acessar Repositório</span>
+              </a>
+              <a href="https://github.com/enthonyaraujo/lgr/issues" target="_blank" rel="noopener noreferrer" class="btn-github-link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span>Reportar Erro (Issues)</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: DETALHES DO PROJETO -->
+        <section class="modal-section">
+          <div class="project-info-grid">
+            <div class="project-info-item">
+              <span class="info-item-label">Desenvolvedor</span>
+              <span class="info-item-val">Enthony Araujo</span>
+            </div>
+            <div class="project-info-item">
+              <span class="info-item-label">Licença</span>
+              <span class="info-item-val">MIT License</span>
+            </div>
+            <div class="project-info-item">
+              <span class="info-item-label">Motor Científico</span>
+              <span class="info-item-val">Python • NumPy • SciPy • Control</span>
+            </div>
+            <div class="project-info-item">
+              <span class="info-item-label">Ambiente</span>
+              <span class="info-item-val">Electron • PWA • Android (Chaquopy)</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
   <!-- KaTeX Local Scripts -->
   <script src="vendor/katex/katex.min.js"></script>
   <script src="vendor/katex/contrib/auto-render.min.js"></script>
   <script src="web-api.js"></script>
+  <script src="settings.js"></script>
   <script src="navigation.js"></script>
   <!-- App Script -->
   <script src="app.js"></script>

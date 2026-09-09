@@ -75,6 +75,10 @@
       );
     },
     copyImageToClipboard,
+    openExternal: async (url) => {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return { success: true };
+    },
   };
 
   if (!nativeLgr && 'serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

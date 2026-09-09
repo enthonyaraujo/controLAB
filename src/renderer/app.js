@@ -1056,6 +1056,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(calculate, 0);
   }
 
+  if (window.ControLABSettings) {
+    window.ControLABSettings.initialize();
+  }
+
   if (!window.LGRNavigation) {
     showToast('Não foi possível carregar o menu de módulos.', 'error', 4000);
     return;

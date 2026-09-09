@@ -1,9 +1,10 @@
-const CACHE_NAME = 'lgr-studio-shell-v1.2.1';
+const CACHE_NAME = 'controlab-shell-v1.2.0';
 const SHELL_FILES = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
+  '/settings.js',
   '/navigation.js',
   '/web-api.js',
   '/manifest.webmanifest',
