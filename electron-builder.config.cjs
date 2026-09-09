@@ -7,7 +7,7 @@ module.exports = {
   productName: 'ControLAB',
   publish: null,
   icon: 'build/icon.png',
-  artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
+  artifactName: '${productName}-v${version}-${os}-${arch}.${ext}',
   directories: {
     output: 'release',
   },

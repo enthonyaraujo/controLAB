@@ -65,7 +65,7 @@ jobs:
       - name: Salvar artefatos Linux
         uses: actions/upload-artifact@v4
         with:
-          name: LGR-Studio-Linux
+          name: ControLAB-Linux
           path: |
             release/*.AppImage
             release/*.deb
@@ -166,13 +166,13 @@ jobs:
       - name: Renomear APK para distribuição
         run: |
           mkdir -p release-apk
-          VERSION="${GITHUB_REF_NAME:-v1.2.0}"
-          cp android/app/build/outputs/apk/debug/app-debug.apk "release-apk/LGR-Studio-${VERSION}-android.apk"
+          VERSION="${GITHUB_REF_NAME:-v2.0.0}"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "release-apk/ControLAB-${VERSION}-android.apk"
 
       - name: Salvar artefatos Android (APK)
         uses: actions/upload-artifact@v4
         with:
-          name: LGR-Studio-Android-APK
+          name: ControLAB-Android-APK
           path: release-apk/*.apk
           if-no-files-found: error
 
@@ -200,7 +200,7 @@ jobs:
       - name: Criar ou Atualizar GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "ControLAB ${{ github.ref_name }}"
+          name: "${{ github.ref_name }}"
           tag_name: ${{ github.ref_name }}
           files: dist/*
           generate_release_notes: true

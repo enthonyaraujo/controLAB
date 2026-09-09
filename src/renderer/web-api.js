@@ -97,7 +97,7 @@
           packageType: 'apk',
           packageLabel: 'Android (.apk)',
           arch: 'arm64',
-          appVersion: '1.2.0',
+          appVersion: '2.0.0',
         };
       }
       const ua = (navigator.userAgent || '').toLowerCase();
@@ -108,7 +108,7 @@
           packageType: 'apk',
           packageLabel: 'Android (.apk)',
           arch: '',
-          appVersion: '1.2.0',
+          appVersion: '2.0.0',
         };
       }
       if (ua.includes('win')) {
@@ -118,7 +118,7 @@
           packageType: 'exe',
           packageLabel: 'Instalador Windows (.exe)',
           arch: 'x64',
-          appVersion: '1.2.0',
+          appVersion: '2.0.0',
         };
       }
       if (ua.includes('linux')) {
@@ -128,7 +128,7 @@
           packageType: 'deb',
           packageLabel: 'Debian / Ubuntu (.deb)',
           arch: 'x64',
-          appVersion: '1.2.0',
+          appVersion: '2.0.0',
         };
       }
       return {
@@ -137,7 +137,7 @@
         packageType: 'web',
         packageLabel: 'Web',
         arch: '',
-        appVersion: '1.2.0',
+        appVersion: '2.0.0',
       };
     },
   };
