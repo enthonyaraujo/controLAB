@@ -2559,5 +2559,228 @@ button {
     width: 100%;
     justify-content: center;
   }
+
+  .asset-download-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .btn-asset-dl {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .token-input-row {
+    flex-wrap: wrap;
+  }
+
+  .token-input {
+    width: 100%;
+  }
 }
+
+/* ==========================================================================
+   RELEASE ASSETS E DOWNLOAD DIRETO
+   ========================================================================== */
+.release-assets-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+}
+
+.assets-section-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.assets-download-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.asset-download-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.asset-download-item.recommended-asset {
+  border-color: var(--accent-emerald);
+  background: color-mix(in srgb, var(--accent-emerald) 8%, var(--bg-card));
+}
+
+.asset-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.asset-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.badge-recommended {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--accent-emerald);
+  color: #022c22;
+}
+
+.btn-asset-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: var(--accent-primary);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-asset-dl:hover {
+  background: color-mix(in srgb, var(--accent-primary) 85%, #000);
+  transform: translateY(-1px);
+}
+
+.release-footer-links {
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   GITHUB TOKEN CONFIG DETAILS
+   ========================================================================== */
+.settings-token-details {
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.token-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.token-summary:hover {
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.token-config-box {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: color-mix(in srgb, var(--bg-card) 60%, transparent);
+}
+
+.token-desc {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.token-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.token-input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-family: var(--font-code);
+}
+
+.token-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.btn-token-action {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.btn-token-save {
+  background: var(--accent-primary);
+  color: #ffffff;
+}
+
+.btn-token-save:hover {
+  background: color-mix(in srgb, var(--accent-primary) 85%, #000);
+}
+
+.btn-token-clear {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.btn-token-clear:hover {
+  background: color-mix(in srgb, #ef4444 15%, transparent);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.token-feedback {
+  font-size: 0.74rem;
+  min-height: 16px;
+  color: var(--text-muted);
+}
+
+.token-feedback.active {
+  color: var(--accent-emerald);
+}
+
+.token-feedback.error {
+  color: #f43f5e;
+}
+
 
