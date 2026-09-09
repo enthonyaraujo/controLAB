@@ -25,6 +25,10 @@
       if (globalBrandTitle) {
         globalBrandTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : 'ControLAB';
       }
+      const navbarCenter = optionalElement('global-navbar-center');
+      if (navbarCenter) {
+        navbarCenter.style.display = opensLgr ? 'none' : 'flex';
+      }
 
       if (opensLgr) {
         onOpenLgr();
