@@ -10,4 +10,4 @@ for (const filename of sources) {
   fs.copyFileSync(path.join(projectRoot, filename), path.join(pythonTarget, filename));
 }
 
-console.log('[LGR Studio] Motor Python sincronizado com o projeto Android.');
+console.log('[ControLAB] Motor Python sincronizado com o projeto Android.');

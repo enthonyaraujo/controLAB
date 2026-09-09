@@ -15,13 +15,13 @@ if (process.platform === 'linux' && !electronOptions.includes('--no-sandbox')) {
 
     if (!hasSetuidRootSandbox) {
       console.warn(
-        '[LGR Studio] chrome-sandbox sem permissão SUID; iniciando com --no-sandbox.\n' +
+        '[ControLAB] chrome-sandbox sem permissão SUID; iniciando com --no-sandbox.\n' +
         'Para manter o sandbox completo, configure o arquivo como root:4755.'
       );
       electronOptions.push('--no-sandbox');
     }
   } catch {
-    console.warn('[LGR Studio] chrome-sandbox não encontrado; iniciando com --no-sandbox.');
+    console.warn('[ControLAB] chrome-sandbox não encontrado; iniciando com --no-sandbox.');
     electronOptions.push('--no-sandbox');
   }
 }
@@ -29,7 +29,7 @@ if (process.platform === 'linux' && !electronOptions.includes('--no-sandbox')) {
 const child = spawn(electron, [...electronOptions, '.', ...appArgs], { stdio: 'inherit' });
 
 child.on('error', (error) => {
-  console.error(`[LGR Studio] Não foi possível iniciar o Electron: ${error.message}`);
+  console.error(`[ControLAB] Não foi possível iniciar o Electron: ${error.message}`);
   process.exitCode = 1;
 });
 

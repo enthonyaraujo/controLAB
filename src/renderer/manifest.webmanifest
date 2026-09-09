@@ -1,7 +1,7 @@
 {
-  "name": "LGR Studio — Lugar Geométrico das Raízes",
-  "short_name": "LGR Studio",
-  "description": "Análise didática dos sete passos clássicos do Lugar Geométrico das Raízes.",
+  "name": "ControLAB — Sistemas de Controle",
+  "short_name": "ControLAB",
+  "description": "Suíte analítica e didática para Sistemas e Engenharia de Controle.",
   "lang": "pt-BR",
   "start_url": "/",
   "scope": "/",

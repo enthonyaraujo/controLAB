@@ -1,5 +1,5 @@
 /**
- * LGR Studio - Renderer Application Logic
+ * ControLAB - Renderer Application Logic
  */
 
 document.addEventListener('DOMContentLoaded', () => {

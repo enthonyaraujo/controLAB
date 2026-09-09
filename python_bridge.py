@@ -1,4 +1,4 @@
-"""Bridge JSON compartilhada pelas interfaces Electron e Web do LGR Studio."""
+"""Bridge JSON compartilhada pelas interfaces Electron e Web do ControLAB."""
 
 import base64
 import io

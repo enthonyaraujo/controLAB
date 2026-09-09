@@ -40,7 +40,7 @@ function findAndroidPython() {
     return uvFind.stdout.trim();
   }
 
-  console.log('[LGR Studio] Python 3.10 não encontrado; instalando pelo uv para o Chaquopy...');
+  console.log('[ControLAB] Python 3.10 não encontrado; instalando pelo uv para o Chaquopy...');
   const uvInstall = spawnSync('uv', ['python', 'install', '3.10'], { stdio: 'inherit' });
   if (uvInstall.status === 0) {
     uvFind = spawnSync('uv', ['python', 'find', '3.10'], { encoding: 'utf8' });
@@ -50,7 +50,7 @@ function findAndroidPython() {
   }
 
   console.error(
-    '[LGR Studio] Instale Python 3.10 ou o uv. Você também pode definir ' +
+    '[ControLAB] Instale Python 3.10 ou o uv. Você também pode definir ' +
     'LGR_ANDROID_PYTHON com o caminho do Python 3.10.'
   );
   process.exit(1);
@@ -76,9 +76,9 @@ function findJdk() {
 
 const androidPython = findAndroidPython();
 const jdk = findJdk();
-console.log(`[LGR Studio] Python do build Android: ${androidPython}`);
+console.log(`[ControLAB] Python do build Android: ${androidPython}`);
 if (jdk) {
-  console.log(`[LGR Studio] JDK do build Android: ${jdk}`);
+  console.log(`[ControLAB] JDK do build Android: ${jdk}`);
 }
 
 const child = spawn(gradle, tasks, {
@@ -92,7 +92,7 @@ const child = spawn(gradle, tasks, {
   },
 });
 child.on('error', (error) => {
-  console.error(`[LGR Studio] Falha ao iniciar Gradle: ${error.message}`);
+  console.error(`[ControLAB] Falha ao iniciar Gradle: ${error.message}`);
   process.exit(1);
 });
 child.on('exit', (code, signal) => {

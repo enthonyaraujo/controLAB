@@ -23,7 +23,7 @@
 
       if (btnNavHome) btnNavHome.style.display = opensLgr ? 'inline-flex' : 'none';
       if (globalBrandTitle) {
-        globalBrandTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : 'Sistemas de Controle';
+        globalBrandTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : 'ControLAB';
       }
 
       if (opensLgr) {

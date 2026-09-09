@@ -16,7 +16,7 @@ const candidates = process.platform === 'win32'
 
 function tryCandidate(index) {
   if (index >= candidates.length) {
-    console.error('[LGR Studio] Python não encontrado. Crie a .venv ou instale Python 3.12+.');
+    console.error('[ControLAB] Python não encontrado. Crie a .venv ou instale Python 3.12+.');
     process.exit(1);
   }
 
@@ -34,7 +34,7 @@ function tryCandidate(index) {
       tryCandidate(index + 1);
       return;
     }
-    console.error(`[LGR Studio] Falha ao iniciar Python: ${error.message}`);
+    console.error(`[ControLAB] Falha ao iniciar Python: ${error.message}`);
     process.exit(1);
   });
 

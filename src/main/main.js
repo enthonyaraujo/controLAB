@@ -79,7 +79,7 @@ function createWindow() {
     minWidth: 360,
     minHeight: 640,
     autoHideMenuBar: true,
-    title: 'LGR Studio - Lugar Geométrico das Raízes',
+    title: 'ControLAB - Sistemas de Controle',
     backgroundColor: '#0f172a',
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),

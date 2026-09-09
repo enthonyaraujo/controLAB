@@ -1,4 +1,4 @@
-"""Servidor local responsivo do LGR Studio para desktop, tablet e celular."""
+"""Servidor local responsivo do ControLAB para desktop, tablet e celular."""
 
 import argparse
 import json
@@ -75,7 +75,7 @@ class LGRRequestHandler(SimpleHTTPRequestHandler):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Executa o LGR Studio no navegador sem gerar build.",
+        description="Executa o ControLAB no navegador sem gerar build.",
     )
     parser.add_argument(
         "--host",
@@ -90,7 +90,7 @@ def main():
     args = parse_args()
     server = ThreadingHTTPServer((args.host, args.port), LGRRequestHandler)
     visible_host = "<IP-DESTE-COMPUTADOR>" if args.host == "0.0.0.0" else args.host
-    print(f"LGR Studio disponível em http://{visible_host}:{args.port}")
+    print(f"ControLAB disponível em http://{visible_host}:{args.port}")
     if args.host == "0.0.0.0":
         print("Mantenha computador e dispositivo móvel na mesma rede local.")
     try:

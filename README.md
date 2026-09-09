@@ -1,6 +1,6 @@
-# <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>LGR Studio — Lugar Geométrico das Raízes (Root Locus)</strong>
+# <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>ControLAB — Suíte de Sistemas de Controle</strong>
 
-> **Interface moderna, interativa e 100% offline para cálculo analítico e traçado didático do Lugar Geométrico das Raízes (LGR) com renderização matemática em tempo real.**
+> **Interface moderna, interativa e 100% offline para cálculo analítico e simulação em Sistemas de Controle com renderização matemática em tempo real.**
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Electron](https://img.shields.io/badge/Electron-44.1.0-47848F.svg?logo=electron&logoColor=white)](https://www.electronjs.org/)
@@ -17,7 +17,7 @@ Para instalar acesse os [Releases](https://github.com/enthonyaraujo/lgr/releases
 ---
 ## Visão Geral
 
-O **LGR Studio** é uma aplicação desktop e web projetada para estudantes, engenheiros e pesquisadores de **Engenharia de Controle** e **Sistemas Dinâmicos**. 
+O **ControLAB** é uma aplicação desktop e web projetada para estudantes, engenheiros e pesquisadores de **Engenharia de Controle** e **Sistemas Dinâmicos**. 
 
 Ele automatiza e explica visualmente o traçado do **Lugar Geométrico das Raízes (Root Locus)** para qualquer função de transferência em malha aberta:
 

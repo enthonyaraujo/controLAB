@@ -8,7 +8,7 @@ if (!expected) {
 if (process.platform !== expected) {
   const target = expected === 'win32' ? 'Windows' : expected;
   console.error(
-    `[LGR Studio] Gere o pacote de ${target} no próprio ${target}. ` +
+    `[ControLAB] Gere o pacote de ${target} no próprio ${target}. ` +
     'O motor Python do executável é específico de cada sistema operacional.'
   );
   process.exit(1);

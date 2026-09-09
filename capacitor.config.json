@@ -1,6 +1,6 @@
 {
   "appId": "br.com.enthony.lgrstudio",
-  "appName": "LGR Studio",
+  "appName": "ControLAB",
   "webDir": "src/renderer",
   "android": {
     "allowMixedContent": false,

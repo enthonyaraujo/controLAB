@@ -4,7 +4,7 @@ const pythonExecutable = process.platform === 'win32' ? 'lgr-bridge.exe' : 'lgr-
 
 module.exports = {
   appId: 'br.com.enthony.lgrstudio',
-  productName: 'LGR Studio',
+  productName: 'ControLAB',
   publish: null,
   icon: 'build/icon.png',
   artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
@@ -25,12 +25,12 @@ module.exports = {
   asar: true,
   linux: {
     category: 'Education;Science',
-    executableName: 'lgr-studio',
+    executableName: 'controlab',
     maintainer: 'Enthony Araujo <contato@enthony.com.br>',
     target: ['AppImage', 'deb', 'rpm'],
   },
   win: {
-    executableName: 'LGR Studio',
+    executableName: 'ControLAB',
     target: ['nsis', 'portable'],
   },
   nsis: {

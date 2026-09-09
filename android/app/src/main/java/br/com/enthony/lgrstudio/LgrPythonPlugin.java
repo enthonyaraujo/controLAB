@@ -94,7 +94,7 @@ public class LgrPythonPlugin extends Plugin {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, defaultName);
                 contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-                contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/LGR Studio");
+                contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/ControLAB");
                 contentValues.put(MediaStore.Images.Media.IS_PENDING, 1);
 
                 Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
@@ -116,7 +116,7 @@ public class LgrPythonPlugin extends Plugin {
                 }
             } else {
                 File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                File lgrDir = new File(picturesDir, "LGR Studio");
+                File lgrDir = new File(picturesDir, "ControLAB");
                 if (!lgrDir.exists()) {
                     lgrDir.mkdirs();
                 }
@@ -177,7 +177,7 @@ public class LgrPythonPlugin extends Plugin {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.Downloads.DISPLAY_NAME, defaultName);
                 contentValues.put(MediaStore.Downloads.MIME_TYPE, "image/svg+xml");
-                contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/LGR Studio");
+                contentValues.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/ControLAB");
                 contentValues.put(MediaStore.Downloads.IS_PENDING, 1);
 
                 Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
@@ -199,7 +199,7 @@ public class LgrPythonPlugin extends Plugin {
                 }
             } else {
                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                File lgrDir = new File(downloadsDir, "LGR Studio");
+                File lgrDir = new File(downloadsDir, "ControLAB");
                 if (!lgrDir.exists()) {
                     lgrDir.mkdirs();
                 }

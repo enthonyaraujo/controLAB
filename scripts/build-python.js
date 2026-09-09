@@ -24,16 +24,16 @@ function findPython() {
     }
   }
 
-  console.error('[LGR Studio] Python não encontrado. Crie a .venv ou instale Python 3.10+.');
+  console.error('[ControLAB] Python não encontrado. Crie a .venv ou instale Python 3.10+.');
   process.exit(1);
 }
 
 const python = findPython();
-console.log(`[LGR Studio] Usando Python para build: ${python}`);
+console.log(`[ControLAB] Usando Python para build: ${python}`);
 
 const checkPyinstaller = spawnSync(python, ['-c', 'import PyInstaller']);
 if (checkPyinstaller.status !== 0) {
-  console.log('[LGR Studio] PyInstaller não encontrado. Instalando requirements-build.txt...');
+  console.log('[ControLAB] PyInstaller não encontrado. Instalando requirements-build.txt...');
   const uvInstall = spawnSync('uv', ['pip', 'install', '-r', 'requirements-build.txt'], { cwd: projectRoot, stdio: 'inherit' });
   if (uvInstall.status !== 0) {
     spawnSync(python, ['-m', 'pip', 'install', '-r', 'requirements-build.txt'], { cwd: projectRoot, stdio: 'inherit' });

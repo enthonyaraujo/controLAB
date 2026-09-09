@@ -1,7 +1,7 @@
 {
-  "name": "lgr-studio",
+  "name": "controlab",
   "version": "1.2.0",
-  "description": "LGR Studio - Interface responsiva em Electron e navegador para os 7 passos clássicos do Lugar Geométrico das Raízes",
+  "description": "ControLAB - Suíte interativa e didática de Engenharia e Sistemas de Controle",
   "main": "src/main/main.js",
   "scripts": {
     "start": "node scripts/start-electron.js",
