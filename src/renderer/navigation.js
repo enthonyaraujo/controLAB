@@ -7,8 +7,7 @@
     const pageHome = optionalElement('page-home');
     const pageLgr = optionalElement('page-lgr');
     const btnNavHome = optionalElement('btn-nav-home');
-    const navModulePill = optionalElement('nav-module-pill');
-    const navModuleName = optionalElement('nav-module-name');
+    const globalBrandTitle = optionalElement('global-brand-title');
     const renderedPages = new WeakSet();
 
     function renderPageOnce(page) {
@@ -23,9 +22,8 @@
       pageLgr?.classList.toggle('active', opensLgr);
 
       if (btnNavHome) btnNavHome.style.display = opensLgr ? 'inline-flex' : 'none';
-      if (navModulePill) navModulePill.style.display = opensLgr ? 'inline-flex' : 'none';
-      if (opensLgr && navModuleName) {
-        navModuleName.textContent = 'Lugar Geométrico das Raízes (LGR)';
+      if (globalBrandTitle) {
+        globalBrandTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : 'Sistemas de Controle';
       }
 
       if (opensLgr) {
