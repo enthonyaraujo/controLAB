@@ -1,9 +1,10 @@
-const CACHE_NAME = 'lgr-studio-shell-v1';
+const CACHE_NAME = 'lgr-studio-shell-v1.2.1';
 const SHELL_FILES = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
+  '/navigation.js',
   '/web-api.js',
   '/manifest.webmanifest',
   '/app-icon.svg',
@@ -31,10 +32,28 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET' || requestUrl.origin !== self.location.origin) return;
   if (requestUrl.pathname.startsWith('/api')) return;
 
+  const mustBeFresh = event.request.mode === 'navigate'
+    || ['.html', '.js', '.css'].some((extension) => requestUrl.pathname.endsWith(extension));
+
+  if (mustBeFresh) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      }).catch(() => caches.match(event.request)),
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
-      const copy = response.clone();
-      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+      if (response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+      }
       return response;
     })),
   );

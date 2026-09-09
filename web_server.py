@@ -28,6 +28,13 @@ class LGRRequestHandler(SimpleHTTPRequestHandler):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Frame-Options", "DENY")
+        if self.path != "/api" and Path(self.path.split("?", 1)[0]).suffix in {
+            "",
+            ".html",
+            ".js",
+            ".css",
+        }:
+            self.send_header("Cache-Control", "no-cache")
         super().end_headers()
 
     def do_POST(self):

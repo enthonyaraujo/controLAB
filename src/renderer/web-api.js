@@ -5,6 +5,15 @@
     ? window.Capacitor.Plugins?.LgrPython
     : null;
 
+  async function readJsonResponse(response) {
+    const body = await response.text();
+    try {
+      return JSON.parse(body);
+    } catch {
+      throw new Error(`O backend retornou uma resposta inválida (HTTP ${response.status}).`);
+    }
+  }
+
   async function request(action, payload = {}) {
     if (nativeLgr) {
       return nativeLgr.dispatch({ payload: { action, ...payload } });
@@ -15,9 +24,9 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, ...payload }),
     });
-    const data = await response.json();
-    if (!response.ok && data.success !== false) {
-      throw new Error(`Falha HTTP ${response.status}`);
+    const data = await readJsonResponse(response);
+    if (!response.ok) {
+      throw new Error(data.error || `Falha HTTP ${response.status}.`);
     }
     return data;
   }
@@ -69,6 +78,13 @@
   };
 
   if (!nativeLgr && 'serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        await registration.update();
+      } catch (error) {
+        console.warn('Não foi possível atualizar o modo offline:', error);
+      }
+    });
   }
 }());
