@@ -188,6 +188,116 @@ ipcMain.handle('open-external', async (event, url) => {
   return { success: false };
 });
 
+function getSystemInfo() {
+  const platform = process.platform;
+  const arch = process.arch;
+  const appVersion = app.getVersion() || '1.2.0';
+
+  if (platform === 'win32') {
+    return {
+      os: 'windows',
+      osName: 'Windows',
+      packageType: 'exe',
+      packageLabel: 'Windows 64-bit (.exe)',
+      arch,
+      appVersion,
+    };
+  }
+
+  if (platform === 'darwin') {
+    return {
+      os: 'mac',
+      osName: 'macOS',
+      packageType: 'dmg',
+      packageLabel: 'macOS (.dmg)',
+      arch,
+      appVersion,
+    };
+  }
+
+  if (platform === 'linux') {
+    if (process.env.APPIMAGE || (process.execPath && process.execPath.includes('.mount_'))) {
+      return {
+        os: 'linux',
+        osName: 'Linux Universal',
+        packageType: 'appimage',
+        packageLabel: 'Linux Universal (.AppImage)',
+        arch,
+        appVersion,
+      };
+    }
+
+    let distroName = 'Linux';
+    let isDebianLike = false;
+    let isRpmLike = false;
+
+    try {
+      if (fs.existsSync('/etc/os-release')) {
+        const osRelease = fs.readFileSync('/etc/os-release', 'utf-8');
+        const lines = osRelease.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('PRETTY_NAME=')) {
+            distroName = line.replace(/^PRETTY_NAME=["']?/, '').replace(/["']?$/, '');
+          }
+          if (line.startsWith('ID=') || line.startsWith('ID_LIKE=')) {
+            const val = line.toLowerCase();
+            if (val.includes('debian') || val.includes('ubuntu') || val.includes('mint') || val.includes('pop')) {
+              isDebianLike = true;
+            }
+            if (val.includes('fedora') || val.includes('rhel') || val.includes('centos') || val.includes('suse') || val.includes('redhat')) {
+              isRpmLike = true;
+            }
+          }
+        }
+      }
+    } catch {}
+
+    if (isDebianLike || fs.existsSync('/usr/bin/dpkg')) {
+      return {
+        os: 'linux',
+        osName: distroName || 'Debian / Ubuntu',
+        packageType: 'deb',
+        packageLabel: 'Debian / Ubuntu (.deb)',
+        arch,
+        appVersion,
+      };
+    }
+
+    if (isRpmLike || fs.existsSync('/usr/bin/rpm')) {
+      return {
+        os: 'linux',
+        osName: distroName || 'Fedora / RedHat',
+        packageType: 'rpm',
+        packageLabel: 'Fedora / RedHat (.rpm)',
+        arch,
+        appVersion,
+      };
+    }
+
+    return {
+      os: 'linux',
+      osName: distroName || 'Linux Universal',
+      packageType: 'appimage',
+      packageLabel: 'Linux Universal (.AppImage)',
+      arch,
+      appVersion,
+    };
+  }
+
+  return {
+    os: 'unknown',
+    osName: 'Desconhecido',
+    packageType: 'web',
+    packageLabel: 'Web',
+    arch,
+    appVersion,
+  };
+}
+
+ipcMain.handle('get-system-info', async () => {
+  return getSystemInfo();
+});
+
 ipcMain.handle('check-github-updates', async (event, token) => {
   try {
     const headers = {
@@ -202,7 +312,7 @@ ipcMain.handle('check-github-updates', async (event, token) => {
       return { success: false, status: response.status, error: `GitHub retornou status HTTP ${response.status}` };
     }
     const release = await response.json();
-    return { success: true, release };
+    return { success: true, release, systemInfo: getSystemInfo() };
   } catch (err) {
     return { success: false, error: err.message };
   }

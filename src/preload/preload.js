@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld('api', {
   copyImageToClipboard: (base64) => ipcRenderer.invoke('copy-image', base64),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
   checkUpdates: (token) => ipcRenderer.invoke('check-github-updates', token),
+  getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
 });

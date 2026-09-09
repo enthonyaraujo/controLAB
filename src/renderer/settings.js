@@ -14,12 +14,73 @@
 
   function detectPlatform() {
     if (global.Capacitor?.isNativePlatform?.()) return 'android';
-    const ua = navigator.userAgent.toLowerCase();
+    const ua = (navigator.userAgent || '').toLowerCase();
     if (ua.includes('android')) return 'android';
     if (ua.includes('win')) return 'windows';
     if (ua.includes('linux')) return 'linux';
     if (ua.includes('mac')) return 'mac';
     return 'web';
+  }
+
+  async function resolveSystemInfo() {
+    if (global.api?.getSystemInfo) {
+      try {
+        const info = await global.api.getSystemInfo();
+        if (info && info.os) return info;
+      } catch {
+        // Fallback para detecção no navegador
+      }
+    }
+
+    if (global.Capacitor?.isNativePlatform?.()) {
+      return {
+        os: 'android',
+        osName: 'Android Nativo',
+        packageType: 'apk',
+        packageLabel: 'Android (.apk)',
+      };
+    }
+
+    const ua = (navigator.userAgent || '').toLowerCase();
+    if (ua.includes('android')) {
+      return {
+        os: 'android',
+        osName: 'Android',
+        packageType: 'apk',
+        packageLabel: 'Android (.apk)',
+      };
+    }
+    if (ua.includes('win')) {
+      return {
+        os: 'windows',
+        osName: 'Windows',
+        packageType: 'exe',
+        packageLabel: 'Windows 64-bit (.exe)',
+      };
+    }
+    if (ua.includes('linux')) {
+      return {
+        os: 'linux',
+        osName: 'Linux',
+        packageType: 'deb',
+        packageLabel: 'Debian / Ubuntu (.deb)',
+      };
+    }
+    if (ua.includes('mac')) {
+      return {
+        os: 'mac',
+        osName: 'macOS',
+        packageType: 'dmg',
+        packageLabel: 'macOS (.dmg)',
+      };
+    }
+
+    return {
+      os: 'web',
+      osName: 'Navegador Web',
+      packageType: 'web',
+      packageLabel: 'Web',
+    };
   }
 
   function formatBytes(bytes) {
@@ -81,46 +142,138 @@
     }
   }
 
-  function renderAssetsList(assets, currentPlatform) {
-    if (!assets || assets.length === 0) {
-      return '<p class="no-assets-msg">Nenhum executável anexado a este lançamento.</p>';
+  function findTargetAsset(assets, systemInfo) {
+    if (!assets || assets.length === 0) return null;
+    const pkg = (systemInfo?.packageType || '').toLowerCase();
+
+    let matched = null;
+    if (pkg === 'deb') {
+      matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.deb'))
+        || assets.find((a) => (a.name || '').toLowerCase().endsWith('.appimage'));
+    } else if (pkg === 'appimage') {
+      matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.appimage'))
+        || assets.find((a) => (a.name || '').toLowerCase().endsWith('.deb'));
+    } else if (pkg === 'rpm') {
+      matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.rpm'))
+        || assets.find((a) => (a.name || '').toLowerCase().endsWith('.appimage'));
+    } else if (pkg === 'exe') {
+      matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.exe'));
+    } else if (pkg === 'apk') {
+      matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.apk'));
     }
 
-    const items = assets.map((asset) => {
-      const name = asset.name || '';
-      const sizeStr = formatBytes(asset.size);
-      const isRecommended = (
-        (currentPlatform === 'linux' && (name.endsWith('.AppImage') || name.endsWith('.deb'))) ||
-        (currentPlatform === 'windows' && name.endsWith('.exe')) ||
-        (currentPlatform === 'android' && name.endsWith('.apk'))
-      );
+    if (!matched) {
+      const os = (systemInfo?.os || '').toLowerCase();
+      if (os === 'linux') {
+        matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.deb'))
+          || assets.find((a) => (a.name || '').toLowerCase().endsWith('.appimage'))
+          || assets.find((a) => (a.name || '').toLowerCase().endsWith('.rpm'));
+      } else if (os === 'windows') {
+        matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.exe'));
+      } else if (os === 'android') {
+        matched = assets.find((a) => (a.name || '').toLowerCase().endsWith('.apk'));
+      }
+    }
 
-      let label = name;
-      if (name.endsWith('.AppImage')) label = `Linux Universal (.AppImage) — ${sizeStr}`;
-      else if (name.endsWith('.deb')) label = `Debian / Ubuntu (.deb) — ${sizeStr}`;
-      else if (name.endsWith('.rpm')) label = `Fedora / RedHat (.rpm) — ${sizeStr}`;
-      else if (name.endsWith('.exe')) label = `Windows 64-bit (.exe) — ${sizeStr}`;
-      else if (name.endsWith('.apk')) label = `Android Nativo (.apk) — ${sizeStr}`;
+    return matched || assets[0] || null;
+  }
 
-      return `
-        <div class="asset-download-item ${isRecommended ? 'recommended-asset' : ''}">
-          <div class="asset-info">
-            <span class="asset-name">${label}</span>
-            ${isRecommended ? '<span class="badge-recommended">Recomendado</span>' : ''}
+  function renderAssetItem(asset, isTarget = false) {
+    const name = asset.name || '';
+    const sizeStr = formatBytes(asset.size);
+    let label = name;
+    if (name.endsWith('.AppImage')) label = `Linux Universal (.AppImage) - ${sizeStr}`;
+    else if (name.endsWith('.deb')) label = `Debian / Ubuntu (.deb) - ${sizeStr}`;
+    else if (name.endsWith('.rpm')) label = `Fedora / RedHat (.rpm) - ${sizeStr}`;
+    else if (name.endsWith('.exe')) label = `Windows 64-bit (.exe) - ${sizeStr}`;
+    else if (name.endsWith('.apk')) label = `Android Nativo (.apk) - ${sizeStr}`;
+
+    return `
+      <div class="asset-download-item ${isTarget ? 'recommended-asset' : ''}">
+        <div class="asset-info">
+          <span class="asset-name">${label}</span>
+          ${isTarget ? '<span class="badge-recommended">Compatível com seu sistema</span>' : ''}
+        </div>
+        <button class="btn-asset-dl" data-url="${asset.browser_download_url}" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Baixar</span>
+        </button>
+      </div>
+    `;
+  }
+
+  function renderUpdateAvailableBox(release, systemInfo) {
+    const latestTag = (release.tag_name || '').replace(/^v/, '');
+    const releaseUrl = release.html_url || `${GITHUB_REPO_URL}/releases`;
+    const publishDate = formatDate(release.published_at);
+    const assets = release.assets || [];
+    const targetAsset = findTargetAsset(assets, systemInfo);
+    const otherAssets = targetAsset ? assets.filter((a) => a !== targetAsset) : assets;
+
+    let targetCardHtml = '';
+    if (targetAsset) {
+      targetCardHtml = `
+        <div class="target-package-card">
+          <div class="target-package-info">
+            <span class="target-pkg-badge">Detectado para seu sistema</span>
+            <div class="target-pkg-title">${systemInfo.osName} • ${systemInfo.packageLabel}</div>
+            <div class="target-pkg-filename">${targetAsset.name} (${formatBytes(targetAsset.size)})</div>
           </div>
-          <button class="btn-asset-dl" data-url="${asset.browser_download_url}" type="button">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button class="btn-download-primary btn-asset-dl" data-url="${targetAsset.browser_download_url}" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="7 10 12 15 17 10"/>
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            <span>Baixar</span>
+            <span>Baixar Atualização</span>
           </button>
         </div>
       `;
-    }).join('');
+    } else {
+      targetCardHtml = `
+        <p class="no-assets-msg">Atualização disponível (v${latestTag}), mas nenhum arquivo binário direto para ${systemInfo.packageLabel} foi identificado no GitHub.</p>
+        <a href="${releaseUrl}" class="btn-download-update" target="_blank" rel="noopener noreferrer">
+          <span>Abrir Release no GitHub &rarr;</span>
+        </a>
+      `;
+    }
 
-    return `<div class="assets-download-grid">${items}</div>`;
+    let otherAssetsHtml = '';
+    if (otherAssets.length > 0) {
+      otherAssetsHtml = `
+        <details class="other-assets-details">
+          <summary class="other-assets-summary">
+            <span>Ver instaladores para outras plataformas (${otherAssets.length})</span>
+          </summary>
+          <div class="assets-download-grid">
+            ${otherAssets.map((a) => renderAssetItem(a, false)).join('')}
+          </div>
+        </details>
+      `;
+    }
+
+    return `
+      <div class="update-msg-title">Nova versão disponível: v${latestTag} ${publishDate ? `(${publishDate})` : ''}</div>
+      <p>Uma versão mais recente do ControLAB está pronta para instalação.</p>
+      ${targetCardHtml}
+      ${otherAssetsHtml}
+      <div class="release-footer-links">
+        <a href="${releaseUrl}" class="external-link-row" target="_blank" rel="noopener noreferrer">
+          <span>Ver notas da versão no GitHub &rarr;</span>
+        </a>
+      </div>
+    `;
+  }
+
+  function renderUpToDateBox(systemInfo) {
+    return `
+      <div class="update-msg-title">Você já está com a versão mais recente (v${CURRENT_VERSION})!</div>
+      <p>Seu sistema (${systemInfo.osName} • ${systemInfo.packageLabel}) está atualizado com as últimas melhorias de engenharia e controle.</p>
+    `;
   }
 
   function initializeSettings() {
@@ -131,11 +284,30 @@
     const updateResultBox = optionalElement('update-result-box');
     const btnCheckText = optionalElement('btn-check-updates-text');
     const iconRefresh = optionalElement('icon-update-refresh');
+    const detectedEnvBadge = optionalElement('detected-env-badge');
+    const updateIndicatorDot = optionalElement('update-indicator-dot');
 
     const inputToken = optionalElement('input-github-token');
     const btnSaveToken = optionalElement('btn-save-token');
     const btnClearToken = optionalElement('btn-clear-token');
     const tokenFeedback = optionalElement('token-feedback-msg');
+
+    let currentSystemInfo = {
+      os: 'unknown',
+      osName: 'Detectando...',
+      packageType: 'web',
+      packageLabel: 'Sistema',
+    };
+
+    // Resolver detecção do sistema operacional e pacote
+    resolveSystemInfo().then((info) => {
+      currentSystemInfo = info;
+      if (detectedEnvBadge) {
+        detectedEnvBadge.textContent = `${info.osName} • ${info.packageLabel}`;
+        detectedEnvBadge.title = `Ambiente detectado: ${info.osName} (${info.packageLabel})`;
+      }
+      performSilentCheck();
+    });
 
     // Carregar token previamente salvo
     if (inputToken) {
@@ -210,6 +382,62 @@
       });
     });
 
+    function bindUpdateBoxEvents() {
+      if (!updateResultBox) return;
+
+      updateResultBox.querySelectorAll('.btn-asset-dl').forEach((btn) => {
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const downloadUrl = btn.dataset.url;
+          if (downloadUrl) {
+            openExternal(downloadUrl);
+          }
+        });
+      });
+
+      updateResultBox.querySelectorAll('a[href^="http"]').forEach((link) => {
+        link.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          openExternal(link.getAttribute('href'));
+        });
+      });
+    }
+
+    async function performSilentCheck() {
+      try {
+        const token = getStoredToken();
+        let release = null;
+        if (global.api?.checkUpdates) {
+          const result = await global.api.checkUpdates(token);
+          if (result && result.success) {
+            release = result.release;
+            if (result.systemInfo) currentSystemInfo = result.systemInfo;
+          }
+        } else {
+          const headers = { Accept: 'application/vnd.github.v3+json' };
+          if (token) headers.Authorization = `Bearer ${token}`;
+          const response = await fetch(GITHUB_RELEASES_API, { headers });
+          if (response.ok) release = await response.json();
+        }
+
+        if (release) {
+          const latestTag = (release.tag_name || '').replace(/^v/, '');
+          const isNewer = latestTag && compareSemver(latestTag, CURRENT_VERSION) > 0;
+          if (isNewer) {
+            if (updateIndicatorDot) updateIndicatorDot.classList.add('active');
+            if (updateResultBox) {
+              updateResultBox.style.display = 'block';
+              updateResultBox.className = 'update-result-box update-available';
+              updateResultBox.innerHTML = renderUpdateAvailableBox(release, currentSystemInfo);
+              bindUpdateBoxEvents();
+            }
+          }
+        }
+      } catch {
+        // Checagem silenciosa sem poluição de UI
+      }
+    }
+
     async function checkForUpdates() {
       if (!updateResultBox) return;
 
@@ -221,13 +449,7 @@
       if (iconRefresh) iconRefresh.classList.add('spinning');
       if (btnCheckUpdates) btnCheckUpdates.disabled = true;
 
-      const headers = { Accept: 'application/vnd.github.v3+json' };
       const token = getStoredToken();
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
-      const platform = detectPlatform();
 
       try {
         let release = null;
@@ -240,7 +462,15 @@
             throw new Error(result.error || `Erro HTTP ${result.status}`);
           }
           release = result.release;
+          if (result.systemInfo) {
+            currentSystemInfo = result.systemInfo;
+            if (detectedEnvBadge) {
+              detectedEnvBadge.textContent = `${currentSystemInfo.osName} • ${currentSystemInfo.packageLabel}`;
+            }
+          }
         } else {
+          const headers = { Accept: 'application/vnd.github.v3+json' };
+          if (token) headers.Authorization = `Bearer ${token}`;
           const response = await fetch(GITHUB_RELEASES_API, { headers });
           if (!response.ok) {
             if (response.status === 403) {
@@ -250,59 +480,21 @@
           }
           release = await response.json();
         }
-        const latestTag = (release.tag_name || '').replace(/^v/, '');
-        const releaseUrl = release.html_url || `${GITHUB_REPO_URL}/releases`;
-        const publishDate = formatDate(release.published_at);
-        const assets = release.assets || [];
 
+        const latestTag = (release.tag_name || '').replace(/^v/, '');
         const isNewer = latestTag && compareSemver(latestTag, CURRENT_VERSION) > 0;
 
         if (isNewer) {
+          if (updateIndicatorDot) updateIndicatorDot.classList.add('active');
           updateResultBox.className = 'update-result-box update-available';
-          updateResultBox.innerHTML = `
-            <div class="update-msg-title">Nova versão disponível: v${latestTag} ${publishDate ? `(${publishDate})` : ''}</div>
-            <p>Uma versão mais recente do ControLAB está pronta para download.</p>
-            <div class="release-assets-section">
-              <span class="assets-section-title">Instaladores disponíveis:</span>
-              ${renderAssetsList(assets, platform)}
-            </div>
-            <div class="release-footer-links">
-              <a href="${releaseUrl}" class="external-link-row" target="_blank" rel="noopener noreferrer">
-                <span>Ver notas da versão no GitHub &rarr;</span>
-              </a>
-            </div>
-          `;
+          updateResultBox.innerHTML = renderUpdateAvailableBox(release, currentSystemInfo);
         } else {
+          if (updateIndicatorDot) updateIndicatorDot.classList.remove('active');
           updateResultBox.className = 'update-result-box up-to-date';
-          updateResultBox.innerHTML = `
-            <div class="update-msg-title">Você já está com a versão mais recente (v${CURRENT_VERSION})!</div>
-            <p>Seu aplicativo está atualizado com as últimas melhorias de engenharia e controle.</p>
-            ${assets.length > 0 ? `
-              <div class="release-assets-section">
-                <span class="assets-section-title">Instaladores da versão atual (v${CURRENT_VERSION}):</span>
-                ${renderAssetsList(assets, platform)}
-              </div>
-            ` : ''}
-          `;
+          updateResultBox.innerHTML = renderUpToDateBox(currentSystemInfo);
         }
 
-        // Adicionar eventos de download nos botões de asset
-        updateResultBox.querySelectorAll('.btn-asset-dl').forEach((btn) => {
-          btn.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            const downloadUrl = btn.dataset.url;
-            if (downloadUrl) {
-              openExternal(downloadUrl);
-            }
-          });
-        });
-
-        updateResultBox.querySelectorAll('a[href^="http"]').forEach((link) => {
-          link.addEventListener('click', (ev) => {
-            ev.preventDefault();
-            openExternal(link.getAttribute('href'));
-          });
-        });
+        bindUpdateBoxEvents();
 
       } catch (error) {
         updateResultBox.className = 'update-result-box update-fallback';

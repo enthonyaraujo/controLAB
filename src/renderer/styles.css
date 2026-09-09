@@ -594,6 +594,23 @@ body {
   transform: scale(1.05);
 }
 
+.update-indicator-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #facc15;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.9);
+  display: none;
+  pointer-events: none;
+}
+
+.update-indicator-dot.active {
+  display: block;
+}
+
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
@@ -2324,6 +2341,17 @@ button {
   border-radius: 6px;
 }
 
+.detected-env-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-primary) 28%, transparent);
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
 .settings-card-desc {
   font-size: 0.82rem;
   color: var(--text-muted);
@@ -2669,6 +2697,90 @@ button {
 
 .release-footer-links {
   margin-top: 10px;
+}
+
+/* ==========================================================================
+   PACOTE DIRECIONADO E DETECTADO
+   ========================================================================== */
+.target-package-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  margin: 10px 0;
+  background: color-mix(in srgb, var(--accent-emerald) 10%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent-emerald) 35%, transparent);
+  border-radius: 8px;
+}
+
+.target-package-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.target-pkg-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-emerald);
+  letter-spacing: 0.4px;
+}
+
+.target-pkg-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.target-pkg-filename {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-family: var(--font-code);
+}
+
+.btn-download-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: var(--accent-emerald);
+  color: #022c22;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.btn-download-primary:hover {
+  background: color-mix(in srgb, var(--accent-emerald) 85%, #fff);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.other-assets-details {
+  margin-top: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: var(--bg-app);
+}
+
+.other-assets-summary {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.other-assets-summary:hover {
+  color: var(--text-main);
 }
 
 /* ==========================================================================

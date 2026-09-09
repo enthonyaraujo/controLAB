@@ -89,6 +89,57 @@
       const release = await response.json();
       return { success: true, release };
     },
+    getSystemInfo: async () => {
+      if (global.Capacitor?.isNativePlatform?.()) {
+        return {
+          os: 'android',
+          osName: 'Android Nativo',
+          packageType: 'apk',
+          packageLabel: 'Android (.apk)',
+          arch: 'arm64',
+          appVersion: '1.2.0',
+        };
+      }
+      const ua = (navigator.userAgent || '').toLowerCase();
+      if (ua.includes('android')) {
+        return {
+          os: 'android',
+          osName: 'Android',
+          packageType: 'apk',
+          packageLabel: 'Android (.apk)',
+          arch: '',
+          appVersion: '1.2.0',
+        };
+      }
+      if (ua.includes('win')) {
+        return {
+          os: 'windows',
+          osName: 'Windows',
+          packageType: 'exe',
+          packageLabel: 'Windows 64-bit (.exe)',
+          arch: 'x64',
+          appVersion: '1.2.0',
+        };
+      }
+      if (ua.includes('linux')) {
+        return {
+          os: 'linux',
+          osName: 'Linux',
+          packageType: 'deb',
+          packageLabel: 'Debian / Ubuntu (.deb)',
+          arch: 'x64',
+          appVersion: '1.2.0',
+        };
+      }
+      return {
+        os: 'web',
+        osName: 'Navegador Web',
+        packageType: 'web',
+        packageLabel: 'Web',
+        arch: '',
+        appVersion: '1.2.0',
+      };
+    },
   };
 
   if (!nativeLgr && 'serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
