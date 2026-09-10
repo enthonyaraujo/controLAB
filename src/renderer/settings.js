@@ -3,7 +3,7 @@
  */
 
 (function registerSettings(global) {
-  const CURRENT_VERSION = '3.0.0';
+  const CURRENT_VERSION = '3.0.1';
   const GITHUB_REPO_URL = 'https://github.com/enthonyaraujo/controlab';
   const GITHUB_RELEASES_API = 'https://api.github.com/repos/enthonyaraujo/controlab/releases/latest';
 
