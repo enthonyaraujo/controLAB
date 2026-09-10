@@ -150,6 +150,18 @@ def _controller_latex(controller):
     return latex_expanded.replace("G(s) = ", "")
 
 
+def _stability_margins(system):
+    gain_margin, phase_margin, _, phase_cross, gain_cross, _ = ct.stability_margins(system)
+    gain_margin = float(gain_margin)
+    gain_margin_db = np.inf if np.isinf(gain_margin) else 20.0 * np.log10(max(gain_margin, np.finfo(float).tiny))
+    return {
+        "gain_margin_db": json_safe_number(float(gain_margin_db)),
+        "phase_margin_deg": json_safe_number(float(phase_margin)),
+        "phase_crossover_frequency": json_safe_number(float(phase_cross)),
+        "gain_crossover_frequency": json_safe_number(float(gain_cross)),
+    }
+
+
 def design_controller(
     plant_expression,
     *,
@@ -216,26 +228,52 @@ def design_controller(
     gains = np.concatenate(([0.0], np.logspace(-3, 3, 260)))
     locus_before = _root_locus_roots(plant, gains)
     locus_after = _root_locus_roots(compensated_loop, gains)
+    omega = np.logspace(-3, 3, 700)
+    frequency_before = ct.frequency_response(plant, omega)
+    frequency_after = ct.frequency_response(compensated_loop, omega)
+    magnitude_before = 20.0 * np.log10(np.maximum(np.asarray(frequency_before.magnitude).squeeze(), np.finfo(float).tiny))
+    magnitude_after = 20.0 * np.log10(np.maximum(np.asarray(frequency_after.magnitude).squeeze(), np.finfo(float).tiny))
+    phase_before = np.unwrap(np.asarray(frequency_before.phase).squeeze()) * 180.0 / np.pi
+    phase_after = np.unwrap(np.asarray(frequency_after.phase).squeeze()) * 180.0 / np.pi
+    margins_before = _stability_margins(plant)
+    margins_after = _stability_margins(compensated_loop)
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.2, 5.0))
-    axes[0].plot(t_before, y_before, color="#64748b", linewidth=1.8, label="Antes")
-    axes[0].plot(t_after, y_after, color="#2563eb", linewidth=2.2, label="Depois")
-    axes[0].set_title("Resposta ao degrau", loc="left", fontweight="bold")
-    axes[0].set_xlabel("Tempo (s)")
-    axes[0].set_ylabel("Saída")
-    axes[0].grid(True, alpha=0.25)
-    axes[0].legend()
+    fig, axes = plt.subplots(2, 2, figsize=(11.2, 8.2))
+    ax_step, ax_locus, ax_mag, ax_phase = axes.flat
+    ax_step.plot(t_before, y_before, color="#64748b", linewidth=1.8, label="Antes")
+    ax_step.plot(t_after, y_after, color="#2563eb", linewidth=2.2, label="Depois")
+    ax_step.set_title("Resposta ao degrau", loc="left", fontweight="bold")
+    ax_step.set_xlabel("Tempo (s)")
+    ax_step.set_ylabel("Saída")
+    ax_step.grid(True, alpha=0.25)
+    ax_step.legend()
 
     for branch in range(locus_before.shape[1]):
-        axes[1].plot(np.real(locus_before[:, branch]), np.imag(locus_before[:, branch]), color="#94a3b8", linewidth=1.0, alpha=0.8)
+        ax_locus.plot(np.real(locus_before[:, branch]), np.imag(locus_before[:, branch]), color="#94a3b8", linewidth=1.0, alpha=0.8)
     for branch in range(locus_after.shape[1]):
-        axes[1].plot(np.real(locus_after[:, branch]), np.imag(locus_after[:, branch]), color="#7c3aed", linewidth=1.5)
-    axes[1].axhline(0, color="#64748b", linewidth=0.7)
-    axes[1].axvline(0, color="#64748b", linewidth=0.7)
-    axes[1].set_title("LGR antes (cinza) e depois (roxo)", loc="left", fontweight="bold")
-    axes[1].set_xlabel("Eixo real")
-    axes[1].set_ylabel("Eixo imaginário")
-    axes[1].grid(True, alpha=0.25)
+        ax_locus.plot(np.real(locus_after[:, branch]), np.imag(locus_after[:, branch]), color="#7c3aed", linewidth=1.5)
+    ax_locus.axhline(0, color="#64748b", linewidth=0.7)
+    ax_locus.axvline(0, color="#64748b", linewidth=0.7)
+    ax_locus.set_title("LGR antes (cinza) e depois (roxo)", loc="left", fontweight="bold")
+    ax_locus.set_xlabel("Eixo real")
+    ax_locus.set_ylabel("Eixo imaginário")
+    ax_locus.grid(True, alpha=0.25)
+
+    ax_mag.semilogx(omega, magnitude_before, color="#64748b", linewidth=1.7, label="Antes")
+    ax_mag.semilogx(omega, magnitude_after, color="#059669", linewidth=2.0, label="Depois")
+    ax_mag.set_title("Bode — magnitude", loc="left", fontweight="bold")
+    ax_mag.set_xlabel("Frequência (rad/s)")
+    ax_mag.set_ylabel("Magnitude (dB)")
+    ax_mag.grid(True, which="both", alpha=0.25)
+    ax_mag.legend()
+
+    ax_phase.semilogx(omega, phase_before, color="#64748b", linewidth=1.7, label="Antes")
+    ax_phase.semilogx(omega, phase_after, color="#f59e0b", linewidth=2.0, label="Depois")
+    ax_phase.set_title("Bode — fase", loc="left", fontweight="bold")
+    ax_phase.set_xlabel("Frequência (rad/s)")
+    ax_phase.set_ylabel("Fase (graus)")
+    ax_phase.grid(True, which="both", alpha=0.25)
+    ax_phase.legend()
     fig.suptitle(design_label, fontsize=13, fontweight="bold")
     fig.tight_layout()
     image, svg = figure_payload(fig)
@@ -250,6 +288,10 @@ def design_controller(
         {"label": "Sobressinal depois", "value": metric_value(metrics_after, "overshoot_percent"), "unit": "%"},
         {"label": "Acomodação antes", "value": metric_value(metrics_before, "settling_time"), "unit": "s"},
         {"label": "Acomodação depois", "value": metric_value(metrics_after, "settling_time"), "unit": "s"},
+        {"label": "Margem de ganho antes", "value": str(margins_before["gain_margin_db"]), "unit": "dB"},
+        {"label": "Margem de ganho depois", "value": str(margins_after["gain_margin_db"]), "unit": "dB"},
+        {"label": "Margem de fase antes", "value": str(margins_before["phase_margin_deg"]), "unit": "°"},
+        {"label": "Margem de fase depois", "value": str(margins_after["phase_margin_deg"]), "unit": "°"},
     ]
     if parameters:
         metric_rows.extend([
@@ -264,6 +306,8 @@ def design_controller(
         "controller_parameters": parameters,
         "before": metrics_before,
         "after": metrics_after,
+        "frequency_margins_before": margins_before,
+        "frequency_margins_after": margins_after,
         "closed_loop_poles_before": serialize_complex(ct.poles(uncompensated)),
         "closed_loop_poles_after": serialize_complex(ct.poles(compensated)),
         "plant_latex_expanded": plant_latex_expanded,

@@ -22,6 +22,7 @@ class ControllerDesignTests(unittest.TestCase):
         self.assertAlmostEqual(params["kp"], 3.6)
         self.assertAlmostEqual(params["ki"], 3.6)
         self.assertAlmostEqual(params["kd"], 0.9)
+        self.assertIn("frequency_margins_after", result["details"])
         json.dumps(result, allow_nan=False)
 
     def test_cohen_coon_and_chr_are_available(self):
