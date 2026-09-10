@@ -41,7 +41,16 @@ A aplicação organiza os domínios clássicos e modernos de controle a partir d
 
 ## Interface da Aplicação
 
-O ControLAB oferece uma interface escura, responsiva e 100% offline, projetada para estudo, simulação e projeto de sistemas dinâmicos. Veja abaixo as capturas de tela em resolução completa de cada módulo (clique em qualquer imagem para abrir em tamanho original):
+O ControLAB oferece uma interface escura, responsiva e 100% offline, projetada para estudo, simulação e projeto de sistemas dinâmicos. Veja abaixo as capturas de tela em resolução completa da tela principal e de cada módulo (clique em qualquer imagem para abrir em tamanho original):
+
+### Tela Principal: Hub Central Integrado (v3.0.0)
+Visão inicial unificada com acesso direto a todos os 6 módulos analíticos da suíte de sistemas de controle.
+
+<p align="center">
+  <a href="docs/screenshots/hub-modulos.webp">
+    <img src="docs/screenshots/hub-modulos.webp" alt="Hub Central de Módulos do ControLAB" width="100%">
+  </a>
+</p>
 
 ### 1. Resposta no Domínio do Tempo
 Simulação da resposta transitória e em regime permanente para sinais degrau, impulso e rampa, com cálculo automático de métricas transitórias ($\%OS$, $t_s$, $t_p$, $t_r$), fator de amortecimento ($\zeta$), frequência natural ($\omega_n$) e mapa de polos.
