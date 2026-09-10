@@ -8,6 +8,7 @@ const sources = [
   'control_utils.py',
   'routh_hurwitz.py',
   'time_response.py',
+  'frequency_response.py',
   'python_bridge.py',
   'android_bridge.py',
 ];

@@ -41,6 +41,43 @@
         ['Sistema tipo 1', '5 / (s * (s + 2))'],
       ],
     },
+    frequency: {
+      action: 'frequency_response',
+      title: 'Resposta em Frequência',
+      kicker: 'Bode & Nyquist',
+      description: 'Compare a curva real às assíntotas de Bode, visualize Nyquist e obtenha margens e frequências críticas.',
+      filename: 'resposta-em-frequencia',
+      fields: [
+        {
+          name: 'expr',
+          label: 'Função de transferência G(s)',
+          type: 'text',
+          value: '10 / (s * (s + 2) * (s + 5))',
+          placeholder: 'Ex.: 10 / (s * (s + 2) * (s + 5))',
+        },
+        {
+          name: 'omega_min',
+          label: 'Frequência mínima (rad/s)',
+          type: 'number',
+          value: '0.01',
+          min: '0.000001',
+          step: '0.01',
+        },
+        {
+          name: 'omega_max',
+          label: 'Frequência máxima (rad/s)',
+          type: 'number',
+          value: '100',
+          min: '0.00001',
+          step: '1',
+        },
+      ],
+      examples: [
+        ['Primeira ordem', '1 / (s + 1)'],
+        ['Segunda ordem', '25 / (s^2 + 4*s + 25)'],
+        ['Tipo 1', '10 / (s * (s + 2) * (s + 5))'],
+      ],
+    },
   };
 
   function element(id) {

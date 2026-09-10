@@ -32,6 +32,7 @@ from routh_hurwitz import (
     evaluate_k_point,
 )
 from time_response import analyze_time_response, get_time_response_presets
+from frequency_response import analyze_frequency_response, get_frequency_presets
 
 
 def get_transfer_function(payload):
@@ -201,6 +202,15 @@ def dispatch(data):
             final_time=data.get("final_time"),
             points=data.get("points", 900),
             settling_threshold=data.get("settling_threshold", 0.02),
+        )
+    if action == "frequency_response_presets":
+        return {"success": True, "presets": get_frequency_presets()}
+    if action == "frequency_response":
+        return analyze_frequency_response(
+            data.get("expr") or "10 / (s * (s + 2) * (s + 5))",
+            omega_min=data.get("omega_min", 0.01),
+            omega_max=data.get("omega_max", 100.0),
+            points=data.get("points", 900),
         )
     raise ValueError(f"Ação desconhecida: {action}")
 
