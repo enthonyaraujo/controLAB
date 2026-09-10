@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('api', {
   calculateRouth: (payload) => ipcRenderer.invoke('calculate-routh', payload),
   getRouthPresets: () => ipcRenderer.invoke('get-routh-presets'),
   evaluateRouthK: (payload) => ipcRenderer.invoke('evaluate-routh-k', payload),
+  runScientificAnalysis: (action, payload) => ipcRenderer.invoke('run-scientific-analysis', action, payload),
   saveImage: (payload) => ipcRenderer.invoke('save-image', payload),
   saveSVG: (payload) => ipcRenderer.invoke('save-svg', payload),
   copyImageToClipboard: (base64) => ipcRenderer.invoke('copy-image', base64),
@@ -23,4 +24,3 @@ contextBridge.exposeInMainWorld('api', {
     return () => ipcRenderer.removeListener('on-update-download-progress', handler);
   },
 });
-

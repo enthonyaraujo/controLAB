@@ -168,7 +168,7 @@
         </article>
 
         <!-- CARD 3: RESPOSTA NO DOMÍNIO DO TEMPO -->
-        <article class="module-card card-soon" data-module="Resposta no Domínio do Tempo">
+        <article id="card-module-time" class="module-card card-active" data-page="time" data-module="Resposta no Domínio do Tempo" tabindex="0">
           <div class="card-top">
             <div class="module-icon-box icon-time">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -178,9 +178,9 @@
                 <line x1="2" y1="20" x2="22" y2="20"/>
               </svg>
             </div>
-            <span class="module-status-badge badge-soon">
+            <span class="module-status-badge badge-active">
               <span class="status-dot"></span>
-              Em breve
+              Disponível
             </span>
           </div>
 
@@ -201,8 +201,12 @@
           </div>
 
           <div class="card-footer">
-            <button class="btn-module-action btn-module-soon" type="button" data-module="Resposta no Domínio do Tempo">
-              <span>Em desenvolvimento</span>
+            <button id="btn-open-time" class="btn-module-action btn-module-primary" type="button">
+              <span>Abrir Módulo</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
             </button>
           </div>
         </article>
@@ -993,6 +997,64 @@
     </div>
   </aside>
 
+  <!-- ========================================================= -->
+  <!-- WORKSPACE COMPARTILHADO DOS MÓDULOS CIENTÍFICOS           -->
+  <!-- ========================================================= -->
+  <div id="page-scientific" class="app-page">
+    <div class="scientific-workspace">
+      <aside class="scientific-sidebar">
+        <div class="scientific-sidebar-content">
+          <span id="scientific-kicker" class="section-kicker">Análise de Sistemas</span>
+          <h1 id="scientific-title">Módulo científico</h1>
+          <p id="scientific-description" class="scientific-description"></p>
+          <form id="scientific-form" class="scientific-form"></form>
+        </div>
+        <div class="scientific-sidebar-footer">
+          <button id="btn-run-scientific" class="btn btn-primary btn-calc-action" type="submit" form="scientific-form">
+            <span>Analisar sistema</span>
+            <kbd class="shortcut-badge">Ctrl + Enter</kbd>
+          </button>
+        </div>
+      </aside>
+
+      <main class="scientific-main">
+        <div id="scientific-loading" class="scientific-state" hidden>
+          <div class="spinner"></div>
+          <p>Executando a análise no motor científico...</p>
+        </div>
+        <div id="scientific-empty" class="scientific-state">
+          <h2>Configure o sistema</h2>
+          <p>Preencha os parâmetros ao lado para gerar fórmulas, métricas e gráficos.</p>
+        </div>
+        <div id="scientific-error" class="scientific-state scientific-error" hidden></div>
+        <div id="scientific-results" class="scientific-results" hidden>
+          <section class="scientific-result-card scientific-result-heading">
+            <div>
+              <span class="section-kicker">Resultado</span>
+              <h2 id="scientific-result-title"></h2>
+              <p id="scientific-result-description"></p>
+            </div>
+            <div class="scientific-actions">
+              <button id="btn-scientific-png" class="btn btn-secondary" type="button">PNG</button>
+              <button id="btn-scientific-svg" class="btn btn-secondary" type="button">SVG</button>
+            </div>
+          </section>
+          <section id="scientific-latex" class="scientific-latex-grid"></section>
+          <section id="scientific-metrics" class="scientific-metrics-grid"></section>
+          <section id="scientific-plot-card" class="scientific-result-card scientific-plot-card">
+            <img id="scientific-plot" alt="Gráfico da análise científica" />
+          </section>
+          <section id="scientific-details-card" class="scientific-result-card" hidden>
+            <details>
+              <summary>Dados técnicos completos</summary>
+              <pre id="scientific-details"></pre>
+            </details>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
   <!-- Botão Flutuante de Retorno ao Topo no Mobile -->
   <button id="btn-scroll-top" class="floating-top-btn" title="Voltar ao início da página" aria-label="Voltar ao topo">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
@@ -1167,6 +1229,7 @@
   <script src="settings.js"></script>
   <script src="navigation.js"></script>
   <script src="routh.js"></script>
+  <script src="scientific-modules.js"></script>
   <!-- App Script -->
   <script src="app.js"></script>
 </body>

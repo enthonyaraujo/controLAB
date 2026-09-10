@@ -3,10 +3,11 @@
     return document.getElementById(id);
   }
 
-  function initializeNavigation({ renderMathInContainer, showToast, onOpenLgr, onOpenRouth }) {
+  function initializeNavigation({ renderMathInContainer, showToast, onOpenLgr, onOpenRouth, onOpenScientific }) {
     const pageHome = optionalElement('page-home');
     const pageLgr = optionalElement('page-lgr');
     const pageRouth = optionalElement('page-routh');
+    const pageScientific = optionalElement('page-scientific');
     const btnNavHome = optionalElement('btn-nav-home');
     const globalBrand = optionalElement('global-brand');
     const globalBrandTitle = optionalElement('global-brand-title');
@@ -25,10 +26,12 @@
       const isHome = pageId === 'home' || !pageId;
       const isLgr = pageId === 'lgr';
       const isRouth = pageId === 'routh';
+      const isScientific = ['time', 'frequency', 'controllers', 'state-space'].includes(pageId);
 
       pageHome?.classList.toggle('active', isHome);
       pageLgr?.classList.toggle('active', isLgr);
       pageRouth?.classList.toggle('active', isRouth);
+      pageScientific?.classList.toggle('active', isScientific);
 
       const hasBack = !isHome;
       if (btnNavHome) btnNavHome.style.display = hasBack ? 'inline-flex' : 'none';
@@ -45,6 +48,14 @@
           globalNavbarTitle.textContent = 'Lugar Geométrico das Raízes';
         } else if (isRouth) {
           globalNavbarTitle.textContent = 'Critério de Routh-Hurwitz';
+        } else if (isScientific) {
+          const titles = {
+            time: 'Resposta no Domínio do Tempo',
+            frequency: 'Resposta em Frequência',
+            controllers: 'Projeto de Controladores',
+            'state-space': 'Espaço de Estados',
+          };
+          globalNavbarTitle.textContent = titles[pageId];
         } else {
           globalNavbarTitle.textContent = 'Hub de Módulos';
         }
@@ -56,6 +67,10 @@
       } else if (isRouth) {
         renderPageOnce(pageRouth);
         if (onOpenRouth) onOpenRouth();
+      } else if (isScientific) {
+        renderPageOnce(pageScientific);
+        onOpenScientific?.(pageId);
+        pageScientific?.scrollTo?.({ top: 0 });
       } else {
         if (pageHome) pageHome.scrollTop = 0;
         renderPageOnce(pageHome);
@@ -73,6 +88,22 @@
       navigateTo('routh');
     });
     optionalElement('card-module-routh')?.addEventListener('click', () => navigateTo('routh'));
+
+    document.querySelectorAll('.module-card.card-active[data-page]').forEach((card) => {
+      if (['lgr', 'routh'].includes(card.dataset.page)) return;
+      const open = () => navigateTo(card.dataset.page);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open();
+        }
+      });
+      card.querySelector('.btn-module-primary')?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        open();
+      });
+    });
 
     btnNavHome?.addEventListener('click', () => navigateTo('home'));
     optionalElement('btn-sidebar-back-home')?.addEventListener('click', () => navigateTo('home'));

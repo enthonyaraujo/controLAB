@@ -1085,6 +1085,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  let scientificController = null;
+  if (window.ControLABScientific) {
+    scientificController = window.ControLABScientific.initialize({
+      renderMath,
+      showToast,
+    });
+  }
+
   if (!window.LGRNavigation) {
     showToast('Não foi possível carregar o menu de módulos.', 'error', 4000);
     return;
@@ -1095,5 +1103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast,
     onOpenLgr: startLgrModule,
     onOpenRouth: startRouthModule,
+    onOpenScientific: (moduleKey) => scientificController?.open(moduleKey),
   });
 });

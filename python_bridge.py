@@ -31,6 +31,7 @@ from routh_hurwitz import (
     analyze_routh_hurwitz,
     evaluate_k_point,
 )
+from time_response import analyze_time_response, get_time_response_presets
 
 
 def get_transfer_function(payload):
@@ -192,6 +193,15 @@ def dispatch(data):
         expr = data.get("expr") or "s^3 + 3s^2 + 2s + K"
         k_val = float(data.get("k_val", 1.0))
         return evaluate_k_point(expr, k_val)
+    if action == "time_response_presets":
+        return {"success": True, "presets": get_time_response_presets()}
+    if action == "time_response":
+        return analyze_time_response(
+            data.get("expr") or "4 / (s^2 + 2*s + 4)",
+            final_time=data.get("final_time"),
+            points=data.get("points", 900),
+            settling_threshold=data.get("settling_threshold", 0.02),
+        )
     raise ValueError(f"Ação desconhecida: {action}")
 
 

@@ -170,6 +170,14 @@ ipcMain.handle('evaluate-routh-k', async (event, payload) => {
   }
 });
 
+ipcMain.handle('run-scientific-analysis', async (event, action, payload) => {
+  try {
+    return await runPythonBridge({ action, ...(payload || {}) });
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 ipcMain.handle('save-image', async (event, { base64, defaultName }) => {
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
     title: 'Salvar Gráfico do LGR',
