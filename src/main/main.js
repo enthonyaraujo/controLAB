@@ -1,7 +1,9 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, clipboard, nativeImage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
+const util = require('util');
+const execPromise = util.promisify(exec);
 
 Menu.setApplicationMenu(null);
 
@@ -341,6 +343,183 @@ ipcMain.handle('check-github-updates', async (event, token) => {
     return { success: false, error: err.message };
   }
 });
+
+let currentDownloadAbortController = null;
+
+ipcMain.handle('download-update-package', async (event, { url, filename, expectedSize, token }) => {
+  try {
+    if (currentDownloadAbortController) {
+      currentDownloadAbortController.abort();
+      currentDownloadAbortController = null;
+    }
+
+    const updatesDir = path.join(app.getPath('temp'), 'controlab-updates');
+    await fs.promises.mkdir(updatesDir, { recursive: true });
+    const targetFilePath = path.join(updatesDir, filename);
+
+    if (fs.existsSync(targetFilePath)) {
+      try {
+        await fs.promises.unlink(targetFilePath);
+      } catch (_) {}
+    }
+
+    currentDownloadAbortController = new AbortController();
+    const headers = {
+      'User-Agent': 'ControLAB-Desktop',
+      'Accept': 'application/octet-stream',
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      headers,
+      redirect: 'follow',
+      signal: currentDownloadAbortController.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Falha no download da atualizacao (HTTP ${response.status})`);
+    }
+
+    const totalBytes = parseInt(response.headers.get('content-length') || expectedSize || '0', 10);
+    const fileStream = fs.createWriteStream(targetFilePath);
+
+    let transferred = 0;
+    let lastProgressTime = Date.now();
+    let lastBytes = 0;
+    let bytesPerSecond = 0;
+
+    for await (const chunk of response.body) {
+      fileStream.write(chunk);
+      transferred += chunk.length;
+      const now = Date.now();
+      if (now - lastProgressTime >= 150) {
+        bytesPerSecond = Math.round(((transferred - lastBytes) / (now - lastProgressTime)) * 1000);
+        lastProgressTime = now;
+        lastBytes = transferred;
+        const percent = totalBytes > 0 ? Math.min(100, Math.round((transferred / totalBytes) * 100)) : null;
+
+        mainWindow?.webContents.send('on-update-download-progress', {
+          percent,
+          transferred,
+          total: totalBytes,
+          bytesPerSecond,
+        });
+      }
+    }
+
+    await new Promise((resolve, reject) => {
+      fileStream.end((err) => (err ? reject(err) : resolve()));
+    });
+
+    currentDownloadAbortController = null;
+
+    mainWindow?.webContents.send('on-update-download-progress', {
+      percent: 100,
+      transferred,
+      total: totalBytes || transferred,
+      bytesPerSecond: 0,
+      completed: true,
+      filePath: targetFilePath,
+    });
+
+    return { success: true, filePath: targetFilePath };
+  } catch (err) {
+    currentDownloadAbortController = null;
+    if (err.name === 'AbortError') {
+      return { success: false, canceled: true };
+    }
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('cancel-update-download', async () => {
+  if (currentDownloadAbortController) {
+    currentDownloadAbortController.abort();
+    currentDownloadAbortController = null;
+    return { success: true };
+  }
+  return { success: false };
+});
+
+ipcMain.handle('open-update-folder', async (event, filePath) => {
+  if (filePath && fs.existsSync(filePath)) {
+    shell.showItemInFolder(filePath);
+    return { success: true };
+  }
+  return { success: false, error: 'Arquivo nao encontrado.' };
+});
+
+ipcMain.handle('install-update-package', async (event, { filePath }) => {
+  try {
+    if (!filePath || !fs.existsSync(filePath)) {
+      return { success: false, error: 'Arquivo do instalador nao encontrado.' };
+    }
+
+    const ext = path.extname(filePath).toLowerCase();
+    const platform = process.platform;
+
+    if (platform === 'win32' || ext === '.exe') {
+      const child = spawn(filePath, [], { detached: true, stdio: 'ignore' });
+      child.unref();
+      setTimeout(() => {
+        app.quit();
+      }, 600);
+      return { success: true, method: 'spawn-exe' };
+    }
+
+    if (platform === 'linux') {
+      if (ext === '.deb') {
+        try {
+          const cmd = `pkexec apt-get install -y --allow-downgrades "${filePath}"`;
+          await execPromise(cmd);
+          spawn('controlab', [], { detached: true, stdio: 'ignore' }).unref();
+          setTimeout(() => {
+            app.quit();
+          }, 600);
+          return { success: true, method: 'pkexec-apt' };
+        } catch (pkErr) {
+          const openResult = await shell.openPath(filePath);
+          if (!openResult) {
+            return { success: true, method: 'open-path', fallbackNote: 'Instalador grafico do sistema iniciado.' };
+          }
+          throw pkErr;
+        }
+      } else if (ext === '.rpm') {
+        try {
+          const cmd = `pkexec rpm -Uvh --replacepkgs "${filePath}"`;
+          await execPromise(cmd);
+          spawn('controlab', [], { detached: true, stdio: 'ignore' }).unref();
+          setTimeout(() => {
+            app.quit();
+          }, 600);
+          return { success: true, method: 'pkexec-rpm' };
+        } catch (pkErr) {
+          await shell.openPath(filePath);
+          return { success: true, method: 'open-path' };
+        }
+      } else if (ext === '.appimage') {
+        fs.chmodSync(filePath, 0o755);
+        const child = spawn(filePath, [], { detached: true, stdio: 'ignore' });
+        child.unref();
+        setTimeout(() => {
+          app.quit();
+        }, 600);
+        return { success: true, method: 'spawn-appimage' };
+      }
+    }
+
+    const openErr = await shell.openPath(filePath);
+    if (openErr) {
+      shell.showItemInFolder(filePath);
+    }
+    return { success: true, method: 'open-path' };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 
 app.whenReady().then(() => {
   createWindow();

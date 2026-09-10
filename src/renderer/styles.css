@@ -2806,6 +2806,194 @@ textarea::placeholder {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
 }
 
+.target-package-card.in-progress,
+.target-package-card.install-ready {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.target-pkg-action-wrap {
+  display: flex;
+  align-items: center;
+  width: auto;
+}
+
+.target-package-card.in-progress .target-pkg-action-wrap,
+.target-package-card.install-ready .target-pkg-action-wrap {
+  width: 100%;
+}
+
+/* Barra de Progresso de Atualizacao */
+.inapp-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.inapp-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.inapp-progress-title {
+  color: var(--text-main);
+}
+
+.inapp-progress-percent {
+  font-family: var(--font-code);
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.inapp-progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.inapp-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-gradient);
+  border-radius: 3px;
+  transition: width 0.15s ease;
+}
+
+.inapp-progress-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.btn-inapp-cancel {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-inapp-cancel:hover {
+  color: var(--accent-rose);
+  border-color: var(--accent-rose);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Card Pronto para Instalacao */
+.inapp-install-ready-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.inapp-install-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inapp-install-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent-emerald);
+}
+
+.inapp-install-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.inapp-install-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-install-execute {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  background: var(--accent-emerald);
+  color: #022c22;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.btn-install-execute:hover {
+  background: color-mix(in srgb, var(--accent-emerald) 85%, #fff);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.btn-install-execute:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-open-folder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-open-folder:hover {
+  border-color: var(--border-focus);
+  background: var(--bg-card-hover);
+}
+
+.inapp-install-hint {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.inapp-error-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--accent-rose);
+  width: 100%;
+}
+
+
 .other-assets-details {
   margin-top: 8px;
   border: 1px solid var(--border-color);
@@ -3971,6 +4159,25 @@ textarea::placeholder {
   border-color: #fde68a;
   color: #b45309;
 }
+
+[data-theme="light"] .btn-install-execute {
+  background: #047857;
+  color: #ffffff;
+}
+
+[data-theme="light"] .btn-install-execute:hover {
+  background: #065f46;
+}
+
+[data-theme="light"] .inapp-progress-track {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .inapp-progress-fill {
+  background: #2563eb;
+}
+
 
 
 

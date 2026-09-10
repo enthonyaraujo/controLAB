@@ -89,6 +89,14 @@
     return `${mb.toFixed(1)} MB`;
   }
 
+  function formatSpeed(bytesPerSec) {
+    if (!bytesPerSec || bytesPerSec <= 0) return '';
+    const mb = bytesPerSec / (1024 * 1024);
+    if (mb >= 1) return `${mb.toFixed(1)} MB/s`;
+    const kb = bytesPerSec / 1024;
+    return `${kb.toFixed(0)} KB/s`;
+  }
+
   function formatDate(isoString) {
     if (!isoString) return '';
     try {
@@ -217,20 +225,22 @@
     let targetCardHtml = '';
     if (targetAsset) {
       targetCardHtml = `
-        <div class="target-package-card">
+        <div class="target-package-card" id="target-package-card">
           <div class="target-package-info">
             <span class="target-pkg-badge">Detectado para seu sistema</span>
             <div class="target-pkg-title">${systemInfo.osName} • ${systemInfo.packageLabel}</div>
             <div class="target-pkg-filename">${targetAsset.name} (${formatBytes(targetAsset.size)})</div>
           </div>
-          <button class="btn-download-primary btn-asset-dl" data-url="${targetAsset.browser_download_url}" type="button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            <span>Baixar Atualização</span>
-          </button>
+          <div class="target-pkg-action-wrap" id="target-pkg-action-wrap">
+            <button class="btn-download-primary btn-inapp-update" id="btn-inapp-update" data-url="${targetAsset.browser_download_url}" data-filename="${targetAsset.name}" data-size="${targetAsset.size || 0}" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Atualizar no Aplicativo</span>
+            </button>
+          </div>
         </div>
       `;
     } else {
@@ -384,6 +394,189 @@
 
     function bindUpdateBoxEvents() {
       if (!updateResultBox) return;
+
+      const btnInappUpdate = updateResultBox.querySelector('#btn-inapp-update');
+      const targetPkgCard = updateResultBox.querySelector('#target-package-card');
+      const targetActionWrap = updateResultBox.querySelector('#target-pkg-action-wrap');
+
+      if (btnInappUpdate && targetPkgCard && targetActionWrap) {
+        btnInappUpdate.addEventListener('click', async (ev) => {
+          ev.preventDefault();
+
+          if (!global.api?.downloadUpdatePackage) {
+            const url = btnInappUpdate.dataset.url;
+            if (url) openExternal(url);
+            return;
+          }
+
+          const url = btnInappUpdate.dataset.url;
+          const filename = btnInappUpdate.dataset.filename;
+          const expectedSize = parseInt(btnInappUpdate.dataset.size || '0', 10);
+          const token = getStoredToken();
+
+          targetPkgCard.classList.add('in-progress');
+          targetActionWrap.innerHTML = `
+            <div class="inapp-progress-wrap">
+              <div class="inapp-progress-header">
+                <span class="inapp-progress-title">Baixando atualizacao...</span>
+                <span class="inapp-progress-percent" id="inapp-progress-percent">0%</span>
+              </div>
+              <div class="inapp-progress-track">
+                <div class="inapp-progress-fill" id="inapp-progress-fill" style="width: 0%"></div>
+              </div>
+              <div class="inapp-progress-footer">
+                <span class="inapp-progress-stats" id="inapp-progress-stats">Iniciando download...</span>
+                <button class="btn-inapp-cancel" id="btn-inapp-cancel" type="button">Cancelar</button>
+              </div>
+            </div>
+          `;
+
+          const progressFill = targetActionWrap.querySelector('#inapp-progress-fill');
+          const progressPercent = targetActionWrap.querySelector('#inapp-progress-percent');
+          const progressStats = targetActionWrap.querySelector('#inapp-progress-stats');
+          const btnCancel = targetActionWrap.querySelector('#btn-inapp-cancel');
+
+          btnCancel?.addEventListener('click', async () => {
+            if (global.api?.cancelUpdateDownload) {
+              await global.api.cancelUpdateDownload();
+            }
+          });
+
+          const unsubscribe = global.api.onUpdateDownloadProgress ? global.api.onUpdateDownloadProgress((prog) => {
+            if (prog.percent != null && progressFill && progressPercent) {
+              progressFill.style.width = `${prog.percent}%`;
+              progressPercent.textContent = `${prog.percent}%`;
+            }
+            if (progressStats) {
+              const speedText = prog.bytesPerSecond > 0 ? ` • ${formatSpeed(prog.bytesPerSecond)}` : '';
+              progressStats.textContent = `${formatBytes(prog.transferred)} de ${formatBytes(prog.total || expectedSize)}${speedText}`;
+            }
+          }) : null;
+
+          try {
+            const res = await global.api.downloadUpdatePackage({
+              url,
+              filename,
+              expectedSize,
+              token,
+            });
+
+            unsubscribe?.();
+
+            if (res && res.success && res.filePath) {
+              const downloadedPath = res.filePath;
+              targetPkgCard.classList.remove('in-progress');
+              targetPkgCard.classList.add('install-ready');
+
+              targetActionWrap.innerHTML = `
+                <div class="inapp-install-ready-wrap">
+                  <div class="inapp-install-header">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                      <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <div>
+                      <div class="inapp-install-title">Download Concluido com Sucesso</div>
+                      <div class="inapp-install-subtitle">${filename} pronto para ser instalado.</div>
+                    </div>
+                  </div>
+                  <div class="inapp-install-actions">
+                    <button class="btn-install-execute" id="btn-install-execute" type="button">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                      <span>Instalar e Reiniciar</span>
+                    </button>
+                    <button class="btn-open-folder" id="btn-open-folder" type="button" title="Abrir pasta onde o arquivo foi baixado">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                      </svg>
+                      <span>Abrir Pasta</span>
+                    </button>
+                  </div>
+                  <div class="inapp-install-hint" id="inapp-install-hint"></div>
+                </div>
+              `;
+
+              const btnInstallExecute = targetActionWrap.querySelector('#btn-install-execute');
+              const btnOpenFolder = targetActionWrap.querySelector('#btn-open-folder');
+              const installHint = targetActionWrap.querySelector('#inapp-install-hint');
+
+              btnOpenFolder?.addEventListener('click', () => {
+                global.api.openUpdateFolder?.(downloadedPath);
+              });
+
+              btnInstallExecute?.addEventListener('click', async () => {
+                btnInstallExecute.disabled = true;
+                btnInstallExecute.innerHTML = `
+                  <svg class="spinning" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                  </svg>
+                  <span>Iniciando Instalador...</span>
+                `;
+                if (installHint) {
+                  installHint.textContent = 'Aguarde. Se solicitado pelo sistema operacional, confirme a autorizacao na tela.';
+                }
+
+                const installRes = await global.api.installUpdatePackage({ filePath: downloadedPath });
+                if (!installRes || !installRes.success) {
+                  btnInstallExecute.disabled = false;
+                  btnInstallExecute.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    <span>Tentar Instalar Novamente</span>
+                  `;
+                  if (installHint) {
+                    installHint.textContent = `Instalacao nao concluiu: ${installRes?.error || 'Acao cancelada'}. Voce pode clicar em "Abrir Pasta" para executar manualmente.`;
+                  }
+                } else if (installRes.fallbackNote) {
+                  if (installHint) {
+                    installHint.textContent = installRes.fallbackNote;
+                  }
+                }
+              });
+            } else if (res && res.canceled) {
+              targetPkgCard.classList.remove('in-progress');
+              targetActionWrap.innerHTML = `
+                <button class="btn-download-primary btn-inapp-update" id="btn-inapp-update" data-url="${url}" data-filename="${filename}" data-size="${expectedSize}" type="button">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <span>Atualizar no Aplicativo</span>
+                </button>
+              `;
+              bindUpdateBoxEvents();
+            } else {
+              targetPkgCard.classList.remove('in-progress');
+              targetActionWrap.innerHTML = `
+                <div class="inapp-error-box">
+                  <span class="inapp-error-msg">Nao foi possivel baixar: ${res?.error || 'Erro desconhecido'}.</span>
+                  <button class="btn-action-primary btn-asset-dl" data-url="${url}" type="button">Baixar pelo Navegador</button>
+                </div>
+              `;
+              bindUpdateBoxEvents();
+            }
+          } catch (err) {
+            unsubscribe?.();
+            targetPkgCard.classList.remove('in-progress');
+            targetActionWrap.innerHTML = `
+              <div class="inapp-error-box">
+                <span class="inapp-error-msg">Falha no download: ${err.message}.</span>
+                <button class="btn-action-primary btn-asset-dl" data-url="${url}" type="button">Baixar pelo Navegador</button>
+              </div>
+            `;
+            bindUpdateBoxEvents();
+          }
+        });
+      }
 
       updateResultBox.querySelectorAll('.btn-asset-dl').forEach((btn) => {
         btn.addEventListener('click', (ev) => {
