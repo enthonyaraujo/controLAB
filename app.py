@@ -1,7 +1,3 @@
-"""
-Interface Web Moderna e Intuitiva para o Lugar Geométrico das Raízes (LGR)
-Desenvolvida com Streamlit.
-"""
 
 import io
 import streamlit as st
