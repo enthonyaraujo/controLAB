@@ -27,13 +27,15 @@
       if (btnNavHome) btnNavHome.style.display = opensLgr ? 'inline-flex' : 'none';
       if (globalNavbar) globalNavbar.classList.toggle('has-back', opensLgr);
       if (globalBrandTitle) {
-        globalBrandTitle.textContent = 'ControLAB';
+        globalBrandTitle.textContent = '';
       }
       if (globalNavbarCenter) {
-        globalNavbarCenter.style.display = opensLgr ? 'flex' : 'none';
+        globalNavbarCenter.style.display = 'flex';
       }
       if (globalNavbarTitle) {
-        globalNavbarTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : '';
+        globalNavbarTitle.textContent = opensLgr
+          ? 'Lugar Geométrico das Raízes'
+          : 'ControLAB - Sistemas de Controle';
       }
 
       if (opensLgr) {

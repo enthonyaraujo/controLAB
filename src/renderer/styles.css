@@ -1863,14 +1863,20 @@ button {
 }
 
 @media (max-width: 600px) {
-  .global-navbar.has-back .global-brand {
-    display: none;
+  .global-navbar-center {
+    max-width: calc(100% - 100px);
   }
+
+  .global-navbar.has-back .global-navbar-center {
+    max-width: calc(100% - 160px);
+  }
+
   .global-navbar-title {
     font-size: 13px;
-    max-width: 170px;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
