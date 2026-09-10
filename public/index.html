@@ -818,7 +818,7 @@
         <span class="section-badge">Instaladores Nativos</span>
         <h2 class="section-title">Baixe o ControLAB para a Sua Plataforma</h2>
         <p class="section-desc">
-          Versão estável atual: <strong>v2.0.0</strong>. Binários autocontidos para desktop e dispositivos móveis.
+          Versão estável atual: <strong>v2.1.0</strong>. Binários autocontidos para desktop e dispositivos móveis.
         </p>
       </div>
 
@@ -832,7 +832,7 @@
           <p class="platform-desc">Ubuntu, Debian, Fedora, openSUSE, Arch e distribuições compatíveis.</p>
           <ul class="download-links">
             <li>
-              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-linux-x86_64.AppImage" target="_blank" rel="noopener" class="dl-btn dl-primary" id="btn-dl-appimage">
+              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-linux-x86_64.AppImage" target="_blank" rel="noopener" class="dl-btn dl-primary" id="btn-dl-appimage">
                 <span>.AppImage Universal</span>
                 <div class="dl-actions">
                   <span class="dl-size" id="size-appimage"></span>
@@ -841,7 +841,7 @@
               </a>
             </li>
             <li>
-              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-linux-amd64.deb" target="_blank" rel="noopener" class="dl-btn dl-secondary" id="btn-dl-deb">
+              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-linux-amd64.deb" target="_blank" rel="noopener" class="dl-btn dl-secondary" id="btn-dl-deb">
                 <span>Pacote .deb (Ubuntu/Debian)</span>
                 <div class="dl-actions">
                   <span class="dl-size" id="size-deb"></span>
@@ -849,7 +849,7 @@
               </a>
             </li>
             <li>
-              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-linux-x86_64.rpm" target="_blank" rel="noopener" class="dl-btn dl-secondary" id="btn-dl-rpm">
+              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-linux-x86_64.rpm" target="_blank" rel="noopener" class="dl-btn dl-secondary" id="btn-dl-rpm">
                 <span>Pacote .rpm (Fedora/RHEL)</span>
                 <div class="dl-actions">
                   <span class="dl-size" id="size-rpm"></span>
@@ -868,7 +868,7 @@
           <p class="platform-desc">Windows 10 e Windows 11 (64-bit).</p>
           <ul class="download-links">
             <li>
-              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-win-x64.exe" target="_blank" rel="noopener" class="dl-btn dl-primary" id="btn-dl-win">
+              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-win-x64.exe" target="_blank" rel="noopener" class="dl-btn dl-primary" id="btn-dl-win">
                 <span>Instalador .exe (NSIS)</span>
                 <div class="dl-actions">
                   <span class="dl-size" id="size-win"></span>
@@ -891,7 +891,7 @@
           <p class="platform-desc">Smartphones e Tablets com Android 8.0 ou superior.</p>
           <ul class="download-links">
             <li>
-              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-android.apk" target="_blank" rel="noopener" class="dl-btn dl-primary" id="btn-dl-apk">
+              <a href="https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-android.apk" target="_blank" rel="noopener" class="dl-btn dl-primary" id="btn-dl-apk">
                 <span>Baixar APK Nativo</span>
                 <div class="dl-actions">
                   <span class="dl-size" id="size-apk"></span>
@@ -907,7 +907,7 @@
       </div>
 
       <div class="all-releases-banner">
-        <span id="release-summary-text">Versão estável v2.0.0 • Binários oficiais compilados via GitHub Actions.</span>
+        <span id="release-summary-text">Versão estável v2.1.0 • Binários oficiais compilados via GitHub Actions.</span>
         <a href="https://github.com/enthonyaraujo/controlab/releases" target="_blank" rel="noopener" class="link-arrow">
           Ver todas as notas de versão no GitHub →
         </a>
@@ -1044,21 +1044,21 @@
       let isWin = /win/i.test(ua) || /win/i.test(platform);
       let isLinux = !isAndroid && (/linux/i.test(ua) || /linux/i.test(platform));
 
-      let primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-linux-x86_64.AppImage';
+      let primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-linux-x86_64.AppImage';
 
       if (isAndroid) {
         targetId = 'card-android';
         osName = 'Android (APK)';
-        primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-android.apk';
+        primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-android.apk';
         document.body.classList.add('is-android-device');
       } else if (isWin) {
         targetId = 'card-windows';
         osName = 'Windows (.exe)';
-        primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-win-x64.exe';
+        primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-win-x64.exe';
       } else {
         targetId = 'card-linux';
         osName = 'Linux (.AppImage)';
-        primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.0.0/ControLAB-v2.0.0-linux-x86_64.AppImage';
+        primaryDlUrl = 'https://github.com/enthonyaraujo/controlab/releases/download/v2.1.0/ControLAB-v2.1.0-linux-x86_64.AppImage';
       }
 
       if (labelOS) {
