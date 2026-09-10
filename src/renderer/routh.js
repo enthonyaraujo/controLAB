@@ -275,9 +275,10 @@
         if (data.exact_roots && data.exact_roots.length > 0) {
           rootsContainer.style.display = 'block';
           rootsList.innerHTML = data.exact_roots.map((r, i) => {
-            const reTag = r.real > 0 ? '<span class="root-rhp">SPD</span>' : (r.real < 0 ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">jω</span>');
-            return `<li class="root-item"><span class="root-index">s_{${i+1}}:</span> <code>${r.str}</code> ${reTag}</li>`;
+            const reTag = r.real > 0 ? '<span class="root-rhp">SPD</span>' : (r.real < 0 ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">$j\\omega$</span>');
+            return `<li class="root-item"><span class="root-index">$s_{${i + 1}}:$</span> <span class="root-val">$${r.str}$</span> ${reTag}</li>`;
           }).join('');
+          renderMathInContainer(rootsList);
         } else {
           rootsContainer.style.display = 'none';
         }
@@ -351,17 +352,19 @@
       const rootsHtml = (res.roots || []).map((r, i) => {
         const tag = r.zone === 'SPD'
           ? '<span class="root-rhp">SPD</span>'
-          : (r.zone === 'SPE' ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">jω</span>');
-        return `<span class="live-root-item"><code>s_{${i + 1}} = ${r.str}</code> ${tag}</span>`;
+          : (r.zone === 'SPE' ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">$j\\omega$</span>');
+        return `<span class="live-root-item"><span class="live-root-math">$s_{${i + 1}} = ${r.str}$</span> ${tag}</span>`;
       }).join('');
 
       kLiveStatus.innerHTML = `
         <div class="live-status-row">
           <span class="live-status-badge ${verdictClass}">${res.verdict}</span>
-          <span class="live-status-poles-summary">${speCount} polo(s) no SPE &bull; ${res.jw_count} no j&omega; &bull; ${res.spd_count} no SPD</span>
+          <span class="live-status-poles-summary">${speCount} polo(s) no SPE &bull; ${res.jw_count} no $j\\omega$ &bull; ${res.spd_count} no SPD</span>
         </div>
         <div class="live-status-roots">${rootsHtml}</div>
       `;
+
+      renderMathInContainer(kLiveStatus);
     }
 
     // Eventos do Simulador de K

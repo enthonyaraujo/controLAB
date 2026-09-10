@@ -553,18 +553,16 @@ def compute_k_range(first_col, poly_s):
 
 def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=None, denom=None, theme="dark"):
     """
-    Gera o gráfico do plano complexo s com:
-    - Região Estável (SPE, Re < 0) em verde translúcido
-    - Região Instável (SPD, Re > 0) em vermelho translúcido
-    - Eixo imaginário jω (Fronteira Marginal) em linha tracejada âmbar
-    - Trajetória contínua das raízes conforme K varia de 0 a K_max
-    - Polos em K=0 e cruzamentos no eixo jω marcados
+    Gera o gráfico do plano complexo s utilizando a biblioteca python-control (control as ct)
+    e matplotlib, exatamente com os mesmos padrões de precisão e engenharia do motor LGR.
     """
+    import io
+    import base64
+    import numpy as np
+    import control as ct
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    import numpy as np
-    import io, base64
 
     is_dark = theme == "dark"
     bg_fig = "#0f172a" if is_dark else "#ffffff"
@@ -573,95 +571,163 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     subtext_color = "#94a3b8" if is_dark else "#64748b"
     grid_color = "#334155" if is_dark else "#e2e8f0"
     border_color = "#334155" if is_dark else "#cbd5e1"
+    axis_color = "#475569" if is_dark else "#94a3b8"
 
-    fig, ax = plt.subplots(figsize=(9, 5.2), dpi=130)
+    fig, ax = plt.subplots(figsize=(9.2, 5.4), dpi=130)
     fig.patch.set_facecolor(bg_fig)
     ax.set_facecolor(bg_ax)
 
     has_k = k_info.get("has_k", False)
-    all_re = []
-    all_im = []
 
     if has_k:
-        crit_vals = [ck["k_val"] for ck in k_info.get("critical_k", []) if ck.get("k_val", 0) > 0]
-        if crit_vals:
-            k_max = max(10.0, max(crit_vals) * 1.8)
+        # Separação analítica D(s) + K * N(s) = 0 para criação da TransferFunction via python-control
+        D_expr = sp.expand(poly_s.as_expr().subs(K_sym, 0))
+        N_expr = sp.expand(sp.diff(poly_s.as_expr(), K_sym))
+
+        poly_D = sp.Poly(D_expr, s_sym)
+        den_coeffs = [float(c) for c in poly_D.all_coeffs()]
+
+        if N_expr != 0:
+            poly_N = sp.Poly(N_expr, s_sym)
+            num_coeffs = [float(c) for c in poly_N.all_coeffs()]
         else:
-            k_max = 20.0
+            num_coeffs = [1.0]
 
-        k_vect = np.linspace(0.001, k_max, 300)
-        coeffs_sym = poly_s.all_coeffs()
+        # Criação do sistema LTI via control.tf
+        sys = ct.tf(num_coeffs, den_coeffs)
+        polos = ct.poles(sys)
+        zeros = ct.zeros(sys)
+        P = len(polos)
+        Z = len(zeros)
+        ramos = max(P, Z)
 
-        roots_list = []
-        for kv in k_vect:
-            try:
-                c_num = [float(sp.N(c.subs(K_sym, kv))) for c in coeffs_sym]
-                r = np.roots(c_num)
-                r_sorted = sorted(r, key=lambda x: (round(x.imag, 3), round(x.real, 3)))
-                roots_list.append(r_sorted)
-                all_re.extend([float(x.real) for x in r])
-                all_im.extend([float(x.imag) for x in r])
-            except Exception:
-                pass
+        # Vetor de ganhos contínuo e logarítmico enriquecido com os pontos críticos
+        crit_k_vals = [float(ck["k_val"]) for ck in k_info.get("critical_k", []) if float(ck.get("k_val", 0)) > 0]
+        if crit_k_vals:
+            max_crit = max(crit_k_vals)
+            k_upper = max(100.0, max_crit * 5.0)
+        else:
+            k_upper = 1000.0
 
-        roots_arr = np.array(roots_list)
-        re_min = min(-4.0, float(np.percentile(all_re, 2)) - 1.2) if all_re else -5.0
-        re_max = max(3.0, float(np.percentile(all_re, 98)) + 1.2) if all_re else 5.0
-        im_max = max(3.5, float(np.percentile(np.abs(all_im), 98)) + 1.5) if all_im else 5.0
+        kvect = np.logspace(-3, np.log10(k_upper), 2500)
+        kvect = np.insert(kvect, 0, 0.0)
+        for ck_val in crit_k_vals:
+            kvect = np.append(kvect, ck_val)
+        kvect = np.sort(kvect)
 
-        ax.axvspan(re_min * 2, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
+        # Cálculo do Lugar Geométrico das Raízes via control.root_locus (mesma biblioteca do LGR)
+        rlist, klist = ct.root_locus(sys, gains=kvect, plot=False)
+
+        # Coleta de limites
+        all_re = [float(np.real(p)) for p in polos] + [float(np.real(z)) for z in zeros] + [0.0]
+        all_im = [abs(float(np.imag(p))) for p in polos] + [abs(float(np.imag(z))) for z in zeros]
+        for i in range(ramos):
+            all_re.extend([float(np.real(r)) for r in rlist[:, i]])
+            all_im.extend([abs(float(np.imag(r))) for r in rlist[:, i]])
+
+        # Percentis para enquadramento anti-divergência
+        re_min = min(-4.0, float(np.percentile(all_re, 1.5)) - 1.2)
+        re_max = max(3.0, float(np.percentile(all_re, 98.5)) + 1.2)
+        im_max = max(3.5, float(np.percentile(all_im, 98.5)) + 1.5)
+
+        # Regiões de Estabilidade (SPE verde translúcido, SPD vermelho translúcido)
+        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
         ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.6, label="Fronteira Marginal (Eixo jω)", zorder=3)
-        ax.axhline(0, color="#64748b", linestyle="-", linewidth=0.8, alpha=0.5)
+        ax.axhline(0, color=axis_color, linestyle="-", linewidth=0.9, alpha=0.6)
 
-        if roots_arr.size > 0:
-            for j in range(roots_arr.shape[1]):
-                ax.plot(roots_arr[:, j].real, roots_arr[:, j].imag, color="#38bdf8", linewidth=2.2, label="Trajetória das Raízes" if j == 0 else "_nolegend_", zorder=4)
+        # Traçado contínuo dos ramos do LGR
+        branch_color = "#38bdf8" if is_dark else "#0284c7"
+        for i in range(ramos):
+            ax.plot(
+                np.real(rlist[:, i]),
+                np.imag(rlist[:, i]),
+                color=branch_color,
+                linewidth=2.2,
+                label="Trajetória das Raízes (LGR)" if i == 0 else "_nolegend_",
+                zorder=4,
+            )
 
-        try:
-            start_coeffs = [float(sp.N(c.subs(K_sym, 0))) for c in coeffs_sym]
-            p0 = np.roots(start_coeffs)
-            ax.plot(p0.real, p0.imag, "x", color="#f87171" if is_dark else "#dc2626", markersize=9, markeredgewidth=2.4, label="Polos Iniciais (K = 0)", zorder=6)
-        except Exception:
-            pass
+        # Marcação de polos em K = 0 (usando ct.poles como no LGR)
+        ax.plot(
+            np.real(polos),
+            np.imag(polos),
+            "x",
+            color="#f87171" if is_dark else "#dc2626",
+            markersize=9.5,
+            markeredgewidth=2.4,
+            label="Polos em K = 0",
+            zorder=6,
+        )
 
+        # Marcação de zeros finitos (usando ct.zeros como no LGR)
+        if Z > 0:
+            ax.plot(
+                np.real(zeros),
+                np.imag(zeros),
+                "o",
+                color="#38bdf8" if is_dark else "#0284c7",
+                markerfacecolor="white" if not is_dark else bg_fig,
+                markersize=8.5,
+                markeredgewidth=2.0,
+                label="Zeros de Malha Aberta",
+                zorder=6,
+            )
+
+        # Cruzamentos com o eixo imaginário (Ganhos Críticos de Routh via ct.feedback)
         for ck in k_info.get("critical_k", []):
-            kv = ck["k_val"]
-            try:
-                c_crit = [float(sp.N(c.subs(K_sym, kv))) for c in coeffs_sym]
-                rc = np.roots(c_crit)
-                jw_pts = [p for p in rc if abs(p.real) < 1e-2]
-                for cp in jw_pts:
-                    lbl = f"Ponto Crítico ($K={kv:.3g}$, $\\omega={abs(cp.imag):.2f}$)" if cp == jw_pts[0] else "_nolegend_"
-                    ax.plot(cp.real, cp.imag, "o", markerfacecolor="#fbbf24", markeredgecolor="#d97706", markeredgewidth=1.8, markersize=8.5, label=lbl, zorder=7)
-            except Exception:
-                pass
+            kv = float(ck.get("k_val", 0))
+            if kv > 0:
+                try:
+                    sys_crit = ct.feedback(kv * sys, 1)
+                    crit_poles = ct.poles(sys_crit)
+                    jw_crit = [cp for cp in crit_poles if abs(np.real(cp)) < 1e-2 and abs(np.imag(cp)) > 1e-4]
+                    for idx_cp, cp in enumerate(jw_crit):
+                        lbl = f"Ponto Crítico ($K={kv:.3g}$, $\\omega={abs(np.imag(cp)):.2f}$)" if idx_cp == 0 else "_nolegend_"
+                        ax.plot(
+                            np.real(cp),
+                            np.imag(cp),
+                            "o",
+                            markerfacecolor="#fbbf24",
+                            markeredgecolor="#d97706",
+                            markeredgewidth=2.0,
+                            markersize=9,
+                            label=lbl,
+                            zorder=7,
+                        )
+                except Exception:
+                    pass
 
-        ax.set_title("Plano Complexo s: Trajetória dos Polos e Regiões de Estabilidade", fontsize=11, fontweight="bold", pad=12, color=text_color)
+        ax.set_title("Plano Complexo s: Trajetória dos Polos e Regiões de Estabilidade (python-control)", fontsize=11, fontweight="bold", pad=12, color=text_color)
+
     else:
-        coeffs_sym = poly_s.all_coeffs()
-        c_num = [float(sp.N(c)) for c in coeffs_sym]
-        roots = np.roots(c_num)
-        re_vals = [float(r.real) for r in roots]
-        im_vals = [float(r.imag) for r in roots]
+        # Sistema Puramente Numérico (sem dependência de K)
+        den_coeffs = [float(c) for c in poly_s.all_coeffs()]
+        sys = ct.tf([1.0], den_coeffs)
+        polos = ct.poles(sys)
+
+        re_vals = [float(np.real(p)) for p in polos]
+        im_vals = [float(np.imag(p)) for p in polos]
         re_min = min(-4.0, min(re_vals) - 1.5)
         re_max = max(3.0, max(re_vals) + 1.5)
         im_max = max(3.5, max(np.abs(im_vals)) + 1.5)
 
-        ax.axvspan(re_min * 2, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
+        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
         ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.6, label="Fronteira Marginal (Eixo jω)", zorder=3)
-        ax.axhline(0, color="#64748b", linestyle="-", linewidth=0.8, alpha=0.5)
+        ax.axhline(0, color=axis_color, linestyle="-", linewidth=0.9, alpha=0.6)
 
-        for r in roots:
-            is_spe = r.real < -1e-4
-            is_spd = r.real > 1e-4
+        for p in polos:
+            re_p = float(np.real(p))
+            im_p = float(np.imag(p))
+            is_spe = re_p < -1e-4
+            is_spd = re_p > 1e-4
             color = "#34d399" if is_spe else ("#f87171" if is_spd else "#fbbf24")
             lbl_tag = "SPE" if is_spe else ("SPD" if is_spd else "jω")
-            ax.plot(r.real, r.imag, "x", color=color, markersize=11, markeredgewidth=2.6, zorder=6)
+            ax.plot(re_p, im_p, "x", color=color, markersize=11, markeredgewidth=2.6, zorder=6)
             ax.annotate(
-                f"{r.real:.2f} + {r.imag:.2f}j [{lbl_tag}]",
-                xy=(r.real, r.imag),
+                f"{re_p:.2f}" + (f" + {im_p:.2f}j" if im_p >= 0 else f" - {abs(im_p):.2f}j") + f" [{lbl_tag}]",
+                xy=(re_p, im_p),
                 xytext=(8, 8),
                 textcoords="offset points",
                 fontsize=8.5,
@@ -669,14 +735,14 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                 bbox=dict(boxstyle="round,pad=0.2", facecolor=bg_fig, edgecolor=border_color, alpha=0.9, lw=0.6),
             )
 
-        ax.set_title("Plano Complexo s: Posição dos Polos e Veredito de Estabilidade", fontsize=11, fontweight="bold", pad=12, color=text_color)
+        ax.set_title("Plano Complexo s: Polos e Veredito de Estabilidade (python-control)", fontsize=11, fontweight="bold", pad=12, color=text_color)
 
     ax.set_xlim(re_min, re_max)
     ax.set_ylim(-im_max, im_max)
     ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=9.5, labelpad=6, color=text_color)
     ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=9.5, labelpad=6, color=text_color)
     ax.tick_params(colors=subtext_color)
-    ax.grid(True, linestyle=":", alpha=0.4, color=grid_color)
+    ax.grid(True, linestyle=":", alpha=0.5, color=grid_color)
     for spine in ax.spines.values():
         spine.set_color(border_color)
 
@@ -698,13 +764,33 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
 
 
 def evaluate_k_point(input_str: str, k_val: float):
-    """Calcula os polos exatos e o veredito de estabilidade para um valor específico de K."""
+    """Calcula os polos exatos e o veredito de estabilidade para um valor específico de K usando python-control."""
     char_poly, poly_s, degree, coeffs, is_fraction, numer, denom = parse_poly_or_tf(
         input_str, has_k_loop=True
     )
-    c_num = [float(sp.N(c.subs(K_sym, k_val))) for c in coeffs]
+    import control as ct
     import numpy as np
-    roots = np.roots(c_num)
+
+    # Decomposição em D(s) + K * N(s) para avaliação com python-control
+    D_expr = sp.expand(poly_s.as_expr().subs(K_sym, 0))
+    N_expr = sp.expand(sp.diff(poly_s.as_expr(), K_sym))
+    poly_D = sp.Poly(D_expr, s_sym)
+    den = [float(c) for c in poly_D.all_coeffs()]
+
+    if N_expr != 0:
+        poly_N = sp.Poly(N_expr, s_sym)
+        num = [float(c) for c in poly_N.all_coeffs()]
+    else:
+        num = [1.0]
+
+    try:
+        sys = ct.tf(num, den)
+        sys_cl = ct.feedback(k_val * sys, 1)
+        roots = ct.poles(sys_cl)
+    except Exception:
+        c_num = [float(sp.N(c.subs(K_sym, k_val))) for c in coeffs]
+        roots = np.roots(c_num)
+
     re_vals = [float(np.real(r)) for r in roots]
     im_vals = [float(np.imag(r)) for r in roots]
 

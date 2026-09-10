@@ -3345,18 +3345,19 @@ button {
 .live-root-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  padding: 3px 8px;
-  border-radius: 5px;
-  font-size: 0.82rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
 }
 
-.live-root-item code {
-  font-family: var(--font-code);
-  font-size: 0.8rem;
+.live-root-math {
+  font-size: 0.9rem;
   color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Gráfico no Plano s */
