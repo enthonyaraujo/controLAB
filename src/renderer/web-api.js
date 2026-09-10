@@ -92,6 +92,48 @@
       const release = await response.json();
       return { success: true, release };
     },
+    downloadUpdatePackage: nativeLgr
+      ? async (payload) => {
+          try {
+            return await nativeLgr.downloadUpdatePackage(payload);
+          } catch (err) {
+            return { success: false, error: err?.message || String(err) };
+          }
+        }
+      : undefined,
+    cancelUpdateDownload: nativeLgr
+      ? async () => {
+          try {
+            return await nativeLgr.cancelUpdateDownload();
+          } catch (err) {
+            return { success: false, error: err?.message || String(err) };
+          }
+        }
+      : undefined,
+    installUpdatePackage: nativeLgr
+      ? async (payload) => {
+          try {
+            return await nativeLgr.installUpdatePackage(payload);
+          } catch (err) {
+            return { success: false, error: err?.message || String(err) };
+          }
+        }
+      : undefined,
+    onUpdateDownloadProgress: nativeLgr
+      ? (callback) => {
+          let handle = null;
+          if (nativeLgr.addListener) {
+            nativeLgr.addListener('updateProgress', (data) => {
+              callback(data);
+            }).then((h) => {
+              handle = h;
+            }).catch(() => {});
+          }
+          return () => {
+            handle?.remove?.();
+          };
+        }
+      : undefined,
     getSystemInfo: async () => {
       if (global.Capacitor?.isNativePlatform?.()) {
         return {

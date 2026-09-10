@@ -464,12 +464,20 @@ ipcMain.handle('install-update-package', async (event, { filePath }) => {
     const platform = process.platform;
 
     if (platform === 'win32' || ext === '.exe') {
-      const child = spawn(filePath, [], { detached: true, stdio: 'ignore' });
-      child.unref();
-      setTimeout(() => {
-        app.quit();
-      }, 600);
-      return { success: true, method: 'spawn-exe' };
+      try {
+        const child = spawn(filePath, [], { detached: true, stdio: 'ignore', shell: true });
+        child.unref();
+        setTimeout(() => {
+          app.quit();
+        }, 800);
+        return { success: true, method: 'spawn-exe' };
+      } catch (spawnErr) {
+        await shell.openPath(filePath);
+        setTimeout(() => {
+          app.quit();
+        }, 800);
+        return { success: true, method: 'open-path' };
+      }
     }
 
     if (platform === 'linux') {

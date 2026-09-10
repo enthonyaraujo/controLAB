@@ -90,7 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       currentMode = tab.dataset.mode;
       const targetPanel = document.getElementById(`form-${currentMode}`);
-      if (targetPanel) targetPanel.classList.add('active');
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+        renderMathInContainer(targetPanel);
+      }
       schedulePreview();
     });
   });
@@ -1051,6 +1054,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function startLgrModule() {
     if (lgrModuleStarted) return;
     lgrModuleStarted = true;
+    const lgrWorkspace = document.getElementById('workspace-lgr');
+    if (lgrWorkspace) {
+      renderMathInContainer(lgrWorkspace);
+    }
     schedulePreview();
     // Libera a navegação antes de iniciar o cálculo e a renderização do memorial.
     window.setTimeout(calculate, 0);

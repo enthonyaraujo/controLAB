@@ -21,9 +21,17 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import android.content.Intent;
+import androidx.core.content.FileProvider;
 
 @CapacitorPlugin(
     name = "LgrPython",
@@ -219,6 +227,219 @@ public class LgrPythonPlugin extends Plugin {
             call.reject("Não foi possível salvar o arquivo SVG.");
         } catch (Exception e) {
             call.reject("Erro ao salvar SVG: " + e.getMessage(), e);
+        }
+    }
+
+    private final ExecutorService downloadExecutor = Executors.newSingleThreadExecutor();
+    private volatile boolean isDownloadCanceled = false;
+    private volatile HttpURLConnection activeDownloadConnection = null;
+
+    @PluginMethod
+    public void downloadUpdatePackage(PluginCall call) {
+        String urlString = call.getString("url");
+        String filename = call.getString("filename", "ControLAB-update.apk");
+        long expectedSize = call.getLong("expectedSize", 0L);
+        String token = call.getString("token", "");
+
+        if (urlString == null || urlString.isEmpty()) {
+            call.reject("URL de download ausente.");
+            return;
+        }
+
+        isDownloadCanceled = false;
+
+        downloadExecutor.execute(() -> {
+            File tempDir = new File(getContext().getCacheDir(), "controlab-updates");
+            if (!tempDir.exists()) {
+                tempDir.mkdirs();
+            }
+            File outputFile = new File(tempDir, filename);
+            File partFile = new File(tempDir, filename + ".part");
+
+            InputStream in = null;
+            FileOutputStream out = null;
+            HttpURLConnection connection = null;
+
+            try {
+                String targetUrl = urlString;
+                int redirectCount = 0;
+                while (redirectCount < 8) {
+                    URL u = new URL(targetUrl);
+                    connection = (HttpURLConnection) u.openConnection();
+                    connection.setInstanceFollowRedirects(true);
+                    connection.setConnectTimeout(20000);
+                    connection.setReadTimeout(30000);
+                    connection.setRequestProperty("User-Agent", "ControLAB-Android-Updater");
+                    if (token != null && !token.trim().isEmpty() && targetUrl.contains("api.github.com")) {
+                        connection.setRequestProperty("Authorization", "Bearer " + token.trim());
+                    }
+                    connection.connect();
+                    int status = connection.getResponseCode();
+                    if (status == HttpURLConnection.HTTP_MOVED_TEMP ||
+                        status == HttpURLConnection.HTTP_MOVED_PERM ||
+                        status == HttpURLConnection.HTTP_SEE_OTHER ||
+                        status == 307 || status == 308) {
+                        targetUrl = connection.getHeaderField("Location");
+                        connection.disconnect();
+                        redirectCount++;
+                        continue;
+                    }
+                    if (status != HttpURLConnection.HTTP_OK) {
+                        call.reject("Servidor respondeu com codigo HTTP " + status);
+                        return;
+                    }
+                    break;
+                }
+
+                activeDownloadConnection = connection;
+                long totalBytes = connection.getContentLengthLong();
+                if (totalBytes <= 0 && expectedSize > 0) {
+                    totalBytes = expectedSize;
+                }
+
+                in = connection.getInputStream();
+                out = new FileOutputStream(partFile);
+
+                byte[] buffer = new byte[32768];
+                long transferred = 0;
+                int bytesRead;
+                long lastEmitTime = System.currentTimeMillis();
+                long lastTransferred = 0;
+
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    if (isDownloadCanceled) {
+                        break;
+                    }
+                    out.write(buffer, 0, bytesRead);
+                    transferred += bytesRead;
+
+                    long now = System.currentTimeMillis();
+                    if (now - lastEmitTime >= 120) {
+                        double deltaSec = Math.max(0.001, (now - lastEmitTime) / 1000.0);
+                        long bytesPerSec = (long) ((transferred - lastTransferred) / deltaSec);
+                        int percent = totalBytes > 0 ? (int) Math.min(100, (transferred * 100) / totalBytes) : 0;
+
+                        JSObject prog = new JSObject();
+                        prog.put("percent", percent);
+                        prog.put("transferred", transferred);
+                        prog.put("total", totalBytes);
+                        prog.put("bytesPerSecond", bytesPerSec);
+                        notifyListeners("updateProgress", prog);
+
+                        lastEmitTime = now;
+                        lastTransferred = transferred;
+                    }
+                }
+
+                out.flush();
+                out.close();
+                out = null;
+                in.close();
+                in = null;
+
+                if (isDownloadCanceled) {
+                    if (partFile.exists()) partFile.delete();
+                    JSObject ret = new JSObject();
+                    ret.put("success", false);
+                    ret.put("canceled", true);
+                    call.resolve(ret);
+                    return;
+                }
+
+                if (outputFile.exists()) {
+                    outputFile.delete();
+                }
+                if (!partFile.renameTo(outputFile)) {
+                    try (InputStream fis = new FileInputStream(partFile);
+                         FileOutputStream fos = new FileOutputStream(outputFile)) {
+                        byte[] buf = new byte[16384];
+                        int r;
+                        while ((r = fis.read(buf)) != -1) {
+                            fos.write(buf, 0, r);
+                        }
+                    }
+                    partFile.delete();
+                }
+
+                JSObject finalProg = new JSObject();
+                finalProg.put("percent", 100);
+                finalProg.put("transferred", transferred);
+                finalProg.put("total", totalBytes > 0 ? totalBytes : transferred);
+                finalProg.put("bytesPerSecond", 0);
+                notifyListeners("updateProgress", finalProg);
+
+                JSObject ret = new JSObject();
+                ret.put("success", true);
+                ret.put("filePath", outputFile.getAbsolutePath());
+                call.resolve(ret);
+            } catch (Exception e) {
+                if (partFile.exists()) partFile.delete();
+                if (isDownloadCanceled) {
+                    JSObject ret = new JSObject();
+                    ret.put("success", false);
+                    ret.put("canceled", true);
+                    call.resolve(ret);
+                } else {
+                    call.reject("Erro no download da atualizacao: " + e.getMessage(), e);
+                }
+            } finally {
+                activeDownloadConnection = null;
+                try { if (in != null) in.close(); } catch (Exception ignored) {}
+                try { if (out != null) out.close(); } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    @PluginMethod
+    public void cancelUpdateDownload(PluginCall call) {
+        isDownloadCanceled = true;
+        if (activeDownloadConnection != null) {
+            new Thread(() -> {
+                try {
+                    activeDownloadConnection.disconnect();
+                } catch (Exception ignored) {}
+            }).start();
+        }
+        JSObject ret = new JSObject();
+        ret.put("success", true);
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void installUpdatePackage(PluginCall call) {
+        String filePath = call.getString("filePath");
+        if (filePath == null || filePath.isEmpty()) {
+            call.reject("Caminho do arquivo nao fornecido.");
+            return;
+        }
+
+        File apkFile = new File(filePath);
+        if (!apkFile.exists()) {
+            call.reject("Arquivo APK nao encontrado no dispositivo.");
+            return;
+        }
+
+        try {
+            Context context = getContext();
+            Uri contentUri = FileProvider.getUriForFile(
+                context,
+                context.getPackageName() + ".fileprovider",
+                apkFile
+            );
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            context.startActivity(intent);
+
+            JSObject ret = new JSObject();
+            ret.put("success", true);
+            ret.put("method", "package-installer");
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("Falha ao abrir instalador do Android: " + e.getMessage(), e);
         }
     }
 }

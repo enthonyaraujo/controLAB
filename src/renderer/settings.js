@@ -487,14 +487,16 @@
                         <polyline points="7 10 12 15 17 10"/>
                         <line x1="12" y1="15" x2="12" y2="3"/>
                       </svg>
-                      <span>Instalar e Reiniciar</span>
+                      <span>${currentSystemInfo?.os === 'android' ? 'Instalar Atualizacao' : 'Instalar e Reiniciar'}</span>
                     </button>
+                    ${currentSystemInfo?.os === 'android' ? '' : `
                     <button class="btn-open-folder" id="btn-open-folder" type="button" title="Abrir pasta onde o arquivo foi baixado">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                       </svg>
                       <span>Abrir Pasta</span>
                     </button>
+                    `}
                   </div>
                   <div class="inapp-install-hint" id="inapp-install-hint"></div>
                 </div>
@@ -518,7 +520,11 @@
                   <span>Iniciando Instalador...</span>
                 `;
                 if (installHint) {
-                  installHint.textContent = 'Aguarde. Se solicitado pelo sistema operacional, confirme a autorizacao na tela.';
+                  if (currentSystemInfo?.os === 'android') {
+                    installHint.textContent = 'Aguarde. O instalador de pacotes do Android sera aberto na tela.';
+                  } else {
+                    installHint.textContent = 'Aguarde. Se solicitado pelo sistema operacional, confirme a autorizacao na tela.';
+                  }
                 }
 
                 const installRes = await global.api.installUpdatePackage({ filePath: downloadedPath });
@@ -533,7 +539,11 @@
                     <span>Tentar Instalar Novamente</span>
                   `;
                   if (installHint) {
-                    installHint.textContent = `Instalacao nao concluiu: ${installRes?.error || 'Acao cancelada'}. Voce pode clicar em "Abrir Pasta" para executar manualmente.`;
+                    if (currentSystemInfo?.os === 'android') {
+                      installHint.textContent = `Instalacao nao iniciou: ${installRes?.error || 'Acao cancelada'}. Verifique as permissoes de instalacao de fontes desconhecidas do aplicativo.`;
+                    } else {
+                      installHint.textContent = `Instalacao nao concluiu: ${installRes?.error || 'Acao cancelada'}. Voce pode clicar em "Abrir Pasta" para executar manualmente.`;
+                    }
                   }
                 } else if (installRes.fallbackNote) {
                   if (installHint) {

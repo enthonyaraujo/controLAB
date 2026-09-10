@@ -51,6 +51,7 @@
       }
 
       if (isLgr) {
+        renderPageOnce(pageLgr);
         onOpenLgr();
       } else if (isRouth) {
         renderPageOnce(pageRouth);
