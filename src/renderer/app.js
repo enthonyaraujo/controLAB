@@ -1065,8 +1065,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (window.ControLABSettings) {
-    window.ControLABSettings.initialize();
+    window.ControLABSettings.initialize({ showToast });
   }
+
+  toastEl?.addEventListener('click', () => {
+    if (toastEl.classList.contains('active') && toastEl.textContent?.includes('atualizar')) {
+      window.ControLABSettings?.open?.();
+      toastEl.classList.remove('active');
+    }
+  });
 
   let routhController = null;
   if (window.ControLABRouth) {

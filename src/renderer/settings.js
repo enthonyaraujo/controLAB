@@ -6,7 +6,6 @@
   const CURRENT_VERSION = '2.1.2';
   const GITHUB_REPO_URL = 'https://github.com/enthonyaraujo/controlab';
   const GITHUB_RELEASES_API = 'https://api.github.com/repos/enthonyaraujo/controlab/releases/latest';
-  const STORAGE_TOKEN_KEY = 'controlab_github_token';
 
   function optionalElement(id) {
     return document.getElementById(id);
@@ -130,24 +129,10 @@
     }
   }
 
-  function getStoredToken() {
-    try {
-      return localStorage.getItem(STORAGE_TOKEN_KEY) || '';
-    } catch {
-      return '';
-    }
-  }
-
-  function setStoredToken(token) {
-    try {
-      if (token) {
-        localStorage.setItem(STORAGE_TOKEN_KEY, token.trim());
-      } else {
-        localStorage.removeItem(STORAGE_TOKEN_KEY);
-      }
-    } catch {
-      // localStorage pode estar indisponível
-    }
+  try {
+    localStorage.removeItem('controlab_github_token');
+  } catch {
+    // Ignora se localStorage indisponível
   }
 
   function findTargetAsset(assets, systemInfo) {
@@ -286,7 +271,8 @@
     `;
   }
 
-  function initializeSettings() {
+  function initializeSettings(options = {}) {
+    const showToast = options?.showToast;
     const modalSettings = optionalElement('modal-settings');
     const btnOpenSettings = optionalElement('btn-open-settings');
     const btnCloseSettings = optionalElement('btn-close-settings');
@@ -297,11 +283,6 @@
     const detectedEnvBadge = optionalElement('detected-env-badge');
     const updateIndicatorDot = optionalElement('update-indicator-dot');
 
-    const inputToken = optionalElement('input-github-token');
-    const btnSaveToken = optionalElement('btn-save-token');
-    const btnClearToken = optionalElement('btn-clear-token');
-    const tokenFeedback = optionalElement('token-feedback-msg');
-
     let currentSystemInfo = {
       os: 'unknown',
       osName: 'Detectando...',
@@ -309,51 +290,16 @@
       packageLabel: 'Sistema',
     };
 
-    // Resolver detecção do sistema operacional e pacote
+    // Resolver detecção do sistema operacional e verificar atualizações automaticamente na inicialização
     resolveSystemInfo().then((info) => {
       currentSystemInfo = info;
       if (detectedEnvBadge) {
         detectedEnvBadge.textContent = `${info.osName} • ${info.packageLabel}`;
         detectedEnvBadge.title = `Ambiente detectado: ${info.osName} (${info.packageLabel})`;
       }
-      performSilentCheck();
-    });
-
-    // Carregar token previamente salvo
-    if (inputToken) {
-      const saved = getStoredToken();
-      if (saved) {
-        inputToken.value = saved;
-        if (tokenFeedback) {
-          tokenFeedback.textContent = 'Token ativo no armazenamento local.';
-          tokenFeedback.className = 'token-feedback active';
-        }
-      }
-    }
-
-    btnSaveToken?.addEventListener('click', () => {
-      const val = inputToken ? inputToken.value.trim() : '';
-      if (!val) {
-        if (tokenFeedback) {
-          tokenFeedback.textContent = 'Digite um token válido antes de salvar.';
-          tokenFeedback.className = 'token-feedback error';
-        }
-        return;
-      }
-      setStoredToken(val);
-      if (tokenFeedback) {
-        tokenFeedback.textContent = 'Token salvo localmente com sucesso.';
-        tokenFeedback.className = 'token-feedback active';
-      }
-    });
-
-    btnClearToken?.addEventListener('click', () => {
-      setStoredToken('');
-      if (inputToken) inputToken.value = '';
-      if (tokenFeedback) {
-        tokenFeedback.textContent = 'Token removido. Usando acesso anônimo público.';
-        tokenFeedback.className = 'token-feedback';
-      }
+      performStartupUpdateCheck();
+    }).catch(() => {
+      performStartupUpdateCheck();
     });
 
     function openModal() {
@@ -412,7 +358,6 @@
           const url = btnInappUpdate.dataset.url;
           const filename = btnInappUpdate.dataset.filename;
           const expectedSize = parseInt(btnInappUpdate.dataset.size || '0', 10);
-          const token = getStoredToken();
 
           targetPkgCard.classList.add('in-progress');
           targetActionWrap.innerHTML = `
@@ -458,7 +403,6 @@
               url,
               filename,
               expectedSize,
-              token,
             });
 
             unsubscribe?.();
@@ -606,19 +550,17 @@
       });
     }
 
-    async function performSilentCheck() {
+    async function performStartupUpdateCheck() {
       try {
-        const token = getStoredToken();
         let release = null;
         if (global.api?.checkUpdates) {
-          const result = await global.api.checkUpdates(token);
+          const result = await global.api.checkUpdates();
           if (result && result.success) {
             release = result.release;
             if (result.systemInfo) currentSystemInfo = result.systemInfo;
           }
         } else {
           const headers = { Accept: 'application/vnd.github.v3+json' };
-          if (token) headers.Authorization = `Bearer ${token}`;
           const response = await fetch(GITHUB_RELEASES_API, { headers });
           if (response.ok) release = await response.json();
         }
@@ -634,10 +576,13 @@
               updateResultBox.innerHTML = renderUpdateAvailableBox(release, currentSystemInfo);
               bindUpdateBoxEvents();
             }
+            if (showToast) {
+              showToast(`Nova versão (v${latestTag}) disponível! Clique para atualizar.`, 'info', 7000);
+            }
           }
         }
       } catch {
-        // Checagem silenciosa sem poluição de UI
+        // Checagem de inicialização silenciosa em caso de dispositivo offline
       }
     }
 
@@ -652,15 +597,13 @@
       if (iconRefresh) iconRefresh.classList.add('spinning');
       if (btnCheckUpdates) btnCheckUpdates.disabled = true;
 
-      const token = getStoredToken();
-
       try {
         let release = null;
         if (global.api?.checkUpdates) {
-          const result = await global.api.checkUpdates(token);
+          const result = await global.api.checkUpdates();
           if (!result.success) {
             if (result.status === 403) {
-              throw new Error('Limite de requisições da API atingido. Configure um GitHub Token abaixo.');
+              throw new Error('Limite de requisições da API do GitHub atingido temporariamente. Tente novamente mais tarde.');
             }
             throw new Error(result.error || `Erro HTTP ${result.status}`);
           }
@@ -673,11 +616,10 @@
           }
         } else {
           const headers = { Accept: 'application/vnd.github.v3+json' };
-          if (token) headers.Authorization = `Bearer ${token}`;
           const response = await fetch(GITHUB_RELEASES_API, { headers });
           if (!response.ok) {
             if (response.status === 403) {
-              throw new Error('Limite de requisições da API atingido. Configure um GitHub Token abaixo.');
+              throw new Error('Limite de requisições da API do GitHub atingido temporariamente. Tente novamente mais tarde.');
             }
             throw new Error(`O GitHub retornou HTTP ${response.status}`);
           }

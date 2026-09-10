@@ -2686,14 +2686,6 @@ textarea::placeholder {
     width: 100%;
     justify-content: center;
   }
-
-  .token-input-row {
-    flex-wrap: wrap;
-  }
-
-  .token-input {
-    width: 100%;
-  }
 }
 
 /* ==========================================================================
@@ -3057,118 +3049,6 @@ textarea::placeholder {
 
 .other-assets-summary:hover {
   color: var(--text-main);
-}
-
-/* ==========================================================================
-   GITHUB TOKEN CONFIG DETAILS
-   ========================================================================== */
-.settings-token-details {
-  background: var(--bg-app);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 6px;
-}
-
-.token-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.token-summary:hover {
-  background: var(--bg-card);
-  color: var(--text-main);
-}
-
-.token-config-box {
-  padding: 12px 14px 14px;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: color-mix(in srgb, var(--bg-card) 60%, transparent);
-}
-
-.token-desc {
-  font-size: 0.76rem;
-  color: var(--text-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.token-input-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.token-input {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-input);
-  color: var(--text-main);
-  font-size: 0.8rem;
-  font-family: var(--font-code);
-}
-
-.token-input:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-}
-
-.btn-token-action {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.15s ease;
-}
-
-.btn-token-save {
-  background: var(--accent-primary);
-  color: #ffffff;
-}
-
-.btn-token-save:hover {
-  background: color-mix(in srgb, var(--accent-primary) 85%, #000);
-}
-
-.btn-token-clear {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border-color);
-}
-
-.btn-token-clear:hover {
-  background: color-mix(in srgb, #ef4444 15%, transparent);
-  color: #ef4444;
-  border-color: #ef4444;
-}
-
-.token-feedback {
-  font-size: 0.74rem;
-  min-height: 16px;
-  color: var(--text-muted);
-}
-
-.token-feedback.active {
-  color: var(--accent-emerald);
-}
-
-.token-feedback.error {
-  color: #f43f5e;
 }
 
 /* ==========================================================================
