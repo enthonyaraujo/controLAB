@@ -115,8 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Chips de Exemplos Rápidos
-  document.querySelectorAll('.chip').forEach((chip) => {
+  // Chips de Exemplos Rápidos (LGR)
+  document.querySelectorAll('#form-expr .chip').forEach((chip) => {
     chip.addEventListener('click', () => {
       inputExpr.value = chip.dataset.example;
       // Muda para aba de expressão se não estiver
