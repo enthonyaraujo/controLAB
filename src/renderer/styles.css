@@ -228,25 +228,30 @@ body {
 }
 
 #page-home.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 .hub-container {
   max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 28px 28px 48px;
+  padding: 28px 28px 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex: 1 0 auto;
   min-height: 100%;
+  box-sizing: border-box;
 }
 
 /* ==========================================================================
    GRID DE MÓDULOS & CARDS
    ========================================================================== */
 .modules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 20px;
   width: 100%;
 }
@@ -264,6 +269,11 @@ body {
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
+  flex: 0 1 280px;
+  width: 280px;
+  max-width: 100%;
+  min-height: 195px;
+  box-sizing: border-box;
 }
 
 .module-card.card-active {
@@ -388,8 +398,10 @@ body {
 .card-content {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 10px;
   flex: 1;
+  min-height: 48px;
 }
 
 .card-heading {
@@ -498,10 +510,11 @@ body {
 }
 
 .hub-footer {
+  margin-top: auto;
   text-align: center;
   font-size: 12px;
   color: var(--text-dim);
-  padding: 16px 0 8px;
+  padding: 20px 0 8px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -2025,11 +2038,17 @@ textarea::placeholder {
   }
 
   .modules-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     gap: 16px;
   }
 
   .module-card {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
     padding: 18px;
   }
 
