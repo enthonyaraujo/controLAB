@@ -26,6 +26,7 @@ assert(app.includes('window.LGRNavigation.initialize'), 'app.js precisa iniciali
 assert(app.includes('window.ControLABSettings.initialize'), 'app.js precisa inicializar as configurações');
 assert(app.includes('window.ControLABRouth.initialize'), 'app.js precisa inicializar o modulo routh');
 assert(app.includes('window.ControLABScientific.initialize'), 'app.js precisa inicializar os módulos científicos');
+assert(app.includes("getElementById('page-lgr')?.classList.contains('active')"), 'o atalho do LGR não pode executar em outros módulos');
 assert(serviceWorker.includes("'/settings.js'"), 'settings.js precisa integrar o shell offline');
 assert(serviceWorker.includes("'/navigation.js'"), 'navigation.js precisa integrar o shell offline');
 assert(serviceWorker.includes("'/routh.js'"), 'routh.js precisa integrar o shell offline');

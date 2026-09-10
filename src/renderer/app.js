@@ -1031,7 +1031,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Atalho de Teclado: Ctrl+Enter / Cmd+Enter
   window.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const lgrPageIsActive = document.getElementById('page-lgr')?.classList.contains('active');
+    if (lgrPageIsActive && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
       calculate();
     }
