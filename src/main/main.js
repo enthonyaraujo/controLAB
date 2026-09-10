@@ -141,6 +141,22 @@ ipcMain.handle('get-presets', async () => {
   }
 });
 
+ipcMain.handle('calculate-routh', async (event, payload) => {
+  try {
+    return await runPythonBridge({ action: 'routh_hurwitz', ...payload });
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('get-routh-presets', async () => {
+  try {
+    return await runPythonBridge({ action: 'routh_presets' });
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 ipcMain.handle('save-image', async (event, { base64, defaultName }) => {
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
     title: 'Salvar Gráfico do LGR',

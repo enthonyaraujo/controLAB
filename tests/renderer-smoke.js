@@ -9,15 +9,20 @@ const serviceWorker = fs.readFileSync(path.join(root, 'src', 'renderer', 'sw.js'
 
 const settingsPosition = html.indexOf('<script src="settings.js"></script>');
 const navigationPosition = html.indexOf('<script src="navigation.js"></script>');
+const routhPosition = html.indexOf('<script src="routh.js"></script>');
 const appPosition = html.indexOf('<script src="app.js"></script>');
 
 assert(settingsPosition >= 0, 'settings.js precisa estar carregado pelo renderer');
 assert(navigationPosition >= 0, 'navigation.js precisa estar carregado pelo renderer');
-assert(appPosition > navigationPosition, 'navigation.js precisa carregar antes de app.js');
+assert(routhPosition >= 0, 'routh.js precisa estar carregado pelo renderer');
+assert(routhPosition > navigationPosition, 'routh.js precisa carregar depois de navigation.js');
+assert(appPosition > routhPosition, 'routh.js precisa carregar antes de app.js');
 assert(app.includes('window.LGRNavigation.initialize'), 'app.js precisa inicializar a navegação');
 assert(app.includes('window.ControLABSettings.initialize'), 'app.js precisa inicializar as configurações');
+assert(app.includes('window.ControLABRouth.initialize'), 'app.js precisa inicializar o modulo routh');
 assert(serviceWorker.includes("'/settings.js'"), 'settings.js precisa integrar o shell offline');
 assert(serviceWorker.includes("'/navigation.js'"), 'navigation.js precisa integrar o shell offline');
+assert(serviceWorker.includes("'/routh.js'"), 'routh.js precisa integrar o shell offline');
 assert(serviceWorker.includes('mustBeFresh'), 'scripts do shell precisam de atualização network-first');
 
 console.log('Integração do renderer, configurações e navegação válida.');

@@ -1060,6 +1060,24 @@ document.addEventListener('DOMContentLoaded', () => {
     window.ControLABSettings.initialize();
   }
 
+  let routhController = null;
+  if (window.ControLABRouth) {
+    routhController = window.ControLABRouth.initialize({
+      renderMath,
+      renderMathInContainer,
+      showToast,
+    });
+  }
+
+  let routhModuleStarted = false;
+  function startRouthModule() {
+    if (routhModuleStarted) return;
+    routhModuleStarted = true;
+    if (routhController) {
+      window.setTimeout(routhController.ensureInitialCalculation, 0);
+    }
+  }
+
   if (!window.LGRNavigation) {
     showToast('Não foi possível carregar o menu de módulos.', 'error', 4000);
     return;
@@ -1069,5 +1087,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMathInContainer,
     showToast,
     onOpenLgr: startLgrModule,
+    onOpenRouth: startRouthModule,
   });
 });

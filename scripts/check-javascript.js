@@ -17,6 +17,7 @@ const javascriptFiles = [
   'src/preload/preload.js',
   'src/renderer/app.js',
   'src/renderer/navigation.js',
+  'src/renderer/routh.js',
   'src/renderer/web-api.js',
   'src/renderer/sw.js',
   'tests/renderer-smoke.js',

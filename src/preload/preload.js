@@ -4,6 +4,8 @@ contextBridge.exposeInMainWorld('api', {
   calculateLGR: (payload) => ipcRenderer.invoke('calculate-lgr', payload),
   previewTransferFunction: (payload) => ipcRenderer.invoke('preview-transfer-function', payload),
   getPresets: () => ipcRenderer.invoke('get-presets'),
+  calculateRouth: (payload) => ipcRenderer.invoke('calculate-routh', payload),
+  getRouthPresets: () => ipcRenderer.invoke('get-routh-presets'),
   saveImage: (payload) => ipcRenderer.invoke('save-image', payload),
   saveSVG: (payload) => ipcRenderer.invoke('save-svg', payload),
   copyImageToClipboard: (base64) => ipcRenderer.invoke('copy-image', base64),

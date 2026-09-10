@@ -9,6 +9,7 @@ const requiredFiles = [
   'android/app/build.gradle',
   'android/app/src/main/java/br/com/enthony/lgrstudio/LgrPythonPlugin.java',
   'android/app/src/main/python/lgr_engine.py',
+  'android/app/src/main/python/routh_hurwitz.py',
   'android/app/src/main/python/python_bridge.py',
   'android/app/src/main/python/android_bridge.py',
 ];
@@ -19,7 +20,7 @@ for (const file of requiredFiles) {
   }
 }
 
-for (const file of ['lgr_engine.py', 'python_bridge.py', 'android_bridge.py']) {
+for (const file of ['lgr_engine.py', 'routh_hurwitz.py', 'python_bridge.py', 'android_bridge.py']) {
   const canonical = fs.readFileSync(path.join(root, file));
   const android = fs.readFileSync(path.join(root, 'android', 'app', 'src', 'main', 'python', file));
   if (!canonical.equals(android)) {

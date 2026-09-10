@@ -3,9 +3,10 @@
     return document.getElementById(id);
   }
 
-  function initializeNavigation({ renderMathInContainer, showToast, onOpenLgr }) {
+  function initializeNavigation({ renderMathInContainer, showToast, onOpenLgr, onOpenRouth }) {
     const pageHome = optionalElement('page-home');
     const pageLgr = optionalElement('page-lgr');
+    const pageRouth = optionalElement('page-routh');
     const btnNavHome = optionalElement('btn-nav-home');
     const globalBrand = optionalElement('global-brand');
     const globalBrandTitle = optionalElement('global-brand-title');
@@ -21,27 +22,38 @@
     }
 
     function navigateTo(pageId) {
-      const opensLgr = pageId === 'lgr';
-      pageHome?.classList.toggle('active', !opensLgr);
-      pageLgr?.classList.toggle('active', opensLgr);
+      const isHome = pageId === 'home' || !pageId;
+      const isLgr = pageId === 'lgr';
+      const isRouth = pageId === 'routh';
 
-      if (btnNavHome) btnNavHome.style.display = opensLgr ? 'inline-flex' : 'none';
-      if (globalBrand) globalBrand.style.display = opensLgr ? 'none' : 'flex';
+      pageHome?.classList.toggle('active', isHome);
+      pageLgr?.classList.toggle('active', isLgr);
+      pageRouth?.classList.toggle('active', isRouth);
+
+      const hasBack = !isHome;
+      if (btnNavHome) btnNavHome.style.display = hasBack ? 'inline-flex' : 'none';
+      if (globalBrand) globalBrand.style.display = isHome ? 'flex' : 'none';
       if (globalBrandTitle) {
-        globalBrandTitle.textContent = opensLgr ? '' : 'ControLAB';
+        globalBrandTitle.textContent = isHome ? 'ControLAB' : '';
       }
-      if (globalNavbar) globalNavbar.classList.toggle('has-back', opensLgr);
+      if (globalNavbar) globalNavbar.classList.toggle('has-back', hasBack);
       if (globalNavbarCenter) {
         globalNavbarCenter.style.display = 'flex';
       }
       if (globalNavbarTitle) {
-        globalNavbarTitle.textContent = opensLgr
-          ? 'Lugar Geométrico das Raízes'
-          : 'Hub de Módulos';
+        if (isLgr) {
+          globalNavbarTitle.textContent = 'Lugar Geométrico das Raízes';
+        } else if (isRouth) {
+          globalNavbarTitle.textContent = 'Critério de Routh-Hurwitz';
+        } else {
+          globalNavbarTitle.textContent = 'Hub de Módulos';
+        }
       }
 
-      if (opensLgr) {
+      if (isLgr) {
         onOpenLgr();
+      } else if (isRouth) {
+        if (onOpenRouth) onOpenRouth();
       } else {
         if (pageHome) pageHome.scrollTop = 0;
         renderPageOnce(pageHome);
@@ -53,6 +65,14 @@
       navigateTo('lgr');
     });
     optionalElement('card-module-lgr')?.addEventListener('click', () => navigateTo('lgr'));
+
+    optionalElement('btn-open-routh')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      navigateTo('routh');
+    });
+    optionalElement('card-module-routh')?.addEventListener('click', () => navigateTo('routh'));
+    optionalElement('btn-routh-back-home')?.addEventListener('click', () => navigateTo('home'));
+
     btnNavHome?.addEventListener('click', () => navigateTo('home'));
     optionalElement('btn-sidebar-back-home')?.addEventListener('click', () => navigateTo('home'));
 

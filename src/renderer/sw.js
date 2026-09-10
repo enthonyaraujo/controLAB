@@ -6,6 +6,7 @@ const SHELL_FILES = [
   '/app.js',
   '/settings.js',
   '/navigation.js',
+  '/routh.js',
   '/web-api.js',
   '/manifest.webmanifest',
   '/app-icon.svg',

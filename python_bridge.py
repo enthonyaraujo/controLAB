@@ -26,6 +26,10 @@ from lgr_engine import (
     parse_tf_parts,
     parse_zpk,
 )
+from routh_hurwitz import (
+    ROUTH_PRESETS,
+    analyze_routh_hurwitz,
+)
 
 
 def get_transfer_function(payload):
@@ -165,14 +169,37 @@ def dispatch(data):
         return handle_preview(data)
     if action == "calculate":
         return handle_calculate(data)
+    if action == "routh_presets":
+        return {
+            "success": True,
+            "presets": [
+                {
+                    "id": key,
+                    "title": key,
+                    "expr": val["expr"],
+                    "desc": val["desc"],
+                }
+                for key, val in ROUTH_PRESETS.items()
+            ],
+        }
+    if action == "routh_hurwitz":
+        expr = data.get("expr") or data.get("input") or data.get("den") or "s^3 + 2s^2 + s + 1"
+        has_k = data.get("has_k", True)
+        return analyze_routh_hurwitz(expr, has_k_loop=has_k)
     raise ValueError(f"Ação desconhecida: {action}")
 
 
 def main():
     try:
-        raw_input = sys.stdin.read().strip()
+        if len(sys.argv) > 1:
+            raw_input = sys.argv[1]
+        elif not sys.stdin.isatty():
+            raw_input = sys.stdin.read().strip()
+        else:
+            raw_input = '{"action":"presets"}'
+
         if not raw_input:
-            raw_input = sys.argv[1] if len(sys.argv) > 1 else '{"action":"presets"}'
+            raw_input = '{"action":"presets"}'
         print(json.dumps(dispatch(json.loads(raw_input))))
     except Exception as exc:
         print(json.dumps({"success": False, "error": str(exc)}))
