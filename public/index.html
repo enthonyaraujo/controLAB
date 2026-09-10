@@ -46,9 +46,7 @@
         <span class="brand-name">Contro<span class="accent-text">LAB</span></span>
       </a>
       <nav class="nav-links">
-        <a href="#modulos">Módulos</a>
         <a href="#interface">Interface</a>
-        <a href="#pilares">Fundamentos</a>
         <a href="#recursos">Recursos</a>
         <a href="#downloads">Downloads</a>
         <a href="#faq">FAQ</a>
@@ -66,9 +64,7 @@
     <!-- Quick Nav Bar for Android / Mobile Devices -->
     <div class="mobile-subnav">
       <div class="container mobile-subnav-container">
-        <a href="#modulos" class="subnav-pill">Módulos</a>
         <a href="#interface" class="subnav-pill">Interface</a>
-        <a href="#pilares" class="subnav-pill">Fundamentos</a>
         <a href="#recursos" class="subnav-pill">Recursos</a>
         <a href="#downloads" class="subnav-pill subnav-pill-highlight">Downloads</a>
         <a href="#faq" class="subnav-pill">FAQ</a>
@@ -96,19 +92,10 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span id="label-primary-os">Baixar para Linux / Windows / Android</span>
           </a>
-          <a href="#modulos" class="btn btn-hero-secondary">
-            <span>Conhecer os Módulos</span>
+          <a href="#interface" class="btn btn-hero-secondary">
+            <span>Conhecer a Interface</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
           </a>
-        </div>
-
-        <div class="hero-tech-pills">
-          <span class="tech-tag">Suíte de 6 Módulos</span>
-          <span class="tech-tag">Domínios s, t e jω</span>
-          <span class="tech-tag">Estabilidade &amp; Síntese</span>
-          <span class="tech-tag">Exportação PNG &amp; SVG</span>
-          <span class="tech-tag">KaTeX Memorial</span>
-          <span class="tech-tag">100% Offline</span>
         </div>
       </div>
 
@@ -123,11 +110,8 @@
             <div class="mockup-title">ControLAB — Suíte Integrada de Sistemas de Controle</div>
           </div>
           <div class="mockup-tab-bar" id="mockup-tabs" role="tablist">
-            <button type="button" class="mockup-tab active" data-mockup="principal" role="tab" aria-selected="true">
+            <button type="button" class="mockup-tab active" data-mockup="hub" role="tab" aria-selected="true">
               <span class="mockup-tab-dot"></span>
-              Visão Geral
-            </button>
-            <button type="button" class="mockup-tab" data-mockup="hub" role="tab" aria-selected="false">
               Hub Central
             </button>
             <button type="button" class="mockup-tab" data-mockup="time" role="tab" aria-selected="false">
@@ -148,8 +132,7 @@
           </div>
           <div class="mockup-body">
             <div class="mockup-screen-container">
-              <img id="mockup-img-principal" class="mockup-screen-img active" src="screenshots/principal.webp" alt="Interface ControLAB - Visão Geral Desktop" width="1024" height="554" fetchpriority="high">
-              <img id="mockup-img-hub" class="mockup-screen-img" src="screenshots/hub-modulos.webp" alt="Interface ControLAB - Hub Central de Módulos" width="1024" height="484" loading="lazy">
+              <img id="mockup-img-hub" class="mockup-screen-img active" src="screenshots/hub-modulos.webp" alt="Interface ControLAB - Hub Central de Módulos" width="1024" height="531" fetchpriority="high">
               <img id="mockup-img-time" class="mockup-screen-img" src="screenshots/resposta-tempo.webp" alt="Interface ControLAB - Resposta no Domínio do Tempo" width="1024" height="529" loading="lazy">
               <img id="mockup-img-lgr" class="mockup-screen-img" src="screenshots/lugar-das-raizes.webp" alt="Interface ControLAB - Lugar Geométrico das Raízes (LGR)" width="1024" height="529" loading="lazy">
               <img id="mockup-img-freq" class="mockup-screen-img" src="screenshots/resposta-frequencia.webp" alt="Interface ControLAB - Resposta em Frequência (Bode e Nyquist)" width="1024" height="529" loading="lazy">
@@ -159,291 +142,11 @@
             <div class="mockup-status-bar">
               <div class="mockup-status-info">
                 <span class="mockup-status-dot"></span>
-                <span id="mockup-caption-text" class="mockup-status-text">Visão Geral Desktop: ambiente integrado v3.0.0 com os 6 módulos em execução</span>
+                <span id="mockup-caption-text" class="mockup-status-text">Hub Central: navegação rápida e unificada entre todos os módulos de controle</span>
               </div>
               <span class="mockup-status-hint">Clique nas abas para alternar as telas</span>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Hub de Módulos Section -->
-  <section class="section bg-elevated" id="modulos">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Arquitetura Integrada</span>
-        <h2 class="section-title">Hub Central de Sistemas de Controle</h2>
-        <p class="section-desc">
-          O ControLAB unifica as etapas essenciais de análise, estabilidade, resposta temporal, domínio da frequência e projeto de compensadores em uma experiência moderna e 100% offline.
-        </p>
-      </div>
-
-      <div class="modules-grid-landing">
-        <!-- Módulo 1: Resposta no Tempo -->
-        <div class="landing-module-card card-active">
-          <div class="card-top">
-            <div class="module-icon-box icon-time">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-card-title">Resposta no Tempo</h3>
-            <span class="module-card-tag">Degrau, Impulso e Regime Permanente</span>
-            <p class="module-card-desc">
-              Simulação temporal rigorosa da resposta a sinais padrão de teste, quantificando o desempenho transitório e o erro estacionário.
-            </p>
-            <ul class="module-feature-list">
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Resposta ao degrau unitário \(y(t)\), impulso e rampa</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Métricas: subida (\(t_r\)), acomodação (\(t_s\)) e pico (\(t_p\))</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Ultrapassagem percentual (\(\%OS\)), \(\zeta\) e \(\omega_n\)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Constantes de erro de posição, velocidade e aceleração (\(e_{ss}\))</span>
-              </li>
-            </ul>
-          </div>
-
-          <a href="#downloads" class="btn-module-link btn-module-link-primary">
-            <span>Abrir no ControLAB</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
-
-        <!-- Módulo 2: Estabilidade -->
-        <div class="landing-module-card card-active">
-          <div class="card-top">
-            <div class="module-icon-box icon-stability">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <line x1="3" y1="9" x2="21" y2="9"/>
-                <line x1="3" y1="15" x2="21" y2="15"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-                <line x1="15" y1="3" x2="15" y2="21"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-card-title">Análise de Estabilidade</h3>
-            <span class="module-card-tag">Critério de Routh-Hurwitz</span>
-            <p class="module-card-desc">
-              Construção analítica da tabela de Routh para determinação da estabilidade assintótica e contagem de raízes no semiplano direito.
-            </p>
-            <ul class="module-feature-list">
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Tratamento automático do primeiro elemento nulo (caso \(\epsilon\))</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Tratamento de linha de zeros via polinômio auxiliar</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Cálculo analítico da faixa de ganho \(K\) estável</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Dedução tabular algébrica passo a passo</span>
-              </li>
-            </ul>
-          </div>
-
-          <a href="#downloads" class="btn-module-link btn-module-link-primary">
-            <span>Abrir no ControLAB</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
-
-        <!-- Módulo 3: LGR -->
-        <div class="landing-module-card card-active">
-          <div class="card-top">
-            <div class="module-icon-box icon-lgr">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <line x1="12" y1="2" x2="12" y2="22"/>
-                <path d="M5 5c3 7 7 7 14 0"/>
-                <path d="M5 19c3-7 7-7 14 0"/>
-                <line x1="4" y1="11" x2="6" y2="13"/>
-                <line x1="4" y1="13" x2="6" y2="11"/>
-                <circle cx="16" cy="12" r="1.5"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-card-title">Lugar Geométrico das Raízes</h3>
-            <span class="module-card-tag">Método de Evans • Domínio s</span>
-            <p class="module-card-desc">
-              Trajetória analítica das raízes da equação característica em malha fechada \(1 + K G(s)H(s) = 0\) com a variação contínua do ganho \(K \ge 0\).
-            </p>
-            <ul class="module-feature-list">
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Memorial completo com os 7 passos clássicos deduzidos</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Gráfico interativo com 10.000 pontos e layout anti-colisão</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Assíntotas, centroide, dispersão e cruzamento \(j\omega\)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Exportação nítida em PNG 300 DPI e SVG vetorial</span>
-              </li>
-            </ul>
-          </div>
-
-          <a href="#sete-passos" class="btn-module-link btn-module-link-primary">
-            <span>Ver os 7 Passos em Detalhes</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
-
-        <!-- Módulo 4: Resposta em Frequência -->
-        <div class="landing-module-card card-active">
-          <div class="card-top">
-            <div class="module-icon-box icon-freq">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12c2-8 6-8 8 0s6 8 8 0 4-4 4-4"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-card-title">Resposta em Frequência</h3>
-            <span class="module-card-tag">Diagramas de Bode e Nyquist</span>
-            <p class="module-card-desc">
-              Caracterização dinâmica no domínio da frequência, sensibilidade a ruído, largura de banda e margens de estabilidade relativa.
-            </p>
-            <ul class="module-feature-list">
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Diagramas assintóticos e reais de Bode (magnitude e fase)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Diagrama Polar de Nyquist com contorno completo</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Cálculo analítico da Margem de Ganho (\(MG\))</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Cálculo da Margem de Fase (\(MF\)) e frequências de cruzamento</span>
-              </li>
-            </ul>
-          </div>
-
-          <a href="#downloads" class="btn-module-link btn-module-link-primary">
-            <span>Abrir no ControLAB</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
-
-        <!-- Módulo 5: Projeto de Controladores -->
-        <div class="landing-module-card card-active">
-          <div class="card-top">
-            <div class="module-icon-box icon-controllers">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-card-title">Projeto de Controladores</h3>
-            <span class="module-card-tag">Sintonia PID e Compensadores Lead-Lag</span>
-            <p class="module-card-desc">
-              Metodologias analíticas e interativas para ajuste de controladores P, PI, PD, PID e compensadores por avanço/atraso de fase.
-            </p>
-            <ul class="module-feature-list">
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Sintonia clássica de Ziegler-Nichols (métodos 1 e 2)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Compensadores Lead, Lag e Lead-Lag pelo Lugar das Raízes</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Ajuste analítico e interativo dos parâmetros \(K_p\), \(T_i\) e \(T_d\)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Comparativo de resposta antes e depois da compensação</span>
-              </li>
-            </ul>
-          </div>
-
-          <a href="#downloads" class="btn-module-link btn-module-link-primary">
-            <span>Abrir no ControLAB</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
-        </div>
-
-        <!-- Módulo 6: Espaço de Estados -->
-        <div class="landing-module-card card-active">
-          <div class="card-top">
-            <div class="module-icon-box icon-statespace">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="module-card-body">
-            <h3 class="module-card-title">Espaço de Estados</h3>
-            <span class="module-card-tag">Modelagem Matricial &amp; Alocação de Polos</span>
-            <p class="module-card-desc">
-              Representação matricial moderna no domínio do tempo para sistemas multivariáveis (MIMO) de ordem arbitrária e observadores de estado.
-            </p>
-            <ul class="module-feature-list">
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Modelagem contínua \(\dot{\mathbf{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}\mathbf{u}\)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Posto e análise de Controlabilidade (\(\mathcal{C}\)) e Observabilidade (\(\mathcal{O}\))</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Alocação de polos por realimentação de estados (Ackermann)</span>
-              </li>
-              <li>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Projeto de Observadores de Estado de Luenberger</span>
-              </li>
-            </ul>
-          </div>
-
-          <a href="#downloads" class="btn-module-link btn-module-link-primary">
-            <span>Abrir no ControLAB</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </a>
         </div>
       </div>
     </div>
@@ -461,28 +164,8 @@
       </div>
 
       <div class="interface-gallery-grid">
-        <!-- Card 1: Visão Geral Desktop (Tela Principal) -->
-        <article class="interface-gallery-card" data-mockup-trigger="principal">
-          <div class="gallery-card-img-wrap">
-            <img src="screenshots/principal.webp" alt="Visão Geral Desktop do ControLAB" loading="lazy" width="1024" height="554">
-            <div class="gallery-card-overlay">
-              <span class="gallery-card-zoom-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Ampliar Imagem
-              </span>
-            </div>
-          </div>
-          <div class="gallery-card-info">
-            <div class="gallery-card-meta">
-              <span class="gallery-card-badge">Aplicação Completa</span>
-              <span class="gallery-card-res">1024 × 554</span>
-            </div>
-            <h3 class="gallery-card-title">Visão Geral Desktop (v3.0.0)</h3>
-            <p class="gallery-card-desc">Ambiente integrado com janela nativa, identificação de versão e acesso aos 6 módulos de controle.</p>
-          </div>
-        </article>
 
-        <!-- Card 2: Hub Central -->
+        <!-- Card 1: Hub Central -->
         <article class="interface-gallery-card" data-mockup-trigger="hub">
           <div class="gallery-card-img-wrap">
             <img src="screenshots/hub-modulos.webp" alt="Hub Central de Módulos do ControLAB" loading="lazy" width="1024" height="484">
@@ -496,7 +179,7 @@
           <div class="gallery-card-info">
             <div class="gallery-card-meta">
               <span class="gallery-card-badge">Página Inicial</span>
-              <span class="gallery-card-res">1024 × 484</span>
+              <span class="gallery-card-res">1024 × 531</span>
             </div>
             <h3 class="gallery-card-title">Hub Central Integrado</h3>
             <p class="gallery-card-desc">Grid dinâmico com acesso direto a todos os 6 módulos analíticos de sistemas de controle.</p>
@@ -607,228 +290,6 @@
             <p class="gallery-card-desc">Entrada matricial, cálculo de controlabilidade, observabilidade, polos no plano complexo e observadores.</p>
           </div>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- Os 5 Pilares de Sistemas de Controle Section -->
-  <section class="section" id="pilares">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-badge">Fundamentos Acadêmicos</span>
-        <h2 class="section-title">Os 5 Pilares da Engenharia de Controle</h2>
-        <p class="section-desc">
-          O ControLAB foi concebido para cobrir o ciclo completo da disciplina de Sistemas de Controle: da modelagem no plano complexo e estabilidade absoluta até o projeto e compensação de malhas fechadas.
-        </p>
-      </div>
-
-      <div class="pillars-grid">
-        <!-- Pilar 1: Domínio Complexo & Lugar Geométrico das Raízes -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon icon-lgr">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-                <line x1="12" y1="3" x2="12" y2="21"/>
-                <path d="M12 7a5 5 0 0 1 5 5"/>
-                <path d="M12 17a5 5 0 0 1-5-5"/>
-              </svg>
-            </div>
-            <div class="pillar-header-info">
-              <h3 class="pillar-title">Domínio Complexo (s) &amp; LGR</h3>
-              <span class="pillar-tag">Método Clássico de Evans</span>
-            </div>
-          </div>
-          <p class="pillar-desc">
-            Rastreamento exato das raízes da equação característica \(1 + K \cdot G(s)H(s) = 0\) conforme o ganho \(K\) varia de \(0\) ao infinito, aplicando as condições de módulo e fase.
-          </p>
-          <div class="pillar-formula">
-            $$|G(s)H(s)| = \frac{1}{K}, \quad \angle G(s)H(s) = (2k+1) \cdot 180^\circ$$
-          </div>
-          <ul class="pillar-subitems">
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Memorial analítico dos 7 passos</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Centroide e assíntotas (\(\sigma_a, \theta_k\))</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Pontos de partida e quebra analíticos</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Cruzamento com o eixo imaginário \(j\omega\)</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Pilar 2: Estabilidade Absoluta & Routh-Hurwitz -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon icon-routh">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <line x1="3" y1="9" x2="21" y2="9"/>
-                <line x1="3" y1="15" x2="21" y2="15"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-                <line x1="15" y1="3" x2="15" y2="21"/>
-              </svg>
-            </div>
-            <div class="pillar-header-info">
-              <h3 class="pillar-title">Estabilidade Absoluta</h3>
-              <span class="pillar-tag">Critério de Routh-Hurwitz</span>
-            </div>
-          </div>
-          <p class="pillar-desc">
-            Construção da tabela de coeficientes a partir do polinômio característico, com detecção automática de trocas de sinal, raízes no semiplano direito e casos especiais.
-          </p>
-          <div class="pillar-formula">
-            $$b_1 = \frac{a_{n-1} a_{n-2} - a_n a_{n-3}}{a_{n-1}}, \quad N_{RHP} = \text{mudanças de sinal}$$
-          </div>
-          <ul class="pillar-subitems">
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Tabela tabular de Routh completa</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Tratamento de primeiro elemento zero (\(\epsilon\))</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Linha inteira de zeros e polinômio auxiliar</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Faixa de ganho estável \(K_{min} < K < K_{max}\)</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Pilar 3: Domínio do Tempo & Dinâmica Transitória -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon icon-time">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"/>
-                <line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6" y1="20" x2="6" y2="14"/>
-                <line x1="2" y1="20" x2="22" y2="20"/>
-              </svg>
-            </div>
-            <div class="pillar-header-info">
-              <h3 class="pillar-title">Domínio do Tempo</h3>
-              <span class="pillar-tag">Degrau, Impulso e Métricas Transitórias</span>
-            </div>
-          </div>
-          <p class="pillar-desc">
-            Simulação temporal de malha fechada e aberta para entradas típicas, determinando a velocidade de resposta, amortecimento e precisão em regime permanente.
-          </p>
-          <div class="pillar-formula">
-            $$\%OS = 100 \cdot e^{-\frac{\zeta \pi}{\sqrt{1-\zeta^2}}}, \quad t_s \approx \frac{4}{\zeta \omega_n} \quad (2\%)$$
-          </div>
-          <ul class="pillar-subitems">
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Sobressinal (\(\%OS\)) e tempo de pico (\(t_p\))</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Tempos de acomodação (\(t_s\)) e subida (\(t_r\))</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Erro de regime estacionário (\(e_{ss}\))</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Comparativo interativo de malha aberta vs. fechada</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Pilar 4: Domínio da Frequência & Estabilidade Relativa -->
-        <div class="pillar-card">
-          <div class="pillar-header">
-            <div class="pillar-icon icon-freq">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12c2-8 6-8 8 0s6 8 8 0 4-4 4-4"/>
-              </svg>
-            </div>
-            <div class="pillar-header-info">
-              <h3 class="pillar-title">Domínio da Frequência</h3>
-              <span class="pillar-tag">Bode, Nyquist e Margens de Robustez</span>
-            </div>
-          </div>
-          <p class="pillar-desc">
-            Resposta a sinais harmônicos \(s = j\omega\), revelando estabilidade relativa, imunidade a ruídos de alta frequência e limites de robustez contra incertezas.
-          </p>
-          <div class="pillar-formula">
-            $$|G(j\omega)|_{dB} = 20 \log_{10} |G(j\omega)|, \quad MF = 180^\circ + \angle G(j\omega_{cg})$$
-          </div>
-          <ul class="pillar-subitems">
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Diagramas assintóticos e reais de Bode</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Diagrama Polar de Nyquist completo</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Margem de Ganho (\(MG\)) e frequência \(\omega_{cf}\)</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Margem de Fase (\(MF\)) e frequência \(\omega_{cg}\)</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Pilar 5: Projeto de Controladores & Síntese (Full Width) -->
-        <div class="pillar-card full-width">
-          <div class="pillar-header">
-            <div class="pillar-icon icon-controllers">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </div>
-            <div class="pillar-header-info">
-              <h3 class="pillar-title">Projeto e Síntese de Controladores</h3>
-              <span class="pillar-tag">Ajuste PID &amp; Compensação Avanço/Atraso (Lead-Lag)</span>
-            </div>
-          </div>
-          <p class="pillar-desc">
-            Transforme plantas instáveis ou de baixo desempenho em malhas fechadas robustas e com especificações estritas de sobressinal, amortecimento, tempo de resposta e erro estacionário nulo.
-          </p>
-          <div class="pillar-formula">
-            $$C_{PID}(s) = K_p \left( 1 + \frac{1}{T_i s} + T_d s \right), \qquad G_c(s) = K_c \frac{s + 1/T}{s + 1/(\alpha T)} \quad (\alpha < 1 \text{ Avanço}, \ \alpha > 1 \text{ Atraso})$$
-          </div>
-          <ul class="pillar-subitems">
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Sintonia de Ziegler-Nichols (Curva de Reação e Oscilação Crítica)</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Alocação de polos dominantes no plano complexo através do LGR</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Compensadores Lead para aumento da margem de fase e rapidez temporal</span>
-            </li>
-            <li>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Compensadores Lag para anulação do erro em regime permanente (\(e_{ss}\))</span>
-            </li>
-          </ul>
-        </div>
       </div>
     </div>
   </section>
@@ -1069,8 +530,7 @@
       <div class="footer-links">
         <div class="footer-col">
           <h4>Software</h4>
-          <a href="#modulos">Módulos</a>
-          <a href="#pilares">Fundamentos</a>
+          <a href="#interface">Interface</a>
           <a href="#recursos">Recursos</a>
           <a href="#downloads">Downloads</a>
         </div>
@@ -1215,7 +675,6 @@
       // Alternância interativa de abas do Mockup da Aplicação
       const mockupTabs = document.querySelectorAll('.mockup-tab[data-mockup]');
       const mockupScreens = {
-        principal: document.getElementById('mockup-img-principal'),
         hub: document.getElementById('mockup-img-hub'),
         time: document.getElementById('mockup-img-time'),
         lgr: document.getElementById('mockup-img-lgr'),
@@ -1224,7 +683,6 @@
         states: document.getElementById('mockup-img-states')
       };
       const mockupCaptions = {
-        principal: 'Visão Geral Desktop: ambiente integrado v3.0.0 com os 6 módulos em execução',
         hub: 'Hub Central: navegação rápida e unificada entre todos os módulos de controle',
         time: 'Resposta no Domínio do Tempo: transitório, sobressinal (%OS) e tempos característicos',
         lgr: 'Lugar Geométrico das Raízes (LGR): traçado analítico de Evans e memorial passo a passo',
@@ -1260,13 +718,6 @@
 
       // Base de dados dos módulos para exibição ampliada no Lightbox
       const galleryData = [
-        {
-          key: 'principal',
-          title: 'Visão Geral Desktop (v3.0.0)',
-          badge: 'Aplicação Completa',
-          src: 'screenshots/principal.webp',
-          desc: 'Ambiente integrado com janela nativa, identificação de versão e acesso aos 6 módulos de controle.'
-        },
         {
           key: 'hub',
           title: 'Hub Central Integrado',
