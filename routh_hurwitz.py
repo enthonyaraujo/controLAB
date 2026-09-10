@@ -224,12 +224,12 @@ def build_routh_table(coeffs, degree):
 
     steps.append({
         "power": f"s^{{{n}}}",
-        "desc": f"Primeira linha formada pelos coeficientes de potências de mesma paridade de s^{{{n}}}.",
+        "desc": f"Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{{{n}}}$.",
         "values": [format_sympy_latex(c) for c in r0],
     })
     steps.append({
         "power": f"s^{{{n-1}}}",
-        "desc": f"Segunda linha formada pelos coeficientes de potências alternadas a partir de s^{{{n-1}}}.",
+        "desc": f"Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{{{n-1}}}$.",
         "values": [format_sympy_latex(c) for c in r1],
     })
 
@@ -269,9 +269,9 @@ def build_routh_table(coeffs, degree):
             prev_row = new_prev_row
 
             note = (
-                f"Linha de zeros detectada em s^{{{n - i + 1}}}. "
-                f"Polinômio auxiliar: A(s) = {format_sympy_latex(aux_poly)}. "
-                f"Derivada substituída: dA/ds = {format_sympy_latex(aux_deriv)}."
+                f"Linha de zeros detectada em $s^{{{n - i + 1}}}$. "
+                f"Polinômio auxiliar: $A(s) = {format_sympy_latex(aux_poly)}$. "
+                f"Derivada substituída: $\\frac{{dA}}{{ds}} = {format_sympy_latex(aux_deriv)}$."
             )
             special_cases.append({
                 "type": "row_of_zeros",
@@ -290,8 +290,8 @@ def build_routh_table(coeffs, degree):
         elif prev_row[0] == 0:
             prev_row[0] = eps_sym
             note = (
-                f"Primeiro elemento nulo em s^{{{n - i + 1}}}. "
-                f"Substituído por termo infinitesimal positivo ε > 0."
+                f"Primeiro elemento nulo em $s^{{{n - i + 1}}}$. "
+                f"Substituído por termo infinitesimal positivo $\\varepsilon > 0$."
             )
             special_cases.append({
                 "type": "zero_first_element",
@@ -458,21 +458,23 @@ def compute_k_range(first_col, poly_s):
             except Exception:
                 pass
 
-    # Resolve o sistema de inequações usando intervalos de teste
-    # Coleta todos os pontos críticos positivos de K
-    crit_points = sorted(list(set([ck["k_val"] for ck in critical_k if ck["k_val"] > 0])))
-    all_points = [0.0] + crit_points
+    # Resolve o sistema de inequações para regimes estável, marginal e instável
+    all_crit = sorted(list(set([ck["k_val"] for ck in critical_k if ck["k_val"] > 0])))
+    all_points = [-float("inf"), 0.0] + all_crit + [float("inf")]
 
-    valid_intervals = []
-    for idx in range(len(all_points)):
+    stable_intervals = []
+    unstable_intervals = []
+
+    for idx in range(len(all_points) - 1):
         p_low = all_points[idx]
-        p_high = all_points[idx + 1] if idx + 1 < len(all_points) else None
+        p_high = all_points[idx + 1]
 
-        # Ponto de teste no interior do intervalo
-        if p_high is not None:
-            k_test = (p_low + p_high) / 2.0
+        if p_low == -float("inf"):
+            k_test = p_high - 5.0
+        elif p_high == float("inf"):
+            k_test = p_low + 5.0
         else:
-            k_test = p_low + 10.0
+            k_test = (p_low + p_high) / 2.0
 
         all_ok = True
         for term in first_col:
@@ -488,25 +490,26 @@ def compute_k_range(first_col, poly_s):
                 all_ok = False
                 break
 
+        if p_low == -float("inf"):
+            int_latex = f"K < {p_high:.4g}"
+        elif p_high == float("inf"):
+            int_latex = f"K > {p_low:.4g}"
+        else:
+            int_latex = f"{p_low:.4g} < K < {p_high:.4g}"
+
         if all_ok:
-            if p_high is not None:
-                if p_low == 0.0:
-                    valid_intervals.append(f"0 < K < {p_high:.4g}")
-                else:
-                    valid_intervals.append(f"{p_low:.4g} < K < {p_high:.4g}")
-            else:
-                valid_intervals.append(f"K > {p_low:.4g}")
+            stable_intervals.append(int_latex)
+        else:
+            unstable_intervals.append(int_latex)
 
-    if valid_intervals:
-        range_latex = r" \quad \text{ou} \quad ".join(valid_intervals)
-    else:
-        range_latex = r"\text{Nenhuma faixa estável com } K > 0"
+    stable_latex = r" \quad \text{ou} \quad ".join(stable_intervals) if stable_intervals else r"\text{Sem faixa estável}"
+    unstable_latex = r" \quad \text{ou} \quad ".join(unstable_intervals) if unstable_intervals else r"\text{Sem faixa instável}"
 
-    # Frequência de oscilação nos ganhos críticos
+    # Frequência de oscilação nos ganhos críticos (Marginal)
+    marginal_cases = []
     for ck in critical_k:
         k_val = ck["k_val"]
         try:
-            # Avalia raízes do polinômio no ganho crítico
             crit_poly = poly_s.as_expr().subs(K_sym, k_val)
             roots = sp.solve(crit_poly, s_sym)
             jw_roots = []
@@ -519,21 +522,227 @@ def compute_k_range(first_col, poly_s):
                 omega_osc = min(jw_roots)
                 ck["omega_osc"] = round(omega_osc, 4)
                 ck["omega_latex"] = f"\\omega_{{osc}} = {omega_osc:.4g} \\text{{ rad/s}}"
+                marginal_cases.append({
+                    "k_val": k_val,
+                    "k_latex": f"K = {k_val:.4g}",
+                    "omega_osc": round(omega_osc, 4),
+                    "omega_latex": f"\\omega_{{osc}} = {omega_osc:.4g} \\text{{ rad/s}}",
+                    "poles_latex": f"s = \\pm {omega_osc:.4g} j",
+                })
         except Exception:
             pass
 
+    if marginal_cases:
+        marginal_latex = r" \quad \text{ou} \quad ".join([f"{mc['k_latex']} \\; ({mc['omega_latex']})" for mc in marginal_cases])
+    else:
+        marginal_latex = r"\text{Nenhum ponto marginal em } K > 0"
+
     return {
         "has_k": True,
-        "range_latex": range_latex,
+        "range_latex": stable_latex,
+        "stable_latex": stable_latex,
+        "unstable_latex": unstable_latex,
+        "marginal_latex": marginal_latex,
+        "stable_intervals": stable_intervals,
+        "unstable_intervals": unstable_intervals,
+        "marginal_cases": marginal_cases,
         "conditions": conditions,
         "critical_k": critical_k,
     }
 
 
-def analyze_routh_hurwitz(input_str: str, has_k_loop: bool = True):
+def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=None, denom=None, theme="dark"):
+    """
+    Gera o gráfico do plano complexo s com:
+    - Região Estável (SPE, Re < 0) em verde translúcido
+    - Região Instável (SPD, Re > 0) em vermelho translúcido
+    - Eixo imaginário jω (Fronteira Marginal) em linha tracejada âmbar
+    - Trajetória contínua das raízes conforme K varia de 0 a K_max
+    - Polos em K=0 e cruzamentos no eixo jω marcados
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import io, base64
+
+    is_dark = theme == "dark"
+    bg_fig = "#0f172a" if is_dark else "#ffffff"
+    bg_ax = "#1e293b" if is_dark else "#f8fafc"
+    text_color = "#f8fafc" if is_dark else "#0f172a"
+    subtext_color = "#94a3b8" if is_dark else "#64748b"
+    grid_color = "#334155" if is_dark else "#e2e8f0"
+    border_color = "#334155" if is_dark else "#cbd5e1"
+
+    fig, ax = plt.subplots(figsize=(9, 5.2), dpi=130)
+    fig.patch.set_facecolor(bg_fig)
+    ax.set_facecolor(bg_ax)
+
+    has_k = k_info.get("has_k", False)
+    all_re = []
+    all_im = []
+
+    if has_k:
+        crit_vals = [ck["k_val"] for ck in k_info.get("critical_k", []) if ck.get("k_val", 0) > 0]
+        if crit_vals:
+            k_max = max(10.0, max(crit_vals) * 1.8)
+        else:
+            k_max = 20.0
+
+        k_vect = np.linspace(0.001, k_max, 300)
+        coeffs_sym = poly_s.all_coeffs()
+
+        roots_list = []
+        for kv in k_vect:
+            try:
+                c_num = [float(sp.N(c.subs(K_sym, kv))) for c in coeffs_sym]
+                r = np.roots(c_num)
+                r_sorted = sorted(r, key=lambda x: (round(x.imag, 3), round(x.real, 3)))
+                roots_list.append(r_sorted)
+                all_re.extend([float(x.real) for x in r])
+                all_im.extend([float(x.imag) for x in r])
+            except Exception:
+                pass
+
+        roots_arr = np.array(roots_list)
+        re_min = min(-4.0, float(np.percentile(all_re, 2)) - 1.2) if all_re else -5.0
+        re_max = max(3.0, float(np.percentile(all_re, 98)) + 1.2) if all_re else 5.0
+        im_max = max(3.5, float(np.percentile(np.abs(all_im), 98)) + 1.5) if all_im else 5.0
+
+        ax.axvspan(re_min * 2, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
+        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.6, label="Fronteira Marginal (Eixo jω)", zorder=3)
+        ax.axhline(0, color="#64748b", linestyle="-", linewidth=0.8, alpha=0.5)
+
+        if roots_arr.size > 0:
+            for j in range(roots_arr.shape[1]):
+                ax.plot(roots_arr[:, j].real, roots_arr[:, j].imag, color="#38bdf8", linewidth=2.2, label="Trajetória das Raízes" if j == 0 else "_nolegend_", zorder=4)
+
+        try:
+            start_coeffs = [float(sp.N(c.subs(K_sym, 0))) for c in coeffs_sym]
+            p0 = np.roots(start_coeffs)
+            ax.plot(p0.real, p0.imag, "x", color="#f87171" if is_dark else "#dc2626", markersize=9, markeredgewidth=2.4, label="Polos Iniciais (K = 0)", zorder=6)
+        except Exception:
+            pass
+
+        for ck in k_info.get("critical_k", []):
+            kv = ck["k_val"]
+            try:
+                c_crit = [float(sp.N(c.subs(K_sym, kv))) for c in coeffs_sym]
+                rc = np.roots(c_crit)
+                jw_pts = [p for p in rc if abs(p.real) < 1e-2]
+                for cp in jw_pts:
+                    lbl = f"Ponto Crítico ($K={kv:.3g}$, $\\omega={abs(cp.imag):.2f}$)" if cp == jw_pts[0] else "_nolegend_"
+                    ax.plot(cp.real, cp.imag, "o", markerfacecolor="#fbbf24", markeredgecolor="#d97706", markeredgewidth=1.8, markersize=8.5, label=lbl, zorder=7)
+            except Exception:
+                pass
+
+        ax.set_title("Plano Complexo s: Trajetória dos Polos e Regiões de Estabilidade", fontsize=11, fontweight="bold", pad=12, color=text_color)
+    else:
+        coeffs_sym = poly_s.all_coeffs()
+        c_num = [float(sp.N(c)) for c in coeffs_sym]
+        roots = np.roots(c_num)
+        re_vals = [float(r.real) for r in roots]
+        im_vals = [float(r.imag) for r in roots]
+        re_min = min(-4.0, min(re_vals) - 1.5)
+        re_max = max(3.0, max(re_vals) + 1.5)
+        im_max = max(3.5, max(np.abs(im_vals)) + 1.5)
+
+        ax.axvspan(re_min * 2, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
+        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.6, label="Fronteira Marginal (Eixo jω)", zorder=3)
+        ax.axhline(0, color="#64748b", linestyle="-", linewidth=0.8, alpha=0.5)
+
+        for r in roots:
+            is_spe = r.real < -1e-4
+            is_spd = r.real > 1e-4
+            color = "#34d399" if is_spe else ("#f87171" if is_spd else "#fbbf24")
+            lbl_tag = "SPE" if is_spe else ("SPD" if is_spd else "jω")
+            ax.plot(r.real, r.imag, "x", color=color, markersize=11, markeredgewidth=2.6, zorder=6)
+            ax.annotate(
+                f"{r.real:.2f} + {r.imag:.2f}j [{lbl_tag}]",
+                xy=(r.real, r.imag),
+                xytext=(8, 8),
+                textcoords="offset points",
+                fontsize=8.5,
+                color=text_color,
+                bbox=dict(boxstyle="round,pad=0.2", facecolor=bg_fig, edgecolor=border_color, alpha=0.9, lw=0.6),
+            )
+
+        ax.set_title("Plano Complexo s: Posição dos Polos e Veredito de Estabilidade", fontsize=11, fontweight="bold", pad=12, color=text_color)
+
+    ax.set_xlim(re_min, re_max)
+    ax.set_ylim(-im_max, im_max)
+    ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=9.5, labelpad=6, color=text_color)
+    ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=9.5, labelpad=6, color=text_color)
+    ax.tick_params(colors=subtext_color)
+    ax.grid(True, linestyle=":", alpha=0.4, color=grid_color)
+    for spine in ax.spines.values():
+        spine.set_color(border_color)
+
+    ax.legend(loc="lower left", fontsize=8.5, framealpha=0.92, facecolor=bg_fig, edgecolor=border_color, labelcolor=text_color)
+    plt.tight_layout()
+
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", bbox_inches="tight", facecolor=bg_fig, dpi=130)
+    buf.seek(0)
+    img_b64 = "data:image/png;base64," + base64.b64encode(buf.read()).decode("utf-8")
+
+    svg_buf = io.BytesIO()
+    fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor=bg_fig)
+    svg_buf.seek(0)
+    svg_text = svg_buf.read().decode("utf-8")
+    plt.close(fig)
+
+    return img_b64, svg_text
+
+
+def evaluate_k_point(input_str: str, k_val: float):
+    """Calcula os polos exatos e o veredito de estabilidade para um valor específico de K."""
+    char_poly, poly_s, degree, coeffs, is_fraction, numer, denom = parse_poly_or_tf(
+        input_str, has_k_loop=True
+    )
+    c_num = [float(sp.N(c.subs(K_sym, k_val))) for c in coeffs]
+    import numpy as np
+    roots = np.roots(c_num)
+    re_vals = [float(np.real(r)) for r in roots]
+    im_vals = [float(np.imag(r)) for r in roots]
+
+    spd_count = sum(1 for re in re_vals if re > 1e-4)
+    jw_count = sum(1 for re in re_vals if abs(re) <= 1e-4)
+
+    if spd_count > 0:
+        verdict = "Instável"
+    elif jw_count > 0:
+        verdict = "Marginalmente Estável"
+    else:
+        verdict = "Estável"
+
+    roots_list = []
+    for r in roots:
+        re_v = round(float(np.real(r)), 4)
+        im_v = round(float(np.imag(r)), 4)
+        roots_list.append({
+            "real": re_v,
+            "imag": im_v,
+            "str": f"{re_v:.4g}" + (f" + {im_v:.4g}j" if im_v >= 0 else f" - {abs(im_v):.4g}j") if abs(im_v) > 1e-6 else f"{re_v:.4g}",
+            "zone": "SPD" if re_v > 1e-4 else ("SPE" if re_v < -1e-4 else "jw"),
+        })
+
+    return {
+        "success": True,
+        "k_val": k_val,
+        "verdict": verdict,
+        "spd_count": spd_count,
+        "jw_count": jw_count,
+        "roots": roots_list,
+    }
+
+
+def analyze_routh_hurwitz(input_str: str, has_k_loop: bool = True, theme: str = "dark"):
     """
     Função principal de análise completa do Critério de Routh-Hurwitz.
-    Retorna estrutura serializável em JSON com tabela, deduções e conclusões.
+    Retorna estrutura serializável em JSON com tabela, deduções, regimes de K e gráfico.
     """
     char_poly, poly_s, degree, coeffs, is_fraction, numer, denom = parse_poly_or_tf(
         input_str, has_k_loop=has_k_loop
@@ -547,6 +756,11 @@ def analyze_routh_hurwitz(input_str: str, has_k_loop: bool = True):
     )
 
     k_info = compute_k_range(first_col, poly_s)
+
+    # Gera o gráfico no plano complexo s
+    plot_image, plot_svg = generate_stability_plot(
+        poly_s, k_info, degree, is_fraction=is_fraction, numer=numer, denom=denom, theme=theme
+    )
 
     # Formata as linhas para serialização
     formatted_table = []
@@ -603,6 +817,8 @@ def analyze_routh_hurwitz(input_str: str, has_k_loop: bool = True):
         "verdict": verdict,
         "summary": summary,
         "k_range": k_info,
+        "plot_image": plot_image,
+        "plot_svg": plot_svg,
         "exact_roots": exact_roots,
     }
 

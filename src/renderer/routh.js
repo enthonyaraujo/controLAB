@@ -1,6 +1,6 @@
 /**
  * ControLAB - Módulo de Análise de Estabilidade por Routh-Hurwitz
- * Gerencia o cálculo, interface interativa e renderização matemática da tabela de Routh.
+ * Gerencia o cálculo, interface interativa, 3 regimes de K, gráfico no plano s e renderização matemática.
  */
 
 (function registerRouthModule(global) {
@@ -28,11 +28,31 @@
     const previewMath = optionalElement('routh-latex-preview');
     let previewTimer = null;
 
-    // Equação e Faixa de K
+    // Equação Característica
     const charPolyEl = optionalElement('routh-char-poly');
+
+    // Regimes de K
     const kRangeBanner = optionalElement('routh-k-range-banner');
-    const kRangeExpr = optionalElement('routh-k-range-expr');
-    const kCritInfo = optionalElement('routh-k-crit-info');
+    const kStableExpr = optionalElement('routh-k-stable-expr');
+    const kStableDesc = optionalElement('routh-k-stable-desc');
+    const kMarginalExpr = optionalElement('routh-k-marginal-expr');
+    const kMarginalDesc = optionalElement('routh-k-marginal-desc');
+    const kUnstableExpr = optionalElement('routh-k-unstable-expr');
+    const kUnstableDesc = optionalElement('routh-k-unstable-desc');
+
+    // Simulador Interativo de Ganho K
+    const kLiveBadge = optionalElement('routh-k-live-badge');
+    const kSlider = optionalElement('routh-k-slider');
+    const btnKPresetStable = optionalElement('btn-k-preset-stable');
+    const btnKPresetCrit = optionalElement('btn-k-preset-crit');
+    const btnKPresetUnstable = optionalElement('btn-k-preset-unstable');
+    const kLiveStatus = optionalElement('routh-k-live-status');
+
+    // Gráfico no Plano s
+    const plotCard = optionalElement('routh-plot-card');
+    const plotImage = optionalElement('routh-plot-image');
+    const btnCopyImg = optionalElement('btn-routh-copy-img');
+    const btnDownloadPng = optionalElement('btn-routh-download-png');
 
     // Tabela e Detalhes
     const tableContainer = optionalElement('routh-table-container');
@@ -42,6 +62,10 @@
     const rootsList = optionalElement('routh-exact-roots-list');
 
     let isCalculating = false;
+    let lastExpr = '';
+    let lastPlotImage = null;
+    let lastCritK = null;
+    let liveKTimer = null;
 
     function updatePreview() {
       if (!previewMath) return;
@@ -91,10 +115,14 @@
       }
 
       setLoading(true);
+      lastExpr = expr;
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
       try {
         const data = await window.api.calculateRouth({
           expr,
           has_k: true,
+          theme: currentTheme,
         });
 
         if (!data.success) {
@@ -142,37 +170,67 @@
         renderMath(charPolyEl, data.char_poly_latex, true);
       }
 
-      // 3. Faixa de K
+      // 3. Regimes de Estabilidade por Ganho K
       if (kRangeBanner) {
         if (data.k_range && data.k_range.has_k) {
           kRangeBanner.style.display = 'block';
-          if (kRangeExpr) {
-            kRangeExpr.innerHTML = '';
-            renderMath(kRangeExpr, data.k_range.range_latex, true);
+
+          // Regime Estável
+          if (kStableExpr) {
+            kStableExpr.innerHTML = '';
+            renderMath(kStableExpr, data.k_range.stable_latex || '\\text{Sem faixa estável}', true);
           }
-          if (kCritInfo) {
-            if (data.k_range.critical_k && data.k_range.critical_k.length > 0) {
-              const critItems = data.k_range.critical_k.map((ck) => {
-                const omegaText = ck.omega_latex ? ` \\quad (\\text{com } ${ck.omega_latex})` : '';
-                return `<li>$K_{crit} = ${ck.k_latex}${omegaText}$</li>`;
-              }).join('');
-              kCritInfo.innerHTML = `<strong>Ganhos Críticos de Oscilação:</strong><ul>${critItems}</ul>`;
-              renderMathInContainer(kCritInfo);
+          if (kStableDesc) {
+            kStableDesc.textContent = (data.k_range.stable_latex && data.k_range.stable_latex.includes('Sem'))
+              ? 'Nenhum valor de K garante todos os polos estritamente no semiplano esquerdo.'
+              : 'Todos os polos de malha fechada situam-se no SPE com amortecimento.';
+          }
+
+          // Regime Marginalmente Estável
+          if (kMarginalExpr) {
+            kMarginalExpr.innerHTML = '';
+            renderMath(kMarginalExpr, data.k_range.marginal_latex || '\\text{Nenhum ponto marginal}', true);
+          }
+          if (kMarginalDesc) {
+            if (data.k_range.marginal_cases && data.k_range.marginal_cases.length > 0) {
+              const omegas = data.k_range.marginal_cases.map((m) => m.omega_latex).join(', ');
+              kMarginalDesc.textContent = `Oscilações sustentadas no eixo imaginário com ${omegas}.`;
             } else {
-              kCritInfo.innerHTML = '';
+              kMarginalDesc.textContent = 'Não há cruzamento com o eixo jω para ganhos positivos.';
             }
           }
+
+          // Regime Instável
+          if (kUnstableExpr) {
+            kUnstableExpr.innerHTML = '';
+            renderMath(kUnstableExpr, data.k_range.unstable_latex || '\\text{Sem faixa instável}', true);
+          }
+          if (kUnstableDesc) {
+            kUnstableDesc.textContent = (data.k_range.unstable_latex && data.k_range.unstable_latex.includes('Sem'))
+              ? 'O sistema permanece estável para todos os valores admissíveis de K.'
+              : 'Polos no semiplano direito causam crescimento exponencial e instabilidade.';
+          }
+
+          // Configuração do Simulador Interativo
+          setupKSimulator(data.k_range);
         } else {
           kRangeBanner.style.display = 'none';
         }
       }
 
-      // 4. Tabela de Routh
-      if (tableContainer) {
-        renderRouthTable(data.routh_table, data.cell_details);
+      // 4. Gráfico no Plano Complexo s
+      if (plotCard && plotImage) {
+        if (data.plot_image) {
+          plotCard.style.display = 'block';
+          plotImage.src = data.plot_image;
+          lastPlotImage = data.plot_image;
+        } else {
+          plotCard.style.display = 'none';
+          lastPlotImage = null;
+        }
       }
 
-      // 5. Casos Especiais
+      // 5. Casos Especiais (Alerta quando ocorrer epsilon ou linha de zeros)
       if (specialCasesContainer) {
         if (data.special_cases && data.special_cases.length > 0) {
           specialCasesContainer.style.display = 'block';
@@ -190,9 +248,14 @@
         }
       }
 
-      // 6. Passos Didáticos
+      // 6. Tabela de Routh
+      if (tableContainer) {
+        renderRouthTable(data.routh_table);
+      }
+
+      // 7. Passo a Passo das Linhas
       if (stepsList) {
-        stepsList.innerHTML = data.steps.map((st, idx) => {
+        stepsList.innerHTML = data.steps.map((st) => {
           const valsHtml = st.values.map((v) => `<span class="routh-step-term">$${v}$</span>`).join(' ');
           return `
             <div class="routh-step-item">
@@ -207,26 +270,160 @@
         renderMathInContainer(stepsList);
       }
 
-      // 7. Raízes Exatas (quando disponíveis)
+      // 8. Raízes Numéricas Exatas (quando disponíveis)
       if (rootsContainer && rootsList) {
         if (data.exact_roots && data.exact_roots.length > 0) {
           rootsContainer.style.display = 'block';
           rootsList.innerHTML = data.exact_roots.map((r, i) => {
             const reTag = r.real > 0 ? '<span class="root-rhp">SPD</span>' : (r.real < 0 ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">jω</span>');
-            return `<li class="root-item"><span class="root-index">s_${i+1}:</span> <code>${r.str}</code> ${reTag}</li>`;
+            return `<li class="root-item"><span class="root-index">s_{${i+1}}:</span> <code>${r.str}</code> ${reTag}</li>`;
           }).join('');
         } else {
           rootsContainer.style.display = 'none';
         }
       }
 
-      // Renderiza expressões LaTeX em toda a área de resultados
+      // Renderiza todas as expressões LaTeX na área de resultados
       if (resultsContainer) {
         renderMathInContainer(resultsContainer);
       }
     }
 
-    function renderRouthTable(rows, cellDetails) {
+    function setupKSimulator(kRange) {
+      if (!kSlider) return;
+
+      let critVal = null;
+      if (kRange.critical_k && kRange.critical_k.length > 0) {
+        critVal = kRange.critical_k[0].k_val;
+      } else if (kRange.marginal_cases && kRange.marginal_cases.length > 0) {
+        critVal = kRange.marginal_cases[0].k_val;
+      }
+      lastCritK = critVal;
+
+      let defaultK = 1.0;
+      if (critVal !== null && critVal > 0) {
+        const maxVal = Math.max(16, Math.ceil(critVal * 2.2));
+        kSlider.min = '0.1';
+        kSlider.max = maxVal.toString();
+        kSlider.step = Math.max(0.05, Math.round((critVal / 60) * 100) / 100).toString();
+        defaultK = Math.max(0.2, Math.round((critVal * 0.5) * 10) / 10);
+      } else {
+        kSlider.min = '0.1';
+        kSlider.max = '20';
+        kSlider.step = '0.1';
+        defaultK = 1.0;
+      }
+
+      kSlider.value = defaultK.toString();
+      updateLiveK(defaultK);
+    }
+
+    function updateLiveK(kVal) {
+      if (kLiveBadge) {
+        kLiveBadge.textContent = `K = ${kVal}`;
+      }
+
+      clearTimeout(liveKTimer);
+      liveKTimer = setTimeout(async () => {
+        if (!window.api || !window.api.evaluateRouthK) return;
+        try {
+          const res = await window.api.evaluateRouthK({
+            expr: lastExpr || (inputExpr ? inputExpr.value.trim() : ''),
+            k_val: kVal,
+          });
+
+          if (!res || !res.success) return;
+          renderLiveKStatus(res);
+        } catch (err) {
+          console.warn('Erro na avaliação de ponto K:', err);
+        }
+      }, 70);
+    }
+
+    function renderLiveKStatus(res) {
+      if (!kLiveStatus) return;
+
+      const verdictClass = res.verdict === 'Estável'
+        ? 'status-pill-stable'
+        : (res.verdict === 'Marginalmente Estável' ? 'status-pill-marginal' : 'status-pill-unstable');
+
+      const speCount = (res.roots || []).length - res.spd_count - res.jw_count;
+      const rootsHtml = (res.roots || []).map((r, i) => {
+        const tag = r.zone === 'SPD'
+          ? '<span class="root-rhp">SPD</span>'
+          : (r.zone === 'SPE' ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">jω</span>');
+        return `<span class="live-root-item"><code>s_{${i + 1}} = ${r.str}</code> ${tag}</span>`;
+      }).join('');
+
+      kLiveStatus.innerHTML = `
+        <div class="live-status-row">
+          <span class="live-status-badge ${verdictClass}">${res.verdict}</span>
+          <span class="live-status-poles-summary">${speCount} polo(s) no SPE &bull; ${res.jw_count} no j&omega; &bull; ${res.spd_count} no SPD</span>
+        </div>
+        <div class="live-status-roots">${rootsHtml}</div>
+      `;
+    }
+
+    // Eventos do Simulador de K
+    kSlider?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      updateLiveK(val);
+    });
+
+    btnKPresetStable?.addEventListener('click', () => {
+      if (!kSlider) return;
+      const target = (lastCritK !== null && lastCritK > 0)
+        ? Math.max(0.1, Math.round((lastCritK * 0.5) * 10) / 10)
+        : 1.0;
+      kSlider.value = target.toString();
+      updateLiveK(target);
+    });
+
+    btnKPresetCrit?.addEventListener('click', () => {
+      if (!kSlider) return;
+      if (lastCritK !== null && lastCritK > 0) {
+        kSlider.value = lastCritK.toString();
+        updateLiveK(lastCritK);
+      } else {
+        showToast('Não há ganho crítico de oscilação marginal neste sistema.', 'info');
+      }
+    });
+
+    btnKPresetUnstable?.addEventListener('click', () => {
+      if (!kSlider) return;
+      const target = (lastCritK !== null && lastCritK > 0)
+        ? Math.round((lastCritK * 1.5) * 10) / 10
+        : 12.0;
+      kSlider.value = target.toString();
+      updateLiveK(target);
+    });
+
+    // Eventos de Exportação do Gráfico do Plano s
+    btnCopyImg?.addEventListener('click', async () => {
+      if (!lastPlotImage) return;
+      try {
+        const res = await window.api.copyImageToClipboard(lastPlotImage);
+        if (res && res.error) throw new Error(res.error);
+        showToast('Gráfico copiado para a área de transferência!', 'success');
+      } catch (err) {
+        showToast('Não foi possível copiar o gráfico: ' + err.message, 'error');
+      }
+    });
+
+    btnDownloadPng?.addEventListener('click', async () => {
+      if (!lastPlotImage) return;
+      try {
+        await window.api.saveImage({
+          base64: lastPlotImage,
+          defaultName: 'estabilidade_routh_plano_s.png',
+        });
+        showToast('Gráfico PNG exportado com sucesso!', 'success');
+      } catch (err) {
+        showToast('Erro ao exportar gráfico: ' + err.message, 'error');
+      }
+    });
+
+    function renderRouthTable(rows) {
       if (!tableContainer || !rows) return;
 
       const numCols = rows[0]?.cells?.length || 0;
@@ -236,13 +433,13 @@
       }
 
       let rowsHtml = '';
-      rows.forEach((r, rIdx) => {
+      rows.forEach((r) => {
         let cellsHtml = `<td class="cell-power">$${r.power}$</td>`;
-        r.cells.forEach((cell, cIdx) => {
+        r.cells.forEach((cell) => {
           const isFirstCol = cell.is_first_col;
           const signClass = isFirstCol && cell.sign ? `sign-${cell.sign === '+' ? 'pos' : (cell.sign === '-' ? 'neg' : 'zero')}` : '';
           const signBadge = isFirstCol && cell.sign && cell.sign !== 'expr' ? `<span class="sign-pill ${signClass}">${cell.sign}</span>` : '';
-          
+
           cellsHtml += `
             <td class="routh-cell ${isFirstCol ? 'first-col' : ''}">
               <div class="cell-wrapper">

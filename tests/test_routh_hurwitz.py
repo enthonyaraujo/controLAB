@@ -61,6 +61,15 @@ class TestRouthHurwitz(unittest.TestCase):
         self.assertAlmostEqual(crit[0]["k_val"], 6.0, places=1)
         self.assertAlmostEqual(crit[0]["omega_osc"], 1.4142, places=2)
 
+        # Regimes completos de K
+        self.assertIn("0 < K < 6", res["k_range"]["stable_latex"])
+        self.assertIn("K = 6", res["k_range"]["marginal_latex"])
+        self.assertIn("K > 6", res["k_range"]["unstable_latex"])
+
+        # Presença do gráfico do plano s
+        self.assertIn("data:image/png;base64", res["plot_image"])
+        self.assertIsNotNone(res["plot_svg"])
+
     def test_degree_4_epsilon_case(self):
         # s^4 + s^3 + 2s^2 + 2s + 3 = 0
         # Linha s^2 tem elemento zero: piv = (1*2 - 1*2)/1 = 0
@@ -107,9 +116,38 @@ class TestRouthHurwitz(unittest.TestCase):
         calc_resp = dispatch({
             "action": "routh_hurwitz",
             "expr": "s^3 + 6*s^2 + 11*s + 6",
+            "theme": "dark",
         })
         self.assertTrue(calc_resp["success"])
         self.assertEqual(calc_resp["verdict"], "Estável")
+
+        # Testa simulador pontual de ganho K via bridge
+        k_eval_stable = dispatch({
+            "action": "routh_evaluate_k",
+            "expr": "s^3 + 3*s^2 + 2*s + K",
+            "k_val": 3.0,
+        })
+        self.assertTrue(k_eval_stable["success"])
+        self.assertEqual(k_eval_stable["verdict"], "Estável")
+        self.assertEqual(k_eval_stable["spd_count"], 0)
+
+        k_eval_crit = dispatch({
+            "action": "routh_evaluate_k",
+            "expr": "s^3 + 3*s^2 + 2*s + K",
+            "k_val": 6.0,
+        })
+        self.assertTrue(k_eval_crit["success"])
+        self.assertEqual(k_eval_crit["verdict"], "Marginalmente Estável")
+        self.assertEqual(k_eval_crit["jw_count"], 2)
+
+        k_eval_unstable = dispatch({
+            "action": "routh_evaluate_k",
+            "expr": "s^3 + 3*s^2 + 2*s + K",
+            "k_val": 10.0,
+        })
+        self.assertTrue(k_eval_unstable["success"])
+        self.assertEqual(k_eval_unstable["verdict"], "Instável")
+        self.assertTrue(k_eval_unstable["spd_count"] > 0)
 
 
 if __name__ == "__main__":

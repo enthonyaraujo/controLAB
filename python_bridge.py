@@ -29,6 +29,7 @@ from lgr_engine import (
 from routh_hurwitz import (
     ROUTH_PRESETS,
     analyze_routh_hurwitz,
+    evaluate_k_point,
 )
 
 
@@ -185,7 +186,12 @@ def dispatch(data):
     if action == "routh_hurwitz":
         expr = data.get("expr") or data.get("input") or data.get("den") or "s^3 + 2s^2 + s + 1"
         has_k = data.get("has_k", True)
-        return analyze_routh_hurwitz(expr, has_k_loop=has_k)
+        theme = data.get("theme", "dark")
+        return analyze_routh_hurwitz(expr, has_k_loop=has_k, theme=theme)
+    if action == "routh_evaluate_k":
+        expr = data.get("expr") or "s^3 + 3s^2 + 2s + K"
+        k_val = float(data.get("k_val", 1.0))
+        return evaluate_k_point(expr, k_val)
     raise ValueError(f"Ação desconhecida: {action}")
 
 

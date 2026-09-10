@@ -58,6 +58,7 @@
     getPresets: () => request('presets'),
     calculateRouth: (payload) => request('routh_hurwitz', payload),
     getRouthPresets: () => request('routh_presets'),
+    evaluateRouthK: (payload) => request('routh_evaluate_k', payload),
     saveImage: async ({ base64, defaultName }) => {
       if (nativeLgr) {
         return nativeLgr.saveImage({ base64, defaultName: defaultName || 'lgr_grafico.png' });

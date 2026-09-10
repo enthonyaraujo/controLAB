@@ -745,49 +745,47 @@
       
       <!-- SIDEBAR DE ENTRADA DO ROUTH-HURWITZ -->
       <aside class="sidebar routh-sidebar">
-        <div class="sidebar-scrollable">
-          <div class="sidebar-content">
-            <div class="sidebar-section-title">
-              <span>Parâmetros de Análise</span>
+        <div class="sidebar-content">
+          <div class="sidebar-section-title">
+            <span>Parâmetros de Análise</span>
+          </div>
+
+          <div class="form-container">
+            <label for="input-routh-expr" class="form-label">
+              Função de Transferência ou Polinômio:
+            </label>
+            <div class="input-with-hint">
+              <input
+                type="text"
+                id="input-routh-expr"
+                class="form-input code-font"
+                value="s^3 + 3*s^2 + 2*s + K"
+                placeholder="Ex: s^3 + 3s^2 + 2s + K ou 1/(s*(s+1)*(s+2))"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <p class="input-help">Aceita polinômio característico direto, função racional com numerador/denominador e ganho <code>K</code>.</p>
+
+            <div class="quick-examples">
+              <span class="hint-title">Exemplos rápidos:</span>
+              <div class="chip-group">
+                <button class="chip chip-routh" data-example="s^3 + 3*s^2 + 2*s + K">3ª Ordem c/ Ganho K</button>
+                <button class="chip chip-routh" data-example="s^3 + 6*s^2 + 11*s + 6">3ª Ordem Estável</button>
+                <button class="chip chip-routh" data-example="s^3 + s^2 + 2*s + 24">3ª Ordem Instável</button>
+                <button class="chip chip-routh" data-example="s^4 + s^3 + 2*s^2 + 2*s + 3">Caso ε (1º Elem. Zero)</button>
+                <button class="chip chip-routh" data-example="s^4 + 2*s^3 + 6*s^2 + 8*s + 8">Linha de Zeros (Oscilatório)</button>
+                <button class="chip chip-routh" data-example="s^5 + 2*s^4 + 2*s^3 + 4*s^2 + 11*s + 10">5ª Ordem Complexa</button>
+              </div>
             </div>
 
-            <div class="form-container">
-              <label for="input-routh-expr" class="form-label">
-                Função de Transferência ou Polinômio:
-              </label>
-              <div class="input-with-hint">
-                <input
-                  type="text"
-                  id="input-routh-expr"
-                  class="form-input code-font"
-                  value="s^3 + 3*s^2 + 2*s + K"
-                  placeholder="Ex: s^3 + 3s^2 + 2s + K ou 1/(s*(s+1)*(s+2))"
-                  autocomplete="off"
-                  spellcheck="false"
-                />
+            <!-- Prévia Matemática em Tempo Real (Padrão LGR) -->
+            <div class="function-preview" id="routh-function-preview" aria-live="polite">
+              <div class="preview-heading">
+                <span>Prévia matemática</span>
+                <span id="routh-preview-status" class="preview-status valid">Expressão válida</span>
               </div>
-              <p class="input-help">Aceita polinômio característico direto, função racional com numerador/denominador e ganho <code>K</code>.</p>
-
-              <div class="quick-examples">
-                <span class="hint-title">Exemplos rápidos:</span>
-                <div class="chip-group">
-                  <button class="chip chip-routh" data-example="s^3 + 3*s^2 + 2*s + K">3ª Ordem c/ Ganho K</button>
-                  <button class="chip chip-routh" data-example="s^3 + 6*s^2 + 11*s + 6">3ª Ordem Estável</button>
-                  <button class="chip chip-routh" data-example="s^3 + s^2 + 2*s + 24">3ª Ordem Instável</button>
-                  <button class="chip chip-routh" data-example="s^4 + s^3 + 2*s^2 + 2*s + 3">Caso ε (1º Elem. Zero)</button>
-                  <button class="chip chip-routh" data-example="s^4 + 2*s^3 + 6*s^2 + 8*s + 8">Linha de Zeros (Oscilatório)</button>
-                  <button class="chip chip-routh" data-example="s^5 + 2*s^4 + 2*s^3 + 4*s^2 + 11*s + 10">5ª Ordem Complexa</button>
-                </div>
-              </div>
-
-              <!-- Prévia Matemática em Tempo Real (Padrão LGR) -->
-              <div class="function-preview" id="routh-function-preview" aria-live="polite">
-                <div class="preview-heading">
-                  <span>Prévia matemática</span>
-                  <span id="routh-preview-status" class="preview-status valid">Expressão válida</span>
-                </div>
-                <div id="routh-latex-preview" class="preview-math">P(s) = 0</div>
-              </div>
+              <div id="routh-latex-preview" class="preview-math">P(s) = 0</div>
             </div>
           </div>
         </div>
@@ -848,11 +846,81 @@
               <div id="routh-char-poly" class="char-poly-display"></div>
             </section>
 
-            <!-- Banner da Faixa de Ganho K (quando aplicável) -->
-            <section id="routh-k-range-banner" class="routh-card k-range-card" style="display: none;">
-              <div class="card-section-label">Faixa de Ganho $K$ para Estabilidade Absoluta:</div>
-              <div id="routh-k-range-expr" class="k-range-display"></div>
-              <div id="routh-k-crit-info" class="k-crit-details"></div>
+            <!-- Regimes de Estabilidade por Ganho K (quando aplicável) -->
+            <section id="routh-k-range-banner" class="routh-card" style="display: none;">
+              <div class="card-section-label">Regimes de Estabilidade em Função do Ganho $K$:</div>
+              <div class="k-regimes-grid">
+                
+                <!-- Regime Estável -->
+                <div class="k-regime-card k-regime-stable">
+                  <div class="regime-header">
+                    <span class="regime-badge badge-stable">Estável</span>
+                    <span class="regime-zone">Polos no SPE ($\text{Re} < 0$)</span>
+                  </div>
+                  <div class="regime-math" id="routh-k-stable-expr"></div>
+                  <p class="regime-desc" id="routh-k-stable-desc">Todos os polos no semiplano esquerdo. Resposta amortecida.</p>
+                </div>
+
+                <!-- Regime Marginalmente Estável -->
+                <div class="k-regime-card k-regime-marginal">
+                  <div class="regime-header">
+                    <span class="regime-badge badge-marginal">Marginalmente Estável</span>
+                    <span class="regime-zone">Polos no Eixo $j\omega$ ($\text{Re} = 0$)</span>
+                  </div>
+                  <div class="regime-math" id="routh-k-marginal-expr"></div>
+                  <p class="regime-desc" id="routh-k-marginal-desc">Oscilações harmônicas sustentadas na frequência crítica.</p>
+                </div>
+
+                <!-- Regime Instável -->
+                <div class="k-regime-card k-regime-unstable">
+                  <div class="regime-header">
+                    <span class="regime-badge badge-unstable">Instável</span>
+                    <span class="regime-zone">Polos no SPD ($\text{Re} > 0$)</span>
+                  </div>
+                  <div class="regime-math" id="routh-k-unstable-expr"></div>
+                  <p class="regime-desc" id="routh-k-unstable-desc">Presença de polo(s) no semiplano direito com divergência temporal.</p>
+                </div>
+
+              </div>
+
+              <!-- Teste Interativo de Ponto de Operação K -->
+              <div class="k-interactive-tester">
+                <div class="tester-title">
+                  <span>Simulador do Ponto de Operação ($K$):</span>
+                  <span id="routh-k-live-badge" class="stat-badge badge-blue">K = 1.0</span>
+                </div>
+                <div class="tester-controls">
+                  <input type="range" id="routh-k-slider" min="0.1" max="20" step="0.1" value="1.0" class="k-slider" />
+                  <div class="tester-presets">
+                    <button type="button" class="chip chip-k-preset" id="btn-k-preset-stable">K Estável</button>
+                    <button type="button" class="chip chip-k-preset" id="btn-k-preset-crit">K Crítico</button>
+                    <button type="button" class="chip chip-k-preset" id="btn-k-preset-unstable">K Instável</button>
+                  </div>
+                </div>
+                <div id="routh-k-live-status" class="tester-live-status"></div>
+              </div>
+            </section>
+
+            <!-- Mapeamento Gráfico de Estabilidade no Plano Complexo s -->
+            <section id="routh-plot-card" class="routh-card plot-card" style="display: none;">
+              <div class="plot-card-header">
+                <div class="card-section-label" style="margin-bottom: 0;">Mapeamento no Plano Complexo $s$:</div>
+                <div class="plot-toolbar">
+                  <div class="toolbar-right">
+                    <button class="tool-btn" id="btn-routh-copy-img" title="Copiar Gráfico">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                      <span>Copiar</span>
+                    </button>
+                    <button class="tool-btn tool-btn-primary" id="btn-routh-download-png" title="Baixar PNG em Alta Resolução">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      <span>Baixar PNG</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="plot-viewport routh-plot-viewport">
+                <img id="routh-plot-image" src="" alt="Mapeamento Gráfico de Estabilidade" class="plot-img" />
+              </div>
             </section>
 
             <!-- Casos Especiais (Alerta quando ocorrer epsilon ou linha de zeros) -->

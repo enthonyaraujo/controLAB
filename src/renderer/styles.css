@@ -2949,13 +2949,22 @@ button {
 }
 
 .routh-sidebar {
-  width: 380px;
+  width: 400px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-card);
+  background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border-color);
   min-height: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.routh-sidebar .sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-sidebar);
+  flex-shrink: 0;
 }
 
 .routh-main-area {
@@ -3101,33 +3110,289 @@ button {
   font-size: 1.05rem;
 }
 
-.k-range-card {
-  border-left: 3px solid var(--accent-primary);
+/* Regimes de Ganho K */
+.k-regimes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 10px;
 }
 
-.k-range-display {
-  padding: 14px 18px;
+.k-regime-card {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.k-regime-card:hover {
+  transform: translateY(-1px);
+}
+
+.k-regime-stable {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: color-mix(in srgb, rgba(16, 185, 129, 0.06) 100%, var(--bg-input));
+}
+
+.k-regime-marginal {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: color-mix(in srgb, rgba(245, 158, 11, 0.06) 100%, var(--bg-input));
+}
+
+.k-regime-unstable {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: color-mix(in srgb, rgba(239, 68, 68, 0.06) 100%, var(--bg-input));
+}
+
+.regime-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.regime-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.badge-stable {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.badge-marginal {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-unstable {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.regime-zone {
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.regime-math {
   font-size: 1.05rem;
+  font-weight: 600;
   color: var(--text-main);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 12px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
   overflow-x: auto;
+  margin-bottom: 8px;
 }
 
-.k-crit-details {
-  margin-top: 12px;
-  font-size: 0.86rem;
+.regime-desc {
+  font-size: 0.82rem;
   color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+  margin-top: auto;
 }
 
-.k-crit-details ul {
-  margin: 6px 0 0 18px;
-  padding: 0;
+/* Simulador Interativo do Ponto de Operação K */
+.k-interactive-tester {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.k-crit-details li {
-  margin-bottom: 4px;
+.tester-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.tester-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.k-slider {
+  flex: 1;
+  min-width: 200px;
+  height: 6px;
+  appearance: none;
+  background: var(--border-color);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.k-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.5);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.k-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.tester-presets {
+  display: flex;
+  gap: 6px;
+}
+
+.chip-k-preset {
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip-k-preset:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-main);
+}
+
+.tester-live-status {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.live-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.live-status-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+.status-pill-stable {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.status-pill-marginal {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.status-pill-unstable {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.live-status-poles-summary {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.live-status-roots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.live-root-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 0.82rem;
+}
+
+.live-root-item code {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--text-main);
+}
+
+/* Gráfico no Plano s */
+.plot-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.routh-plot-viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.routh-plot-viewport .plot-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+@media (max-width: 900px) {
+  .k-regimes-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .routh-table-wrapper {
