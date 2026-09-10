@@ -51,6 +51,8 @@ def json_safe_number(value):
     """Mantém infinitos legíveis sem produzir JSON não padronizado."""
     if isinstance(value, (float, np.floating)) and math.isinf(float(value)):
         return "∞" if float(value) > 0 else "-∞"
+    if isinstance(value, (float, np.floating)) and math.isnan(float(value)):
+        return None
     return value
 
 

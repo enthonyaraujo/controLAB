@@ -32,8 +32,10 @@ assert(serviceWorker.includes("'/routh.js'"), 'routh.js precisa integrar o shell
 assert(serviceWorker.includes("'/scientific-modules.js'"), 'scientific-modules.js precisa integrar o shell offline');
 assert(scientificModules.includes("action: 'time_response'"), 'o módulo temporal precisa estar registrado');
 assert(scientificModules.includes("action: 'frequency_response'"), 'o módulo de frequência precisa estar registrado');
+assert(scientificModules.includes("action: 'controller_design'"), 'o módulo de controladores precisa estar registrado');
 assert(html.includes('id="card-module-time" class="module-card card-active"'), 'o card temporal precisa estar disponível');
 assert(html.includes('id="card-module-frequency" class="module-card card-active"'), 'o card de frequência precisa estar disponível');
+assert(html.includes('id="card-module-controllers" class="module-card card-active"'), 'o card de controladores precisa estar disponível');
 assert(html.includes('id="page-scientific"'), 'o workspace científico compartilhado precisa existir');
 assert(serviceWorker.includes('mustBeFresh'), 'scripts do shell precisam de atualização network-first');
 assert(styles.includes('@media (max-width: 1000px)'), 'o layout precisa adaptar os módulos em telas menores');

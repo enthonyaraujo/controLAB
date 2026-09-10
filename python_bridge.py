@@ -33,6 +33,7 @@ from routh_hurwitz import (
 )
 from time_response import analyze_time_response, get_time_response_presets
 from frequency_response import analyze_frequency_response, get_frequency_presets
+from controller_design import design_controller, get_controller_presets
 
 
 def get_transfer_function(payload):
@@ -210,6 +211,28 @@ def dispatch(data):
             data.get("expr") or "10 / (s * (s + 2) * (s + 5))",
             omega_min=data.get("omega_min", 0.01),
             omega_max=data.get("omega_max", 100.0),
+            points=data.get("points", 900),
+        )
+    if action == "controller_presets":
+        return {"success": True, "presets": get_controller_presets()}
+    if action == "controller_design":
+        return design_controller(
+            data.get("plant_expr") or "1 / (s * (s + 1) * (s + 5))",
+            design_type=data.get("design_type", "pid"),
+            method=data.get("method", "zn_critical"),
+            controller_type=data.get("controller_type", "PID"),
+            process_gain=data.get("process_gain", 1.0),
+            delay=data.get("delay", 1.0),
+            time_constant=data.get("time_constant", 4.0),
+            critical_gain=data.get("critical_gain", 6.0),
+            critical_period=data.get("critical_period", 2.0),
+            chr_response=data.get("chr_response", "0"),
+            compensator_type=data.get("compensator_type", "lead"),
+            compensator_zero=data.get("compensator_zero", 1.0),
+            compensator_pole=data.get("compensator_pole", 5.0),
+            compensator_gain=data.get("compensator_gain", 1.0),
+            design_domain=data.get("design_domain", "frequency"),
+            final_time=data.get("final_time"),
             points=data.get("points", 900),
         )
     raise ValueError(f"Ação desconhecida: {action}")

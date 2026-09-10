@@ -4336,6 +4336,10 @@ textarea::placeholder {
   gap: 18px;
 }
 
+.scientific-field[hidden] {
+  display: none;
+}
+
 .scientific-field textarea {
   resize: vertical;
   min-height: 76px;
@@ -4539,4 +4543,3 @@ textarea::placeholder {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-

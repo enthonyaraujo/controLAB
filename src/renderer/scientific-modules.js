@@ -78,6 +78,104 @@
         ['Tipo 1', '10 / (s * (s + 2) * (s + 5))'],
       ],
     },
+    controllers: {
+      action: 'controller_design',
+      title: 'Projeto de Controladores',
+      kicker: 'PID & Compensadores Lead-Lag',
+      description: 'Sintonize controladores clássicos ou aplique compensação de fase e compare a dinâmica antes e depois.',
+      filename: 'projeto-de-controlador',
+      fields: [
+        {
+          name: 'plant_expr',
+          label: 'Planta G(s)',
+          type: 'text',
+          value: '1 / (s * (s + 1) * (s + 5))',
+          placeholder: 'Ex.: 1 / (s * (s + 1) * (s + 5))',
+        },
+        {
+          name: 'design_type',
+          label: 'Tipo de projeto',
+          type: 'select',
+          value: 'pid',
+          options: [['pid', 'Sintonia P / PI / PID'], ['lead_lag', 'Compensador avanço / atraso']],
+        },
+        {
+          name: 'method',
+          label: 'Método de sintonia',
+          type: 'select',
+          value: 'zn_critical',
+          options: [
+            ['zn_critical', 'Ziegler-Nichols — oscilação crítica'],
+            ['zn_reaction', 'Ziegler-Nichols — curva de reação'],
+            ['cohen_coon', 'Cohen-Coon'],
+            ['chr', 'CHR'],
+          ],
+          when: { design_type: ['pid'] },
+        },
+        {
+          name: 'controller_type',
+          label: 'Estrutura do controlador',
+          type: 'select',
+          value: 'PID',
+          options: [['P', 'P'], ['PI', 'PI'], ['PID', 'PID']],
+          when: { design_type: ['pid'] },
+        },
+        {
+          name: 'critical_gain', label: 'Ganho crítico Kcr', type: 'number', value: '6', min: '0.000001', step: '0.1',
+          when: { design_type: ['pid'], method: ['zn_critical'] },
+        },
+        {
+          name: 'critical_period', label: 'Período crítico Pcr (s)', type: 'number', value: '2', min: '0.000001', step: '0.1',
+          when: { design_type: ['pid'], method: ['zn_critical'] },
+        },
+        {
+          name: 'process_gain', label: 'Ganho do processo K', type: 'number', value: '1', min: '0.000001', step: '0.1',
+          when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
+        },
+        {
+          name: 'delay', label: 'Atraso aparente L (s)', type: 'number', value: '0.5', min: '0.000001', step: '0.1',
+          when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
+        },
+        {
+          name: 'time_constant', label: 'Constante de tempo T (s)', type: 'number', value: '4', min: '0.000001', step: '0.1',
+          when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
+        },
+        {
+          name: 'chr_response', label: 'Configuração CHR', type: 'select', value: '0',
+          options: [['0', '0% de sobressinal'], ['20', '20% de sobressinal']],
+          when: { design_type: ['pid'], method: ['chr'] },
+        },
+        {
+          name: 'compensator_type', label: 'Tipo de compensador', type: 'select', value: 'lead',
+          options: [['lead', 'Avanço de fase (lead)'], ['lag', 'Atraso de fase (lag)']],
+          when: { design_type: ['lead_lag'] },
+        },
+        {
+          name: 'design_domain', label: 'Domínio de referência', type: 'select', value: 'frequency',
+          options: [['frequency', 'Frequência / Bode'], ['root_locus', 'Plano s / LGR']],
+          when: { design_type: ['lead_lag'] },
+        },
+        {
+          name: 'compensator_zero', label: 'Frequência do zero', type: 'number', value: '1', min: '0.000001', step: '0.1',
+          when: { design_type: ['lead_lag'] },
+        },
+        {
+          name: 'compensator_pole', label: 'Frequência do polo', type: 'number', value: '5', min: '0.000001', step: '0.1',
+          help: 'No avanço, polo > zero. No atraso, polo < zero.',
+          when: { design_type: ['lead_lag'] },
+        },
+        {
+          name: 'compensator_gain', label: 'Ganho do compensador', type: 'number', value: '1', min: '0.000001', step: '0.1',
+          when: { design_type: ['lead_lag'] },
+        },
+        { name: 'final_time', label: 'Tempo final da comparação (s)', type: 'number', value: '20', min: '0.05', step: '0.5' },
+      ],
+      examples: [
+        ['Terceira ordem', '1 / (s * (s + 1) * (s + 5))'],
+        ['Primeira ordem', '1 / (4*s + 1)'],
+        ['Segunda ordem', '1 / (s^2 + 3*s + 2)'],
+      ],
+    },
   };
 
   function element(id) {
@@ -106,6 +204,7 @@
       config.fields.forEach((field) => {
         const group = document.createElement('label');
         group.className = 'scientific-field';
+        if (field.when) group.dataset.when = JSON.stringify(field.when);
         appendTextNode(group, 'span', 'form-label', field.label);
 
         let input;
@@ -155,6 +254,17 @@
         examples.appendChild(chips);
         form.appendChild(examples);
       }
+      updateConditionalFields();
+    }
+
+    function updateConditionalFields() {
+      form.querySelectorAll('[data-when]').forEach((group) => {
+        const conditions = JSON.parse(group.dataset.when);
+        group.hidden = !Object.entries(conditions).every(([fieldName, accepted]) => {
+          const control = form.elements.namedItem(fieldName);
+          return control && accepted.includes(control.value);
+        });
+      });
     }
 
     function open(moduleKey) {
@@ -259,6 +369,7 @@
       event.preventDefault();
       run();
     });
+    form.addEventListener('change', updateConditionalFields);
     global.addEventListener('keydown', (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 'Enter'
         && element('page-scientific')?.classList.contains('active')) {
