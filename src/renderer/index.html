@@ -72,7 +72,14 @@
   <main id="page-home" class="app-page active">
     <div class="hub-container">
       
-      <!-- Grid de Módulos (6 Cards) -->
+      <!-- Introdução da Página -->
+      <section class="hub-hero">
+        <h1 class="hub-hero-title">Hub de Módulos</h1>
+        <p class="hub-hero-subtitle">Explore as ferramentas de Sistemas de Controle</p>
+        <span class="hub-hero-hint">Selecione um módulo para começar.</span>
+      </section>
+
+      <!-- Grid de Módulos (3x2 Cards) -->
       <section class="modules-grid">
         
         <!-- CARD 1: RESPOSTA NO DOMÍNIO DO TEMPO -->
@@ -90,6 +97,7 @@
 
           <div class="card-content">
             <h2 class="module-title">Resposta no Domínio do Tempo</h2>
+            <p class="module-desc">Análise transitória e estacionária com degrau, rampa e impulso.</p>
           </div>
 
           <div class="card-footer">
@@ -104,7 +112,7 @@
         </article>
 
         <!-- CARD 2: ANÁLISE DE ESTABILIDADE (ROUTH-HURWITZ) -->
-        <article class="module-card card-active" id="card-module-routh">
+        <article class="module-card card-active" id="card-module-routh" data-page="routh" data-module="Análise de Estabilidade" tabindex="0">
           <div class="card-top">
             <div class="module-icon-box icon-stability">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -119,6 +127,7 @@
 
           <div class="card-content">
             <h2 class="module-title">Análise de Estabilidade</h2>
+            <p class="module-desc">Critério de Routh-Hurwitz com tabela detalhada e casos especiais.</p>
           </div>
 
           <div class="card-footer">
@@ -132,8 +141,8 @@
           </div>
         </article>
 
-        <!-- CARD 3: LUGAR GEOMÉTRICO DAS RAÍZES (ATIVO) -->
-        <article class="module-card card-active" id="card-module-lgr">
+        <!-- CARD 3: LUGAR GEOMÉTRICO DAS RAÍZES -->
+        <article class="module-card card-active" id="card-module-lgr" data-page="lgr" data-module="Lugar Geométrico das Raízes" tabindex="0">
           <div class="card-top">
             <div class="module-icon-box icon-lgr">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -150,6 +159,7 @@
 
           <div class="card-content">
             <h2 class="module-title">Lugar Geométrico das Raízes</h2>
+            <p class="module-desc">Traçado dinâmico do LGR com ramos, assíntotas e pontos de partida e chegada.</p>
           </div>
 
           <div class="card-footer">
@@ -175,6 +185,7 @@
 
           <div class="card-content">
             <h2 class="module-title">Resposta em Frequência</h2>
+            <p class="module-desc">Diagramas de Bode e Nyquist com margens de ganho e fase.</p>
           </div>
 
           <div class="card-footer">
@@ -201,6 +212,7 @@
 
           <div class="card-content">
             <h2 class="module-title">Projeto de Controladores</h2>
+            <p class="module-desc">Síntese de controladores PID, avanço, atraso e avanço-atraso.</p>
           </div>
 
           <div class="card-footer">
@@ -228,6 +240,7 @@
 
           <div class="card-content">
             <h2 class="module-title">Espaço de Estados</h2>
+            <p class="module-desc">Representação matricial, controlabilidade, observabilidade e resposta temporal.</p>
           </div>
 
           <div class="card-footer">
