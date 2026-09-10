@@ -220,7 +220,7 @@ ipcMain.handle('open-external', async (event, url) => {
 function getSystemInfo() {
   const platform = process.platform;
   const arch = process.arch;
-  const appVersion = app.getVersion() || '2.1.0';
+  const appVersion = app.getVersion() || '2.1.1';
 
   if (platform === 'win32') {
     return {
