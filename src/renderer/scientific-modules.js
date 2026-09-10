@@ -176,6 +176,48 @@
         ['Segunda ordem', '1 / (s^2 + 3*s + 2)'],
       ],
     },
+    'state-space': {
+      action: 'state_space',
+      title: 'Espaço de Estados',
+      kicker: 'Modelagem Matricial Moderna',
+      description: 'Converta modelos, verifique controlabilidade e observabilidade e projete realimentação e observadores.',
+      filename: 'espaco-de-estados',
+      fields: [
+        {
+          name: 'mode', label: 'Forma de entrada', type: 'select', value: 'matrices',
+          options: [['matrices', 'Matrizes A, B, C e D'], ['transfer', 'Função de transferência']],
+        },
+        {
+          name: 'expr', label: 'Função de transferência G(s)', type: 'text', value: '1 / (s^2 + 3*s + 2)',
+          placeholder: 'Ex.: 1 / (s^2 + 3*s + 2)', when: { mode: ['transfer'] },
+        },
+        {
+          name: 'A', label: 'Matriz A', type: 'textarea', rows: 2, value: '[[0, 1], [-2, -3]]',
+          help: 'Use colchetes ou separe as linhas por ponto e vírgula.', when: { mode: ['matrices'] },
+        },
+        { name: 'B', label: 'Matriz B', type: 'textarea', rows: 2, value: '[[0], [1]]', when: { mode: ['matrices'] } },
+        { name: 'C', label: 'Matriz C', type: 'textarea', rows: 2, value: '[[1, 0]]', when: { mode: ['matrices'] } },
+        { name: 'D', label: 'Matriz D', type: 'textarea', rows: 2, value: '[[0]]', when: { mode: ['matrices'] } },
+        {
+          name: 'canonical_form', label: 'Representação solicitada', type: 'select', value: 'controllable',
+          options: [
+            ['original', 'Original'],
+            ['controllable', 'Canônica controlável'],
+            ['observable', 'Canônica observável'],
+            ['diagonal', 'Canônica diagonal'],
+            ['jordan', 'Forma de Jordan'],
+          ],
+        },
+        {
+          name: 'desired_poles', label: 'Polos desejados para A - BK', type: 'text', value: '-4, -5',
+          placeholder: 'Ex.: -4, -5', help: 'Opcional. Informe um polo por estado, separados por vírgula.',
+        },
+        {
+          name: 'observer_poles', label: 'Polos do observador A - LC', type: 'text', value: '-6, -7',
+          placeholder: 'Ex.: -6, -7', help: 'Opcional. Informe um polo por estado, separados por vírgula.',
+        },
+      ],
+    },
   };
 
   function element(id) {

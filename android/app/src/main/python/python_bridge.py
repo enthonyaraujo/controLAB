@@ -34,6 +34,7 @@ from routh_hurwitz import (
 from time_response import analyze_time_response, get_time_response_presets
 from frequency_response import analyze_frequency_response, get_frequency_presets
 from controller_design import design_controller, get_controller_presets
+from state_space import analyze_state_space, get_state_space_presets
 
 
 def get_transfer_function(payload):
@@ -234,6 +235,20 @@ def dispatch(data):
             design_domain=data.get("design_domain", "frequency"),
             final_time=data.get("final_time"),
             points=data.get("points", 900),
+        )
+    if action == "state_space_presets":
+        return {"success": True, "presets": get_state_space_presets()}
+    if action == "state_space":
+        return analyze_state_space(
+            mode=data.get("mode", "matrices"),
+            expression=data.get("expr") or data.get("expression") or "1 / (s^2 + 3*s + 2)",
+            a=data.get("A", "[[0, 1], [-2, -3]]"),
+            b=data.get("B", "[[0], [1]]"),
+            c=data.get("C", "[[1, 0]]"),
+            d=data.get("D", "[[0]]"),
+            canonical_form=data.get("canonical_form", "controllable"),
+            desired_poles=data.get("desired_poles", ""),
+            observer_poles=data.get("observer_poles", ""),
         )
     raise ValueError(f"Ação desconhecida: {action}")
 

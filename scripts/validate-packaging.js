@@ -17,6 +17,7 @@ const requiredFiles = [
   'android/app/src/main/python/time_response.py',
   'android/app/src/main/python/frequency_response.py',
   'android/app/src/main/python/controller_design.py',
+  'android/app/src/main/python/state_space.py',
   'android/app/src/main/python/python_bridge.py',
   'android/app/src/main/python/android_bridge.py',
 ];
@@ -34,6 +35,7 @@ for (const file of [
   'time_response.py',
   'frequency_response.py',
   'controller_design.py',
+  'state_space.py',
   'python_bridge.py',
   'android_bridge.py',
 ]) {
