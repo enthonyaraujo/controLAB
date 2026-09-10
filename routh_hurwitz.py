@@ -554,7 +554,7 @@ def compute_k_range(first_col, poly_s):
 def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=None, denom=None, theme="dark"):
     """
     Gera o gráfico do plano complexo s utilizando a biblioteca python-control (control as ct)
-    e matplotlib, exatamente com os mesmos padrões de precisão e engenharia do motor LGR.
+    e matplotlib, com o exato padrão visual, estilização e engenharia do motor LGR.
     """
     import io
     import base64
@@ -564,18 +564,13 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    is_dark = theme == "dark"
-    bg_fig = "#0f172a" if is_dark else "#ffffff"
-    bg_ax = "#1e293b" if is_dark else "#f8fafc"
-    text_color = "#f8fafc" if is_dark else "#0f172a"
-    subtext_color = "#94a3b8" if is_dark else "#64748b"
-    grid_color = "#334155" if is_dark else "#e2e8f0"
-    border_color = "#334155" if is_dark else "#cbd5e1"
-    axis_color = "#475569" if is_dark else "#94a3b8"
+    fig, ax = plt.subplots(figsize=(11, 7.2), dpi=110)
+    fig.patch.set_facecolor("#ffffff")
+    ax.set_facecolor("#ffffff")
 
-    fig, ax = plt.subplots(figsize=(9.2, 5.4), dpi=130)
-    fig.patch.set_facecolor(bg_fig)
-    ax.set_facecolor(bg_ax)
+    ax.grid(True, linestyle=":", alpha=0.6, color="#94a3b8")
+    ax.axhline(0, color="#334155", linewidth=1.2)  # Eixo Real
+    ax.axvline(0, color="#334155", linewidth=1.2)  # Eixo jw
 
     has_k = k_info.get("has_k", False)
 
@@ -619,62 +614,112 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         rlist, klist = ct.root_locus(sys, gains=kvect, plot=False)
 
         # Coleta de limites
-        all_re = [float(np.real(p)) for p in polos] + [float(np.real(z)) for z in zeros] + [0.0]
-        all_im = [abs(float(np.imag(p))) for p in polos] + [abs(float(np.imag(z))) for z in zeros]
+        all_x = [float(np.real(p)) for p in polos] + [float(np.real(z)) for z in zeros] + [0.0]
+        all_y = [abs(float(np.imag(p))) for p in polos] + [abs(float(np.imag(z))) for z in zeros]
         for i in range(ramos):
-            all_re.extend([float(np.real(r)) for r in rlist[:, i]])
-            all_im.extend([abs(float(np.imag(r))) for r in rlist[:, i]])
+            all_x.extend([float(np.real(r)) for r in rlist[:, i]])
+            all_y.extend([abs(float(np.imag(r))) for r in rlist[:, i]])
 
-        # Percentis para enquadramento anti-divergência
-        re_min = min(-4.0, float(np.percentile(all_re, 1.5)) - 1.2)
-        re_max = max(3.0, float(np.percentile(all_re, 98.5)) + 1.2)
-        im_max = max(3.5, float(np.percentile(all_im, 98.5)) + 1.5)
+        x_min, x_max = min(all_x), max(all_x)
+        y_max = max(all_y) if all_y else 2.0
+        y_max = max(y_max, 2.0)
 
-        # Regiões de Estabilidade (SPE verde translúcido, SPD vermelho translúcido)
-        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
-        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.6, label="Fronteira Marginal (Eixo jω)", zorder=3)
-        ax.axhline(0, color=axis_color, linestyle="-", linewidth=0.9, alpha=0.6)
+        span_x = max(x_max - x_min, 4.0)
+        span_y = max(2 * y_max, 4.0)
+        pad_x = span_x * 0.18
+        pad_y = span_y * 0.15
 
-        # Traçado contínuo dos ramos do LGR
-        branch_color = "#38bdf8" if is_dark else "#0284c7"
+        re_min = min(x_min - pad_x, -1.0)
+        re_max = max(x_max + pad_x, 1.5)
+        im_max = y_max + pad_y
+
+        # Regiões de Estabilidade (SPE verde suave, SPD vermelho suave)
+        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.08, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.08, label="Regime Instável (SPD, Re > 0)")
+        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
+
+        # Traçado contínuo dos ramos do LGR (Vermelho clássico LGR: #dc2626)
         for i in range(ramos):
             ax.plot(
                 np.real(rlist[:, i]),
                 np.imag(rlist[:, i]),
-                color=branch_color,
+                color="#dc2626",
                 linewidth=2.2,
-                label="Trajetória das Raízes (LGR)" if i == 0 else "_nolegend_",
+                label="Ramos do LGR" if i == 0 else "_nolegend_",
                 zorder=4,
             )
 
-        # Marcação de polos em K = 0 (usando ct.poles como no LGR)
+        # Marcação de polos em K = 0 (usando 'kx' padrão LGR)
         ax.plot(
             np.real(polos),
             np.imag(polos),
-            "x",
-            color="#f87171" if is_dark else "#dc2626",
-            markersize=9.5,
-            markeredgewidth=2.4,
-            label="Polos em K = 0",
-            zorder=6,
+            "kx",
+            markersize=9,
+            markeredgewidth=2.2,
+            label="Polos (Início)",
+            zorder=5,
         )
 
-        # Marcação de zeros finitos (usando ct.zeros como no LGR)
+        # Anotações com badges dos polos
+        for p in polos:
+            re_p, im_p = float(np.real(p)), float(np.imag(p))
+            if abs(im_p) < 1e-5:
+                txt = f"p={re_p:.2g}"
+                ax.annotate(
+                    txt,
+                    xy=(re_p, 0),
+                    xytext=(0, 14),
+                    textcoords="offset points",
+                    ha="center",
+                    va="bottom",
+                    fontsize=9,
+                    fontweight="bold",
+                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                )
+            else:
+                sgn = "+" if im_p >= 0 else "-"
+                txt = f"p={re_p:.2g}{sgn}j{abs(im_p):.2g}"
+                offset_y = 12 if im_p > 0 else -18
+                ax.annotate(
+                    txt,
+                    xy=(re_p, im_p),
+                    xytext=(-10, offset_y),
+                    textcoords="offset points",
+                    ha="right" if re_p < 0 else "left",
+                    va="center",
+                    fontsize=9,
+                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                )
+
+        # Marcação de zeros finitos (usando 'ko' padrão LGR)
         if Z > 0:
             ax.plot(
                 np.real(zeros),
                 np.imag(zeros),
-                "o",
-                color="#38bdf8" if is_dark else "#0284c7",
-                markerfacecolor="white" if not is_dark else bg_fig,
+                "ko",
+                markerfacecolor="white",
                 markersize=8.5,
-                markeredgewidth=2.0,
-                label="Zeros de Malha Aberta",
-                zorder=6,
+                markeredgewidth=2.2,
+                label="Zeros (Término)",
+                zorder=5,
             )
+            for z in zeros:
+                re_z, im_z = float(np.real(z)), float(np.imag(z))
+                if abs(im_z) < 1e-5:
+                    txt = f"z={re_z:.2g}"
+                    ax.annotate(
+                        txt,
+                        xy=(re_z, 0),
+                        xytext=(0, -18),
+                        textcoords="offset points",
+                        ha="center",
+                        va="top",
+                        fontsize=9,
+                        fontweight="bold",
+                        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                    )
 
-        # Cruzamentos com o eixo imaginário (Ganhos Críticos de Routh via ct.feedback)
+        # Cruzamentos com o eixo imaginário (Ganhos Críticos de Routh com anotações callout idênticas ao LGR)
         for ck in k_info.get("critical_k", []):
             kv = float(ck.get("k_val", 0))
             if kv > 0:
@@ -683,22 +728,35 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                     crit_poles = ct.poles(sys_crit)
                     jw_crit = [cp for cp in crit_poles if abs(np.real(cp)) < 1e-2 and abs(np.imag(cp)) > 1e-4]
                     for idx_cp, cp in enumerate(jw_crit):
-                        lbl = f"Ponto Crítico ($K={kv:.3g}$, $\\omega={abs(np.imag(cp)):.2f}$)" if idx_cp == 0 else "_nolegend_"
+                        w_val = float(np.imag(cp))
+                        lbl = rf"Cruz. j$\omega$ ($\omega=\pm${abs(w_val):.2f}, K={kv:.1f})" if idx_cp == 0 else "_nolegend_"
                         ax.plot(
-                            np.real(cp),
-                            np.imag(cp),
+                            0,
+                            w_val,
                             "o",
-                            markerfacecolor="#fbbf24",
-                            markeredgecolor="#d97706",
-                            markeredgewidth=2.0,
-                            markersize=9,
+                            color="#b91c1c",
+                            markerfacecolor="white",
+                            markeredgewidth=2,
+                            markersize=7.5,
                             label=lbl,
-                            zorder=7,
+                            zorder=6,
+                        )
+                        ax.annotate(
+                            rf"$j\omega={w_val:+.2f}$" + "\n" + rf"K={kv:.1f}",
+                            xy=(0, w_val),
+                            xytext=(16, 0),
+                            textcoords="offset points",
+                            ha="left",
+                            va="center",
+                            fontsize=8.5,
+                            color="#991b1b",
+                            bbox=dict(boxstyle="round,pad=0.25", facecolor="#fef2f2", edgecolor="#ef4444", alpha=0.95, lw=0.8),
+                            arrowprops=dict(arrowstyle="->", color="#ef4444", lw=0.8),
                         )
                 except Exception:
                     pass
 
-        ax.set_title("Plano Complexo s: Trajetória dos Polos e Regiões de Estabilidade (python-control)", fontsize=11, fontweight="bold", pad=12, color=text_color)
+        ax.set_title("Lugar Geométrico das Raízes e Estabilidade", fontsize=14, pad=15, fontweight="bold")
 
     else:
         # Sistema Puramente Numérico (sem dependência de K)
@@ -712,50 +770,49 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         re_max = max(3.0, max(re_vals) + 1.5)
         im_max = max(3.5, max(np.abs(im_vals)) + 1.5)
 
-        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.10, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.10, label="Regime Instável (SPD, Re > 0)")
-        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.6, label="Fronteira Marginal (Eixo jω)", zorder=3)
-        ax.axhline(0, color=axis_color, linestyle="-", linewidth=0.9, alpha=0.6)
+        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.08, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.08, label="Regime Instável (SPD, Re > 0)")
+        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
 
         for p in polos:
             re_p = float(np.real(p))
             im_p = float(np.imag(p))
             is_spe = re_p < -1e-4
             is_spd = re_p > 1e-4
-            color = "#34d399" if is_spe else ("#f87171" if is_spd else "#fbbf24")
+            color = "#16a34a" if is_spe else ("#dc2626" if is_spd else "#d97706")
             lbl_tag = "SPE" if is_spe else ("SPD" if is_spd else "jω")
-            ax.plot(re_p, im_p, "x", color=color, markersize=11, markeredgewidth=2.6, zorder=6)
+            ax.plot(re_p, im_p, "kx", markersize=10, markeredgewidth=2.2, zorder=6)
+            sgn = "+" if im_p >= 0 else "-"
+            txt = f"p={re_p:.2g}{sgn}j{abs(im_p):.2g} [{lbl_tag}]" if abs(im_p) > 1e-5 else f"p={re_p:.2g} [{lbl_tag}]"
             ax.annotate(
-                f"{re_p:.2f}" + (f" + {im_p:.2f}j" if im_p >= 0 else f" - {abs(im_p):.2f}j") + f" [{lbl_tag}]",
+                txt,
                 xy=(re_p, im_p),
                 xytext=(8, 8),
                 textcoords="offset points",
                 fontsize=8.5,
-                color=text_color,
-                bbox=dict(boxstyle="round,pad=0.2", facecolor=bg_fig, edgecolor=border_color, alpha=0.9, lw=0.6),
+                color=color,
+                fontweight="bold",
+                bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
             )
 
-        ax.set_title("Plano Complexo s: Polos e Veredito de Estabilidade (python-control)", fontsize=11, fontweight="bold", pad=12, color=text_color)
+        ax.set_title("Mapeamento dos Polos no Plano Complexo s", fontsize=14, pad=15, fontweight="bold")
 
     ax.set_xlim(re_min, re_max)
     ax.set_ylim(-im_max, im_max)
-    ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=9.5, labelpad=6, color=text_color)
-    ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=9.5, labelpad=6, color=text_color)
-    ax.tick_params(colors=subtext_color)
-    ax.grid(True, linestyle=":", alpha=0.5, color=grid_color)
-    for spine in ax.spines.values():
-        spine.set_color(border_color)
+    ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=11, labelpad=8)
+    ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=11, labelpad=8)
+    ax.grid(True, linestyle=":", alpha=0.6, color="#94a3b8")
 
-    ax.legend(loc="lower left", fontsize=8.5, framealpha=0.92, facecolor=bg_fig, edgecolor=border_color, labelcolor=text_color)
+    ax.legend(loc="lower left", bbox_to_anchor=(1.02, 0.35), borderaxespad=0, title="Componentes do LGR", framealpha=0.95)
     plt.tight_layout()
 
     buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", facecolor=bg_fig, dpi=130)
+    fig.savefig(buf, format="png", bbox_inches="tight", facecolor="#ffffff", dpi=110)
     buf.seek(0)
     img_b64 = "data:image/png;base64," + base64.b64encode(buf.read()).decode("utf-8")
 
     svg_buf = io.BytesIO()
-    fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor=bg_fig)
+    fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor="#ffffff")
     svg_buf.seek(0)
     svg_text = svg_buf.read().decode("utf-8")
     plt.close(fig)

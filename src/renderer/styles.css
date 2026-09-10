@@ -3374,11 +3374,11 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-input);
+  background-color: #ffffff;
   border-radius: 8px;
   border: 1px solid var(--border-color);
   padding: 12px;
-  min-height: 400px;
+  min-height: 440px;
   overflow: hidden;
 }
 

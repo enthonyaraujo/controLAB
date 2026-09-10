@@ -52,6 +52,7 @@
     const plotCard = optionalElement('routh-plot-card');
     const plotImage = optionalElement('routh-plot-image');
     const btnCopyImg = optionalElement('btn-routh-copy-img');
+    const btnDownloadSvg = optionalElement('btn-routh-download-svg');
     const btnDownloadPng = optionalElement('btn-routh-download-png');
 
     // Tabela e Detalhes
@@ -64,6 +65,7 @@
     let isCalculating = false;
     let lastExpr = '';
     let lastPlotImage = null;
+    let lastPlotSvg = null;
     let lastCritK = null;
     let liveKTimer = null;
 
@@ -224,9 +226,11 @@
           plotCard.style.display = 'block';
           plotImage.src = data.plot_image;
           lastPlotImage = data.plot_image;
+          lastPlotSvg = data.plot_svg || null;
         } else {
           plotCard.style.display = 'none';
           lastPlotImage = null;
+          lastPlotSvg = null;
         }
       }
 
@@ -410,6 +414,19 @@
         showToast('Gráfico copiado para a área de transferência!', 'success');
       } catch (err) {
         showToast('Não foi possível copiar o gráfico: ' + err.message, 'error');
+      }
+    });
+
+    btnDownloadSvg?.addEventListener('click', async () => {
+      if (!lastPlotSvg) return;
+      try {
+        await window.api.saveSVG({
+          svg: lastPlotSvg,
+          defaultName: 'estabilidade_routh_plano_s.svg',
+        });
+        showToast('Gráfico SVG exportado com sucesso!', 'success');
+      } catch (err) {
+        showToast('Erro ao exportar SVG: ' + err.message, 'error');
       }
     });
 
