@@ -10,6 +10,7 @@ module.exports = {
   artifactName: '${productName}-v${version}-${os}-${arch}.${ext}',
   directories: {
     output: 'release',
+    buildResources: 'build',
   },
   files: [
     'src/**/*',
@@ -28,6 +29,8 @@ module.exports = {
     executableName: 'controlab',
     maintainer: 'Enthony Araujo <contato@enthony.com.br>',
     target: ['AppImage', 'deb', 'rpm'],
+    icon: 'build/icons',
+    syncDesktopName: true,
   },
   win: {
     executableName: 'ControLAB',

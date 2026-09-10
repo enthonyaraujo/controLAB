@@ -5,6 +5,9 @@ const root = path.join(__dirname, '..');
 const requiredFiles = [
   'capacitor.config.json',
   'electron-builder.config.cjs',
+  'build/icon.png',
+  'build/icon.ico',
+  'build/icons/512x512.png',
   'android/gradlew',
   'android/app/build.gradle',
   'android/app/src/main/java/br/com/enthony/lgrstudio/LgrPythonPlugin.java',

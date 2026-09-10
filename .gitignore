@@ -11,7 +11,8 @@ graphify-out/
 htmlcov/
 
 dist/
-build/
+build/python/
+build/pyinstaller/
 release/
 release-apk/
 *.AppImage

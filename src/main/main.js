@@ -75,6 +75,8 @@ function runPythonBridge(payload) {
 }
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '..', 'renderer', 'app-icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1360,
     height: 880,
@@ -83,6 +85,7 @@ function createWindow() {
     autoHideMenuBar: true,
     title: 'ControLAB - Sistemas de Controle',
     backgroundColor: '#0f172a',
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
       contextIsolation: true,
@@ -522,6 +525,10 @@ ipcMain.handle('install-update-package', async (event, { filePath }) => {
 
 
 app.whenReady().then(() => {
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('br.com.enthony.lgrstudio');
+  }
+
   createWindow();
 
   app.on('activate', () => {
