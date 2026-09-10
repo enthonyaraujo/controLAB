@@ -23,6 +23,11 @@
     const badgeSignChanges = optionalElement('routh-badge-sign-changes');
     const badgeRhp = optionalElement('routh-badge-rhp');
 
+    // Prévia Matemática da Sidebar
+    const previewStatus = optionalElement('routh-preview-status');
+    const previewMath = optionalElement('routh-latex-preview');
+    let previewTimer = null;
+
     // Equação e Faixa de K
     const charPolyEl = optionalElement('routh-char-poly');
     const kRangeBanner = optionalElement('routh-k-range-banner');
@@ -37,6 +42,37 @@
     const rootsList = optionalElement('routh-exact-roots-list');
 
     let isCalculating = false;
+
+    function updatePreview() {
+      if (!previewMath) return;
+      const raw = (inputExpr ? inputExpr.value : '').trim();
+      if (!raw) {
+        if (previewStatus) {
+          previewStatus.textContent = 'Aguardando entrada';
+          previewStatus.className = 'preview-status';
+        }
+        renderMath(previewMath, 'P(s) = 0', true);
+        return;
+      }
+
+      let tex = raw
+        .replace(/\*/g, ' ')
+        .replace(/\^([0-9]+)/g, '^{$1}')
+        .replace(/s([0-9]+)/g, 's^{$1}');
+
+      if (tex.includes('/')) {
+        const parts = tex.split('/');
+        tex = `G(s) = \\frac{${parts[0].trim()}}{${parts.slice(1).join('/').trim()}}`;
+      } else {
+        tex = `P(s) = ${tex} = 0`;
+      }
+
+      if (previewStatus) {
+        previewStatus.textContent = 'Expressão válida';
+        previewStatus.className = 'preview-status valid';
+      }
+      renderMath(previewMath, tex, true);
+    }
 
     function setLoading(isLoading) {
       isCalculating = isLoading;
@@ -98,7 +134,7 @@
 
       if (badgeDegree) badgeDegree.textContent = `Grau ${data.degree}`;
       if (badgeSignChanges) badgeSignChanges.textContent = `${data.sign_changes} Trocas de Sinal`;
-      if (badgeRhp) badgeRhp.textContent = `${data.rhp_poles} Raízes no RHP`;
+      if (badgeRhp) badgeRhp.textContent = `${data.rhp_poles} Raízes no SPD`;
 
       // 2. Equação Característica
       if (charPolyEl) {
@@ -117,7 +153,7 @@
           if (kCritInfo) {
             if (data.k_range.critical_k && data.k_range.critical_k.length > 0) {
               const critItems = data.k_range.critical_k.map((ck) => {
-                const omegaText = ck.omega_latex ? ` • ${ck.omega_latex}` : '';
+                const omegaText = ck.omega_latex ? ` \\quad (\\text{com } ${ck.omega_latex})` : '';
                 return `<li>$K_{crit} = ${ck.k_latex}${omegaText}$</li>`;
               }).join('');
               kCritInfo.innerHTML = `<strong>Ganhos Críticos de Oscilação:</strong><ul>${critItems}</ul>`;
@@ -176,12 +212,17 @@
         if (data.exact_roots && data.exact_roots.length > 0) {
           rootsContainer.style.display = 'block';
           rootsList.innerHTML = data.exact_roots.map((r, i) => {
-            const reTag = r.real > 0 ? '<span class="root-rhp">RHP</span>' : (r.real < 0 ? '<span class="root-lhp">LHP</span>' : '<span class="root-jw">jω</span>');
+            const reTag = r.real > 0 ? '<span class="root-rhp">SPD</span>' : (r.real < 0 ? '<span class="root-lhp">SPE</span>' : '<span class="root-jw">jω</span>');
             return `<li class="root-item"><span class="root-index">s_${i+1}:</span> <code>${r.str}</code> ${reTag}</li>`;
           }).join('');
         } else {
           rootsContainer.style.display = 'none';
         }
+      }
+
+      // Renderiza expressões LaTeX em toda a área de resultados
+      if (resultsContainer) {
+        renderMathInContainer(resultsContainer);
       }
     }
 
@@ -228,12 +269,19 @@
       renderMathInContainer(tableContainer);
     }
 
+    // Prévia em tempo real ao digitar
+    inputExpr?.addEventListener('input', () => {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(updatePreview, 120);
+    });
+
     // Eventos de clique nos chips de exemplos
     document.querySelectorAll('.chip-routh').forEach((chip) => {
       chip.addEventListener('click', () => {
         const example = chip.dataset.example;
         if (example && inputExpr) {
           inputExpr.value = example;
+          updatePreview();
           executeCalculation();
         }
       });
@@ -250,8 +298,12 @@
       }
     });
 
+    // Atualiza a prévia matemática inicial
+    updatePreview();
+
     // Se estiver vazio ao carregar, executa o primeiro exemplo por padrão ao abrir o módulo
     function ensureInitialCalculation() {
+      updatePreview();
       if (resultsContainer && resultsContainer.style.display !== 'flex') {
         executeCalculation();
       }

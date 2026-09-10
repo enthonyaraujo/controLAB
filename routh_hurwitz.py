@@ -144,6 +144,52 @@ def format_sympy_latex(expr) -> str:
     return ltx
 
 
+def format_poly_descending(poly_s) -> str:
+    """Formata polinômio em ordem estritamente decrescente das potências de s."""
+    deg = poly_s.degree()
+    coeffs = poly_s.all_coeffs()
+    terms = []
+    for i, c in enumerate(coeffs):
+        p = deg - i
+        if c == 0:
+            continue
+        c_latex = format_sympy_latex(c)
+        if p == 0:
+            terms.append((c, c_latex, 0))
+        elif p == 1:
+            if c == 1:
+                t = "s"
+            elif c == -1:
+                t = "-s"
+            elif c.is_Add:
+                t = f"({c_latex}) s"
+            else:
+                t = f"{c_latex} s"
+            terms.append((c, t, 1))
+        else:
+            if c == 1:
+                t = f"s^{{{p}}}"
+            elif c == -1:
+                t = f"-s^{{{p}}}"
+            elif c.is_Add:
+                t = f"({c_latex}) s^{{{p}}}"
+            else:
+                t = f"{c_latex} s^{{{p}}}"
+            terms.append((c, t, p))
+
+    if not terms:
+        return "0"
+
+    out = terms[0][1]
+    for c, t, p in terms[1:]:
+        t_clean = t.strip()
+        if t_clean.startswith("-"):
+            out += f" - {t_clean[1:].strip()}"
+        else:
+            out += f" + {t_clean}"
+    return out
+
+
 def build_routh_table(coeffs, degree):
     """
     Constrói a tabela de Routh completa para um polinômio com coeficientes dados.
@@ -472,7 +518,7 @@ def compute_k_range(first_col, poly_s):
             if jw_roots:
                 omega_osc = min(jw_roots)
                 ck["omega_osc"] = round(omega_osc, 4)
-                ck["omega_latex"] = f"\\omega = {omega_osc:.4g} \\text{{ rad/s}}"
+                ck["omega_latex"] = f"\\omega_{{osc}} = {omega_osc:.4g} \\text{{ rad/s}}"
         except Exception:
             pass
 
@@ -544,7 +590,7 @@ def analyze_routh_hurwitz(input_str: str, has_k_loop: bool = True):
         "success": True,
         "input_str": input_str,
         "is_fraction": is_fraction,
-        "char_poly_latex": format_sympy_latex(char_poly) + " = 0",
+        "char_poly_latex": format_poly_descending(poly_s) + " = 0",
         "degree": degree,
         "coeffs_latex": [format_sympy_latex(c) for c in coeffs],
         "routh_table": formatted_table,

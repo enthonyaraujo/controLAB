@@ -2951,6 +2951,11 @@ button {
 .routh-sidebar {
   width: 380px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  min-height: 0;
 }
 
 .routh-main-area {
@@ -3005,6 +3010,17 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
+.card-section-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+
 .routh-verdict-section {
   display: flex;
   flex-direction: column;
@@ -3025,16 +3041,16 @@ button {
   font-weight: 700;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   margin-bottom: 4px;
 }
 
 .verdict-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  padding: 6px 16px;
+  padding: 6px 14px;
   border-radius: 8px;
   letter-spacing: -0.2px;
 }
@@ -3070,8 +3086,8 @@ button {
 }
 
 .verdict-desc-text {
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 0.88rem;
+  line-height: 1.6;
   color: var(--text-muted);
   margin: 0;
 }
@@ -3082,7 +3098,7 @@ button {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow-x: auto;
-  font-size: 1.08rem;
+  font-size: 1.05rem;
 }
 
 .k-range-card {
@@ -3094,14 +3110,14 @@ button {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   color: var(--text-main);
   overflow-x: auto;
 }
 
 .k-crit-details {
   margin-top: 12px;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
 }
 
@@ -3124,7 +3140,7 @@ button {
 .routh-matrix {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   text-align: center;
 }
 
@@ -3145,7 +3161,7 @@ button {
 }
 
 .routh-matrix td {
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border-color);
   border-right: 1px solid var(--border-color);
   white-space: nowrap;

@@ -53,6 +53,7 @@
       if (isLgr) {
         onOpenLgr();
       } else if (isRouth) {
+        renderPageOnce(pageRouth);
         if (onOpenRouth) onOpenRouth();
       } else {
         if (pageHome) pageHome.scrollTop = 0;
@@ -71,7 +72,6 @@
       navigateTo('routh');
     });
     optionalElement('card-module-routh')?.addEventListener('click', () => navigateTo('routh'));
-    optionalElement('btn-routh-back-home')?.addEventListener('click', () => navigateTo('home'));
 
     btnNavHome?.addEventListener('click', () => navigateTo('home'));
     optionalElement('btn-sidebar-back-home')?.addEventListener('click', () => navigateTo('home'));
