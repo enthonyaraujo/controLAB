@@ -6,6 +6,7 @@ const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'src', 'renderer', 'index.html'), 'utf8');
 const app = fs.readFileSync(path.join(root, 'src', 'renderer', 'app.js'), 'utf8');
 const serviceWorker = fs.readFileSync(path.join(root, 'src', 'renderer', 'sw.js'), 'utf8');
+const styles = fs.readFileSync(path.join(root, 'src', 'renderer', 'styles.css'), 'utf8');
 
 const settingsPosition = html.indexOf('<script src="settings.js"></script>');
 const navigationPosition = html.indexOf('<script src="navigation.js"></script>');
@@ -24,5 +25,11 @@ assert(serviceWorker.includes("'/settings.js'"), 'settings.js precisa integrar o
 assert(serviceWorker.includes("'/navigation.js'"), 'navigation.js precisa integrar o shell offline');
 assert(serviceWorker.includes("'/routh.js'"), 'routh.js precisa integrar o shell offline');
 assert(serviceWorker.includes('mustBeFresh'), 'scripts do shell precisam de atualização network-first');
+assert(styles.includes('@media (max-width: 1000px)'), 'o layout precisa adaptar os módulos em telas menores');
+assert(styles.includes('#page-routh'), 'o módulo Routh precisa ter regras de layout próprias');
+assert(styles.includes('prefers-reduced-motion: reduce'), 'a interface precisa respeitar redução de movimento');
+assert(styles.includes('safe-area-inset-bottom'), 'os elementos fixos precisam respeitar a área segura móvel');
+assert(styles.includes('.katex-display'), 'fórmulas extensas precisam permanecer navegáveis em telas estreitas');
+assert(styles.includes('grid-template-columns: minmax(0, 1fr)'), 'cards do Routh não podem expandir além da tela móvel');
 
-console.log('Integração do renderer, configurações e navegação válida.');
+console.log('Integração, responsividade e navegação do renderer válidas.');

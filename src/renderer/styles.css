@@ -68,6 +68,26 @@
   box-sizing: border-box;
 }
 
+img,
+svg,
+canvas {
+  max-inline-size: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  min-inline-size: 0;
+}
+
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--bg-app);
@@ -2198,7 +2218,11 @@ textarea::placeholder {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  padding:
+    max(16px, env(safe-area-inset-top, 0px))
+    max(16px, env(safe-area-inset-right, 0px))
+    max(16px, env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -2216,7 +2240,7 @@ textarea::placeholder {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), var(--shadow-glow);
   width: min(680px, 94vw);
   max-width: 680px;
-  max-height: 90vh;
+  max-height: min(90vh, calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2608,7 +2632,8 @@ textarea::placeholder {
 
 @media (max-width: 640px) {
   .modal-container {
-    max-height: 95vh;
+    width: 100%;
+    max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   }
 
   .project-info-grid {
@@ -3594,7 +3619,13 @@ textarea::placeholder {
 
 @media (max-width: 900px) {
   .k-regimes-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .k-regime-card,
+  .routh-card,
+  .routh-results-scrollable {
+    min-width: 0;
   }
 }
 
@@ -3806,7 +3837,7 @@ textarea::placeholder {
 @media (max-width: 900px) {
   .routh-workspace-container {
     flex-direction: column;
-    overflow-y: auto;
+    overflow: visible;
   }
 
   .routh-sidebar {
@@ -3814,7 +3845,87 @@ textarea::placeholder {
   }
 
   .routh-main-area {
+    min-width: 0;
     padding: 16px;
+    overflow: visible;
+  }
+}
+
+/* Fórmulas extensas preservam a largura do layout em telas estreitas. */
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Evita que nomes de arquivos, versões e expressões longas expandam cards. */
+.asset-name,
+.detected-env-badge,
+.target-pkg-filename,
+.module-desc,
+.settings-card-desc,
+.repo-desc {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1000px) {
+  #page-routh {
+    height: auto;
+    min-height: calc(100vh - 54px);
+    min-height: calc(100dvh - 54px);
+    overflow: visible;
+  }
+
+  .routh-workspace-container {
+    flex: none;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  .routh-sidebar,
+  .routh-main-area {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .routh-main-area {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .routh-main-area {
+    padding: 14px;
+  }
+
+  .routh-card,
+  .routh-empty-card {
+    padding: 16px;
+  }
+
+  .routh-plot-viewport {
+    min-height: 280px;
+    padding: 8px;
+  }
+}
+
+@media (max-height: 550px) and (orientation: landscape) {
+  .routh-plot-viewport {
+    min-height: 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -4177,7 +4288,5 @@ textarea::placeholder {
 [data-theme="light"] .inapp-progress-fill {
   background: #2563eb;
 }
-
-
 
 
