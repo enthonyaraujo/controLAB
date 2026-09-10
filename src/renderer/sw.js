@@ -1,4 +1,4 @@
-const CACHE_NAME = 'controlab-shell-v2.1.1';
+const CACHE_NAME = 'controlab-shell-v2.1.2';
 const SHELL_FILES = [
   '/',
   '/index.html',
