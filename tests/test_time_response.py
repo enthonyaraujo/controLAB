@@ -1,5 +1,6 @@
 """Testes do módulo de resposta no domínio do tempo."""
 
+import json
 import unittest
 
 from python_bridge import dispatch
@@ -25,6 +26,7 @@ class TimeResponseTests(unittest.TestCase):
         self.assertEqual(error["ess_step"], 0.0)
         self.assertAlmostEqual(error["kv"], 2.5, places=5)
         self.assertAlmostEqual(error["ess_ramp"], 0.4, places=5)
+        json.dumps(result, allow_nan=False)
 
     def test_bridge_dispatch(self):
         result = dispatch({

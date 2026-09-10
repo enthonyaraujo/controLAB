@@ -12,6 +12,7 @@ import sympy as sp
 from control_utils import (
     figure_payload,
     finite_float,
+    json_safe_number,
     parse_siso_transfer_function,
     recommended_time_vector,
     response_arrays,
@@ -200,7 +201,7 @@ def analyze_time_response(expression, *, final_time=None, points=900, settling_t
             "stable": stable,
             "poles": serialize_complex(poles),
             "step": metrics,
-            "steady_state": errors,
+            "steady_state": {key: json_safe_number(value) for key, value in errors.items()},
             "latex_expanded": latex_expanded,
         },
     }
@@ -211,4 +212,3 @@ def get_time_response_presets():
         {"id": name, "title": name, "expr": expression}
         for name, expression in TIME_RESPONSE_PRESETS.items()
     ]
-

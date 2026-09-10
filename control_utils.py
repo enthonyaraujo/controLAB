@@ -47,6 +47,13 @@ def finite_float(value, default=None):
     return candidate if math.isfinite(candidate) else default
 
 
+def json_safe_number(value):
+    """Mantém infinitos legíveis sem produzir JSON não padronizado."""
+    if isinstance(value, (float, np.floating)) and math.isinf(float(value)):
+        return "∞" if float(value) > 0 else "-∞"
+    return value
+
+
 def serialize_complex(values: Iterable[complex]):
     return [
         {
@@ -79,4 +86,3 @@ def response_arrays(response):
     if output.ndim != 1:
         output = output.reshape(-1)
     return time, output
-
