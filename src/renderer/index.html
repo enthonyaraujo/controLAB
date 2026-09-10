@@ -31,11 +31,12 @@
 
       <div class="global-brand">
         <span class="global-brand-title" id="global-brand-title">ControLAB</span>
+        <span class="global-brand-version">v2.0.0</span>
       </div>
     </div>
 
     <div class="global-navbar-center" id="global-navbar-center">
-      <span class="global-navbar-subtitle" id="global-navbar-subtitle">Selecione um tópico para análise analítica e computacional passo a passo.</span>
+      <span class="global-navbar-subtitle" id="global-navbar-subtitle">Hub de Módulos</span>
     </div>
 
     <div class="global-navbar-right">
@@ -79,7 +80,7 @@
         <article class="module-card card-active" id="card-module-lgr">
           <div class="card-top">
             <div class="module-icon-box icon-lgr">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <line x1="12" y1="2" x2="12" y2="22"/>
                 <path d="M5 5c3 7 7 7 14 0"/>
@@ -100,33 +101,21 @@
               <h2 class="module-title">Lugar Geométrico das Raízes</h2>
               <span class="module-tag">Método de Evans • Domínio s</span>
             </div>
+            <div class="module-math-badge">$1 + K \cdot G(s)H(s) = 0$</div>
             <p class="module-desc">
-              Trajetória analítica das raízes da equação característica em malha fechada $1 + K G(s)H(s) = 0$ com a variação do ganho $K \ge 0$.
+              Trajetória analítica das raízes em malha fechada conforme o ganho escalar $K \ge 0$ varia de zero ao infinito.
             </p>
-            <ul class="module-features">
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Memorial com os 7 Passos clássicos deduzidos</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Gráfico interativo com zoom, pan e exportação</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Dedução passo a passo com fórmulas algébricas</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Assíntotas, centroide, dispersão e cruzamento $j\omega$</span>
-              </li>
-            </ul>
+            <div class="module-pill-group">
+              <span class="module-pill">7 Passos de Evans</span>
+              <span class="module-pill">Gráfico Interativo</span>
+              <span class="module-pill">Deduções Algébricas</span>
+            </div>
           </div>
 
           <div class="card-footer">
             <button id="btn-open-lgr" class="btn-module-action btn-module-primary" type="button">
               <span>Abrir Módulo</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="5" y1="12" x2="19" y2="12"/>
                 <polyline points="12 5 19 12 12 19"/>
               </svg>
@@ -138,9 +127,12 @@
         <article class="module-card card-soon" data-module="Análise de Estabilidade">
           <div class="card-top">
             <div class="module-icon-box icon-stability">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 12 11 14 15 10"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <line x1="3" y1="9" x2="21" y2="9"/>
+                <line x1="3" y1="15" x2="21" y2="15"/>
+                <line x1="9" y1="3" x2="9" y2="21"/>
+                <line x1="15" y1="3" x2="15" y2="21"/>
               </svg>
             </div>
             <span class="module-status-badge badge-soon">
@@ -154,32 +146,20 @@
               <h2 class="module-title">Análise de Estabilidade</h2>
               <span class="module-tag">Critério de Routh-Hurwitz</span>
             </div>
+            <div class="module-math-badge">$b_1 = \frac{a_{n-1} a_{n-2} - a_n a_{n-3}}{a_{n-1}}$</div>
             <p class="module-desc">
-              Determinação analítica da estabilidade absoluta e relativa de malha fechada sem necessidade de fatoração polinomial direta.
+              Determinação da estabilidade absoluta sem fatoração direta, com tabela de Routh, detecção de raízes no semiplano direito e casos especiais ($\epsilon$ e linha nula).
             </p>
-            <ul class="module-features">
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Tabela de Routh-Hurwitz construída passo a passo</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Casos especiais: primeiro elemento nulo ($\epsilon \to 0$)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Linha inteiramente nula (raízes imaginárias puras)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Faixa analítica de ganho estável $K_{min} < K < K_{max}$</span>
-              </li>
-            </ul>
+            <div class="module-pill-group">
+              <span class="module-pill">Tabela de Routh</span>
+              <span class="module-pill">Polinômio Auxiliar</span>
+              <span class="module-pill">Faixa $K_{min} < K < K_{max}$</span>
+            </div>
           </div>
 
           <div class="card-footer">
             <button class="btn-module-action btn-module-soon" type="button" data-module="Análise de Estabilidade">
-              <span>Em breve</span>
+              <span>Em desenvolvimento</span>
             </button>
           </div>
         </article>
@@ -188,10 +168,11 @@
         <article class="module-card card-soon" data-module="Resposta no Domínio do Tempo">
           <div class="card-top">
             <div class="module-icon-box icon-time">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="20" x2="21" y2="20"/>
-                <line x1="3" y1="4" x2="3" y2="20"/>
-                <path d="M3 18c3 0 4-13 7-13 3 0 4 5 6 5 2 0 3-1 5-1"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+                <line x1="2" y1="20" x2="22" y2="20"/>
               </svg>
             </div>
             <span class="module-status-badge badge-soon">
@@ -203,34 +184,22 @@
           <div class="card-content">
             <div class="card-heading">
               <h2 class="module-title">Resposta no Domínio do Tempo</h2>
-              <span class="module-tag">Transitório & Regime Permanente</span>
+              <span class="module-tag">Transitório &amp; Regime Permanente</span>
             </div>
+            <div class="module-math-badge">$\%OS = 100 \cdot e^{-\frac{\zeta\pi}{\sqrt{1-\zeta^2}}}, \quad t_s \approx \frac{4}{\zeta\omega_n}$</div>
             <p class="module-desc">
-              Comportamento temporal dinâmico para entradas canônicas degrau, impulso e rampa com métricas clássicas de desempenho.
+              Simulação temporal analítica para entradas degrau, impulso e rampa com extração de métricas de amortecimento, velocidade e erro estacionário $e_{ss}$.
             </p>
-            <ul class="module-features">
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Curvas analíticas para Degrau $y(t)$ e Impulso</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Parâmetros transitórios: $\%OS$, $t_s$, $t_p$, $t_r$, $\zeta$, $\omega_n$</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Erro em regime permanente ($e_{ss}$) por tipo de sistema</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Constantes de erro de posição ($K_p$), velocidade ($K_v$) e aceleração ($K_a$)</span>
-              </li>
-            </ul>
+            <div class="module-pill-group">
+              <span class="module-pill">Degrau $y(t)$ &amp; Impulso</span>
+              <span class="module-pill">Sobressinal &amp; $t_s, t_r$</span>
+              <span class="module-pill">Constantes $K_p, K_v, K_a$</span>
+            </div>
           </div>
 
           <div class="card-footer">
             <button class="btn-module-action btn-module-soon" type="button" data-module="Resposta no Domínio do Tempo">
-              <span>Em breve</span>
+              <span>Em desenvolvimento</span>
             </button>
           </div>
         </article>
@@ -239,11 +208,8 @@
         <article class="module-card card-soon" data-module="Resposta em Frequência">
           <div class="card-top">
             <div class="module-icon-box icon-freq">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="20" x2="21" y2="20"/>
-                <line x1="3" y1="4" x2="3" y2="20"/>
-                <path d="M3 6h7l8 12h3"/>
-                <circle cx="10" cy="6" r="2"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12c2-8 6-8 8 0s6 8 8 0 4-4 4-4"/>
               </svg>
             </div>
             <span class="module-status-badge badge-soon">
@@ -255,34 +221,22 @@
           <div class="card-content">
             <div class="card-heading">
               <h2 class="module-title">Resposta em Frequência</h2>
-              <span class="module-tag">Bode & Nyquist</span>
+              <span class="module-tag">Bode &amp; Nyquist • Domínio $j\omega$</span>
             </div>
+            <div class="module-math-badge">$|G(j\omega)|_{dB}, \quad MF = 180^\circ + \angle G(j\omega_{cg})$</div>
             <p class="module-desc">
-              Caracterização em regime senoidal permanente $s = j\omega$ para avaliação de robustez e margens de estabilidade.
+              Avaliação em regime permanente senoidal para análise de largura de banda, rejeição de distúrbios e cálculo exato das margens de ganho ($MG$) e fase ($MF$).
             </p>
-            <ul class="module-features">
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Diagramas de Bode (Magnitude em dB e Fase em graus)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Diagrama polar de Nyquist com contorno complexo</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Margem de Ganho ($MG$) e Margem de Fase ($MF$)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Frequências de cruzamento $\omega_{cg}$ e $\omega_{cp}$</span>
-              </li>
-            </ul>
+            <div class="module-pill-group">
+              <span class="module-pill">Diagramas de Bode</span>
+              <span class="module-pill">Plano Polar de Nyquist</span>
+              <span class="module-pill">Margens $MG$ e $MF$</span>
+            </div>
           </div>
 
           <div class="card-footer">
             <button class="btn-module-action btn-module-soon" type="button" data-module="Resposta em Frequência">
-              <span>Em breve</span>
+              <span>Em desenvolvimento</span>
             </button>
           </div>
         </article>
@@ -291,16 +245,9 @@
         <article class="module-card card-soon" data-module="Projeto de Controladores">
           <div class="card-top">
             <div class="module-icon-box icon-controllers">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="4" y1="21" x2="4" y2="14"/>
-                <line x1="4" y1="10" x2="4" y2="3"/>
-                <line x1="12" y1="21" x2="12" y2="12"/>
-                <line x1="12" y1="8" x2="12" y2="3"/>
-                <line x1="20" y1="21" x2="20" y2="16"/>
-                <line x1="20" y1="12" x2="20" y2="3"/>
-                <line x1="1" y1="14" x2="7" y2="14"/>
-                <line x1="9" y1="8" x2="15" y2="8"/>
-                <line x1="17" y1="16" x2="23" y2="16"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
               </svg>
             </div>
             <span class="module-status-badge badge-soon">
@@ -312,34 +259,22 @@
           <div class="card-content">
             <div class="card-heading">
               <h2 class="module-title">Projeto de Controladores</h2>
-              <span class="module-tag">PID & Compensadores Lead-Lag</span>
+              <span class="module-tag">Sintonia PID &amp; Compensadores Lead-Lag</span>
             </div>
+            <div class="module-math-badge">$C(s) = K_p \left(1 + \frac{1}{T_i s} + T_d s\right), \quad G_c(s) = K_c \frac{s + 1/T}{s + 1/(\alpha T)}$</div>
             <p class="module-desc">
-              Síntese e sintonia de ações de controle proporcional, integral e derivativo e compensadores por avanço e atraso de fase.
+              Síntese de malhas fechadas para atender requisitos estritos de sobressinal, margem de estabilidade e erro nulo em regime estacionário.
             </p>
-            <ul class="module-features">
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Sintonia PID por Ziegler-Nichols (Métodos 1 e 2)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Compensadores por Avanço (Lead) e Atraso (Lag) no LGR</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Ajuste analítico de ganhos $K_p$, $T_i$, $T_d$</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Comparativo antes e após compensação em malha fechada</span>
-              </li>
-            </ul>
+            <div class="module-pill-group">
+              <span class="module-pill">Ziegler-Nichols 1 e 2</span>
+              <span class="module-pill">Avanço &amp; Atraso (Lead-Lag)</span>
+              <span class="module-pill">Alocação de Polos no LGR</span>
+            </div>
           </div>
 
           <div class="card-footer">
             <button class="btn-module-action btn-module-soon" type="button" data-module="Projeto de Controladores">
-              <span>Em breve</span>
+              <span>Em desenvolvimento</span>
             </button>
           </div>
         </article>
@@ -348,13 +283,10 @@
         <article class="module-card card-soon" data-module="Espaço de Estados">
           <div class="card-top">
             <div class="module-icon-box icon-statespace">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="4" y1="20" x2="20" y2="20"/>
-                <line x1="4" y1="20" x2="4" y2="4"/>
-                <line x1="4" y1="20" x2="15" y2="9"/>
-                <polyline points="19 16 20 20 16 20"/>
-                <polyline points="4 8 4 4 8 4"/>
-                <polyline points="12 9 15 9 15 12"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <line x1="9" y1="3" x2="9" y2="21"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
               </svg>
             </div>
             <span class="module-status-badge badge-soon">
@@ -366,34 +298,22 @@
           <div class="card-content">
             <div class="card-heading">
               <h2 class="module-title">Espaço de Estados</h2>
-              <span class="module-tag">Modelagem Matricial & Alocação</span>
+              <span class="module-tag">Modelagem Matricial &amp; Alocação de Polos</span>
             </div>
+            <div class="module-math-badge">$\dot{\mathbf{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}\mathbf{u}, \quad \mathbf{y} = \mathbf{C}\mathbf{x} + \mathbf{D}\mathbf{u}$</div>
             <p class="module-desc">
-              Representação matricial moderna no domínio do tempo para sistemas multivariáveis (MIMO) de ordem arbitrária.
+              Representação matricial moderna no domínio do tempo para sistemas multivariáveis (MIMO) de ordem arbitrária e observadores de estado.
             </p>
-            <ul class="module-features">
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Matrizes de estado $(\mathbf{A}, \mathbf{B}, \mathbf{C}, \mathbf{D})$ e FCT</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Testes de Controlabilidade ($\mathcal{C}$) e Observabilidade ($\mathcal{O}$)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Alocação de Polos por Realimentação de Estados (Ackermann)</span>
-              </li>
-              <li>
-                <svg class="feature-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Projeto de Observador de Estados de Luenberger</span>
-              </li>
-            </ul>
+            <div class="module-pill-group">
+              <span class="module-pill">Controlabilidade ($\mathcal{C}$)</span>
+              <span class="module-pill">Observabilidade ($\mathcal{O}$)</span>
+              <span class="module-pill">Fórmula de Ackermann</span>
+            </div>
           </div>
 
           <div class="card-footer">
             <button class="btn-module-action btn-module-soon" type="button" data-module="Espaço de Estados">
-              <span>Em breve</span>
+              <span>Em desenvolvimento</span>
             </button>
           </div>
         </article>
@@ -549,12 +469,12 @@
 
       <!-- Rodapé da Sidebar: Botão de Ação Principal -->
       <div class="sidebar-footer">
-        <button id="btn-calculate" class="btn btn-animated-cta" type="button">
-          <span class="btn-shine"></span>
-          <span class="btn-content">
-            <span class="btn-text">Traçar LGR (7 Passos)</span>
-          </span>
-          <span class="shortcut-badge">↵</span>
+        <button id="btn-calculate" class="btn btn-primary btn-calc-action" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <span class="btn-text">Traçar LGR (7 Passos)</span>
+          <kbd class="shortcut-badge">Enter</kbd>
         </button>
       </div>
     </aside>

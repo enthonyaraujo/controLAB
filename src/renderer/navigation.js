@@ -25,9 +25,13 @@
       if (globalBrandTitle) {
         globalBrandTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : 'ControLAB';
       }
+      const navbarSubtitle = optionalElement('global-navbar-subtitle');
+      if (navbarSubtitle) {
+        navbarSubtitle.textContent = opensLgr ? 'Domínio s • Método de Evans' : 'Hub de Módulos';
+      }
       const navbarCenter = optionalElement('global-navbar-center');
       if (navbarCenter) {
-        navbarCenter.style.display = opensLgr ? 'none' : 'flex';
+        navbarCenter.style.display = 'flex';
       }
 
       if (opensLgr) {

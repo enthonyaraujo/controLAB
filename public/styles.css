@@ -47,7 +47,7 @@ body {
   min-height: 100vh;
 }
 
-/* Background Ambient Glows */
+/* Background Subtle Top Illumination */
 .glow-bg {
   position: absolute;
   border-radius: 50%;
@@ -57,19 +57,15 @@ body {
 }
 
 .glow-primary {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, rgba(56, 189, 248, 0) 70%);
-  top: -100px;
-  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(56, 189, 248, 0) 70%);
+  top: -150px;
+  right: -50px;
 }
 
 .glow-secondary {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(168, 85, 247, 0) 70%);
-  top: 40%;
-  left: -150px;
+  display: none;
 }
 
 .grid-overlay {
@@ -305,7 +301,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -333,18 +329,19 @@ body {
   gap: 10px;
   padding: 14px 28px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+  background: #0284c7;
   color: #fff;
   font-size: 1.05rem;
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.25);
-  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+  transition: all 0.2s ease;
 }
 
 .btn-hero-primary:hover {
+  background: #0369a1;
   transform: translateY(-2px);
-  box-shadow: 0 6px 28px rgba(56, 189, 248, 0.4);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
 }
 
 .btn-hero-secondary {
@@ -559,7 +556,7 @@ body {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  background: var(--accent-cyan);
 }
 
 .landing-module-card.card-active:hover {
