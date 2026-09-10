@@ -1016,14 +1016,19 @@
     <div class="scientific-workspace">
       <aside class="scientific-sidebar">
         <div class="scientific-sidebar-content">
-          <span id="scientific-kicker" class="section-kicker">Análise de Sistemas</span>
-          <h1 id="scientific-title">Módulo científico</h1>
+          <div class="sidebar-section-title">
+            <span id="scientific-kicker" class="section-kicker">Análise de Sistemas</span>
+          </div>
+          <h1 id="scientific-title" class="scientific-title">Módulo científico</h1>
           <p id="scientific-description" class="scientific-description"></p>
           <form id="scientific-form" class="scientific-form"></form>
         </div>
         <div class="scientific-sidebar-footer">
           <button id="btn-run-scientific" class="btn btn-primary btn-calc-action" type="submit" form="scientific-form">
-            <span>Analisar sistema</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <span class="btn-text">Calcular e Analisar</span>
             <kbd class="shortcut-badge">Ctrl + Enter</kbd>
           </button>
         </div>
@@ -1034,31 +1039,59 @@
           <div class="spinner"></div>
           <p>Executando a análise no motor científico...</p>
         </div>
-        <div id="scientific-empty" class="scientific-state">
-          <h2>Configure o sistema</h2>
-          <p>Preencha os parâmetros ao lado para gerar fórmulas, métricas e gráficos.</p>
+        <div id="scientific-empty" class="scientific-state scientific-empty-state">
+          <div class="empty-state-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </div>
+          <h3>Configure os Parâmetros</h3>
+          <p>Preencha os dados do sistema ou selecione um exemplo rápido para gerar fórmulas, métricas e gráficos.</p>
         </div>
         <div id="scientific-error" class="scientific-state scientific-error" hidden></div>
         <div id="scientific-results" class="scientific-results" hidden>
           <section class="scientific-result-card scientific-result-heading">
-            <div>
-              <span class="section-kicker">Resultado</span>
-              <h2 id="scientific-result-title"></h2>
-              <p id="scientific-result-description"></p>
-            </div>
-            <div class="scientific-actions">
-              <button id="btn-scientific-png" class="btn btn-secondary" type="button">PNG</button>
-              <button id="btn-scientific-svg" class="btn btn-secondary" type="button">SVG</button>
+            <div class="scientific-heading-content">
+              <span class="section-kicker">Resultado da Análise</span>
+              <h2 id="scientific-result-title" class="scientific-result-title"></h2>
+              <p id="scientific-result-description" class="scientific-result-description"></p>
             </div>
           </section>
           <section id="scientific-latex" class="scientific-latex-grid"></section>
           <section id="scientific-metrics" class="scientific-metrics-grid"></section>
           <section id="scientific-plot-card" class="scientific-result-card scientific-plot-card">
-            <img id="scientific-plot" alt="Gráfico da análise científica" />
+            <div class="plot-card-header">
+              <div class="card-section-label" style="margin-bottom: 0;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+                <span>Curvas e Resposta Gráfica</span>
+              </div>
+              <div class="plot-toolbar">
+                <div class="toolbar-right scientific-actions">
+                  <button id="btn-scientific-svg" class="tool-btn tool-btn-accent" type="button" title="Exportar como Vetorial SVG">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    <span>Vetorial SVG</span>
+                  </button>
+                  <button id="btn-scientific-png" class="tool-btn tool-btn-primary" type="button" title="Baixar PNG em Alta Resolução">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Baixar PNG</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="plot-viewport scientific-plot-viewport">
+              <img id="scientific-plot" alt="Gráfico da análise científica" class="plot-img" />
+            </div>
           </section>
           <section id="scientific-details-card" class="scientific-result-card" hidden>
             <details>
-              <summary>Dados técnicos completos</summary>
+              <summary>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                <span>Dados técnicos estruturados (JSON)</span>
+              </summary>
               <pre id="scientific-details"></pre>
             </details>
           </section>

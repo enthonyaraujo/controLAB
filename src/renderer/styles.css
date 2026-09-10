@@ -4314,16 +4314,20 @@ textarea::placeholder {
   padding: 24px 20px;
 }
 
-.scientific-sidebar h1 {
-  margin: 6px 0 8px;
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
+.scientific-sidebar h1,
+.scientific-title {
+  margin: 4px 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
 .scientific-description {
-  margin: 0 0 22px;
+  margin: 0 0 18px;
   color: var(--text-muted);
-  line-height: 1.55;
+  line-height: 1.5;
+  font-size: 0.85rem;
 }
 
 .scientific-form,
@@ -4345,8 +4349,13 @@ textarea::placeholder {
   min-height: 76px;
 }
 
-.scientific-field select {
-  appearance: auto;
+.scientific-field select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
 }
 
 .scientific-examples {
@@ -4380,6 +4389,45 @@ textarea::placeholder {
   color: var(--text-muted);
 }
 
+.scientific-empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: 12px;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 40px auto;
+  min-height: auto;
+}
+
+.scientific-empty-state .empty-state-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.scientific-empty-state h3 {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.scientific-empty-state p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
 .scientific-state[hidden],
 .scientific-results[hidden],
 .scientific-result-card[hidden] {
@@ -4392,8 +4440,8 @@ textarea::placeholder {
 
 .scientific-results {
   display: grid;
-  gap: 16px;
-  max-width: 1280px;
+  gap: 18px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -4401,26 +4449,29 @@ textarea::placeholder {
 .scientific-metric-card {
   min-width: 0;
   border: 1px solid var(--border-color);
-  border-radius: 14px;
+  border-radius: 10px;
   background: var(--bg-card);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .scientific-result-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px;
+  padding: 20px 22px;
 }
 
-.scientific-result-heading h2 {
-  margin: 5px 0;
+.scientific-result-heading h2,
+.scientific-result-title {
+  margin: 4px 0 6px;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-main);
+  letter-spacing: -0.015em;
 }
 
-.scientific-result-heading p {
+.scientific-result-heading p,
+.scientific-result-description {
   margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
   color: var(--text-muted);
 }
 
@@ -4434,63 +4485,101 @@ textarea::placeholder {
 .scientific-metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
 .scientific-latex-card,
 .scientific-metric-card {
-  padding: 16px;
+  padding: 16px 18px;
   overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.scientific-latex-card:hover,
+.scientific-metric-card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
 }
 
 .scientific-card-label {
   display: block;
   margin-bottom: 9px;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .scientific-metric-card strong {
-  color: var(--text-main);
-  font-size: 1.15rem;
+  color: #38bdf8;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-code);
+  letter-spacing: -0.01em;
 }
 
 .scientific-math {
   max-width: 100%;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 6px 0;
   color: var(--text-main);
 }
 
 .scientific-plot-card {
-  padding: clamp(8px, 2vw, 18px);
-  overflow: auto;
+  padding: 18px 20px;
 }
 
-.scientific-plot-card img {
-  display: block;
-  width: 100%;
+.scientific-plot-viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.scientific-plot-viewport .plot-img {
+  max-width: 100%;
   height: auto;
-  min-width: 0;
-  border-radius: 9px;
-  background: #ffffff;
+  max-height: 540px;
+  object-fit: contain;
+  border-radius: 6px;
 }
 
 #scientific-details-card {
-  padding: 16px;
+  padding: 16px 20px;
 }
 
 #scientific-details-card summary {
   cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+#scientific-details-card summary:hover {
   color: var(--text-main);
-  font-weight: 700;
+}
+
+#scientific-details-card details[open] summary svg {
+  transform: rotate(90deg);
+}
+
+#scientific-details-card summary svg {
+  transition: transform 0.2s ease;
 }
 
 #scientific-details {
+  margin-top: 12px;
   max-height: 360px;
   overflow: auto;
   white-space: pre-wrap;
@@ -4534,12 +4623,18 @@ textarea::placeholder {
   }
 
   .scientific-actions,
-  .scientific-actions .btn {
+  .scientific-actions .tool-btn {
     width: 100%;
+    justify-content: center;
   }
 
   .scientific-latex-grid,
   .scientific-metrics-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scientific-plot-viewport {
+    min-height: 250px;
+    padding: 8px;
   }
 }

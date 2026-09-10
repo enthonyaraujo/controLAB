@@ -32,17 +32,14 @@
   padding: 0;
 }
 
-html {
-  scroll-behavior: smooth;
-  color-scheme: dark;
-}
-
-body {
+html, body {
   background-color: var(--bg-main);
   color: var(--text-main);
   font-family: var(--font-sans);
   line-height: 1.6;
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
   position: relative;
   min-height: 100vh;
 }
@@ -91,6 +88,8 @@ body {
   padding: 0 24px;
   position: relative;
   z-index: 1;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Header & Nav */
@@ -103,12 +102,18 @@ body {
   background: rgba(6, 9, 19, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding: 14px 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .header-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .brand {
@@ -256,6 +261,7 @@ body {
 .hero-section {
   padding: 90px 0 70px;
   position: relative;
+  overflow-x: clip;
 }
 
 .hero-container {
@@ -263,6 +269,16 @@ body {
   grid-template-columns: 1.15fr 0.95fr;
   gap: 48px;
   align-items: center;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero-content,
+.hero-preview {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 .pill-badge {
@@ -298,6 +314,8 @@ body {
   font-weight: 800;
   letter-spacing: -0.025em;
   margin-bottom: 20px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .gradient-text {
@@ -311,6 +329,8 @@ body {
   line-height: 1.7;
   color: var(--text-muted);
   margin-bottom: 36px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .hero-subtitle strong {
@@ -321,6 +341,8 @@ body {
   display: flex;
   gap: 16px;
   margin-bottom: 36px;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .btn-hero-primary {
@@ -336,6 +358,8 @@ body {
   text-decoration: none;
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
   transition: all 0.2s ease;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .btn-hero-primary:hover {
@@ -357,6 +381,8 @@ body {
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .btn-hero-secondary:hover {
@@ -388,6 +414,10 @@ body {
   overflow: hidden;
   box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px -10px rgba(56, 189, 248, 0.15);
   transition: transform 0.3s ease;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mockup-window:hover {
@@ -401,11 +431,15 @@ body {
   padding: 12px 16px;
   background: #0d1322;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .mockup-dots {
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .dot {
@@ -425,6 +459,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 0;
+  flex: 1;
 }
 
 .mockup-tab-bar {
@@ -435,7 +471,11 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding: 8px 14px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 .mockup-tab-bar::-webkit-scrollbar {
@@ -454,6 +494,7 @@ body {
   align-items: center;
   gap: 6px;
   border: 1px solid transparent;
+  flex-shrink: 0;
 }
 
 .mockup-tab.active {
@@ -472,11 +513,24 @@ body {
 .mockup-body {
   padding: 0;
   line-height: 0;
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .preview-svg-container {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   aspect-ratio: 800 / 520;
+  overflow: hidden;
+}
+
+.preview-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 /* Sections Common */
@@ -618,6 +672,12 @@ body {
   background: rgba(96, 165, 250, 0.12);
   color: #60a5fa;
   border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.icon-statespace {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .module-status-badge {
@@ -1307,7 +1367,16 @@ body {
   .hero-container {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 36px;
+    gap: 32px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .hero-content,
+  .hero-preview {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
   .hero-actions {
     justify-content: center;
@@ -1339,10 +1408,26 @@ body {
 @media (max-width: 768px) {
   .site-header {
     padding: 10px 0 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .header-container {
+    min-width: 0;
+    max-width: 100%;
   }
   .mobile-subnav {
     display: block;
     margin-top: 10px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .mobile-subnav-container {
+    padding: 0 16px;
+    min-width: max-content;
   }
   .nav-links {
     display: none;
@@ -1356,47 +1441,96 @@ body {
   .btn-header-dl {
     padding: 8px 14px;
     font-size: 0.85rem;
+    white-space: nowrap;
   }
   .hero-section {
-    padding: 40px 0 50px;
+    padding: 32px 0 44px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
   }
   .hero-title {
-    font-size: clamp(1.9rem, 7.5vw, 2.5rem);
+    font-size: clamp(1.65rem, 6.5vw, 2.25rem);
     letter-spacing: -0.02em;
-    margin-bottom: 16px;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
   .hero-subtitle {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 28px;
+    font-size: 0.96rem;
+    line-height: 1.55;
+    margin-bottom: 22px;
+    overflow-wrap: break-word;
   }
   .hero-actions {
     flex-direction: column;
     gap: 12px;
+    width: 100%;
+    max-width: 100%;
   }
   .btn-hero-primary,
   .btn-hero-secondary {
     width: 100%;
-    min-height: 50px;
+    min-height: 48px;
+    padding: 12px 18px;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+    white-space: normal;
+    box-sizing: border-box;
+  }
+  #label-primary-os {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .hero-tech-pills {
+    justify-content: center;
+    gap: 6px;
+  }
+  .tech-tag {
+    font-size: 0.74rem;
+    padding: 3px 8px;
+  }
+  .glow-primary {
+    right: -20px;
+    width: min(320px, 90vw);
+    height: min(320px, 90vw);
   }
   .section {
-    padding: 60px 0;
+    padding: 50px 0;
   }
   .section-header {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
   .section-title {
-    font-size: 1.8rem;
+    font-size: 1.7rem;
+    overflow-wrap: break-word;
   }
   .step-card,
   .feature-box,
-  .download-card {
-    padding: 24px 20px;
+  .download-card,
+  .landing-module-card {
+    padding: 22px 18px;
   }
   .mockup-window {
     border-radius: var(--radius-md);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .mockup-header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .mockup-tab-bar {
+    padding: 6px 10px;
+    gap: 4px;
+  }
+  .mockup-tab {
+    font-size: 0.7rem;
+    padding: 3px 8px;
   }
   .footer-bottom-content {
     flex-direction: column;
@@ -1409,17 +1543,48 @@ body {
 /* Otimizações Específicas para Smartphones Android (Telas <= 480px) */
 @media (max-width: 480px) {
   .container {
-    padding: 0 16px;
+    padding: 0 14px;
+    width: 100%;
+    max-width: 100%;
+  }
+  .brand {
+    gap: 6px;
+  }
+  .brand-icon {
+    width: 28px;
+    height: 28px;
   }
   .brand-name {
-    font-size: 1.05rem;
+    font-size: 1rem;
+  }
+  .header-cta {
+    gap: 6px;
+  }
+  .btn-header-dl {
+    padding: 6px 10px;
+    font-size: 0.78rem;
   }
   .version-badge {
     display: none;
   }
+  .hero-title {
+    font-size: clamp(1.4rem, 5.8vw, 1.85rem);
+    line-height: 1.22;
+  }
+  .hero-subtitle {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
   .pill-badge {
-    font-size: 0.75rem;
-    padding: 5px 10px;
+    font-size: 0.72rem;
+    padding: 4px 8px;
+    margin-bottom: 16px;
+  }
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    font-size: 0.9rem;
+    padding: 12px 14px;
   }
   .step-formula {
     padding: 10px 12px;
