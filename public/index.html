@@ -123,8 +123,11 @@
             <div class="mockup-title">ControLAB — Suíte Integrada de Sistemas de Controle</div>
           </div>
           <div class="mockup-tab-bar" id="mockup-tabs" role="tablist">
-            <button type="button" class="mockup-tab active" data-mockup="hub" role="tab" aria-selected="true">
+            <button type="button" class="mockup-tab active" data-mockup="principal" role="tab" aria-selected="true">
               <span class="mockup-tab-dot"></span>
+              Visão Geral
+            </button>
+            <button type="button" class="mockup-tab" data-mockup="hub" role="tab" aria-selected="false">
               Hub Central
             </button>
             <button type="button" class="mockup-tab" data-mockup="time" role="tab" aria-selected="false">
@@ -145,7 +148,8 @@
           </div>
           <div class="mockup-body">
             <div class="mockup-screen-container">
-              <img id="mockup-img-hub" class="mockup-screen-img active" src="screenshots/hub-modulos.webp" alt="Interface ControLAB - Hub Central de Módulos" width="1024" height="554" fetchpriority="high">
+              <img id="mockup-img-principal" class="mockup-screen-img active" src="screenshots/principal.webp" alt="Interface ControLAB - Visão Geral Desktop" width="1024" height="554" fetchpriority="high">
+              <img id="mockup-img-hub" class="mockup-screen-img" src="screenshots/hub-modulos.webp" alt="Interface ControLAB - Hub Central de Módulos" width="1024" height="484" loading="lazy">
               <img id="mockup-img-time" class="mockup-screen-img" src="screenshots/resposta-tempo.webp" alt="Interface ControLAB - Resposta no Domínio do Tempo" width="1024" height="529" loading="lazy">
               <img id="mockup-img-lgr" class="mockup-screen-img" src="screenshots/lugar-das-raizes.webp" alt="Interface ControLAB - Lugar Geométrico das Raízes (LGR)" width="1024" height="529" loading="lazy">
               <img id="mockup-img-freq" class="mockup-screen-img" src="screenshots/resposta-frequencia.webp" alt="Interface ControLAB - Resposta em Frequência (Bode e Nyquist)" width="1024" height="529" loading="lazy">
@@ -155,7 +159,7 @@
             <div class="mockup-status-bar">
               <div class="mockup-status-info">
                 <span class="mockup-status-dot"></span>
-                <span id="mockup-caption-text" class="mockup-status-text">Hub Central: navegação rápida e unificada entre todos os módulos de controle</span>
+                <span id="mockup-caption-text" class="mockup-status-text">Visão Geral Desktop: ambiente integrado v3.0.0 com os 6 módulos em execução</span>
               </div>
               <span class="mockup-status-hint">Clique nas abas para alternar as telas</span>
             </div>
@@ -457,10 +461,31 @@
       </div>
 
       <div class="interface-gallery-grid">
-        <!-- Card 1: Hub Central -->
+        <!-- Card 1: Visão Geral Desktop (Tela Principal) -->
+        <article class="interface-gallery-card" data-mockup-trigger="principal">
+          <div class="gallery-card-img-wrap">
+            <img src="screenshots/principal.webp" alt="Visão Geral Desktop do ControLAB" loading="lazy" width="1024" height="554">
+            <div class="gallery-card-overlay">
+              <span class="gallery-card-zoom-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                Ampliar Imagem
+              </span>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <div class="gallery-card-meta">
+              <span class="gallery-card-badge">Aplicação Completa</span>
+              <span class="gallery-card-res">1024 × 554</span>
+            </div>
+            <h3 class="gallery-card-title">Visão Geral Desktop (v3.0.0)</h3>
+            <p class="gallery-card-desc">Ambiente integrado com janela nativa, identificação de versão e acesso aos 6 módulos de controle.</p>
+          </div>
+        </article>
+
+        <!-- Card 2: Hub Central -->
         <article class="interface-gallery-card" data-mockup-trigger="hub">
           <div class="gallery-card-img-wrap">
-            <img src="screenshots/hub-modulos.webp" alt="Hub Central de Módulos do ControLAB" loading="lazy" width="1024" height="554">
+            <img src="screenshots/hub-modulos.webp" alt="Hub Central de Módulos do ControLAB" loading="lazy" width="1024" height="484">
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
@@ -471,7 +496,7 @@
           <div class="gallery-card-info">
             <div class="gallery-card-meta">
               <span class="gallery-card-badge">Página Inicial</span>
-              <span class="gallery-card-res">1024 × 554</span>
+              <span class="gallery-card-res">1024 × 484</span>
             </div>
             <h3 class="gallery-card-title">Hub Central Integrado</h3>
             <p class="gallery-card-desc">Grid dinâmico com acesso direto a todos os 6 módulos analíticos de sistemas de controle.</p>
@@ -1190,6 +1215,7 @@
       // Alternância interativa de abas do Mockup da Aplicação
       const mockupTabs = document.querySelectorAll('.mockup-tab[data-mockup]');
       const mockupScreens = {
+        principal: document.getElementById('mockup-img-principal'),
         hub: document.getElementById('mockup-img-hub'),
         time: document.getElementById('mockup-img-time'),
         lgr: document.getElementById('mockup-img-lgr'),
@@ -1198,6 +1224,7 @@
         states: document.getElementById('mockup-img-states')
       };
       const mockupCaptions = {
+        principal: 'Visão Geral Desktop: ambiente integrado v3.0.0 com os 6 módulos em execução',
         hub: 'Hub Central: navegação rápida e unificada entre todos os módulos de controle',
         time: 'Resposta no Domínio do Tempo: transitório, sobressinal (%OS) e tempos característicos',
         lgr: 'Lugar Geométrico das Raízes (LGR): traçado analítico de Evans e memorial passo a passo',
@@ -1233,6 +1260,13 @@
 
       // Base de dados dos módulos para exibição ampliada no Lightbox
       const galleryData = [
+        {
+          key: 'principal',
+          title: 'Visão Geral Desktop (v3.0.0)',
+          badge: 'Aplicação Completa',
+          src: 'screenshots/principal.webp',
+          desc: 'Ambiente integrado com janela nativa, identificação de versão e acesso aos 6 módulos de controle.'
+        },
         {
           key: 'hub',
           title: 'Hub Central Integrado',

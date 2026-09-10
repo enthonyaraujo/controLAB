@@ -11,11 +11,11 @@
 ---
 
 <p align="center">
-  <a href="docs/screenshots/hub-modulos.webp">
-    <img src="docs/screenshots/hub-modulos.webp" alt="Hub Central de Módulos do ControLAB" width="100%">
+  <a href="docs/screenshots/principal.webp">
+    <img src="docs/screenshots/principal.webp" alt="Visão Geral da Suíte ControLAB v3.0.0" width="100%">
   </a>
   <br>
-  <em>Hub Central unificando os domínios clássicos e modernos de sistemas de controle. Clique em qualquer imagem para abrir em alta resolução.</em>
+  <em>Visão Geral da Suíte ControLAB v3.0.0 em execução no desktop. Clique em qualquer imagem para abrir em alta resolução.</em>
 </p>
 
 ---
@@ -43,8 +43,17 @@ A aplicação organiza os domínios clássicos e modernos de controle a partir d
 
 O ControLAB oferece uma interface escura, responsiva e 100% offline, projetada para estudo, simulação e projeto de sistemas dinâmicos. Veja abaixo as capturas de tela em resolução completa da tela principal e de cada módulo (clique em qualquer imagem para abrir em tamanho original):
 
-### Tela Principal: Hub Central Integrado (v3.0.0)
-Visão inicial unificada com acesso direto a todos os 6 módulos analíticos da suíte de sistemas de controle.
+### Tela Principal: Visão Geral Desktop (v3.0.0)
+Visão completa da aplicação em execução com janela nativa, identificação de versão e acesso rápido a todos os módulos.
+
+<p align="center">
+  <a href="docs/screenshots/principal.webp">
+    <img src="docs/screenshots/principal.webp" alt="Visão Geral Desktop do ControLAB" width="100%">
+  </a>
+</p>
+
+### Hub Central de Módulos (Página Inicial)
+Grid de acesso rápido aos domínios analíticos e de projeto de sistemas de controle.
 
 <p align="center">
   <a href="docs/screenshots/hub-modulos.webp">
