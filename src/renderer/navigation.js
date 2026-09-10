@@ -8,6 +8,9 @@
     const pageLgr = optionalElement('page-lgr');
     const btnNavHome = optionalElement('btn-nav-home');
     const globalBrandTitle = optionalElement('global-brand-title');
+    const globalNavbarCenter = optionalElement('global-navbar-center');
+    const globalNavbarTitle = optionalElement('global-navbar-title') || optionalElement('global-navbar-subtitle');
+    const globalNavbar = document.querySelector('.global-navbar');
     const renderedPages = new WeakSet();
 
     function renderPageOnce(page) {
@@ -22,16 +25,15 @@
       pageLgr?.classList.toggle('active', opensLgr);
 
       if (btnNavHome) btnNavHome.style.display = opensLgr ? 'inline-flex' : 'none';
+      if (globalNavbar) globalNavbar.classList.toggle('has-back', opensLgr);
       if (globalBrandTitle) {
-        globalBrandTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : 'ControLAB';
+        globalBrandTitle.textContent = 'ControLAB';
       }
-      const navbarSubtitle = optionalElement('global-navbar-subtitle');
-      if (navbarSubtitle) {
-        navbarSubtitle.textContent = opensLgr ? 'Domínio s • Método de Evans' : 'Hub de Módulos';
+      if (globalNavbarCenter) {
+        globalNavbarCenter.style.display = opensLgr ? 'flex' : 'none';
       }
-      const navbarCenter = optionalElement('global-navbar-center');
-      if (navbarCenter) {
-        navbarCenter.style.display = 'flex';
+      if (globalNavbarTitle) {
+        globalNavbarTitle.textContent = opensLgr ? 'Lugar Geométrico das Raízes' : '';
       }
 
       if (opensLgr) {
