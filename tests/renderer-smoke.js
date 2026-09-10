@@ -35,6 +35,8 @@ assert(scientificModules.includes("action: 'time_response'"), 'o módulo tempora
 assert(scientificModules.includes("action: 'frequency_response'"), 'o módulo de frequência precisa estar registrado');
 assert(scientificModules.includes("action: 'controller_design'"), 'o módulo de controladores precisa estar registrado');
 assert(scientificModules.includes("action: 'state_space'"), 'o módulo de espaço de estados precisa estar registrado');
+assert(scientificModules.includes("input.step = 'any'"), 'campos científicos decimais não podem usar uma grade incompatível com o valor mínimo');
+assert(scientificModules.includes("input.inputMode = 'decimal'"), 'campos científicos precisam abrir o teclado decimal em dispositivos móveis');
 assert(html.includes('id="card-module-time" class="module-card card-active"'), 'o card temporal precisa estar disponível');
 assert(html.includes('id="card-module-frequency" class="module-card card-active"'), 'o card de frequência precisa estar disponível');
 assert(html.includes('id="card-module-controllers" class="module-card card-active"'), 'o card de controladores precisa estar disponível');

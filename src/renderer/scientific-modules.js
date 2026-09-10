@@ -22,7 +22,6 @@
           value: '10',
           min: '0.05',
           max: '10000',
-          step: '0.1',
         },
         {
           name: 'settling_threshold',
@@ -61,7 +60,6 @@
           type: 'number',
           value: '0.01',
           min: '0.000001',
-          step: '0.01',
         },
         {
           name: 'omega_max',
@@ -69,7 +67,6 @@
           type: 'number',
           value: '100',
           min: '0.00001',
-          step: '1',
         },
       ],
       examples: [
@@ -121,23 +118,23 @@
           when: { design_type: ['pid'] },
         },
         {
-          name: 'critical_gain', label: 'Ganho crítico Kcr', type: 'number', value: '6', min: '0.000001', step: '0.1',
+          name: 'critical_gain', label: 'Ganho crítico Kcr', type: 'number', value: '6', min: '0.000001',
           when: { design_type: ['pid'], method: ['zn_critical'] },
         },
         {
-          name: 'critical_period', label: 'Período crítico Pcr (s)', type: 'number', value: '2', min: '0.000001', step: '0.1',
+          name: 'critical_period', label: 'Período crítico Pcr (s)', type: 'number', value: '2', min: '0.000001',
           when: { design_type: ['pid'], method: ['zn_critical'] },
         },
         {
-          name: 'process_gain', label: 'Ganho do processo K', type: 'number', value: '1', min: '0.000001', step: '0.1',
+          name: 'process_gain', label: 'Ganho do processo K', type: 'number', value: '1', min: '0.000001',
           when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
         },
         {
-          name: 'delay', label: 'Atraso aparente L (s)', type: 'number', value: '0.5', min: '0.000001', step: '0.1',
+          name: 'delay', label: 'Atraso aparente L (s)', type: 'number', value: '0.5', min: '0.000001',
           when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
         },
         {
-          name: 'time_constant', label: 'Constante de tempo T (s)', type: 'number', value: '4', min: '0.000001', step: '0.1',
+          name: 'time_constant', label: 'Constante de tempo T (s)', type: 'number', value: '4', min: '0.000001',
           when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
         },
         {
@@ -156,19 +153,19 @@
           when: { design_type: ['lead_lag'] },
         },
         {
-          name: 'compensator_zero', label: 'Frequência do zero', type: 'number', value: '1', min: '0.000001', step: '0.1',
+          name: 'compensator_zero', label: 'Frequência do zero', type: 'number', value: '1', min: '0.000001',
           when: { design_type: ['lead_lag'] },
         },
         {
-          name: 'compensator_pole', label: 'Frequência do polo', type: 'number', value: '5', min: '0.000001', step: '0.1',
+          name: 'compensator_pole', label: 'Frequência do polo', type: 'number', value: '5', min: '0.000001',
           help: 'No avanço, polo > zero. No atraso, polo < zero.',
           when: { design_type: ['lead_lag'] },
         },
         {
-          name: 'compensator_gain', label: 'Ganho do compensador', type: 'number', value: '1', min: '0.000001', step: '0.1',
+          name: 'compensator_gain', label: 'Ganho do compensador', type: 'number', value: '1', min: '0.000001',
           when: { design_type: ['lead_lag'] },
         },
-        { name: 'final_time', label: 'Tempo final da comparação (s)', type: 'number', value: '20', min: '0.05', step: '0.5' },
+        { name: 'final_time', label: 'Tempo final da comparação (s)', type: 'number', value: '20', min: '0.05' },
       ],
       examples: [
         ['Terceira ordem', '1 / (s * (s + 1) * (s + 5))'],
@@ -267,9 +264,15 @@
           input = document.createElement('input');
           input.type = field.type || 'text';
           input.value = field.value || '';
-          ['placeholder', 'min', 'max', 'step'].forEach((property) => {
+          ['placeholder', 'min', 'max'].forEach((property) => {
             if (field[property] !== undefined) input[property] = field[property];
           });
+          if (field.type === 'number') {
+            // Um min fracionário não deve deslocar a grade de valores válidos.
+            // step="any" também respeita a vírgula decimal exibida em pt-BR.
+            input.step = 'any';
+            input.inputMode = 'decimal';
+          }
         }
         input.name = field.name;
         input.className = 'form-input code-font';
