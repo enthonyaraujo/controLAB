@@ -462,7 +462,7 @@
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Visualizar no Preview
+                Ampliar Imagem
               </span>
             </div>
           </div>
@@ -483,7 +483,7 @@
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Visualizar no Preview
+                Ampliar Imagem
               </span>
             </div>
           </div>
@@ -504,7 +504,7 @@
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Visualizar no Preview
+                Ampliar Imagem
               </span>
             </div>
           </div>
@@ -525,7 +525,7 @@
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Visualizar no Preview
+                Ampliar Imagem
               </span>
             </div>
           </div>
@@ -546,7 +546,7 @@
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Visualizar no Preview
+                Ampliar Imagem
               </span>
             </div>
           </div>
@@ -567,7 +567,7 @@
             <div class="gallery-card-overlay">
               <span class="gallery-card-zoom-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                Visualizar no Preview
+                Ampliar Imagem
               </span>
             </div>
           </div>
@@ -1229,22 +1229,177 @@
         });
       });
 
-      // Clique em cards da galeria visual navega para o preview interativo
+      // Base de dados dos módulos para exibição ampliada no Lightbox
+      const galleryData = [
+        {
+          key: 'hub',
+          title: 'Hub Central Integrado',
+          badge: 'Página Inicial',
+          src: 'screenshots/hub-modulos.webp',
+          desc: 'Grid dinâmico com acesso direto a todos os 6 módulos analíticos de sistemas de controle.'
+        },
+        {
+          key: 'time',
+          title: 'Resposta no Domínio do Tempo',
+          badge: 'Domínio do Tempo',
+          src: 'screenshots/resposta-tempo.webp',
+          desc: 'Curvas de resposta ao degrau, impulso e rampa com tabela de métricas completas (%OS, ts, tp, tr, polos).'
+        },
+        {
+          key: 'lgr',
+          title: 'Lugar Geométrico das Raízes (LGR)',
+          badge: 'Domínio s',
+          src: 'screenshots/lugar-das-raizes.webp',
+          desc: 'Traçado analítico de Evans com ramos, assíntotas, centroide, dispersão e memorial de cálculo passo a passo.'
+        },
+        {
+          key: 'freq',
+          title: 'Resposta em Frequência (Bode & Nyquist)',
+          badge: 'Domínio da Frequência',
+          src: 'screenshots/resposta-frequencia.webp',
+          desc: 'Diagramas de Bode (magnitude em dB e fase em graus) e Nyquist polar com margens de ganho e fase.'
+        },
+        {
+          key: 'ctrl',
+          title: 'Projeto de Controladores',
+          badge: 'Compensação',
+          src: 'screenshots/projeto-controladores.webp',
+          desc: 'Sintonia PID pelos métodos clássicos de Ziegler-Nichols e projeto analítico de compensadores Lead-Lag.'
+        },
+        {
+          key: 'states',
+          title: 'Espaço de Estados',
+          badge: 'Modelagem Matricial',
+          src: 'screenshots/espaco-estados.webp',
+          desc: 'Entrada matricial, cálculo de controlabilidade, observabilidade, polos no plano complexo e observadores.'
+        }
+      ];
+
+      let currentLightboxIndex = 0;
+      const lightboxModal = document.getElementById('lightbox-modal');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const lightboxTitle = document.getElementById('lightbox-title');
+      const lightboxBadge = document.getElementById('lightbox-badge');
+      const lightboxDesc = document.getElementById('lightbox-desc');
+      const lightboxCounter = document.getElementById('lightbox-counter');
+      const lightboxCloseBtn = document.getElementById('lightbox-close');
+      const lightboxBackdrop = document.getElementById('lightbox-backdrop');
+      const lightboxPrevBtn = document.getElementById('lightbox-prev');
+      const lightboxNextBtn = document.getElementById('lightbox-next');
+
+      function updateLightboxContent(idx) {
+        currentLightboxIndex = (idx + galleryData.length) % galleryData.length;
+        const item = galleryData[currentLightboxIndex];
+        if (!item || !lightboxImg) return;
+        lightboxImg.src = item.src;
+        lightboxImg.alt = item.title;
+        if (lightboxTitle) lightboxTitle.textContent = item.title;
+        if (lightboxBadge) lightboxBadge.textContent = item.badge;
+        if (lightboxDesc) lightboxDesc.textContent = item.desc;
+        if (lightboxCounter) lightboxCounter.textContent = `${currentLightboxIndex + 1} de ${galleryData.length}`;
+      }
+
+      function openLightbox(idx) {
+        updateLightboxContent(idx);
+        if (lightboxModal) {
+          lightboxModal.classList.add('active');
+          lightboxModal.setAttribute('aria-hidden', 'false');
+        }
+        document.body.classList.add('lightbox-open');
+      }
+
+      function closeLightbox() {
+        if (lightboxModal) {
+          lightboxModal.classList.remove('active');
+          lightboxModal.setAttribute('aria-hidden', 'true');
+        }
+        document.body.classList.remove('lightbox-open');
+      }
+
+      function prevLightbox() {
+        updateLightboxContent(currentLightboxIndex - 1);
+      }
+
+      function nextLightbox() {
+        updateLightboxContent(currentLightboxIndex + 1);
+      }
+
+      if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+      if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
+      if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', prevLightbox);
+      if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', nextLightbox);
+
+      document.addEventListener('keydown', (e) => {
+        if (!lightboxModal || !lightboxModal.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowLeft') prevLightbox();
+        else if (e.key === 'ArrowRight') nextLightbox();
+      });
+
+      // Clique nos cards da galeria visual abre a imagem ampliada no Lightbox (sem subir na página)
       const galleryTriggers = document.querySelectorAll('[data-mockup-trigger]');
       galleryTriggers.forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           const key = card.getAttribute('data-mockup-trigger');
-          switchMockupTab(key);
-          const previewElem = document.querySelector('.hero-preview');
-          if (previewElem) {
-            previewElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+          const idx = galleryData.findIndex(item => item.key === key);
+          openLightbox(idx !== -1 ? idx : 0);
         });
       });
+
+      // Clique no container do mockup do Hero também permite abrir em tela cheia
+      const heroScreenContainer = document.querySelector('.mockup-screen-container');
+      if (heroScreenContainer) {
+        heroScreenContainer.style.cursor = 'zoom-in';
+        heroScreenContainer.title = 'Clique para ampliar esta tela';
+        heroScreenContainer.addEventListener('click', () => {
+          const activeImg = heroScreenContainer.querySelector('.mockup-screen-img.active');
+          if (activeImg) {
+            const activeId = activeImg.id.replace('mockup-img-', '');
+            const idx = galleryData.findIndex(item => item.key === activeId);
+            openLightbox(idx !== -1 ? idx : 0);
+          }
+        });
+      }
     });
 
     window.addEventListener('load', initKaTeX);
   </script>
+
+  <!-- Modal Lightbox para Ampliação de Imagens da Interface -->
+  <div id="lightbox-modal" class="lightbox-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox-dialog">
+      <div class="lightbox-header">
+        <div class="lightbox-meta">
+          <span id="lightbox-badge" class="lightbox-badge">Módulo</span>
+          <h3 id="lightbox-title" class="lightbox-title">Título da Interface</h3>
+        </div>
+        <button type="button" class="lightbox-close-btn" id="lightbox-close" aria-label="Fechar ampliação">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="lightbox-body">
+        <button type="button" class="lightbox-nav-btn lightbox-prev" id="lightbox-prev" aria-label="Imagem anterior">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="lightbox-img-wrapper">
+          <img id="lightbox-img" src="screenshots/hub-modulos.webp" alt="Interface ampliada" class="lightbox-img">
+        </div>
+        <button type="button" class="lightbox-nav-btn lightbox-next" id="lightbox-next" aria-label="Próxima imagem">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="lightbox-footer">
+        <p id="lightbox-desc" class="lightbox-desc">Descrição detalhada do módulo.</p>
+        <span id="lightbox-counter" class="lightbox-counter">1 de 6</span>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 
