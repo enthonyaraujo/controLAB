@@ -123,11 +123,12 @@
               <span class="mockup-tab-dot"></span>
               Hub Central
             </span>
-            <span class="mockup-tab">Lugar das Raízes (s)</span>
-            <span class="mockup-tab">Estabilidade (Routh)</span>
             <span class="mockup-tab">Resposta Temporal (t)</span>
+            <span class="mockup-tab">Estabilidade (Routh)</span>
+            <span class="mockup-tab">Lugar das Raízes (s)</span>
             <span class="mockup-tab">Frequência (Bode)</span>
             <span class="mockup-tab">Controladores PID</span>
+            <span class="mockup-tab">Espaço de Estados</span>
           </div>
           <div class="mockup-body">
             <!-- Simulated Multi-Domain Dashboard inside App Frame -->
@@ -297,18 +298,12 @@
       </div>
 
       <div class="modules-grid-landing">
-        <!-- Módulo 1: LGR -->
+        <!-- Módulo 1: Resposta no Tempo -->
         <div class="landing-module-card card-active">
           <div class="card-top">
-            <div class="module-icon-box icon-lgr">
+            <div class="module-icon-box icon-time">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <line x1="12" y1="2" x2="12" y2="22"/>
-                <path d="M5 5c3 7 7 7 14 0"/>
-                <path d="M5 19c3-7 7-7 14 0"/>
-                <line x1="4" y1="11" x2="6" y2="13"/>
-                <line x1="4" y1="13" x2="6" y2="11"/>
-                <circle cx="16" cy="12" r="1.5"/>
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
               </svg>
             </div>
             <span class="module-status-badge badge-active">
@@ -318,33 +313,33 @@
           </div>
 
           <div class="module-card-body">
-            <h3 class="module-card-title">Lugar Geométrico das Raízes</h3>
-            <span class="module-card-tag">Método de Evans • Domínio s</span>
+            <h3 class="module-card-title">Resposta no Tempo</h3>
+            <span class="module-card-tag">Degrau, Impulso e Regime Permanente</span>
             <p class="module-card-desc">
-              Trajetória analítica das raízes da equação característica em malha fechada \(1 + K G(s)H(s) = 0\) com a variação contínua do ganho \(K \ge 0\).
+              Simulação temporal rigorosa da resposta a sinais padrão de teste, quantificando o desempenho transitório e o erro estacionário.
             </p>
             <ul class="module-feature-list">
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Memorial completo com os 7 passos clássicos deduzidos</span>
+                <span>Resposta ao degrau unitário \(y(t)\), impulso e rampa</span>
               </li>
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Gráfico interativo com 10.000 pontos e layout anti-colisão</span>
+                <span>Métricas: subida (\(t_r\)), acomodação (\(t_s\)) e pico (\(t_p\))</span>
               </li>
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Assíntotas, centroide, dispersão e cruzamento \(j\omega\)</span>
+                <span>Ultrapassagem percentual (\(\%OS\)), \(\zeta\) e \(\omega_n\)</span>
               </li>
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Exportação nítida em PNG 300 DPI e SVG vetorial</span>
+                <span>Constantes de erro de posição, velocidade e aceleração (\(e_{ss}\))</span>
               </li>
             </ul>
           </div>
 
-          <a href="#sete-passos" class="btn-module-link btn-module-link-primary">
-            <span>Ver os 7 Passos em Detalhes</span>
+          <a href="#downloads" class="btn-module-link btn-module-link-primary">
+            <span>Abrir no ControLAB</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
@@ -399,12 +394,18 @@
           </a>
         </div>
 
-        <!-- Módulo 3: Resposta no Tempo -->
+        <!-- Módulo 3: LGR -->
         <div class="landing-module-card card-active">
           <div class="card-top">
-            <div class="module-icon-box icon-time">
+            <div class="module-icon-box icon-lgr">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <line x1="12" y1="2" x2="12" y2="22"/>
+                <path d="M5 5c3 7 7 7 14 0"/>
+                <path d="M5 19c3-7 7-7 14 0"/>
+                <line x1="4" y1="11" x2="6" y2="13"/>
+                <line x1="4" y1="13" x2="6" y2="11"/>
+                <circle cx="16" cy="12" r="1.5"/>
               </svg>
             </div>
             <span class="module-status-badge badge-active">
@@ -414,33 +415,33 @@
           </div>
 
           <div class="module-card-body">
-            <h3 class="module-card-title">Resposta no Tempo</h3>
-            <span class="module-card-tag">Degrau, Impulso e Regime Permanente</span>
+            <h3 class="module-card-title">Lugar Geométrico das Raízes</h3>
+            <span class="module-card-tag">Método de Evans • Domínio s</span>
             <p class="module-card-desc">
-              Simulação temporal rigorosa da resposta a sinais padrão de teste, quantificando o desempenho transitório e o erro estacionário.
+              Trajetória analítica das raízes da equação característica em malha fechada \(1 + K G(s)H(s) = 0\) com a variação contínua do ganho \(K \ge 0\).
             </p>
             <ul class="module-feature-list">
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Resposta ao degrau unitário \(y(t)\), impulso e rampa</span>
+                <span>Memorial completo com os 7 passos clássicos deduzidos</span>
               </li>
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Métricas: subida (\(t_r\)), acomodação (\(t_s\)) e pico (\(t_p\))</span>
+                <span>Gráfico interativo com 10.000 pontos e layout anti-colisão</span>
               </li>
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Ultrapassagem percentual (\(\%OS\)), \(\zeta\) e \(\omega_n\)</span>
+                <span>Assíntotas, centroide, dispersão e cruzamento \(j\omega\)</span>
               </li>
               <li>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Constantes de erro de posição, velocidade e aceleração (\(e_{ss}\))</span>
+                <span>Exportação nítida em PNG 300 DPI e SVG vetorial</span>
               </li>
             </ul>
           </div>
 
-          <a href="#downloads" class="btn-module-link btn-module-link-primary">
-            <span>Abrir no ControLAB</span>
+          <a href="#sete-passos" class="btn-module-link btn-module-link-primary">
+            <span>Ver os 7 Passos em Detalhes</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
         </div>
