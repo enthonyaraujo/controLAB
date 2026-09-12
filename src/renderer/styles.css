@@ -4,7 +4,7 @@
 
 :root,
 [data-theme="dark"] {
-  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-code: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
 
   /* Theme: Dark (Console de Engenharia / Swiss Technical) */
@@ -155,15 +155,58 @@ body {
 .global-brand {
   display: flex;
   align-items: center;
+  gap: 8px;
   user-select: none;
 }
 
+.brand-emblem {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(6, 182, 212, 0.10);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #22d3ee;
+  flex-shrink: 0;
+}
+
+.brand-emblem-svg {
+  width: 14px;
+  height: 14px;
+}
+
 .global-brand-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.2px;
+  font-family: var(--font-main);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  letter-spacing: 0.02em;
   white-space: nowrap;
+}
+
+[data-theme="light"] .global-brand-title {
+  color: #0f172a;
+}
+
+.brand-version-badge {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  background: rgba(30, 41, 59, 0.85);
+  color: #94a3b8;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+}
+
+[data-theme="light"] .brand-version-badge {
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: #cbd5e1;
 }
 
 .global-navbar-center {
