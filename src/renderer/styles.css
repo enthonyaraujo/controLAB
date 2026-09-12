@@ -279,13 +279,13 @@ body {
   max-width: 1140px;
   width: 100%;
   margin: 0 auto;
-  padding: 28px 24px 20px;
+  padding: 20px 24px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 24px;
+  gap: 18px;
   flex: 1 0 auto;
-  min-height: 100%;
+  min-height: auto;
   box-sizing: border-box;
 }
 
@@ -293,27 +293,33 @@ body {
    SEÇÃO DE INTRODUÇÃO DO HUB
    ========================================================================== */
 .hub-hero {
+  width: 100%;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-app);
+}
+
+.hub-hero-inner {
+  max-width: 1140px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 24px 14px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 5px;
-  padding: 2px 0 4px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+  box-sizing: border-box;
 }
 
 .hub-hero-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.025em;
-  line-height: 1.25;
-  margin: 0;
+  display: none;
 }
 
 .hub-hero-subtitle {
   font-size: 0.95rem;
-  font-weight: 400;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: var(--text-main);
   line-height: 1.4;
   margin: 0;
 }
@@ -323,7 +329,7 @@ body {
   font-weight: 400;
   color: var(--text-dim);
   letter-spacing: 0.01em;
-  margin-top: 2px;
+  margin: 0;
 }
 
 /* ==========================================================================
@@ -2150,13 +2156,9 @@ textarea::placeholder {
     gap: 16px;
   }
 
-  .hub-hero {
-    padding: 2px 0 4px;
-    gap: 4px;
-  }
-
-  .hub-hero-title {
-    font-size: 1.35rem;
+  .hub-hero-inner {
+    padding: 12px 14px 10px;
+    gap: 3px;
   }
 
   .hub-hero-subtitle {
