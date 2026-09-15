@@ -5,9 +5,6 @@ Implementa rigorosamente os 7 passos clássicos da análise de controle.
 
 import re
 import numpy as np
-import matplotlib.pyplot as plt
-import control as ct
-from matplotlib.patches import Arc
 import sympy as sp
 from sympy.parsing.sympy_parser import (
     parse_expr,
@@ -581,6 +578,32 @@ def gerar_passo_a_passo(
     }
 
 
+def _draw_conjugate_angles(ax, point, angle, radius, *, arrival):
+    """Espelha a tangente e o arco; a seta acompanha o crescimento de K."""
+    from matplotlib.patches import Arc
+
+    color = '#15803d' if arrival else '#6d28d9'
+    symbol = 'a' if arrival else 'd'
+    for sign in (1, -1):
+        origin = complex(point.real, sign * point.imag)
+        degrees = sign * float(angle)
+        end = origin + radius * np.exp(1j * np.radians(degrees))
+        ax.add_patch(Arc((origin.real, origin.imag), radius, radius,
+                         theta1=min(0, degrees), theta2=max(0, degrees),
+                         color=color, lw=1.3))
+        ax.plot([origin.real, origin.real + radius], [origin.imag, origin.imag],
+                color='#64748b', linestyle=':', linewidth=0.8)
+        start_xy, end_xy = (origin.real, origin.imag), (end.real, end.imag)
+        ax.annotate('', xy=start_xy if arrival else end_xy,
+                    xytext=end_xy if arrival else start_xy,
+                    arrowprops=dict(arrowstyle='->', color=color, lw=1.5))
+        ax.annotate(rf"$\theta_{symbol}={degrees:.1f}^\circ$",
+                    xy=end_xy, xytext=(10, sign * 18), textcoords='offset points',
+                    ha='left', va='bottom' if sign > 0 else 'top', fontsize=8.5,
+                    color=color, bbox=dict(boxstyle='round,pad=0.2',
+                    facecolor='white', edgecolor=color, alpha=0.95, lw=0.6))
+
+
 def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plot=False):
     """
     Gera um gráfico do LGR autossuficiente com cálculos automáticos 
@@ -595,6 +618,9 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     Retorna: (fig, ax, detalhes_dos_passos)
     """
 
+    import control as ct
+    import matplotlib.pyplot as plt
+
     # --------------------------------------------------------
     # TRATAMENTO DE ENTRADA (Múltiplos formatos)
     # --------------------------------------------------------
@@ -605,15 +631,8 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
 
     elif isinstance(num, str):
         # CASO 1: Passou uma string (ex: "(s+1)/(s+2)")
-        try:
-            s = ct.tf('s')
-            sys = eval(num)
-            if not isinstance(sys, ct.TransferFunction):
-                raise ValueError("A expressão não resultou em TransferFunction.")
-        except Exception:
-            # Fallback para parser algébrico simbólico (suporta ^, potências Unicode, multiplicação implícita)
-            n_coeffs, d_coeffs, _, _ = parse_tf_expression(num)
-            sys = ct.tf(n_coeffs, d_coeffs)
+        n_coeffs, d_coeffs, _, _ = parse_tf_expression(num)
+        sys = ct.tf(n_coeffs, d_coeffs)
 
     elif isinstance(num, ct.TransferFunction):
         # CASO 2: Passou o sistema direto (ex: sys_algebrico)
@@ -658,10 +677,11 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     # Aumentamos o limite para 10^4 e os pontos para 10000 para manter a alta precisão
     kvect = np.logspace(-3, 4, 10000)
     kvect = np.insert(kvect, 0, 0)
-    rlist, klist = ct.root_locus(sys, kvect=kvect, plot=False)
+    locus = ct.root_locus_map(sys, gains=kvect)
+    rlist, klist = locus.loci, locus.gains
     
     # Configuração da Figura
-    fig, ax = plt.subplots(figsize=(11, 7.5), dpi=100)
+    fig, ax = plt.subplots(figsize=(8, 7.5), dpi=100)
     ax.grid(True, linestyle=':', alpha=0.6, color='#94a3b8')
     ax.axhline(0, color='#334155', linewidth=1.2) # Eixo Real
     ax.axvline(0, color='#334155', linewidth=1.2) # Eixo jw
@@ -740,8 +760,10 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     jw_pts = []
     for i in range(ramos):
         ramo = rlist[:, i]
-        for j in range(len(ramo)-1):
-            if np.real(ramo[j]) * np.real(ramo[j+1]) < 0:
+        real = ramo.real
+        crossings = np.flatnonzero(real[:-1] * real[1:] < 0)
+        for j in crossings:
+            if real[j] * real[j+1] < 0:
                 t = abs(np.real(ramo[j])) / (abs(np.real(ramo[j])) + abs(np.real(ramo[j+1])))
                 w_cruz = np.imag(ramo[j]) + t * (np.imag(ramo[j+1]) - np.imag(ramo[j]))
                 K_cruz = klist[j] + t * (klist[j+1] - klist[j])
@@ -778,6 +800,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
 
     ax.set_xlim(min(x_min - pad_x, -1.0), max(x_max + pad_x, 1.5))
     ax.set_ylim(-y_max - pad_y, y_max + pad_y)
+    ax.set_aspect("equal", adjustable="box")
 
     # ========================================================
     # ANOTAÇÕES ESTRUTURADAS ANTI-COLISÃO (COM BADGES)
@@ -865,13 +888,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
                 "angulo": angulo
             })
             
-            arco = Arc((np.real(p), np.imag(p)), 2*arc_r, 2*arc_r, angle=0, theta1=min(0, angulo), theta2=max(0, angulo), color='#7c3aed', lw=1.6)
-            ax.add_patch(arco)
-            ax.plot([np.real(p)-arc_r*1.2, np.real(p)+arc_r*1.2], [np.imag(p), np.imag(p)], color='#6b7280', linestyle=':', alpha=0.6)
-            ax.annotate(rf"$\theta_d={angulo:.1f}^\circ$", xy=(np.real(p), np.imag(p)),
-                        xytext=(arc_r*14, 10), textcoords="offset points",
-                        ha="left", va="bottom", fontsize=8.5, color="#6d28d9", fontweight="bold",
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="#f5f3ff", edgecolor="#8b5cf6", alpha=0.95, lw=0.8))
+            _draw_conjugate_angles(ax, p, angulo, arc_r, arrival=False)
 
     # Ângulos de Chegada para Zeros Complexos
     for z in zeros:
@@ -889,13 +906,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
                 "angulo": angulo
             })
             
-            arco = Arc((np.real(z), np.imag(z)), 2*arc_r, 2*arc_r, angle=0, theta1=min(0, angulo), theta2=max(0, angulo), color='green', lw=1.6)
-            ax.add_patch(arco)
-            ax.plot([np.real(z)-arc_r*1.2, np.real(z)+arc_r*1.2], [np.imag(z), np.imag(z)], color='#6b7280', linestyle=':', alpha=0.6)
-            ax.annotate(rf"$\theta_a={angulo:.1f}^\circ$", xy=(np.real(z), np.imag(z)),
-                        xytext=(arc_r*14, 10), textcoords="offset points",
-                        ha="left", va="bottom", fontsize=8.5, color="#15803d", fontweight="bold",
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="#f0fdf4", edgecolor="#16a34a", alpha=0.95, lw=0.8))
+            _draw_conjugate_angles(ax, z, angulo, arc_r, arrival=True)
 
     # ========================================================
     # TÍTULOS E LEGENDA FINAL
@@ -905,7 +916,8 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     ax.set_ylabel(r'Eixo Imaginário ($j\omega$)', fontsize=11, labelpad=8)
     
     # Posiciona a legenda com fundo semi-transparente fora dos ramos principais
-    ax.legend(loc='lower left', bbox_to_anchor=(1.02, 0.4), borderaxespad=0, title="Componentes do LGR", framealpha=0.95)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.16), ncol=3,
+              fontsize=8, frameon=False)
     
     plt.tight_layout()
     if show_plot:

@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSVGData = null;
   let previewTimer = null;
   let previewRequestId = 0;
+  let previewBusy = false;
+  let calculating = false;
+  let lastCalculationKey = null;
+  let lastPreviewKey = null;
+  let pendingMemorial = null;
 
   // Zoom / Pan State
   let zoomLevel = 1.0;
@@ -106,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.classList.add('active');
       const targetView = document.getElementById(`view-${tab.dataset.view}`);
       if (targetView) {
+        if (tab.dataset.view === 'memorial') ensureMemorial();
         targetView.classList.add('active');
         renderMathInContainer(targetView);
       }
@@ -164,10 +170,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function calculate() {
+    if (calculating) return;
+    const payload = getPayload();
+    const calculationKey = JSON.stringify(payload);
+    if (calculationKey === lastCalculationKey) return;
+    calculating = true;
+    window.clearTimeout(previewTimer);
+    ++previewRequestId;
     showLoading(true);
 
     try {
-      const payload = getPayload();
       const res = await window.api.calculateLGR(payload);
 
       if (!res.success) {
@@ -177,6 +189,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // 1. Atualizar Imagem e Vetorial
+      lastCalculationKey = calculationKey;
+      if (JSON.stringify(getPayload()) === calculationKey) {
+        lastPreviewKey = previewKey(payload);
+        renderMath(latexPreview, res.latex_fac, true);
+        previewStatus.textContent = 'Expressão válida';
+        previewStatus.className = 'preview-status valid';
+        previewError.hidden = true;
+      }
       currentImageData = res.image;
       currentSVGData = res.svg;
       plotImg.src = res.image;
@@ -197,16 +217,25 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMathInContainer(badgeCentroid);
 
       // 4. Preencher o Memorial de Cálculo dos 7 Passos e Deduções
-      populateMemorialSteps(det);
-      populateMemorialDeductions(det.passo_a_passo);
+      pendingMemorial = det;
+      if (document.getElementById('view-memorial').classList.contains('active')) ensureMemorial();
 
       showToast('LGR calculado e traçado com sucesso!', 'success');
 
     } catch (err) {
       showToast(`Erro inesperado: ${err.message}`, 'error', 4000);
     } finally {
+      calculating = false;
       showLoading(false);
+      if (JSON.stringify(getPayload()) !== calculationKey) schedulePreview();
     }
+  }
+
+  function ensureMemorial() {
+    if (!pendingMemorial) return;
+    populateMemorialSteps(pendingMemorial);
+    populateMemorialDeductions(pendingMemorial.passo_a_passo);
+    pendingMemorial = null;
   }
 
   function renderMath(element, texString, displayMode = false) {
@@ -245,22 +274,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function previewKey(payload) {
+    const { title, ...input } = payload;
+    return JSON.stringify(input);
+  }
+
   function schedulePreview() {
+    ++previewRequestId;
     window.clearTimeout(previewTimer);
-    previewTimer = window.setTimeout(previewTransferFunction, 220);
+    previewTimer = window.setTimeout(previewTransferFunction, 450);
   }
 
   async function previewTransferFunction() {
-    const requestId = ++previewRequestId;
+    if (previewBusy || calculating || document.hidden) return;
+    const payload = getPayload();
+    const key = previewKey(payload);
+    if (key === lastPreviewKey) return;
+    const requestId = previewRequestId;
+    previewBusy = true;
+    lastPreviewKey = null;
     previewStatus.textContent = 'Validando…';
     previewStatus.className = 'preview-status loading';
     previewError.hidden = true;
 
     try {
-      const res = await window.api.previewTransferFunction(getPayload());
+      const res = await window.api.previewTransferFunction(payload);
       if (requestId !== previewRequestId) return;
       if (!res.success) throw new Error(res.error || 'Entrada inválida.');
 
+      lastPreviewKey = key;
       renderMath(latexPreview, res.latex_fac, true);
       previewStatus.textContent = 'Expressão válida';
       previewStatus.className = 'preview-status valid';
@@ -271,8 +313,20 @@ document.addEventListener('DOMContentLoaded', () => {
       previewStatus.className = 'preview-status invalid';
       previewError.textContent = err.message;
       previewError.hidden = false;
+    } finally {
+      previewBusy = false;
+      if (requestId !== previewRequestId && !calculating) schedulePreview();
     }
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      window.clearTimeout(previewTimer);
+      ++previewRequestId;
+    } else if (document.getElementById('page-lgr')?.classList.contains('active')) {
+      schedulePreview();
+    }
+  });
 
   // =========================================================================
   // PREENCHIMENTO DO MEMORIAL DE CÁLCULO DOS 7 PASSOS
@@ -1059,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lgrWorkspace) {
       renderMathInContainer(lgrWorkspace);
     }
-    schedulePreview();
+    // A resposta inicial já inclui a prévia; evita iniciar Python duas vezes.
     // Libera a navegação antes de iniciar o cálculo e a renderização do memorial.
     window.setTimeout(calculate, 0);
   }

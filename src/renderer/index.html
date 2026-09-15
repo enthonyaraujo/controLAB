@@ -4,15 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0f172a">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self'; connect-src 'self' https://api.github.com; font-src 'self' https://fonts.gstatic.com data:; worker-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.github.com; font-src 'self' data:; worker-src 'self';">
   <title>ControLAB - Sistemas de Controle</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   
   <!-- Google Fonts: Inter & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- KaTeX Local CSS -->
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
@@ -41,7 +38,7 @@
           </svg>
         </div>
         <span class="global-brand-title" id="global-brand-title">ControLAB</span>
-        <span class="brand-version-badge">v3.0.2</span>
+        <span class="brand-version-badge">v3.0.3</span>
       </div>
     </div>
 
@@ -272,7 +269,7 @@
 
     <!-- Rodapé do Hub Full-Width -->
     <footer class="hub-footer">
-      <span>ControLAB - Sistemas de Controle v3.0.2 • Plataforma Educacional e Analítica</span>
+      <span>ControLAB - Sistemas de Controle v3.0.3 • Plataforma Educacional e Analítica</span>
     </footer>
   </main>
 
@@ -391,17 +388,18 @@
           <div class="function-preview" id="function-preview" aria-live="polite">
             <div class="preview-heading">
               <span>Prévia matemática</span>
-              <span id="preview-status" class="preview-status">Validando…</span>
+              <span id="preview-status" class="preview-status">Prévia da entrada</span>
             </div>
             <div id="latex-preview" class="preview-math">G(s)</div>
             <div id="preview-error" class="preview-error" hidden></div>
           </div>
 
           <!-- Título Customizado -->
-          <div class="custom-title-section">
-            <label class="form-label">Título da Análise:</label>
+          <details class="custom-title-section">
+            <summary>Opções do gráfico</summary>
+            <label class="form-label" for="input-title">Título:</label>
             <input type="text" id="input-title" class="form-input" value="Lugar Geométrico das Raízes" />
-          </div>
+          </details>
 
         </div>
       </div>
@@ -412,7 +410,7 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
-          <span class="btn-text">Traçar LGR (7 Passos)</span>
+          <span class="btn-text">Traçar LGR</span>
         </button>
       </div>
     </aside>
@@ -426,12 +424,12 @@
       <header class="equation-banner">
         <div class="equation-container">
           <div class="eq-box">
-            <span class="eq-label">Forma Polinomial Expandida:</span>
+            <span class="eq-label">Forma expandida</span>
             <div id="latex-expanded" class="math-render"></div>
           </div>
           <div class="eq-divider"></div>
           <div class="eq-box">
-            <span class="eq-label">Forma Fatorada (Polos e Zeros):</span>
+            <span class="eq-label">Forma fatorada</span>
             <div id="latex-factored" class="math-render"></div>
           </div>
         </div>
@@ -453,7 +451,7 @@
         </button>
         <button class="view-tab" data-view="memorial">
           <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span>Memorial de Cálculo (7 Passos)</span>
+          <span>Passo a passo</span>
         </button>
         <button class="view-tab" data-view="theory">
           <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
@@ -490,11 +488,11 @@
                 </button>
                 <button class="tool-btn tool-btn-accent" id="btn-download-svg" title="Exportar como Vetorial SVG">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                  <span>Vetorial SVG</span>
+                  <span>SVG</span>
                 </button>
                 <button class="tool-btn tool-btn-primary" id="btn-download-png" title="Exportar Imagem em Alta Resolução">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  <span>Baixar PNG</span>
+                  <span>PNG</span>
                 </button>
               </div>
             </div>
@@ -835,11 +833,11 @@
                     </button>
                     <button class="tool-btn tool-btn-accent" id="btn-routh-download-svg" title="Exportar como Vetorial SVG">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                      <span>Vetorial SVG</span>
+                      <span>SVG</span>
                     </button>
                     <button class="tool-btn tool-btn-primary" id="btn-routh-download-png" title="Baixar PNG em Alta Resolução">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      <span>Baixar PNG</span>
+                      <span>PNG</span>
                     </button>
                   </div>
                 </div>
@@ -978,11 +976,11 @@
                 <div class="toolbar-right scientific-actions">
                   <button id="btn-scientific-svg" class="tool-btn tool-btn-accent" type="button" title="Exportar como Vetorial SVG">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                    <span>Vetorial SVG</span>
+                    <span>SVG</span>
                   </button>
                   <button id="btn-scientific-png" class="tool-btn tool-btn-primary" type="button" title="Baixar PNG em Alta Resolução">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>Baixar PNG</span>
+                    <span>PNG</span>
                   </button>
                 </div>
               </div>
@@ -1031,7 +1029,7 @@
           </div>
           <div>
             <h2 id="modal-settings-title" class="modal-title">Configurações & Sobre</h2>
-            <span class="modal-subtitle">ControLAB v3.0.2 • Engenharia de Controle</span>
+            <span class="modal-subtitle">ControLAB v3.0.3 • Engenharia de Controle</span>
           </div>
         </div>
         <button id="btn-close-settings" class="modal-close-btn" title="Fechar" aria-label="Fechar configurações">
@@ -1061,7 +1059,7 @@
               <div class="settings-card-header-info">
                 <div class="settings-version-tag">
                   <span class="version-label">Versão Instalada</span>
-                  <span class="version-value">v3.0.2</span>
+                  <span class="version-value">v3.0.3</span>
                   <span id="detected-env-badge" class="detected-env-badge">Detectando sistema...</span>
                 </div>
                 <p id="update-status-text" class="settings-card-desc">Consulte a versão estável mais recente publicada no GitHub Releases.</p>

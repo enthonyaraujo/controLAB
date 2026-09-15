@@ -3,17 +3,15 @@
 import base64
 import io
 import json
+import os
 import sys
 import warnings
 
 warnings.filterwarnings("ignore")
 
-import matplotlib
+# A ponte JSON nunca precisa de uma janela gráfica, inclusive em subprocessos.
+os.environ["MPLBACKEND"] = "Agg"
 
-matplotlib.use("Agg")
-import matplotlib.backends.backend_agg
-import matplotlib.backends.backend_svg
-import matplotlib.pyplot as plt
 import numpy as np
 
 from lgr_engine import (
@@ -26,15 +24,6 @@ from lgr_engine import (
     parse_tf_parts,
     parse_zpk,
 )
-from routh_hurwitz import (
-    ROUTH_PRESETS,
-    analyze_routh_hurwitz,
-    evaluate_k_point,
-)
-from time_response import analyze_time_response, get_time_response_presets
-from frequency_response import analyze_frequency_response, get_frequency_presets
-from controller_design import design_controller, get_controller_presets
-from state_space import analyze_state_space, get_state_space_presets
 
 
 def get_transfer_function(payload):
@@ -103,24 +92,31 @@ def handle_preview(payload):
 
 
 def handle_calculate(payload):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
     num, den, latex_exp, latex_fac = get_transfer_function(payload)
     title = payload.get("title", "Lugar Geométrico das Raízes")
 
     # Executa o LGR preservando rigorosamente os 7 passos originais.
     fig, _ax, detalhes = lgr_completo(num, den, titulo=title, show_plot=False)
 
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=160, bbox_inches="tight", facecolor="white")
-    buf.seek(0)
-    img_base64 = "data:image/png;base64," + base64.b64encode(buf.read()).decode(
-        "utf-8"
-    )
+    try:
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=160, bbox_inches="tight", facecolor="white")
+        buf.seek(0)
+        img_base64 = "data:image/png;base64," + base64.b64encode(buf.read()).decode(
+            "utf-8"
+        )
 
-    svg_buf = io.BytesIO()
-    fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor="white")
-    svg_buf.seek(0)
-    svg_text = svg_buf.read().decode("utf-8")
-    plt.close(fig)
+        svg_buf = io.BytesIO()
+        fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor="white")
+        svg_buf.seek(0)
+        svg_text = svg_buf.read().decode("utf-8")
+
+    finally:
+        plt.close(fig)
 
     polos_serializados = [
         {"re": float(np.real(p)), "im": float(np.imag(p)), "str": format_complex(p)}
@@ -175,6 +171,7 @@ def dispatch(data):
     if action == "calculate":
         return handle_calculate(data)
     if action == "routh_presets":
+        from routh_hurwitz import ROUTH_PRESETS
         return {
             "success": True,
             "presets": [
@@ -188,17 +185,21 @@ def dispatch(data):
             ],
         }
     if action == "routh_hurwitz":
+        from routh_hurwitz import analyze_routh_hurwitz
         expr = data.get("expr") or data.get("input") or data.get("den") or "s^3 + 2s^2 + s + 1"
         has_k = data.get("has_k", True)
         theme = data.get("theme", "dark")
         return analyze_routh_hurwitz(expr, has_k_loop=has_k, theme=theme)
     if action == "routh_evaluate_k":
+        from routh_hurwitz import evaluate_k_point
         expr = data.get("expr") or "s^3 + 3s^2 + 2s + K"
         k_val = float(data.get("k_val", 1.0))
         return evaluate_k_point(expr, k_val)
     if action == "time_response_presets":
+        from time_response import get_time_response_presets
         return {"success": True, "presets": get_time_response_presets()}
     if action == "time_response":
+        from time_response import analyze_time_response
         return analyze_time_response(
             data.get("expr") or "4 / (s^2 + 2*s + 4)",
             final_time=data.get("final_time"),
@@ -206,8 +207,10 @@ def dispatch(data):
             settling_threshold=data.get("settling_threshold", 0.02),
         )
     if action == "frequency_response_presets":
+        from frequency_response import get_frequency_presets
         return {"success": True, "presets": get_frequency_presets()}
     if action == "frequency_response":
+        from frequency_response import analyze_frequency_response
         return analyze_frequency_response(
             data.get("expr") or "10 / (s * (s + 2) * (s + 5))",
             omega_min=data.get("omega_min", 0.01),
@@ -215,8 +218,10 @@ def dispatch(data):
             points=data.get("points", 900),
         )
     if action == "controller_presets":
+        from controller_design import get_controller_presets
         return {"success": True, "presets": get_controller_presets()}
     if action == "controller_design":
+        from controller_design import design_controller
         return design_controller(
             data.get("plant_expr") or "1 / (s * (s + 1) * (s + 5))",
             design_type=data.get("design_type", "pid"),
@@ -237,8 +242,10 @@ def dispatch(data):
             points=data.get("points", 900),
         )
     if action == "state_space_presets":
+        from state_space import get_state_space_presets
         return {"success": True, "presets": get_state_space_presets()}
     if action == "state_space":
+        from state_space import analyze_state_space
         return analyze_state_space(
             mode=data.get("mode", "matrices"),
             expression=data.get("expr") or data.get("expression") or "1 / (s^2 + 3*s + 2)",
