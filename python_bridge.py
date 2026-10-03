@@ -99,24 +99,11 @@ def handle_calculate(payload):
     num, den, latex_exp, latex_fac = get_transfer_function(payload)
     title = payload.get("title", "Lugar Geométrico das Raízes")
 
-    # Executa o LGR preservando rigorosamente os 7 passos originais.
-    fig, _ax, detalhes = lgr_completo(num, den, titulo=title, show_plot=False)
+    theme = payload.get("theme", "dark")
+    fig, _ax, detalhes = lgr_completo(num, den, titulo=title, show_plot=False, theme=theme)
 
-    try:
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=160, bbox_inches="tight", facecolor="white")
-        buf.seek(0)
-        img_base64 = "data:image/png;base64," + base64.b64encode(buf.read()).decode(
-            "utf-8"
-        )
-
-        svg_buf = io.BytesIO()
-        fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor="white")
-        svg_buf.seek(0)
-        svg_text = svg_buf.read().decode("utf-8")
-
-    finally:
-        plt.close(fig)
+    from control_utils import figure_payload
+    img_base64, svg_text = figure_payload(fig, dpi=160, theme=theme)
 
     polos_serializados = [
         {"re": float(np.real(p)), "im": float(np.imag(p)), "str": format_complex(p)}
@@ -164,6 +151,7 @@ def handle_calculate(payload):
 
 def dispatch(data):
     action = data.get("action", "calculate")
+    theme = data.get("theme", "dark")
     if action == "presets":
         return get_presets_response()
     if action == "preview":
@@ -188,7 +176,6 @@ def dispatch(data):
         from routh_hurwitz import analyze_routh_hurwitz
         expr = data.get("expr") or data.get("input") or data.get("den") or "s^3 + 2s^2 + s + 1"
         has_k = data.get("has_k", True)
-        theme = data.get("theme", "dark")
         return analyze_routh_hurwitz(expr, has_k_loop=has_k, theme=theme)
     if action == "routh_evaluate_k":
         from routh_hurwitz import evaluate_k_point
@@ -205,6 +192,8 @@ def dispatch(data):
             final_time=data.get("final_time"),
             points=data.get("points", 900),
             settling_threshold=data.get("settling_threshold", 0.02),
+            theme=theme,
+            response_type=data.get("response_type", "step"),
         )
     if action == "frequency_response_presets":
         from frequency_response import get_frequency_presets
@@ -216,6 +205,7 @@ def dispatch(data):
             omega_min=data.get("omega_min", 0.01),
             omega_max=data.get("omega_max", 100.0),
             points=data.get("points", 900),
+            theme=theme,
         )
     if action == "controller_presets":
         from controller_design import get_controller_presets
@@ -240,6 +230,7 @@ def dispatch(data):
             design_domain=data.get("design_domain", "frequency"),
             final_time=data.get("final_time"),
             points=data.get("points", 900),
+            theme=theme,
         )
     if action == "state_space_presets":
         from state_space import get_state_space_presets
@@ -256,6 +247,7 @@ def dispatch(data):
             canonical_form=data.get("canonical_form", "controllable"),
             desired_poles=data.get("desired_poles", ""),
             observer_poles=data.get("observer_poles", ""),
+            theme=theme,
         )
     raise ValueError(f"Ação desconhecida: {action}")
 

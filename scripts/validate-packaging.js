@@ -13,6 +13,7 @@ const requiredFiles = [
   'android/app/src/main/java/br/com/enthony/lgrstudio/LgrPythonPlugin.java',
   'android/app/src/main/python/lgr_engine.py',
   'android/app/src/main/python/control_utils.py',
+  'android/app/src/main/python/plot_theme.py',
   'android/app/src/main/python/routh_hurwitz.py',
   'android/app/src/main/python/time_response.py',
   'android/app/src/main/python/frequency_response.py',
@@ -31,6 +32,7 @@ for (const file of requiredFiles) {
 for (const file of [
   'lgr_engine.py',
   'control_utils.py',
+  'plot_theme.py',
   'routh_hurwitz.py',
   'time_response.py',
   'frequency_response.py',

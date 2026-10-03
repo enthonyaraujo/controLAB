@@ -11,6 +11,7 @@ import numpy as np
 from control_utils import (
     figure_payload,
     finite_float,
+    get_theme_tokens,
     json_safe_number,
     parse_siso_transfer_function,
 )
@@ -65,7 +66,7 @@ def _safe_bandwidth(system):
         return None
 
 
-def analyze_frequency_response(expression, *, omega_min=0.01, omega_max=100.0, points=900):
+def analyze_frequency_response(expression, *, omega_min=0.01, omega_max=100.0, points=900, theme="dark"):
     omega_min = float(omega_min)
     omega_max = float(omega_max)
     points = int(np.clip(int(points or 900), 200, 4000))
@@ -104,37 +105,37 @@ def analyze_frequency_response(expression, *, omega_min=0.01, omega_max=100.0, p
     z_count = int(np.count_nonzero(np.real(closed_poles) > 1e-8))
     n_count = z_count - p_count
 
-    fig = plt.figure(figsize=(11.2, 7.8))
-    grid = fig.add_gridspec(2, 2, width_ratios=(1.2, 1.0), hspace=0.28, wspace=0.28)
+    tokens = get_theme_tokens(theme)
+    accent = tokens["accent"]
+    ref_color = tokens["reference"]
+    danger_color = tokens["danger"]
+
+    fig = plt.figure(figsize=(11.2, 7.2), dpi=140)
+    grid = fig.add_gridspec(2, 2, width_ratios=(1.2, 1.0), hspace=0.25, wspace=0.25)
     ax_mag = fig.add_subplot(grid[0, 0])
     ax_phase = fig.add_subplot(grid[1, 0], sharex=ax_mag)
     ax_nyquist = fig.add_subplot(grid[:, 1])
 
-    ax_mag.semilogx(omega, magnitude_db, color="#2563eb", linewidth=2, label="Curva real")
-    ax_mag.semilogx(omega, asymptote_db, color="#f59e0b", linewidth=1.6, linestyle="--", label="Assíntotas")
+    ax_mag.semilogx(omega, magnitude_db, color=accent, linewidth=2.0, label="Curva real")
+    ax_mag.semilogx(omega, asymptote_db, color=ref_color, linewidth=1.5, linestyle="--", label="Assíntotas")
     ax_mag.set_ylabel("Magnitude (dB)")
-    ax_mag.set_title("Diagrama de Bode", loc="left", fontweight="bold")
-    ax_mag.grid(True, which="both", alpha=0.25)
-    ax_mag.legend(fontsize=8)
+    ax_mag.legend(loc="upper right")
 
-    ax_phase.semilogx(omega, phase_deg, color="#7c3aed", linewidth=2)
+    ax_phase.semilogx(omega, phase_deg, color=accent, linewidth=2.0)
     ax_phase.set_xlabel("Frequência (rad/s)")
     ax_phase.set_ylabel("Fase (graus)")
-    ax_phase.grid(True, which="both", alpha=0.25)
 
-    ax_nyquist.plot(np.real(complex_response), np.imag(complex_response), color="#059669", linewidth=2, label="ω ≥ 0")
-    ax_nyquist.plot(np.real(complex_response), -np.imag(complex_response), color="#059669", linewidth=1.4, linestyle="--", label="ω < 0")
-    ax_nyquist.scatter([-1], [0], marker="x", s=90, linewidths=2.2, color="#dc2626", label="Ponto crítico (-1, 0)")
-    ax_nyquist.axhline(0, color="#64748b", linewidth=0.8)
-    ax_nyquist.axvline(0, color="#64748b", linewidth=0.8)
+    ax_nyquist.plot(np.real(complex_response), np.imag(complex_response), color=accent, linewidth=2.0, label="ω ≥ 0")
+    ax_nyquist.plot(np.real(complex_response), -np.imag(complex_response), color=accent, linewidth=1.4, linestyle="--", label="ω < 0", alpha=0.7)
+    ax_nyquist.scatter([-1], [0], marker="x", s=80, linewidths=2.2, color=danger_color, label="Ponto crítico (-1, 0)", zorder=5)
+    ax_nyquist.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
+    ax_nyquist.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     ax_nyquist.set_xlabel("Parte real")
     ax_nyquist.set_ylabel("Parte imaginária")
-    ax_nyquist.set_title("Diagrama de Nyquist", loc="left", fontweight="bold")
-    ax_nyquist.grid(True, alpha=0.25)
-    ax_nyquist.legend(fontsize=8)
+    ax_nyquist.legend(loc="upper right")
     ax_nyquist.set_aspect("equal", adjustable="datalim")
-    fig.suptitle("Resposta em frequência da malha aberta", fontsize=13, fontweight="bold")
-    image, svg = figure_payload(fig)
+    fig.subplots_adjust(left=0.08, right=0.96, top=0.96, bottom=0.09, hspace=0.28, wspace=0.25)
+    image, svg = figure_payload(fig, theme=theme)
 
     metrics = [
         {"label": "Margem de ganho (MG)", "value": _display(gain_margin_db), "unit": "dB"},

@@ -578,12 +578,13 @@ def gerar_passo_a_passo(
     }
 
 
-def _draw_conjugate_angles(ax, point, angle, radius, *, arrival):
+def _draw_conjugate_angles(ax, point, angle, radius, *, arrival, bg_card=None):
     """Espelha a tangente e o arco; a seta acompanha o crescimento de K."""
     from matplotlib.patches import Arc
 
     color = '#15803d' if arrival else '#6d28d9'
     symbol = 'a' if arrival else 'd'
+    badge_bg = bg_card if bg_card is not None else '#ffffff'
     for sign in (1, -1):
         origin = complex(point.real, sign * point.imag)
         degrees = sign * float(angle)
@@ -601,10 +602,10 @@ def _draw_conjugate_angles(ax, point, angle, radius, *, arrival):
                     xy=end_xy, xytext=(10, sign * 18), textcoords='offset points',
                     ha='left', va='bottom' if sign > 0 else 'top', fontsize=8.5,
                     color=color, bbox=dict(boxstyle='round,pad=0.2',
-                    facecolor='white', edgecolor=color, alpha=0.95, lw=0.6))
+                    facecolor=badge_bg, edgecolor=color, alpha=0.95, lw=0.6))
 
 
-def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plot=False):
+def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plot=False, theme="dark"):
     """
     Gera um gráfico do LGR autossuficiente com cálculos automáticos 
     para todos os 7 passos clássicos da análise, incluindo legendas dinâmicas.
@@ -620,6 +621,11 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
 
     import control as ct
     import matplotlib.pyplot as plt
+    from plot_theme import get_theme_tokens, apply_plot_theme
+
+    tokens = get_theme_tokens(theme)
+    accent = tokens["accent"]
+    ref_color = tokens["reference"]
 
     # --------------------------------------------------------
     # TRATAMENTO DE ENTRADA (Múltiplos formatos)
@@ -674,34 +680,32 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     }
     
     # Gera os dados exatos do LGR (lista de raízes e ganhos K)
-    # Aumentamos o limite para 10^4 e os pontos para 10000 para manter a alta precisão
     kvect = np.logspace(-3, 4, 10000)
     kvect = np.insert(kvect, 0, 0)
     locus = ct.root_locus_map(sys, gains=kvect)
     rlist, klist = locus.loci, locus.gains
     
     # Configuração da Figura
-    fig, ax = plt.subplots(figsize=(8, 7.5), dpi=100)
-    ax.grid(True, linestyle=':', alpha=0.6, color='#94a3b8')
-    ax.axhline(0, color='#334155', linewidth=1.2) # Eixo Real
-    ax.axvline(0, color='#334155', linewidth=1.2) # Eixo jw
+    fig, ax = plt.subplots(figsize=(8.2, 7.2), dpi=140)
+    ax.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7) # Eixo Real
+    ax.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7) # Eixo jw
     
     # ========================================================
     # PASSO 1, 2 e 3: Ramos, Polos, Zeros e Simetria
     # ========================================================
     # Traça os ramos
     for i in range(ramos):
-        ax.plot(np.real(rlist[:, i]), np.imag(rlist[:, i]), color='#dc2626', linewidth=2.2, 
+        ax.plot(np.real(rlist[:, i]), np.imag(rlist[:, i]), color=accent, linewidth=2.0, 
                 label='Ramos do LGR' if i == 0 else "_nolegend_")
         
     # Marca polos (x)
-    ax.plot(np.real(polos), np.imag(polos), 'kx', markersize=9, markeredgewidth=2.2, label='Polos (Início)', zorder=5)
+    ax.plot(np.real(polos), np.imag(polos), 'x', color=tokens["text"], markersize=8.5, markeredgewidth=2.2, label='Polos (Início)', zorder=5)
     
     # Marca zeros (o)
     if Z > 0:
-        ax.plot(np.real(zeros), np.imag(zeros), 'ko', markerfacecolor='white', markersize=8.5, markeredgewidth=2.2, label='Zeros (Término)', zorder=5)
+        ax.plot(np.real(zeros), np.imag(zeros), 'o', color=tokens["text"], markerfacecolor='none', markersize=7.5, markeredgewidth=2.0, label='Zeros (Término)', zorder=5)
     else:
-        ax.plot([], [], 'ko', markerfacecolor='white', markersize=8.5, markeredgewidth=2.2, label='Zeros (Nenhum nesta FT)')
+        ax.plot([], [], 'o', color=tokens["text"], markerfacecolor='none', markersize=7.5, markeredgewidth=2.0, label='Zeros (Nenhum nesta FT)')
 
     # ========================================================
     # PASSO 4: Assíntotas e Centroide
@@ -710,7 +714,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     if P > Z:
         centroide = float(np.real((np.sum(polos) - np.sum(zeros)) / (P - Z)))
         detalhes["centroide"] = centroide
-        ax.plot(centroide, 0, 'k+', markersize=11, markeredgewidth=2, label=rf'Centroide ($\sigma_a = {centroide:.2f}$)', zorder=6)
+        ax.plot(centroide, 0, '+', color=ref_color, markersize=10, markeredgewidth=1.8, label=rf'Centroide ($\sigma_a = {centroide:.2f}$)', zorder=6)
         
         raio = 100
         for k in range(P - Z):
@@ -723,7 +727,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
             })
             x_end = centroide + raio * np.cos(ang_rad)
             y_end = raio * np.sin(ang_rad)
-            ax.plot([centroide, x_end], [0, y_end], color='#64748b', linestyle='--', linewidth=1.2, zorder=0,
+            ax.plot([centroide, x_end], [0, y_end], color=ref_color, linestyle='--', linewidth=1.2, zorder=0,
                     label='Assíntotas' if k == 0 else "_nolegend_")
 
     # ========================================================
@@ -752,7 +756,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
 
     for idx, (r_val, K_b) in enumerate(break_pts):
         lbl = f'Break-in/out (K={K_b:.1f})' if idx == 0 else "_nolegend_"
-        ax.plot(r_val, 0, 's', color='#2563eb', markersize=7, label=lbl, zorder=6)
+        ax.plot(r_val, 0, 's', color=tokens["accent"], markersize=7, label=lbl, zorder=6)
 
     # ========================================================
     # PASSO 6: Cruzamento do eixo jw
@@ -777,7 +781,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
 
     for idx, (w_cruz, K_c) in enumerate(jw_pts):
         lbl = rf'Cruz. j$\omega$ ($\omega=\pm${abs(w_cruz):.2f}, K={K_c:.1f})' if idx == 0 else "_nolegend_"
-        ax.plot(0, w_cruz, 'o', color='#b91c1c', markerfacecolor='white', markeredgewidth=2, markersize=7, label=lbl, zorder=6)
+        ax.plot(0, w_cruz, 'o', color=tokens["danger"], markerfacecolor=tokens["bg_card"], markeredgewidth=2, markersize=7, label=lbl, zorder=6)
 
     # ========================================================
     # CÁLCULO INTELIGENTE DOS LIMITES DO GRÁFICO
@@ -803,45 +807,87 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     ax.set_aspect("equal", adjustable="box")
 
     # ========================================================
-    # ANOTAÇÕES ESTRUTURADAS ANTI-COLISÃO (COM BADGES)
+    # ANOTAÇÕES ESTRUTURADAS ANTI-COLISÃO (COM BADGES DINÂMICAS)
     # ========================================================
-    # Anotações dos Polos
+    bg_badge = tokens.get("bg_card", "#0F151C")
+    edge_badge = tokens.get("spine", "#3A4654")
+    text_badge = tokens.get("text", "#E6EDF3")
+    text_sec_badge = tokens.get("text_secondary", "#8693A3")
+    accent_badge = tokens.get("accent", "#3DD6F5")
+    danger_badge = tokens.get("danger", "#EF4444")
+
+    # Mapeia coordenadas reais para detecção de proximidade
+    real_polos_x = [float(np.real(p)) for p in polos if abs(np.imag(p)) < 1e-5]
+    real_zeros_x = [float(np.real(z)) for z in zeros if abs(np.imag(z)) < 1e-5]
+
+    # Proximidade horizontal para alternância de níveis (evita colisão de badges)
+    collision_dx = span_x * 0.09
+
+    # 1. Anotações dos Polos
+    real_polos_sorted = sorted(real_polos_x)
     for p in polos:
-        re_p, im_p = np.real(p), np.imag(p)
+        re_p, im_p = float(np.real(p)), float(np.imag(p))
         if abs(im_p) < 1e-5:
+            # Verifica se outro polo real ou ponto de break está muito próximo
+            idx = real_polos_sorted.index(re_p)
+            has_close_left = idx > 0 and (re_p - real_polos_sorted[idx - 1]) < collision_dx
+            has_close_right = idx < len(real_polos_sorted) - 1 and (real_polos_sorted[idx + 1] - re_p) < collision_dx
+            
+            # Polos alternam altura se estiverem grudados
+            offset_y = 22 if (has_close_left and idx % 2 == 1) else 12
+
             txt = f"p={re_p:.2g}"
-            ax.annotate(txt, xy=(re_p, 0), xytext=(0, 14), textcoords="offset points",
-                        ha="center", va="bottom", fontsize=9, fontweight="bold",
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6))
+            ax.annotate(txt, xy=(re_p, 0), xytext=(0, offset_y), textcoords="offset points",
+                        ha="center", va="bottom", fontsize=8.5, fontweight="bold", color=text_badge,
+                        bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7))
         else:
             sgn = "+" if im_p >= 0 else "-"
             txt = f"p={re_p:.2g}{sgn}j{abs(im_p):.2g}"
             offset_y = 12 if im_p > 0 else -18
             ax.annotate(txt, xy=(re_p, im_p), xytext=(-10, offset_y), textcoords="offset points",
-                        ha="right" if re_p < 0 else "left", va="center", fontsize=9,
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6))
+                        ha="right" if re_p < 0 else "left", va="center", fontsize=8.5, color=text_badge,
+                        bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7))
 
-    # Anotações dos Zeros
+    # 2. Anotações dos Zeros
+    real_zeros_sorted = sorted(real_zeros_x)
     for z in zeros:
-        re_z, im_z = np.real(z), np.imag(z)
+        re_z, im_z = float(np.real(z)), float(np.imag(z))
         if abs(im_z) < 1e-5:
+            idx = real_zeros_sorted.index(re_z)
+            has_close = (idx > 0 and (re_z - real_zeros_sorted[idx - 1]) < collision_dx) or \
+                        (idx < len(real_zeros_sorted) - 1 and (real_zeros_sorted[idx + 1] - re_z) < collision_dx)
+            
+            offset_y = -26 if (has_close and idx % 2 == 1) else -14
+
             txt = f"z={re_z:.2g}"
-            ax.annotate(txt, xy=(re_z, 0), xytext=(0, -18), textcoords="offset points",
-                        ha="center", va="top", fontsize=9, fontweight="bold",
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6))
+            ax.annotate(txt, xy=(re_z, 0), xytext=(0, offset_y), textcoords="offset points",
+                        ha="center", va="top", fontsize=8.5, fontweight="bold", color=text_badge,
+                        bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7))
         else:
             sgn = "+" if im_z >= 0 else "-"
             txt = f"z={re_z:.2g}{sgn}j{abs(im_z):.2g}"
             offset_y = 12 if im_z > 0 else -18
             ax.annotate(txt, xy=(re_z, im_z), xytext=(10, offset_y), textcoords="offset points",
-                        ha="left", va="center", fontsize=9,
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6))
+                        ha="left", va="center", fontsize=8.5, color=text_badge,
+                        bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7))
 
-    # Anotação do Centroide
+    # 3. Anotação do Centroide
     if centroide is not None:
-        ax.annotate(rf"Centroide $\sigma_a={centroide:.2f}$", xy=(centroide, 0), xytext=(0, -22), textcoords="offset points",
-                    ha="center", va="top", fontsize=9, color="#1e293b",
-                    bbox=dict(boxstyle="round,pad=0.25", facecolor="#f8fafc", edgecolor="#94a3b8", alpha=0.95, lw=0.7))
+        # Verifica se há zero real próximo ao centroide (evita sobreposição no semiplano inferior)
+        has_near_zero = any(abs(zx - centroide) < collision_dx * 1.3 for zx in real_zeros_x)
+
+        if has_near_zero:
+            # Se houver zero logo abaixo, empurra o centroide para baixo com seta sutil
+            c_offset_y = -38
+            c_arrow = dict(arrowstyle="->", color=ref_color, lw=0.8, shrinkA=2, shrinkB=3)
+        else:
+            c_offset_y = -22
+            c_arrow = None
+
+        ax.annotate(rf"$\sigma_a={centroide:.2f}$", xy=(centroide, 0), xytext=(0, c_offset_y), textcoords="offset points",
+                    ha="center", va="top", fontsize=8.5, color=text_sec_badge,
+                    bbox=dict(boxstyle="round,pad=0.24", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7),
+                    arrowprops=c_arrow)
 
         # Anotações de Ângulo das Assíntotas na Periferia
         asymp_radius = min(span_x, span_y) * 0.44
@@ -849,23 +895,27 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
             ang_deg = item["graus"]
             ang_rad = item["rad"]
             ax.text(centroide + asymp_radius * np.cos(ang_rad), asymp_radius * np.sin(ang_rad), f"{ang_deg:.0f}°",
-                    ha="center", va="center", fontsize=8.5, color="#475569",
-                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.5))
+                    ha="center", va="center", fontsize=8.5, color=text_sec_badge,
+                    bbox=dict(boxstyle="round,pad=0.2", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.6))
 
-    # Anotações de Break-in / Breakaway
+    # 4. Anotações de Break-in / Breakaway
     for r_val, K_b in break_pts:
-        ax.annotate(f"Break: {r_val:.2f}\n(K={K_b:.1f})", xy=(r_val, 0), xytext=(0, 26), textcoords="offset points",
-                    ha="center", va="bottom", fontsize=8.5, color="#1d4ed8", fontweight="bold",
-                    bbox=dict(boxstyle="round,pad=0.25", facecolor="#eff6ff", edgecolor="#3b82f6", alpha=0.95, lw=0.8),
-                    arrowprops=dict(arrowstyle="->", color="#3b82f6", lw=1))
+        # Se houver polos próximos no eixo real, eleva o Breakpoint para não colidir
+        has_near_pole = any(abs(px - r_val) < collision_dx * 1.4 for px in real_polos_x)
+        b_offset_y = 42 if has_near_pole else 30
 
-    # Anotações de Cruzamento com jw
+        ax.annotate(f"Break: {r_val:.2f}\n(K={K_b:.1f})", xy=(r_val, 0), xytext=(0, b_offset_y), textcoords="offset points",
+                    ha="center", va="bottom", fontsize=8.5, color=accent_badge, fontweight="bold",
+                    bbox=dict(boxstyle="round,pad=0.25", facecolor=bg_badge, edgecolor=accent_badge, alpha=0.96, lw=0.9),
+                    arrowprops=dict(arrowstyle="->", color=accent_badge, lw=1.0, shrinkA=2, shrinkB=3))
+
+    # 5. Anotações de Cruzamento com jw
     for w_cruz, K_c in jw_pts:
         ax.annotate(rf"$j\omega={w_cruz:+.2f}$" + "\n" + rf"K={K_c:.1f}", xy=(0, w_cruz),
                     xytext=(16, 0), textcoords="offset points",
-                    ha="left", va="center", fontsize=8.5, color="#991b1b",
-                    bbox=dict(boxstyle="round,pad=0.25", facecolor="#fef2f2", edgecolor="#ef4444", alpha=0.95, lw=0.8),
-                    arrowprops=dict(arrowstyle="->", color="#ef4444", lw=0.8))
+                    ha="left", va="center", fontsize=8.5, color=danger_badge, fontweight="bold",
+                    bbox=dict(boxstyle="round,pad=0.25", facecolor=bg_badge, edgecolor=danger_badge, alpha=0.96, lw=0.9),
+                    arrowprops=dict(arrowstyle="->", color=danger_badge, lw=0.9))
 
     # ========================================================
     # PASSO 7: Ângulos de Partida (Polos) e Chegada (Zeros)
@@ -888,7 +938,7 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
                 "angulo": angulo
             })
             
-            _draw_conjugate_angles(ax, p, angulo, arc_r, arrival=False)
+            _draw_conjugate_angles(ax, p, angulo, arc_r, arrival=False, bg_card=bg_badge)
 
     # Ângulos de Chegada para Zeros Complexos
     for z in zeros:
@@ -906,19 +956,24 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
                 "angulo": angulo
             })
             
-            _draw_conjugate_angles(ax, z, angulo, arc_r, arrival=True)
+            _draw_conjugate_angles(ax, z, angulo, arc_r, arrival=True, bg_card=bg_badge)
 
     # ========================================================
     # TÍTULOS E LEGENDA FINAL
     # ========================================================
-    ax.set_title(titulo, fontsize=14, pad=15, fontweight="bold")
-    ax.set_xlabel(r'Eixo Real ($\sigma$)', fontsize=11, labelpad=8)
-    ax.set_ylabel(r'Eixo Imaginário ($j\omega$)', fontsize=11, labelpad=8)
+    ax.set_xlabel(r'Eixo Real ($\sigma$)', fontsize=10, labelpad=8)
+    ax.set_ylabel(r'Eixo Imaginário ($j\omega$)', fontsize=10, labelpad=8)
     
-    # Posiciona a legenda com fundo semi-transparente fora dos ramos principais
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.16), ncol=3,
+    # Posiciona a legenda limpa abaixo dos ramos
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3,
               fontsize=8, frameon=False)
     
+    apply_plot_theme(fig, ax, theme=theme)
+    if not show_plot:
+        ax.set_title("")
+    else:
+        ax.set_title(titulo, fontsize=13, pad=12, fontweight="bold")
+
     plt.tight_layout()
     if show_plot:
         plt.show()

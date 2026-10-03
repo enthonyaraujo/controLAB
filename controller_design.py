@@ -10,6 +10,7 @@ import numpy as np
 
 from control_utils import (
     figure_payload,
+    get_theme_tokens,
     json_safe_number,
     parse_siso_transfer_function,
     recommended_time_vector,
@@ -181,6 +182,7 @@ def design_controller(
     design_domain="frequency",
     final_time=None,
     points=900,
+    theme="dark",
 ):
     plant, _, _, plant_latex_expanded, plant_latex_factored = parse_siso_transfer_function(plant_expression)
     design_type = str(design_type).lower()
@@ -238,45 +240,43 @@ def design_controller(
     margins_before = _stability_margins(plant)
     margins_after = _stability_margins(compensated_loop)
 
-    fig, axes = plt.subplots(2, 2, figsize=(11.2, 8.2))
+    tokens = get_theme_tokens(theme)
+    accent = tokens["accent"]
+    ref_color = tokens["reference"]
+
+    fig, axes = plt.subplots(2, 2, figsize=(11.2, 7.8), dpi=140)
     ax_step, ax_locus, ax_mag, ax_phase = axes.flat
-    ax_step.plot(t_before, y_before, color="#64748b", linewidth=1.8, label="Antes")
-    ax_step.plot(t_after, y_after, color="#2563eb", linewidth=2.2, label="Depois")
-    ax_step.set_title("Resposta ao degrau", loc="left", fontweight="bold")
+
+    ax_step.plot(t_before, y_before, color=ref_color, linestyle="--", linewidth=1.8, label="Antes")
+    ax_step.plot(t_after, y_after, color=accent, linewidth=2.2, label="Depois")
     ax_step.set_xlabel("Tempo (s)")
-    ax_step.set_ylabel("Saída")
-    ax_step.grid(True, alpha=0.25)
-    ax_step.legend()
+    ax_step.set_ylabel("Saída y(t)")
+    ax_step.legend(loc="best")
 
     for branch in range(locus_before.shape[1]):
-        ax_locus.plot(np.real(locus_before[:, branch]), np.imag(locus_before[:, branch]), color="#94a3b8", linewidth=1.0, alpha=0.8)
+        ax_locus.plot(np.real(locus_before[:, branch]), np.imag(locus_before[:, branch]), color=ref_color, linestyle="--", linewidth=1.2, alpha=0.75, label="Antes" if branch == 0 else "_nolegend_")
     for branch in range(locus_after.shape[1]):
-        ax_locus.plot(np.real(locus_after[:, branch]), np.imag(locus_after[:, branch]), color="#7c3aed", linewidth=1.5)
-    ax_locus.axhline(0, color="#64748b", linewidth=0.7)
-    ax_locus.axvline(0, color="#64748b", linewidth=0.7)
-    ax_locus.set_title("LGR antes (cinza) e depois (roxo)", loc="left", fontweight="bold")
+        ax_locus.plot(np.real(locus_after[:, branch]), np.imag(locus_after[:, branch]), color=accent, linewidth=2.0, label="Depois" if branch == 0 else "_nolegend_")
+    ax_locus.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
+    ax_locus.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     ax_locus.set_xlabel("Eixo real")
     ax_locus.set_ylabel("Eixo imaginário")
-    ax_locus.grid(True, alpha=0.25)
+    ax_locus.legend(loc="best")
 
-    ax_mag.semilogx(omega, magnitude_before, color="#64748b", linewidth=1.7, label="Antes")
-    ax_mag.semilogx(omega, magnitude_after, color="#059669", linewidth=2.0, label="Depois")
-    ax_mag.set_title("Bode — magnitude", loc="left", fontweight="bold")
+    ax_mag.semilogx(omega, magnitude_before, color=ref_color, linestyle="--", linewidth=1.6, label="Antes")
+    ax_mag.semilogx(omega, magnitude_after, color=accent, linewidth=2.0, label="Depois")
     ax_mag.set_xlabel("Frequência (rad/s)")
     ax_mag.set_ylabel("Magnitude (dB)")
-    ax_mag.grid(True, which="both", alpha=0.25)
-    ax_mag.legend()
+    ax_mag.legend(loc="best")
 
-    ax_phase.semilogx(omega, phase_before, color="#64748b", linewidth=1.7, label="Antes")
-    ax_phase.semilogx(omega, phase_after, color="#f59e0b", linewidth=2.0, label="Depois")
-    ax_phase.set_title("Bode — fase", loc="left", fontweight="bold")
+    ax_phase.semilogx(omega, phase_before, color=ref_color, linestyle="--", linewidth=1.6, label="Antes")
+    ax_phase.semilogx(omega, phase_after, color=accent, linewidth=2.0, label="Depois")
     ax_phase.set_xlabel("Frequência (rad/s)")
     ax_phase.set_ylabel("Fase (graus)")
-    ax_phase.grid(True, which="both", alpha=0.25)
-    ax_phase.legend()
-    fig.suptitle(design_label, fontsize=13, fontweight="bold")
+    ax_phase.legend(loc="best")
+
     fig.tight_layout()
-    image, svg = figure_payload(fig)
+    image, svg = figure_payload(fig, theme=theme)
 
     def metric_value(metrics, key):
         value = metrics.get(key)

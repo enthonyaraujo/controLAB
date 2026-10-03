@@ -12,6 +12,7 @@ import sympy as sp
 from control_utils import (
     figure_payload,
     finite_float,
+    get_theme_tokens,
     json_safe_number,
     parse_siso_transfer_function,
     recommended_time_vector,
@@ -132,7 +133,75 @@ def _display_value(value, digits=5):
     return str(value)
 
 
-def analyze_time_response(expression, *, final_time=None, points=900, settling_threshold=0.02):
+def _plot_step(time, output, metrics, tokens, theme):
+    fig, ax = plt.subplots(figsize=(9.2, 5.2), dpi=140)
+    accent = tokens["accent"]
+    ref_color = tokens["reference"]
+    mono_font = tokens["font_mono"]
+
+    ax.plot(time, output, color=accent, linewidth=2.2, label="Resposta ao degrau y(t)")
+
+    final_val = metrics.get("final_value")
+    if final_val is not None and math.isfinite(final_val):
+        ax.axhline(final_val, color=ref_color, linestyle="--", linewidth=1.5, alpha=0.85)
+        ax.annotate(
+            f"{final_val:.2f}".replace(".", ","),
+            xy=(time[-1], final_val),
+            xytext=(6, 0),
+            textcoords="offset points",
+            va="center",
+            ha="left",
+            color=tokens["text_secondary"],
+            fontsize=9,
+            fontfamily=mono_font,
+        )
+
+    peak_val = metrics.get("peak_value")
+    peak_time = metrics.get("peak_time")
+    overshoot = metrics.get("overshoot_percent")
+    if peak_val is not None and peak_time is not None and math.isfinite(peak_val) and math.isfinite(peak_time):
+        ax.plot([peak_time, peak_time], [0, peak_val], linestyle=":", color=tokens.get("accent_secondary", accent), linewidth=1.1, alpha=0.7)
+        ax.plot(peak_time, peak_val, marker="o", markersize=6.5, color=accent, markeredgecolor=tokens["text"], markeredgewidth=1.2, zorder=5)
+        mp_label = f"Mp {overshoot:.1f}%".replace(".", ",") if overshoot is not None and overshoot > 0 else f"{peak_val:.2f}".replace(".", ",")
+        ax.annotate(
+            mp_label,
+            xy=(peak_time, peak_val),
+            xytext=(10, 8),
+            textcoords="offset points",
+            color=tokens["text"],
+            fontsize=9,
+            fontweight="bold",
+            fontfamily=mono_font,
+        )
+
+    ax.set_xlabel("Tempo (s)")
+    ax.set_ylabel("y(t)")
+    fig.tight_layout()
+    return figure_payload(fig, theme=theme)
+
+
+def _plot_ramp(time, output, tokens, theme):
+    fig, ax = plt.subplots(figsize=(9.2, 5.2), dpi=140)
+    ax.plot(time, time, color=tokens["reference"], linestyle="--", linewidth=1.5, label="Entrada r(t) = t", alpha=0.85)
+    ax.plot(time, output, color=tokens["accent"], linewidth=2.2, label="Resposta à rampa y(t)")
+    ax.set_xlabel("Tempo (s)")
+    ax.set_ylabel("y(t)")
+    ax.legend(loc="upper left")
+    fig.tight_layout()
+    return figure_payload(fig, theme=theme)
+
+
+def _plot_impulse(time, output, tokens, theme):
+    fig, ax = plt.subplots(figsize=(9.2, 5.2), dpi=140)
+    ax.plot(time, output, color=tokens["accent"], linewidth=2.2, label="Resposta ao impulso y_δ(t)")
+    ax.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
+    ax.set_xlabel("Tempo (s)")
+    ax.set_ylabel("y_δ(t)")
+    fig.tight_layout()
+    return figure_payload(fig, theme=theme)
+
+
+def analyze_time_response(expression, *, final_time=None, points=900, settling_threshold=0.02, theme="dark", response_type="step"):
     """Analisa a resposta de malha fechada e os erros da malha aberta."""
     threshold = float(settling_threshold)
     if threshold not in (0.02, 0.05):
@@ -151,21 +220,19 @@ def analyze_time_response(expression, *, final_time=None, points=900, settling_t
     metrics = _step_metrics(t_step, y_step, poles, threshold)
     errors = _static_error_analysis(num, den)
 
-    fig, axes = plt.subplots(3, 1, figsize=(9.2, 8.0), sharex=True)
-    series = [
-        (t_step, y_step, "Degrau unitário", "$y(t)$", "#2563eb"),
-        (t_impulse, y_impulse, "Impulso", "$y_δ(t)$", "#7c3aed"),
-        (t_ramp, y_ramp, "Rampa unitária", "$y_r(t)$", "#059669"),
-    ]
-    for axis, (t_values, y_values, title, ylabel, color) in zip(axes, series):
-        axis.plot(t_values, y_values, color=color, linewidth=2.0)
-        axis.set_title(title, loc="left", fontsize=10, fontweight="bold")
-        axis.set_ylabel(ylabel)
-        axis.grid(True, alpha=0.25)
-    axes[-1].set_xlabel("Tempo (s)")
-    fig.suptitle("Respostas temporais da malha fechada com realimentação unitária", fontsize=13, fontweight="bold")
-    fig.tight_layout()
-    image, svg = figure_payload(fig)
+    tokens = get_theme_tokens(theme)
+    img_step, svg_step = _plot_step(t_step, y_step, metrics, tokens, theme)
+    img_ramp, svg_ramp = _plot_ramp(t_ramp, y_ramp, tokens, theme)
+    img_impulse, svg_impulse = _plot_impulse(t_impulse, y_impulse, tokens, theme)
+
+    plots = {
+        "step": {"image": img_step, "svg": svg_step},
+        "ramp": {"image": img_ramp, "svg": svg_ramp},
+        "impulse": {"image": img_impulse, "svg": svg_impulse},
+    }
+
+    selected_plot = plots.get(response_type, plots["step"])
+    image, svg = selected_plot["image"], selected_plot["svg"]
 
     metric_rows = [
         {"label": "Estabilidade", "value": "Estável" if stable else "Instável"},
@@ -191,6 +258,7 @@ def analyze_time_response(expression, *, final_time=None, points=900, settling_t
         "description": "Degrau, impulso e rampa da malha fechada com análise de regime permanente da malha aberta.",
         "image": image,
         "svg": svg,
+        "plots": plots,
         "latex": [
             {"label": "Planta", "value": latex_factored.replace("G(s) = ", "")},
             {"label": "Malha fechada", "value": r"T(s)=\frac{G(s)}{1+G(s)}"},

@@ -21,19 +21,26 @@ def parse_siso_transfer_function(expression: str):
     return system, np.asarray(num, dtype=float), np.asarray(den, dtype=float), latex_expanded, latex_factored
 
 
-def figure_payload(fig, *, dpi: int = 150):
-    """Serializa uma figura Matplotlib em PNG base64 e SVG."""
-    png_buffer = io.BytesIO()
-    fig.savefig(png_buffer, format="png", dpi=dpi, bbox_inches="tight", facecolor="white")
-    png_buffer.seek(0)
-    image = "data:image/png;base64," + base64.b64encode(png_buffer.read()).decode("utf-8")
+from plot_theme import apply_plot_theme, get_theme_tokens, register_local_fonts, theme_context
 
-    svg_buffer = io.BytesIO()
-    fig.savefig(svg_buffer, format="svg", bbox_inches="tight", facecolor="white")
-    svg_buffer.seek(0)
-    svg = svg_buffer.read().decode("utf-8")
-    plt.close(fig)
-    return image, svg
+
+def figure_payload(fig, *, dpi: int = 150, theme: str = "dark"):
+    """Serializa uma figura Matplotlib em PNG base64 e SVG respeitando o tema visual."""
+    try:
+        apply_plot_theme(fig, theme=theme)
+        png_buffer = io.BytesIO()
+        fig.savefig(png_buffer, format="png", dpi=dpi, bbox_inches="tight", transparent=True)
+        png_buffer.seek(0)
+        image = "data:image/png;base64," + base64.b64encode(png_buffer.read()).decode("utf-8")
+
+        svg_buffer = io.BytesIO()
+        with plt.rc_context({"svg.fonttype": "none"}):
+            fig.savefig(svg_buffer, format="svg", bbox_inches="tight", transparent=True)
+        svg_buffer.seek(0)
+        svg = svg_buffer.read().decode("utf-8")
+        return image, svg
+    finally:
+        plt.close(fig)
 
 
 def finite_float(value, default=None):

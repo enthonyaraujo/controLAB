@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 
-from control_utils import figure_payload, parse_siso_transfer_function, serialize_complex
+from control_utils import figure_payload, get_theme_tokens, parse_siso_transfer_function, serialize_complex
 from lgr_engine import format_transfer_function
 
 
@@ -173,6 +173,7 @@ def analyze_state_space(
     canonical_form="controllable",
     desired_poles="",
     observer_poles="",
+    theme="dark",
 ):
     mode = str(mode).lower()
     source_latex = None
@@ -228,21 +229,20 @@ def analyze_state_space(
         observer_error_poles = np.linalg.eigvals(system.A - observer_gain @ system.C)
 
     original_poles = np.linalg.eigvals(system.A)
-    fig, axis = plt.subplots(figsize=(8.4, 5.4))
-    axis.scatter(np.real(original_poles), np.imag(original_poles), marker="x", s=90, linewidths=2.2, color="#64748b", label="Sistema original")
+    tokens = get_theme_tokens(theme)
+    fig, axis = plt.subplots(figsize=(8.4, 5.2), dpi=140)
+    axis.scatter(np.real(original_poles), np.imag(original_poles), marker="x", s=85, linewidths=2.2, color=tokens["reference"], label="Sistema original", zorder=5)
     if len(feedback_poles):
-        axis.scatter(np.real(feedback_poles), np.imag(feedback_poles), marker="o", s=70, facecolors="none", linewidths=2, color="#2563eb", label="A - BK")
+        axis.scatter(np.real(feedback_poles), np.imag(feedback_poles), marker="o", s=70, facecolors="none", linewidths=2.0, color=tokens["accent"], label="A - BK", zorder=5)
     if len(observer_error_poles):
-        axis.scatter(np.real(observer_error_poles), np.imag(observer_error_poles), marker="s", s=55, facecolors="none", linewidths=2, color="#7c3aed", label="A - LC")
-    axis.axhline(0, color="#64748b", linewidth=0.8)
-    axis.axvline(0, color="#64748b", linewidth=0.8)
+        axis.scatter(np.real(observer_error_poles), np.imag(observer_error_poles), marker="s", s=55, facecolors="none", linewidths=2.0, color=tokens.get("accent_secondary", tokens["accent"]), label="A - LC", zorder=5)
+    axis.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
+    axis.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     axis.set_xlabel("Parte real")
     axis.set_ylabel("Parte imaginária")
-    axis.set_title("Polos no plano complexo", loc="left", fontweight="bold")
-    axis.grid(True, alpha=0.25)
-    axis.legend()
+    axis.legend(loc="best")
     fig.tight_layout()
-    image, svg = figure_payload(fig)
+    image, svg = figure_payload(fig, theme=theme)
 
     transfer_details = _transfer_details(system)
     metrics = [

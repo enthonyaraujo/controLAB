@@ -564,13 +564,16 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    fig, ax = plt.subplots(figsize=(11, 7.2), dpi=110)
-    fig.patch.set_facecolor("#ffffff")
-    ax.set_facecolor("#ffffff")
+    from plot_theme import get_theme_tokens, apply_plot_theme
+    tokens = get_theme_tokens(theme)
 
-    ax.grid(True, linestyle=":", alpha=0.6, color="#94a3b8")
-    ax.axhline(0, color="#334155", linewidth=1.2)  # Eixo Real
-    ax.axvline(0, color="#334155", linewidth=1.2)  # Eixo jw
+    fig, ax = plt.subplots(figsize=(11, 7.2), dpi=110)
+    fig.patch.set_facecolor("none")
+    ax.set_facecolor("none")
+
+    ax.grid(True, linestyle="--", alpha=tokens["grid_alpha"], color=tokens["grid"])
+    ax.axhline(0, color=tokens["spine"], linewidth=1.0)  # Eixo Real
+    ax.axvline(0, color=tokens["spine"], linewidth=1.0)  # Eixo jw
 
     has_k = k_info.get("has_k", False)
 
@@ -653,7 +656,8 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         ax.plot(
             np.real(polos),
             np.imag(polos),
-            "kx",
+            "x",
+            color=tokens["text"],
             markersize=9,
             markeredgewidth=2.2,
             label="Polos (Início)",
@@ -672,9 +676,10 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                     textcoords="offset points",
                     ha="center",
                     va="bottom",
-                    fontsize=9,
+                    fontsize=8.5,
                     fontweight="bold",
-                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                    color=tokens["text"],
+                    bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
                 )
             else:
                 sgn = "+" if im_p >= 0 else "-"
@@ -687,8 +692,9 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                     textcoords="offset points",
                     ha="right" if re_p < 0 else "left",
                     va="center",
-                    fontsize=9,
-                    bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                    fontsize=8.5,
+                    color=tokens["text"],
+                    bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
                 )
 
         # Marcação de zeros finitos (usando 'ko' padrão LGR)
@@ -696,8 +702,9 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
             ax.plot(
                 np.real(zeros),
                 np.imag(zeros),
-                "ko",
-                markerfacecolor="white",
+                "o",
+                color=tokens["text"],
+                markerfacecolor="none",
                 markersize=8.5,
                 markeredgewidth=2.2,
                 label="Zeros (Término)",
@@ -714,9 +721,10 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                         textcoords="offset points",
                         ha="center",
                         va="top",
-                        fontsize=9,
+                        fontsize=8.5,
                         fontweight="bold",
-                        bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                        color=tokens["text"],
+                        bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
                     )
 
         # Cruzamentos com o eixo imaginário (Ganhos Críticos de Routh com anotações callout idênticas ao LGR)
@@ -734,8 +742,8 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                             0,
                             w_val,
                             "o",
-                            color="#b91c1c",
-                            markerfacecolor="white",
+                            color=tokens["danger"],
+                            markerfacecolor=tokens["bg_card"],
                             markeredgewidth=2,
                             markersize=7.5,
                             label=lbl,
@@ -749,14 +757,15 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                             ha="left",
                             va="center",
                             fontsize=8.5,
-                            color="#991b1b",
-                            bbox=dict(boxstyle="round,pad=0.25", facecolor="#fef2f2", edgecolor="#ef4444", alpha=0.95, lw=0.8),
-                            arrowprops=dict(arrowstyle="->", color="#ef4444", lw=0.8),
+                            color=tokens["danger"],
+                            fontweight="bold",
+                            bbox=dict(boxstyle="round,pad=0.25", facecolor=tokens["bg_card"], edgecolor=tokens["danger"], alpha=0.96, lw=0.8),
+                            arrowprops=dict(arrowstyle="->", color=tokens["danger"], lw=0.8),
                         )
                 except Exception:
                     pass
 
-        ax.set_title("Lugar Geométrico das Raízes e Estabilidade", fontsize=14, pad=15, fontweight="bold")
+        ax.set_title("")
 
     else:
         # Sistema Puramente Numérico (sem dependência de K)
@@ -770,18 +779,18 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         re_max = max(3.0, max(re_vals) + 1.5)
         im_max = max(3.5, max(np.abs(im_vals)) + 1.5)
 
-        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.08, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.08, label="Regime Instável (SPD, Re > 0)")
-        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
+        ax.axvspan(re_min * 2.5, 0, color=tokens.get("success", "#10b981"), alpha=0.08, label="Regime Estável (SPE, Re < 0)")
+        ax.axvspan(0, re_max * 2.5, color=tokens.get("danger", "#ef4444"), alpha=0.08, label="Regime Instável (SPD, Re > 0)")
+        ax.axvline(0, color=tokens.get("warning", "#f59e0b"), linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
 
         for p in polos:
             re_p = float(np.real(p))
             im_p = float(np.imag(p))
             is_spe = re_p < -1e-4
             is_spd = re_p > 1e-4
-            color = "#16a34a" if is_spe else ("#dc2626" if is_spd else "#d97706")
+            color = tokens.get("success", "#10b981") if is_spe else (tokens.get("danger", "#ef4444") if is_spd else tokens.get("warning", "#f59e0b"))
             lbl_tag = "SPE" if is_spe else ("SPD" if is_spd else "jω")
-            ax.plot(re_p, im_p, "kx", markersize=10, markeredgewidth=2.2, zorder=6)
+            ax.plot(re_p, im_p, "x", color=tokens["text"], markersize=10, markeredgewidth=2.2, zorder=6)
             sgn = "+" if im_p >= 0 else "-"
             txt = f"p={re_p:.2g}{sgn}j{abs(im_p):.2g} [{lbl_tag}]" if abs(im_p) > 1e-5 else f"p={re_p:.2g} [{lbl_tag}]"
             ax.annotate(
@@ -792,32 +801,22 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                 fontsize=8.5,
                 color=color,
                 fontweight="bold",
-                bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="#cbd5e1", alpha=0.9, lw=0.6),
+                bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
             )
 
-        ax.set_title("Mapeamento dos Polos no Plano Complexo s", fontsize=14, pad=15, fontweight="bold")
+        ax.set_title("")
 
     ax.set_xlim(re_min, re_max)
     ax.set_ylim(-im_max, im_max)
-    ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=11, labelpad=8)
-    ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=11, labelpad=8)
-    ax.grid(True, linestyle=":", alpha=0.6, color="#94a3b8")
+    ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=10, labelpad=8)
+    ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=10, labelpad=8)
 
     ax.legend(loc="lower left", bbox_to_anchor=(1.02, 0.35), borderaxespad=0, title="Componentes do LGR", framealpha=0.95)
     plt.tight_layout()
 
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", facecolor="#ffffff", dpi=110)
-    buf.seek(0)
-    img_b64 = "data:image/png;base64," + base64.b64encode(buf.read()).decode("utf-8")
-
-    svg_buf = io.BytesIO()
-    fig.savefig(svg_buf, format="svg", bbox_inches="tight", facecolor="#ffffff")
-    svg_buf.seek(0)
-    svg_text = svg_buf.read().decode("utf-8")
-    plt.close(fig)
-
-    return img_b64, svg_text
+    apply_plot_theme(fig, ax, theme=theme)
+    from control_utils import figure_payload
+    return figure_payload(fig, dpi=110, theme=theme)
 
 
 def evaluate_k_point(input_str: str, k_val: float):

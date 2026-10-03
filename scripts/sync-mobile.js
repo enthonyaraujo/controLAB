@@ -6,6 +6,7 @@ const pythonTarget = path.join(projectRoot, 'android', 'app', 'src', 'main', 'py
 const sources = [
   'lgr_engine.py',
   'control_utils.py',
+  'plot_theme.py',
   'routh_hurwitz.py',
   'time_response.py',
   'frequency_response.py',
