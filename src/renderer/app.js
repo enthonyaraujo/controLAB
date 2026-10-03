@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastCalculationKey = null;
   let lastPreviewKey = null;
   let pendingMemorial = null;
+  let routhController = null;
+  let scientificController = null;
 
   // Zoom / Pan State
   let zoomLevel = 1.0;
@@ -50,6 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const latexExpanded = document.getElementById('latex-expanded');
   const latexFactored = document.getElementById('latex-factored');
+  const btnToggleFactored = document.getElementById('btn-toggle-lgr-factored');
+  const btnToggleExpanded = document.getElementById('btn-toggle-lgr-expanded');
 
   const badgePoles = document.getElementById('badge-poles');
   const badgeZeros = document.getElementById('badge-zeros');
@@ -73,6 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('lgr-theme', next);
     updateThemeIcon(next);
+
+    // Re-render ou recalcula gráfico no tema ativo
+    if (document.getElementById('page-lgr')?.classList.contains('active')) {
+      if (lastCalculationKey) {
+        lastCalculationKey = null;
+        calculate();
+      }
+    } else if (document.getElementById('page-routh')?.classList.contains('active')) {
+      routhController?.executeCalculation?.();
+    } else if (document.getElementById('page-scientific')?.classList.contains('active')) {
+      scientificController?.recalculate?.();
+    }
   }
 
   function updateThemeIcon(theme) {
@@ -131,17 +147,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Alternância da forma da equação no LGR (Fatorada vs Expandida)
+  btnToggleFactored?.addEventListener('click', () => {
+    btnToggleFactored.classList.add('active');
+    btnToggleExpanded?.classList.remove('active');
+    if (latexFactored) latexFactored.style.display = 'block';
+    if (latexExpanded) latexExpanded.style.display = 'none';
+  });
+  btnToggleExpanded?.addEventListener('click', () => {
+    btnToggleExpanded.classList.add('active');
+    btnToggleFactored?.classList.remove('active');
+    if (latexExpanded) latexExpanded.style.display = 'block';
+    if (latexFactored) latexFactored.style.display = 'none';
+  });
+
   // =========================================================================
   // CÁLCULO E PLOTAGEM DO LGR
   // =========================================================================
   function getPayload() {
     const title = inputTitle.value.trim() || 'Lugar Geométrico das Raízes';
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
     
     if (currentMode === 'expr') {
       return {
         mode: 'expr',
         expr: inputExpr.value.trim(),
         title,
+        theme,
       };
     } else if (currentMode === 'parts') {
       return {
@@ -149,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         numerator: inputNumerator.value.trim(),
         denominator: inputDenominator.value.trim(),
         title,
+        theme,
       };
     } else if (currentMode === 'coeffs') {
       return {
@@ -156,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
         num: inputNum.value.trim(),
         den: inputDen.value.trim(),
         title,
+        theme,
       };
     } else if (currentMode === 'zpk') {
       return {
@@ -164,9 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
         zeros: inputZeros.value.trim(),
         poles: inputPoles.value.trim(),
         title,
+        theme,
       };
     }
-    return { mode: 'expr', expr: inputExpr.value.trim(), title };
+    return { mode: 'expr', expr: inputExpr.value.trim(), title, theme };
   }
 
   async function calculate() {
@@ -1129,7 +1164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  let routhController = null;
   if (window.ControLABRouth) {
     routhController = window.ControLABRouth.initialize({
       renderMath,
@@ -1147,7 +1181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  let scientificController = null;
   if (window.ControLABScientific) {
     scientificController = window.ControLABScientific.initialize({
       renderMath,

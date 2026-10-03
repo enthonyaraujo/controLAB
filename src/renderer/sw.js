@@ -14,6 +14,13 @@ const SHELL_FILES = [
   '/vendor/katex/katex.min.css',
   '/vendor/katex/katex.min.js',
   '/vendor/katex/contrib/auto-render.min.js',
+  '/vendor/fonts/ibm-plex-sans/IBMPlexSans-Regular.woff2',
+  '/vendor/fonts/ibm-plex-sans/IBMPlexSans-Medium.woff2',
+  '/vendor/fonts/ibm-plex-sans/IBMPlexSans-SemiBold.woff2',
+  '/vendor/fonts/ibm-plex-sans/IBMPlexSans-Bold.woff2',
+  '/vendor/fonts/jetbrains-mono/JetBrainsMono-Regular.woff2',
+  '/vendor/fonts/jetbrains-mono/JetBrainsMono-Medium.woff2',
+  '/vendor/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2',
 ];
 
 self.addEventListener('install', (event) => {

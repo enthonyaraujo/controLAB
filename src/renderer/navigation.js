@@ -41,7 +41,7 @@
       }
       if (globalNavbar) globalNavbar.classList.toggle('has-back', hasBack);
       if (globalNavbarCenter) {
-        globalNavbarCenter.style.display = 'flex';
+        globalNavbarCenter.style.display = isHome ? 'none' : 'flex';
       }
       if (globalNavbarTitle) {
         if (isLgr) {
@@ -57,7 +57,7 @@
           };
           globalNavbarTitle.textContent = titles[pageId];
         } else {
-          globalNavbarTitle.textContent = 'Hub de Módulos';
+          globalNavbarTitle.textContent = '';
         }
       }
 
@@ -78,30 +78,41 @@
     }
 
     optionalElement('btn-open-lgr')?.addEventListener('click', (event) => {
+      event.preventDefault();
       event.stopPropagation();
       navigateTo('lgr');
     });
-    optionalElement('card-module-lgr')?.addEventListener('click', () => navigateTo('lgr'));
+    optionalElement('card-module-lgr')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      navigateTo('lgr');
+    });
 
     optionalElement('btn-open-routh')?.addEventListener('click', (event) => {
+      event.preventDefault();
       event.stopPropagation();
       navigateTo('routh');
     });
-    optionalElement('card-module-routh')?.addEventListener('click', () => navigateTo('routh'));
+    optionalElement('card-module-routh')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      navigateTo('routh');
+    });
 
     document.querySelectorAll('.module-card.card-active[data-page]').forEach((card) => {
       if (['lgr', 'routh'].includes(card.dataset.page)) return;
-      const open = () => navigateTo(card.dataset.page);
+      const open = (event) => {
+        event?.preventDefault();
+        navigateTo(card.dataset.page);
+      };
       card.addEventListener('click', open);
       card.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          open();
+          open(event);
         }
       });
       card.querySelector('.btn-module-primary')?.addEventListener('click', (event) => {
         event.stopPropagation();
-        open();
+        open(event);
       });
     });
 

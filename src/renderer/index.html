@@ -32,22 +32,20 @@
       </button>
 
       <div class="global-brand" id="global-brand">
-        <div class="brand-emblem" aria-hidden="true">
-          <svg class="brand-emblem-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12h4l3-7 4 14 3-7h4"></path>
-          </svg>
-        </div>
+        <svg class="brand-pulse-svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2 12h4l3-7 4 14 3-7h6"></path>
+        </svg>
         <span class="global-brand-title" id="global-brand-title">ControLAB</span>
         <span class="brand-version-badge">v3.0.3</span>
       </div>
     </div>
 
-    <div class="global-navbar-center" id="global-navbar-center">
-      <span class="global-navbar-title" id="global-navbar-title">Hub de Módulos</span>
+    <div class="global-navbar-center" id="global-navbar-center" style="display: none;">
+      <span class="global-navbar-title" id="global-navbar-title"></span>
     </div>
 
     <div class="global-navbar-right">
-      <button id="theme-toggle" class="theme-toggle-btn" title="Alternar Tema Claro/Escuro" aria-label="Alternar Tema">
+      <button id="theme-toggle" class="theme-toggle-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
         <svg class="theme-icon sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="4"/>
           <path d="M12 2v2"/>
@@ -64,7 +62,7 @@
         </svg>
       </button>
 
-      <button id="btn-open-settings" class="nav-icon-btn" title="Configurações e Atualizações" aria-label="Abrir Configurações">
+      <button id="btn-open-settings" class="nav-icon-btn" title="Configurações e atualizações" aria-label="Abrir configurações">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -78,199 +76,154 @@
   <!-- PÁGINA INICIAL: HUB CENTRAL DE SISTEMAS DE CONTROLE       -->
   <!-- ========================================================= -->
   <main id="page-home" class="app-page active">
-    <!-- Introdução da Página com Linha Divisória Full-Width -->
-    <section class="hub-hero">
-      <div class="hub-hero-inner">
-        <p class="hub-hero-subtitle">Explore as ferramentas de Sistemas de Controle</p>
-        <span class="hub-hero-hint">Selecione um módulo para começar.</span>
-      </div>
-    </section>
-
     <div class="hub-container">
-
-      <!-- Grid de Módulos (3x2 Cards) -->
       <section class="modules-grid">
         
-        <!-- CARD 1: RESPOSTA NO DOMÍNIO DO TEMPO -->
-        <article id="card-module-time" class="module-card card-active" data-page="time" data-module="Resposta no Domínio do Tempo" tabindex="0">
-          <div class="card-top">
-            <div class="module-icon-box icon-time">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"/>
-                <line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6" y1="20" x2="6" y2="14"/>
-                <line x1="2" y1="20" x2="22" y2="20"/>
-              </svg>
-            </div>
+        <!-- CARD 1: RESPOSTA NO TEMPO -->
+        <a id="card-module-time" class="module-card card-active" data-page="time" href="#time" role="button" aria-label="Resposta no Tempo">
+          <div class="card-title-row">
+            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="6" y1="20" x2="6" y2="14" />
+              <line x1="12" y1="20" x2="12" y2="8" />
+              <line x1="18" y1="20" x2="18" y2="4" />
+            </svg>
+            <h2 class="module-title">Resposta no Tempo</h2>
           </div>
 
-          <div class="card-content">
-            <h2 class="module-title">Resposta no Domínio do Tempo</h2>
-            <p class="module-desc">Análise transitória e estacionária com degrau, rampa e impulso.</p>
+          <div class="module-preview-box" aria-hidden="true">
+            <svg viewBox="0 0 280 80" class="preview-svg">
+              <line x1="20" y1="68" x2="260" y2="68" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="20" y1="40" x2="260" y2="40" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
+              <path d="M 20 68 C 30 68, 40 45, 52 30 C 60 20, 72 20, 82 28 C 94 38, 104 46, 116 46 C 128 46, 138 38, 150 38 C 162 38, 172 40, 186 40 L 260 40" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </a>
+
+        <!-- CARD 2: ESTABILIDADE -->
+        <a id="card-module-routh" class="module-card card-active" data-page="routh" href="#routh" role="button" aria-label="Estabilidade">
+          <div class="card-title-row">
+            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+              <line x1="15" y1="3" x2="15" y2="21" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="3" y1="15" x2="21" y2="15" />
+            </svg>
+            <h2 class="module-title">Estabilidade</h2>
           </div>
 
-          <div class="card-footer">
-            <button id="btn-open-time" class="btn-module-action btn-module-primary" type="button">
-              <span>Abrir Módulo</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
+          <div class="module-preview-box" aria-hidden="true">
+            <svg viewBox="0 0 280 80" class="preview-svg">
+              <rect x="65" y="16" width="75" height="48" fill="var(--accent)" fill-opacity="0.07" />
+              <line x1="40" y1="40" x2="240" y2="40" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="140" y1="16" x2="140" y2="64" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round" />
+              <g class="thumb-markers">
+                <path d="M 119 25 L 125 31 M 125 25 L 119 31" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+                <path d="M 119 49 L 125 55 M 125 49 L 119 55" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+                <path d="M 99 37 L 105 43 M 105 37 L 99 43" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+              </g>
+            </svg>
           </div>
-        </article>
+        </a>
 
-        <!-- CARD 2: ANÁLISE DE ESTABILIDADE (ROUTH-HURWITZ) -->
-        <article class="module-card card-active" id="card-module-routh" data-page="routh" data-module="Análise de Estabilidade" tabindex="0">
-          <div class="card-top">
-            <div class="module-icon-box icon-stability">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <line x1="3" y1="9" x2="21" y2="9"/>
-                <line x1="3" y1="15" x2="21" y2="15"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-                <line x1="15" y1="3" x2="15" y2="21"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="card-content">
-            <h2 class="module-title">Análise de Estabilidade</h2>
-            <p class="module-desc">Critério de Routh-Hurwitz com tabela detalhada e casos especiais.</p>
+        <!-- CARD 3: LUGAR DAS RAÍZES -->
+        <a id="card-module-lgr" class="module-card card-active" data-page="lgr" href="#lgr" role="button" aria-label="Lugar das Raízes">
+          <div class="card-title-row">
+            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="3" x2="12" y2="21" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="5.64" y1="5.64" x2="18.36" y2="18.36" />
+              <line x1="5.64" y1="18.36" x2="18.36" y2="5.64" />
+            </svg>
+            <h2 class="module-title">Lugar das Raízes</h2>
           </div>
 
-          <div class="card-footer">
-            <button id="btn-open-routh" class="btn-module-action btn-module-primary" type="button">
-              <span>Abrir Módulo</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
+          <div class="module-preview-box" aria-hidden="true">
+            <svg viewBox="0 0 280 80" class="preview-svg">
+              <line x1="25" y1="40" x2="255" y2="40" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="182" y1="16" x2="182" y2="64" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="3 3" />
+              <line x1="55" y1="40" x2="105" y2="40" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+              <line x1="186" y1="40" x2="232" y2="40" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
+              <path d="M 105 40 C 114 40, 126 30, 128 15" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" />
+              <path d="M 105 40 C 114 40, 126 50, 128 65" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" />
+              <g class="thumb-markers">
+                <path d="M 52 37 L 58 43 M 58 37 L 52 43" stroke="var(--text)" stroke-width="2" stroke-linecap="round" />
+                <path d="M 102 37 L 108 43 M 108 37 L 102 43" stroke="var(--text)" stroke-width="2" stroke-linecap="round" />
+                <path d="M 229 37 L 235 43 M 235 37 L 229 43" stroke="var(--text)" stroke-width="2" stroke-linecap="round" />
+              </g>
+            </svg>
           </div>
-        </article>
-
-        <!-- CARD 3: LUGAR GEOMÉTRICO DAS RAÍZES -->
-        <article class="module-card card-active" id="card-module-lgr" data-page="lgr" data-module="Lugar Geométrico das Raízes" tabindex="0">
-          <div class="card-top">
-            <div class="module-icon-box icon-lgr">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <line x1="12" y1="2" x2="12" y2="22"/>
-                <path d="M5 5c3 7 7 7 14 0"/>
-                <path d="M5 19c3-7 7-7 14 0"/>
-                <line x1="4" y1="11" x2="6" y2="13"/>
-                <line x1="4" y1="13" x2="6" y2="11"/>
-                <circle cx="16" cy="12" r="1.5"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="card-content">
-            <h2 class="module-title">Lugar Geométrico das Raízes</h2>
-            <p class="module-desc">Traçado dinâmico do LGR com ramos, assíntotas e pontos de partida e chegada.</p>
-          </div>
-
-          <div class="card-footer">
-            <button id="btn-open-lgr" class="btn-module-action btn-module-primary" type="button">
-              <span>Abrir Módulo</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
-          </div>
-        </article>
+        </a>
 
         <!-- CARD 4: RESPOSTA EM FREQUÊNCIA -->
-        <article id="card-module-frequency" class="module-card card-active" data-page="frequency" data-module="Resposta em Frequência" tabindex="0">
-          <div class="card-top">
-            <div class="module-icon-box icon-freq">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12c2-8 6-8 8 0s6 8 8 0 4-4 4-4"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="card-content">
+        <a id="card-module-frequency" class="module-card card-active" data-page="frequency" href="#frequency" role="button" aria-label="Resposta em Frequência">
+          <div class="card-title-row">
+            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 13 C 5 7, 9 7, 12 13 C 15 19, 19 19, 22 13" />
+            </svg>
             <h2 class="module-title">Resposta em Frequência</h2>
-            <p class="module-desc">Diagramas de Bode e Nyquist com margens de ganho e fase.</p>
           </div>
 
-          <div class="card-footer">
-            <button id="btn-open-frequency" class="btn-module-action btn-module-primary" type="button">
-              <span>Abrir Módulo</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
+          <div class="module-preview-box" aria-hidden="true">
+            <svg viewBox="0 0 280 80" class="preview-svg">
+              <line x1="25" y1="68" x2="255" y2="68" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="25" y1="30" x2="110" y2="30" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
+              <line x1="110" y1="30" x2="250" y2="66" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
+              <path d="M 25 30 L 85 30 C 110 30, 130 38, 160 46 C 190 54, 220 60, 250 64" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </div>
-        </article>
+        </a>
 
         <!-- CARD 5: PROJETO DE CONTROLADORES -->
-        <article id="card-module-controllers" class="module-card card-active" data-page="controllers" data-module="Projeto de Controladores" tabindex="0">
-          <div class="card-top">
-            <div class="module-icon-box icon-controllers">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="card-content">
+        <a id="card-module-controllers" class="module-card card-active" data-page="controllers" href="#controllers" role="button" aria-label="Projeto de Controladores">
+          <div class="card-title-row">
+            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="4" y1="8" x2="20" y2="8" />
+              <circle cx="9" cy="8" r="2.5" fill="var(--surface)" />
+              <line x1="4" y1="16" x2="20" y2="16" />
+              <circle cx="15" cy="16" r="2.5" fill="var(--surface)" />
+            </svg>
             <h2 class="module-title">Projeto de Controladores</h2>
-            <p class="module-desc">Síntese de controladores PID, avanço, atraso e avanço-atraso.</p>
           </div>
 
-          <div class="card-footer">
-            <button id="btn-open-controllers" class="btn-module-action btn-module-primary" type="button">
-              <span>Abrir Módulo</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
+          <div class="module-preview-box" aria-hidden="true">
+            <svg viewBox="0 0 280 80" class="preview-svg">
+              <line x1="25" y1="36" x2="255" y2="36" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
+              <path d="M 25 66 C 70 66, 110 58, 150 48 C 180 40, 210 36, 255 36" stroke="var(--text-faint)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M 25 66 C 40 66, 50 35, 62 25 C 72 17, 85 17, 98 25 C 112 34, 125 40, 142 40 C 160 40, 185 36, 255 36" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </div>
-        </article>
+        </a>
 
         <!-- CARD 6: ESPAÇO DE ESTADOS -->
-        <article id="card-module-state-space" class="module-card card-active" data-page="state-space" data-module="Espaço de Estados" tabindex="0">
-          <div class="card-top">
-            <div class="module-icon-box icon-statespace">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <line x1="9" y1="3" x2="9" y2="21"/>
-                <line x1="3" y1="12" x2="21" y2="12"/>
-              </svg>
-            </div>
-          </div>
-
-          <div class="card-content">
+        <a id="card-module-state-space" class="module-card card-active" data-page="state-space" href="#state-space" role="button" aria-label="Espaço de Estados">
+          <div class="card-title-row">
+            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M 6 5 L 4 5 L 4 19 L 6 19" />
+              <path d="M 18 5 L 20 5 L 20 19 L 18 19" />
+              <circle cx="9" cy="9.5" r="1.2" fill="var(--accent)" />
+              <circle cx="15" cy="9.5" r="1.2" fill="var(--accent)" />
+              <circle cx="9" cy="14.5" r="1.2" fill="var(--accent)" />
+              <circle cx="15" cy="14.5" r="1.2" fill="var(--accent)" />
+            </svg>
             <h2 class="module-title">Espaço de Estados</h2>
-            <p class="module-desc">Representação matricial, controlabilidade, observabilidade e resposta temporal.</p>
           </div>
 
-          <div class="card-footer">
-            <button id="btn-open-state-space" class="btn-module-action btn-module-primary" type="button">
-              <span>Abrir Módulo</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
+          <div class="module-preview-box" aria-hidden="true">
+            <svg viewBox="0 0 280 80" class="preview-svg">
+              <path d="M 76 22 L 66 22 L 66 58 L 76 58" stroke="var(--text-faint)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M 106 22 L 116 22 L 116 58 L 106 58" stroke="var(--text-faint)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="81" cy="33" r="2.8" fill="var(--accent)" />
+              <circle cx="101" cy="33" r="2.8" fill="var(--accent)" />
+              <circle cx="81" cy="47" r="2.8" fill="var(--accent)" />
+              <circle cx="101" cy="47" r="2.8" fill="var(--accent)" />
+              <path d="M 148 48 C 158 48, 164 24, 178 24 C 192 24, 196 62, 208 62 C 220 62, 226 34, 234 34 C 240 34, 244 46, 252 46 L 260 46" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </div>
-        </article>
+        </a>
 
       </section>
-
     </div>
-
-    <!-- Rodapé do Hub Full-Width -->
-    <footer class="hub-footer">
-      <span>ControLAB - Sistemas de Controle v3.0.3 • Plataforma Educacional e Analítica</span>
-    </footer>
   </main>
 
   <!-- ========================================================= -->
@@ -423,14 +376,16 @@
       <!-- Banner de Equação e Status -->
       <header class="equation-banner">
         <div class="equation-container">
-          <div class="eq-box">
-            <span class="eq-label">Forma expandida</span>
-            <div id="latex-expanded" class="math-render"></div>
+          <div class="eq-header-row">
+            <span class="eq-label">G(s)</span>
+            <div class="tabs-segmented eq-representation-toggle" role="tablist" aria-label="Representação de G(s)">
+              <button type="button" class="tab-seg active" id="btn-toggle-lgr-factored" data-eq="factored">Fatorada</button>
+              <button type="button" class="tab-seg" id="btn-toggle-lgr-expanded" data-eq="expanded">Expandida</button>
+            </div>
           </div>
-          <div class="eq-divider"></div>
-          <div class="eq-box">
-            <span class="eq-label">Forma fatorada</span>
-            <div id="latex-factored" class="math-render"></div>
+          <div class="eq-active-wrap">
+            <div id="latex-factored" class="math-render active"></div>
+            <div id="latex-expanded" class="math-render" style="display: none;"></div>
           </div>
         </div>
 
@@ -920,84 +875,100 @@
     <div class="scientific-workspace">
       <aside class="scientific-sidebar">
         <div class="scientific-sidebar-content">
-          <div class="sidebar-section-title">
-            <span id="scientific-kicker" class="section-kicker">Análise de Sistemas</span>
-          </div>
-          <h1 id="scientific-title" class="scientific-title">Módulo científico</h1>
-          <p id="scientific-description" class="scientific-description"></p>
+          <span id="scientific-kicker" class="section-kicker" style="display: none;"></span>
+          <h1 id="scientific-title" class="scientific-title" style="display: none;"></h1>
+          <p id="scientific-description" class="scientific-description" style="display: none;"></p>
           <form id="scientific-form" class="scientific-form"></form>
         </div>
         <div class="scientific-sidebar-footer">
           <button id="btn-run-scientific" class="btn btn-primary btn-calc-action" type="submit" form="scientific-form">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-            <span class="btn-text">Calcular e Analisar</span>
+            <span class="btn-text">Calcular</span>
+            <kbd class="btn-kbd">Ctrl + Enter</kbd>
           </button>
         </div>
       </aside>
 
       <main class="scientific-main">
         <div id="scientific-loading" class="scientific-state" hidden>
-          <div class="spinner"></div>
-          <p>Executando a análise no motor científico...</p>
+          <div class="skeleton-layout" aria-busy="true" aria-label="Calculando resposta do sistema">
+            <div class="skeleton skeleton-plot"></div>
+            <div class="skeleton-metrics-row">
+              <div class="skeleton skeleton-metric"></div>
+              <div class="skeleton skeleton-metric"></div>
+              <div class="skeleton skeleton-metric"></div>
+              <div class="skeleton skeleton-metric"></div>
+            </div>
+          </div>
         </div>
         <div id="scientific-empty" class="scientific-state scientific-empty-state">
           <div class="empty-state-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="12" y1="16" x2="12" y2="12"/>
               <line x1="12" y1="8" x2="12.01" y2="8"/>
             </svg>
           </div>
-          <h3>Configure os Parâmetros</h3>
-          <p>Preencha os dados do sistema ou selecione um exemplo rápido para gerar fórmulas, métricas e gráficos.</p>
+          <h3>Configure os parâmetros</h3>
+          <p>Preencha a função de transferência ou selecione um exemplo para calcular.</p>
         </div>
         <div id="scientific-error" class="scientific-state scientific-error" hidden></div>
         <div id="scientific-results" class="scientific-results" hidden>
-          <section class="scientific-result-card scientific-result-heading">
-            <div class="scientific-heading-content">
-              <span class="section-kicker">Resultado da Análise</span>
-              <h2 id="scientific-result-title" class="scientific-result-title"></h2>
-              <p id="scientific-result-description" class="scientific-result-description"></p>
-            </div>
-          </section>
-          <section id="scientific-latex" class="scientific-latex-grid"></section>
-          <section id="scientific-metrics" class="scientific-metrics-grid"></section>
+          <span id="scientific-result-title" style="display: none;"></span>
+          <span id="scientific-result-description" style="display: none;"></span>
+
+          <!-- Gráfico primeiro e maior -->
           <section id="scientific-plot-card" class="scientific-result-card scientific-plot-card">
             <div class="plot-card-header">
-              <div class="card-section-label" style="margin-bottom: 0;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-                <span>Curvas e Resposta Gráfica</span>
-              </div>
-              <div class="plot-toolbar">
-                <div class="toolbar-right scientific-actions">
-                  <button id="btn-scientific-svg" class="tool-btn tool-btn-accent" type="button" title="Exportar como Vetorial SVG">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                    <span>SVG</span>
-                  </button>
-                  <button id="btn-scientific-png" class="tool-btn tool-btn-primary" type="button" title="Baixar PNG em Alta Resolução">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>PNG</span>
-                  </button>
+              <div class="plot-header-left">
+                <div id="scientific-plot-tabs" class="tabs-segmented" style="display: none;">
+                  <button type="button" class="tab-seg active" data-resp="step">Degrau</button>
+                  <button type="button" class="tab-seg" data-resp="ramp">Rampa</button>
+                  <button type="button" class="tab-seg" data-resp="impulse">Impulso</button>
                 </div>
+              </div>
+              <div class="plot-header-right">
+                <div id="scientific-status-chip" class="status-chip" style="display: none;">
+                  <span class="status-dot"></span>
+                  <span id="scientific-status-text">Estável</span>
+                </div>
+                <button id="btn-scientific-png" class="btn-ghost-pill" type="button" title="Exportar PNG">PNG</button>
+                <button id="btn-scientific-svg" class="btn-ghost-pill" type="button" title="Exportar SVG">SVG</button>
               </div>
             </div>
             <div class="plot-viewport scientific-plot-viewport">
-              <img id="scientific-plot" alt="Gráfico da análise científica" class="plot-img" />
+              <img id="scientific-plot" alt="Gráfico da resposta do sistema" class="plot-img" />
             </div>
           </section>
-          <section id="scientific-details-card" class="scientific-result-card" hidden>
-            <details>
-              <summary>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+
+          <!-- Métricas Principais (Top 4) -->
+          <section id="scientific-primary-metrics" class="scientific-primary-grid"></section>
+
+          <!-- Seções Colapsáveis: Todas as métricas e Memorial de cálculo -->
+          <div class="scientific-accordions">
+            <details id="details-all-metrics" class="scientific-accordion">
+              <summary class="accordion-summary">
+                <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                <span>Todas as métricas</span>
+              </summary>
+              <section id="scientific-metrics" class="submetrics-list"></section>
+            </details>
+
+            <details id="details-memorial" class="scientific-accordion">
+              <summary class="accordion-summary">
+                <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                <span>Memorial de cálculo</span>
+              </summary>
+              <section id="scientific-latex" class="scientific-latex-grid"></section>
+            </details>
+
+            <details id="scientific-details-card" class="scientific-accordion" hidden>
+              <summary class="accordion-summary">
+                <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 <span>Dados técnicos estruturados (JSON)</span>
               </summary>
               <pre id="scientific-details"></pre>
             </details>
-          </section>
+          </div>
         </div>
       </main>
     </div>

@@ -15,14 +15,16 @@
   }
 
   async function request(action, payload = {}) {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const mergedPayload = { theme: currentTheme, ...payload };
     if (nativeLgr) {
-      return nativeLgr.dispatch({ payload: { action, ...payload } });
+      return nativeLgr.dispatch({ payload: { action, ...mergedPayload } });
     }
 
     const response = await fetch('/api', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, ...payload }),
+      body: JSON.stringify({ action, ...mergedPayload }),
     });
     const data = await readJsonResponse(response);
     if (!response.ok) {
