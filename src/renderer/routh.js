@@ -518,17 +518,15 @@
     // Atualiza a prévia matemática inicial
     updatePreview();
 
-    // Se estiver vazio ao carregar, executa o primeiro exemplo por padrão ao abrir o módulo
+    // Atualiza a prévia matemática inicial sem calcular automaticamente
     function ensureInitialCalculation() {
       updatePreview();
-      if (resultsContainer && resultsContainer.style.display !== 'flex') {
-        executeCalculation();
-      }
     }
 
     return {
       executeCalculation,
       ensureInitialCalculation,
+      updatePreview,
     };
   }
 

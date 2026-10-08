@@ -55,5 +55,11 @@ assert(!html.includes('Ctrl + Enter'), 'o atalho visual Ctrl + Enter deve ser re
 assert(!html.includes('id="btn-calculate" class="btn btn-primary btn-calc-action" type="button">\n          <svg'), 'o botão Traçar LGR não deve ter ícone SVG');
 assert(!html.includes('id="btn-calculate-routh" class="btn btn-primary btn-calc-action" type="button">\n            <svg'), 'o botão Calcular Estabilidade não deve ter ícone SVG');
 assert(scientificModules.includes('scheduleScientificPreview'), 'os módulos científicos precisam agendar e atualizar a prévia matemática');
+assert(html.includes('<h2 class="module-title">Lugar Geométrico das Raízes</h2>'), 'o título do card LGR deve ser Lugar Geométrico das Raízes');
+assert(html.includes('id="routh-empty-state" class="routh-empty-card" style="display: flex;"'), 'o empty state do Routh deve iniciar visível');
+assert(html.includes('id="routh-results-container" class="routh-results-layout" style="display: none;"'), 'os resultados do Routh devem iniciar ocultos');
+assert(html.includes('id="lgr-empty-state"'), 'o empty state do LGR deve existir');
+assert(!app.includes('window.setTimeout(calculate, 0)'), 'o LGR não deve calcular automaticamente ao entrar no módulo');
+assert(!app.includes('window.setTimeout(routhController.ensureInitialCalculation, 0)'), 'o Routh não deve calcular automaticamente ao entrar no módulo');
 
 console.log('Integração, responsividade e navegação do renderer válidas.');

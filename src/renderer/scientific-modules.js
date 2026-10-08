@@ -35,11 +35,6 @@
           ],
         },
       ],
-      examples: [
-        ['Segunda ordem', '4 / (s^2 + 2*s + 4)'],
-        ['Primeira ordem', '1 / (2*s + 1)'],
-        ['Tipo 1', '5 / (s * (s + 2))'],
-      ],
     },
     frequency: {
       action: 'frequency_response',
@@ -70,11 +65,6 @@
           value: '100',
           min: '0.00001',
         },
-      ],
-      examples: [
-        ['Primeira ordem', '1 / (s + 1)'],
-        ['Segunda ordem', '25 / (s^2 + 4*s + 25)'],
-        ['Tipo 1', '10 / (s * (s + 2) * (s + 5))'],
       ],
     },
     controllers: {
@@ -169,11 +159,6 @@
           when: { design_type: ['lead_lag'] },
         },
         { name: 'final_time', label: 'Tempo final (s)', type: 'number', value: '20', min: '0.05' },
-      ],
-      examples: [
-        ['Terceira ordem', '1 / (s * (s + 1) * (s + 5))'],
-        ['Primeira ordem', '1 / (4*s + 1)'],
-        ['Segunda ordem', '1 / (s^2 + 3*s + 2)'],
       ],
     },
     'state-space': {

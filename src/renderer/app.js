@@ -234,6 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       currentImageData = res.image;
       currentSVGData = res.svg;
+      const lgrEmptyState = document.getElementById('lgr-empty-state');
+      if (lgrEmptyState) lgrEmptyState.style.display = 'none';
+      plotImg.style.display = 'block';
       plotImg.src = res.image;
       resetZoom();
 
@@ -1148,9 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lgrWorkspace) {
       renderMathInContainer(lgrWorkspace);
     }
-    // A resposta inicial já inclui a prévia; evita iniciar Python duas vezes.
-    // Libera a navegação antes de iniciar o cálculo e a renderização do memorial.
-    window.setTimeout(calculate, 0);
+    schedulePreview();
   }
 
   if (window.ControLABSettings) {
@@ -1177,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (routhModuleStarted) return;
     routhModuleStarted = true;
     if (routhController) {
-      window.setTimeout(routhController.ensureInitialCalculation, 0);
+      routhController.updatePreview();
     }
   }
 

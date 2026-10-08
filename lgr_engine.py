@@ -965,14 +965,17 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     ax.set_ylabel(r'Eixo Imaginário ($j\omega$)', fontsize=10, labelpad=8)
     
     # Posiciona a legenda limpa abaixo dos ramos
-    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3,
+    leg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3,
               fontsize=8, frameon=False)
+    if leg:
+        for text in leg.get_texts():
+            text.set_color(tokens["text"])
     
     apply_plot_theme(fig, ax, theme=theme)
     if not show_plot:
         ax.set_title("")
     else:
-        ax.set_title(titulo, fontsize=13, pad=12, fontweight="bold")
+        ax.set_title(titulo, fontsize=13, pad=12, fontweight="bold", color=tokens["text"])
 
     plt.tight_layout()
     if show_plot:

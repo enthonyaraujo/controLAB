@@ -811,12 +811,32 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=10, labelpad=8)
     ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=10, labelpad=8)
 
-    ax.legend(loc="lower left", bbox_to_anchor=(1.02, 0.35), borderaxespad=0, title="Componentes do LGR", framealpha=0.95)
-    plt.tight_layout()
+    legend_title = "Componentes do LGR" if has_k else "Polos e Regiões de Estabilidade"
+    leg = ax.legend(
+        loc="lower left",
+        bbox_to_anchor=(1.02, 0.35),
+        borderaxespad=0,
+        title=legend_title,
+        framealpha=0.92,
+        facecolor=tokens["bg_card"],
+        edgecolor=tokens["spine"],
+    )
+    if leg:
+        title_obj = leg.get_title()
+        if title_obj is not None:
+            title_obj.set_color(tokens["text"])
+            title_obj.set_fontsize(9.0)
+            title_obj.set_fontweight("bold")
+        for t in leg.get_texts():
+            t.set_color(tokens["text"])
+            t.set_fontsize(8.5)
 
     apply_plot_theme(fig, ax, theme=theme)
+    plt.tight_layout()
+
     from control_utils import figure_payload
     return figure_payload(fig, dpi=110, theme=theme)
+
 
 
 def evaluate_k_point(input_str: str, k_val: float):

@@ -127,7 +127,7 @@
         </a>
 
         <!-- CARD 3: LUGAR DAS RAÍZES -->
-        <a id="card-module-lgr" class="module-card card-active" data-page="lgr" href="#lgr" role="button" aria-label="Lugar das Raízes">
+        <a id="card-module-lgr" class="module-card card-active" data-page="lgr" href="#lgr" role="button" aria-label="Lugar Geométrico das Raízes">
           <div class="card-title-row">
             <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="12" y1="3" x2="12" y2="21" />
@@ -135,7 +135,7 @@
               <line x1="5.64" y1="5.64" x2="18.36" y2="18.36" />
               <line x1="5.64" y1="18.36" x2="18.36" y2="5.64" />
             </svg>
-            <h2 class="module-title">Lugar das Raízes</h2>
+            <h2 class="module-title">Lugar Geométrico das Raízes</h2>
           </div>
 
           <div class="module-preview-box" aria-hidden="true">
@@ -455,7 +455,10 @@
                 <div class="spinner"></div>
                 <span>Calculando Lugar Geométrico das Raízes...</span>
               </div>
-              <img id="plot-image" src="" alt="Lugar Geométrico das Raízes" class="plot-img" />
+              <div id="lgr-empty-state" class="routh-empty-card" style="display: flex; margin: auto; max-width: 440px; text-align: center;">
+                <p>Insira a função de transferência e clique em <strong>Traçar LGR</strong> para visualizar o gráfico e o memorial de cálculo.</p>
+              </div>
+              <img id="plot-image" src="" alt="Lugar Geométrico das Raízes" class="plot-img" style="display: none;" />
             </div>
           </div>
         </section>
@@ -682,12 +685,12 @@
           </div>
 
           <!-- Empty State -->
-          <div id="routh-empty-state" class="routh-empty-card" style="display: none;">
+          <div id="routh-empty-state" class="routh-empty-card" style="display: flex;">
             <p>Insira uma função de transferência ou selecione um exemplo para calcular a estabilidade.</p>
           </div>
 
           <!-- Results Container -->
-          <div id="routh-results-container" class="routh-results-layout">
+          <div id="routh-results-container" class="routh-results-layout" style="display: none;">
             
             <!-- Veredito e Estatísticas -->
             <section class="routh-card routh-verdict-section">

@@ -155,11 +155,22 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
             alpha=tokens["grid_alpha"],
         )
 
-        # Legenda minimalista e sem borda
+        # Legenda com estilo profissional e legibilidade garantida
         legend = ax.get_legend()
         if legend is not None:
-            legend.get_frame().set_linewidth(0.0)
-            legend.get_frame().set_alpha(0.0)
+            legend_title = legend.get_title()
+            if legend_title is not None:
+                legend_title.set_color(tokens["text"])
+                legend_title.set_fontsize(9.0)
+                legend_title.set_fontweight("bold")
+
+            frame = legend.get_frame()
+            if frame is not None:
+                frame.set_facecolor(tokens["bg_card"])
+                frame.set_edgecolor(tokens["spine"])
+                frame.set_linewidth(0.8)
+                frame.set_alpha(0.92)
+
             for text in legend.get_texts():
                 text.set_color(tokens["text"])
                 text.set_fontsize(8.5)
@@ -189,11 +200,17 @@ def theme_context(theme: str = "dark"):
         "font.family": [tokens["font_sans"], "DejaVu Sans", "sans-serif"],
         "font.size": 9.5,
         "lines.linewidth": 2.0,
-        "legend.frameon": False,
+        "text.color": tokens["text"],
+        "legend.frameon": True,
+        "legend.facecolor": tokens["bg_card"],
+        "legend.edgecolor": tokens["spine"],
+        "legend.framealpha": 0.92,
         "legend.fontsize": 8.5,
+        "legend.title_fontsize": 9.0,
         "legend.labelcolor": tokens["text"],
         "svg.fonttype": "none",  # Exporta texto como elemento <text> nativo
     }
 
     with plt.rc_context(rc_settings):
         yield tokens
+
