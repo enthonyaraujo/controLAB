@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="docs/screenshots/principal.webp">
-    <img src="docs/screenshots/principal.webp" alt="Hub Central de Módulos do ControLAB v3.1.0" width="100%">
+    <img src="docs/screenshots/principal.webp" alt="Hub Central de Módulos do ControLAB v3.1.1" width="100%">
   </a>
   <br>
 </p>

@@ -5,6 +5,28 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [3.1.1] - 2026-10-08
+
+### Corrigido
+- **Tema Dark em Gráficos Científicos (`plot_theme.py`, `routh_hurwitz.py`, `lgr_engine.py`):**
+  - Correção de legibilidade no título e itens de legendas em gráficos no Critério de Routh-Hurwitz e Lugar Geométrico das Raízes sob tema Dark. O título da legenda e os rótulos agora utilizam a cor e peso corretos de contraste com quadro de fundo dedicado (`bg_card`).
+- **Navegação Sem Disparo Automático de Cálculo:**
+  - Desativação do cálculo automático ao abrir os módulos de *Critério de Routh-Hurwitz* e *Lugar Geométrico das Raízes*. Os cálculos agora só são executados sob comando explícito do usuário, com telas iniciais limpas e informativas.
+
+### Aprimorado
+- **Padronização de Nomenclatura no Hub Central:**
+  - O módulo de raízes foi formalmente renomeado de *"Lugar das Raízes"* para **"Lugar Geométrico das Raízes"** no Hub Central e no site do projeto.
+- **Prévias Matemáticas e Interface de Parâmetros:**
+  - Inclusão de prévia KaTeX em tempo real nos módulos de *Resposta no Domínio do Tempo*, *Resposta em Frequência* e *Projeto de Controladores*.
+  - Remoção de exemplos rápidos que poluíam os formulários científicos desses três módulos.
+  - Limpeza dos botões de ação e remoção de atalhos redundantes.
+- **Plataformas e Empacotamento:**
+  - Atualização do Android para `versionCode 12` e `versionName 3.1.1`.
+  - Cache do Service Worker atualizado para `controlab-shell-v3.1.1-1`.
+  - Atualização dos metadados de versão em toda a suíte.
+
+---
+
 ## [3.1.0] - 2026-10-03
 
 ### Adicionado

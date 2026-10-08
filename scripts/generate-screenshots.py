@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera capturas de tela WebP em alta resolução no modo desktop do ControLAB v3.1.0."""
+"""Gera capturas de tela WebP em alta resolução no modo desktop do ControLAB v3.1.1."""
 
 import os
 import subprocess
