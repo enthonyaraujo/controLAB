@@ -31,8 +31,10 @@ def render_html_to_webp(html_content: str, width: int, height: int, out_filename
     html_fixed = html_fixed.replace('href="styles.css"', f'href="{PROJECT_ROOT}/src/renderer/styles.css"')
     html_fixed = html_fixed.replace('href="vendor/katex/katex.min.css"', f'href="{PROJECT_ROOT}/src/renderer/vendor/katex/katex.min.css"')
     html_fixed = html_fixed.replace('src="vendor/katex/katex.min.js"', f'src="{PROJECT_ROOT}/src/renderer/vendor/katex/katex.min.js"')
+    html_fixed = html_fixed.replace('src="vendor/katex/contrib/auto-render.min.js"', f'src="{PROJECT_ROOT}/src/renderer/vendor/katex/contrib/auto-render.min.js"')
     for s in ['app.js', 'web-api.js', 'navigation.js', 'settings.js', 'routh.js', 'scientific-modules.js']:
         html_fixed = html_fixed.replace(f'<script src="{s}"></script>', '')
+    html_fixed = html_fixed.replace('</body>', '<script>if(window.renderMathInElement) renderMathInElement(document.body, {delimiters:[{left:"$$",right:"$$",display:true}]});</script></body>')
 
     tmp_html.write_text(html_fixed, encoding="utf-8")
     png_tmp = f"/tmp/{out_filename}.png"
@@ -119,6 +121,13 @@ def generate_all():
     res_time = dispatch({'action': 'time_response', 'numerator': '4', 'denominator': 's^2 + 2*s + 4', 'theme': 'dark'})
     form_time = '''
     <div class="field-group"><label class="field-label">G(s) — Função de Transferência</label><input class="form-input code-font" value="4 / (s^2 + 2*s + 4)"></div>
+    <div class="function-preview" style="margin-top: 0;">
+      <div class="preview-heading">
+        <span>Prévia matemática</span>
+        <span class="preview-status valid">Expressão válida</span>
+      </div>
+      <div class="preview-math">$$G(s) = \\frac{4}{s^{2} + 2 s + 4}$$</div>
+    </div>
     <div class="field-group"><label class="field-label">Tempo final (s)</label><input class="form-input code-font" value="10"></div>
     <div class="field-group"><label class="field-label">Faixa de acomodação</label><select class="form-select"><option selected>2%</option><option>5%</option></select></div>
     '''
@@ -154,6 +163,13 @@ def generate_all():
     res_freq = dispatch({'action': 'frequency_response', 'numerator': '10', 'denominator': 's * (s + 2) * (s + 5)', 'theme': 'dark'})
     form_freq = '''
     <div class="field-group"><label class="field-label">G(s) — Função de Transferência</label><input class="form-input code-font" value="10 / (s * (s + 2) * (s + 5))"></div>
+    <div class="function-preview" style="margin-top: 0;">
+      <div class="preview-heading">
+        <span>Prévia matemática</span>
+        <span class="preview-status valid">Expressão válida</span>
+      </div>
+      <div class="preview-math">$$G(s) = \\frac{10}{s (s + 2) (s + 5)}$$</div>
+    </div>
     <div class="field-group"><label class="field-label">Frequência mínima ωmin (rad/s)</label><input class="form-input code-font" value="0.01"></div>
     <div class="field-group"><label class="field-label">Frequência máxima ωmax (rad/s)</label><input class="form-input code-font" value="100"></div>
     '''
@@ -170,6 +186,13 @@ def generate_all():
     res_ctrl = dispatch({'action': 'controller_design', 'plant_expr': '1 / (s * (s + 1) * (s + 5))', 'design_type': 'pid', 'method': 'zn_critical', 'controller_type': 'PID', 'critical_gain': 6, 'critical_period': 2, 'theme': 'dark'})
     form_ctrl = '''
     <div class="field-group"><label class="field-label">Planta G(s)</label><input class="form-input code-font" value="1 / (s * (s + 1) * (s + 5))"></div>
+    <div class="function-preview" style="margin-top: 0;">
+      <div class="preview-heading">
+        <span>Prévia matemática</span>
+        <span class="preview-status valid">Expressão válida</span>
+      </div>
+      <div class="preview-math">$$G(s) = \\frac{1}{s (s + 1) (s + 5)}$$</div>
+    </div>
     <div class="field-group"><label class="field-label">Tipo de projeto</label><select class="form-select"><option selected>Sintonia P / PI / PID</option></select></div>
     <div class="field-group"><label class="field-label">Método</label><select class="form-select"><option selected>Ziegler-Nichols — oscilação crítica</option></select></div>
     <div class="field-group"><label class="field-label">Estrutura</label><select class="form-select"><option selected>PID</option></select></div>

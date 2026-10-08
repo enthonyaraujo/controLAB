@@ -360,9 +360,6 @@
       <!-- Rodapé da Sidebar: Botão de Ação Principal -->
       <div class="sidebar-footer">
         <button id="btn-calculate" class="btn btn-primary btn-calc-action" type="button">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
           <span class="btn-text">Traçar LGR</span>
         </button>
       </div>
@@ -669,9 +666,6 @@
         <!-- Rodapé da Sidebar: Botão de Ação Primária idêntico ao LGR -->
         <div class="sidebar-footer">
           <button id="btn-calculate-routh" class="btn btn-primary btn-calc-action" type="button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
             <span class="btn-text">Calcular Estabilidade</span>
           </button>
         </div>
@@ -879,11 +873,19 @@
           <h1 id="scientific-title" class="scientific-title" style="display: none;"></h1>
           <p id="scientific-description" class="scientific-description" style="display: none;"></p>
           <form id="scientific-form" class="scientific-form"></form>
+          <!-- Prévia Matemática em Tempo Real (Resposta no tempo, Resposta em frequência, Projeto de controladores) -->
+          <div class="function-preview" id="scientific-function-preview" aria-live="polite" style="display: none;">
+            <div class="preview-heading">
+              <span>Prévia matemática</span>
+              <span id="scientific-preview-status" class="preview-status valid">Expressão válida</span>
+            </div>
+            <div id="scientific-latex-preview" class="preview-math">G(s) = 0</div>
+            <div id="scientific-preview-error" class="preview-error" hidden></div>
+          </div>
         </div>
         <div class="scientific-sidebar-footer">
           <button id="btn-run-scientific" class="btn btn-primary btn-calc-action" type="submit" form="scientific-form">
             <span class="btn-text">Calcular</span>
-            <kbd class="btn-kbd">Ctrl + Enter</kbd>
           </button>
         </div>
       </aside>

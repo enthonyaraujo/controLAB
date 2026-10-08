@@ -246,14 +246,118 @@
   function initialize({ renderMath, showToast }) {
     const form = element('scientific-form');
     const runButton = element('btn-run-scientific');
+    const previewContainer = element('scientific-function-preview');
+    const previewStatus = element('scientific-preview-status');
+    const previewMath = element('scientific-latex-preview');
+    const previewError = element('scientific-preview-error');
     if (!form || !runButton) return null;
 
     let currentKey = null;
     let currentResult = null;
     let currentResponseType = 'step';
     let requestId = 0;
+    let previewTimer = null;
+    let previewRequestId = 0;
+    let lastPreviewExpr = null;
+
+    function formatExpressionToLatex(raw, prefix = 'G(s)') {
+      if (!raw) return `${prefix} = 0`;
+      let tex = raw.trim();
+      tex = tex
+        .replace(/\s+/g, ' ')
+        .replace(/\*/g, ' ')
+        .replace(/\^([0-9]+)/g, '^{$1}')
+        .replace(/s([0-9]+)/g, 's^{$1}');
+
+      if (tex.includes('/')) {
+        const slashIdx = tex.indexOf('/');
+        let num = tex.slice(0, slashIdx).trim();
+        let den = tex.slice(slashIdx + 1).trim();
+        if (num.startsWith('(') && num.endsWith(')')) num = num.slice(1, -1).trim();
+        if (den.startsWith('(') && den.endsWith(')')) den = den.slice(1, -1).trim();
+        return `${prefix} = \\frac{${num}}{${den}}`;
+      }
+      return `${prefix} = ${tex}`;
+    }
+
+    function getExpressionInput() {
+      return form.elements.namedItem('expr') || form.elements.namedItem('plant_expr');
+    }
+
+    function scheduleScientificPreview() {
+      const exprInput = getExpressionInput();
+      if (!exprInput || !previewContainer) return;
+      const raw = exprInput.value.trim();
+
+      if (previewMath) {
+        const instantTex = formatExpressionToLatex(raw);
+        renderMath(previewMath, instantTex, true);
+      }
+
+      if (previewStatus) {
+        if (!raw) {
+          previewStatus.textContent = 'Aguardando entrada';
+          previewStatus.className = 'preview-status';
+        } else {
+          previewStatus.textContent = 'Validando…';
+          previewStatus.className = 'preview-status loading';
+        }
+      }
+      if (previewError) previewError.hidden = true;
+
+      if (!raw) {
+        lastPreviewExpr = '';
+        return;
+      }
+
+      const reqId = ++previewRequestId;
+      window.clearTimeout(previewTimer);
+      previewTimer = window.setTimeout(async () => {
+        if (reqId !== previewRequestId) return;
+        if (raw === lastPreviewExpr) return;
+
+        if (!global.api?.previewTransferFunction) {
+          if (previewStatus) {
+            previewStatus.textContent = 'Expressão válida';
+            previewStatus.className = 'preview-status valid';
+          }
+          return;
+        }
+
+        try {
+          const res = await global.api.previewTransferFunction({ mode: 'expr', expr: raw });
+          if (reqId !== previewRequestId) return;
+          if (!res || !res.success) {
+            throw new Error(res?.error || 'Expressão matemática inválida.');
+          }
+          lastPreviewExpr = raw;
+          if (previewMath) {
+            renderMath(previewMath, res.latex_fac || res.latex_exp, true);
+          }
+          if (previewStatus) {
+            previewStatus.textContent = 'Expressão válida';
+            previewStatus.className = 'preview-status valid';
+          }
+          if (previewError) previewError.hidden = true;
+        } catch (err) {
+          if (reqId !== previewRequestId) return;
+          if (previewStatus) {
+            previewStatus.textContent = 'Revise a entrada';
+            previewStatus.className = 'preview-status invalid';
+          }
+          if (previewError) {
+            previewError.textContent = err.message;
+            previewError.hidden = false;
+          }
+        }
+      }, 300);
+    }
 
     function renderFields(config) {
+      if (previewContainer && form.parentElement) {
+        previewContainer.style.display = 'none';
+        form.parentElement.appendChild(previewContainer);
+      }
       form.replaceChildren();
       config.fields.forEach((field) => {
         const group = document.createElement('div');
@@ -332,6 +436,12 @@
         input.autocomplete = 'off';
         group.appendChild(input);
         form.appendChild(group);
+
+        if (field.name === 'expr' || field.name === 'plant_expr') {
+          if (previewContainer) {
+            form.appendChild(previewContainer);
+          }
+        }
       });
 
       if (config.examples?.length) {
@@ -346,6 +456,7 @@
             const expressionInput = form.elements.namedItem('expr') || form.elements.namedItem('plant_expr');
             if (expressionInput) {
               expressionInput.value = expression;
+              scheduleScientificPreview();
               run();
             }
           });
@@ -364,6 +475,15 @@
           return control && accepted.includes(control.value);
         });
       });
+
+      const exprInput = getExpressionInput();
+      if (previewContainer) {
+        const isExprVisible = exprInput && !exprInput.closest('.form-group')?.hidden;
+        previewContainer.style.display = isExprVisible ? 'block' : 'none';
+        if (isExprVisible) {
+          scheduleScientificPreview();
+        }
+      }
     }
 
     function open(moduleKey) {
@@ -371,6 +491,7 @@
       if (!config) return false;
       if (currentKey !== moduleKey) {
         currentKey = moduleKey;
+        lastPreviewExpr = null;
         const kickerEl = element('scientific-kicker');
         if (kickerEl) kickerEl.textContent = config.kicker;
         const titleEl = element('scientific-title');
@@ -569,6 +690,11 @@
       run();
     });
     form.addEventListener('change', updateConditionalFields);
+    form.addEventListener('input', (event) => {
+      if (event.target.name === 'expr' || event.target.name === 'plant_expr') {
+        scheduleScientificPreview();
+      }
+    });
     global.addEventListener('keydown', (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 'Enter'
         && element('page-scientific')?.classList.contains('active')) {

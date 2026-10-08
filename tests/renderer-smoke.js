@@ -50,5 +50,10 @@ assert(styles.includes('prefers-reduced-motion: reduce'), 'a interface precisa r
 assert(styles.includes('safe-area-inset-bottom'), 'os elementos fixos precisam respeitar a área segura móvel');
 assert(styles.includes('.katex-display'), 'fórmulas extensas precisam permanecer navegáveis em telas estreitas');
 assert(styles.includes('grid-template-columns: minmax(0, 1fr)'), 'cards do Routh não podem expandir além da tela móvel');
+assert(html.includes('id="scientific-function-preview"'), 'a prévia matemática dos módulos científicos precisa existir no HTML');
+assert(!html.includes('Ctrl + Enter'), 'o atalho visual Ctrl + Enter deve ser removido de todos os botões');
+assert(!html.includes('id="btn-calculate" class="btn btn-primary btn-calc-action" type="button">\n          <svg'), 'o botão Traçar LGR não deve ter ícone SVG');
+assert(!html.includes('id="btn-calculate-routh" class="btn btn-primary btn-calc-action" type="button">\n            <svg'), 'o botão Calcular Estabilidade não deve ter ícone SVG');
+assert(scientificModules.includes('scheduleScientificPreview'), 'os módulos científicos precisam agendar e atualizar a prévia matemática');
 
 console.log('Integração, responsividade e navegação do renderer válidas.');
