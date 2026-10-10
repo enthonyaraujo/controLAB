@@ -484,6 +484,7 @@ body {
 .module-title-icon {
   width: 28px;
   height: 28px;
+  color: var(--accent);
   stroke: var(--accent);
   flex-shrink: 0;
 }
