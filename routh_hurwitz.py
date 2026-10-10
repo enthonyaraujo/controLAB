@@ -568,8 +568,8 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     tokens = get_theme_tokens(theme)
 
     fig, ax = plt.subplots(figsize=(11, 7.2), dpi=110)
-    fig.patch.set_facecolor("none")
-    ax.set_facecolor("none")
+    fig.patch.set_facecolor("#FFFFFF")
+    ax.set_facecolor("#FFFFFF")
 
     ax.grid(True, linestyle="--", alpha=tokens["grid_alpha"], color=tokens["grid"])
     ax.axhline(0, color=tokens["spine"], linewidth=1.0)  # Eixo Real

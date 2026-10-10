@@ -25,17 +25,17 @@ from plot_theme import apply_plot_theme, get_theme_tokens, register_local_fonts,
 
 
 def figure_payload(fig, *, dpi: int = 150, theme: str = "dark"):
-    """Serializa uma figura Matplotlib em PNG base64 e SVG respeitando o tema visual."""
+    """Serializa uma figura Matplotlib em PNG base64 e SVG no padrão preto e branco com curvas coloridas."""
     try:
         apply_plot_theme(fig, theme=theme)
         png_buffer = io.BytesIO()
-        fig.savefig(png_buffer, format="png", dpi=dpi, bbox_inches="tight", transparent=True)
+        fig.savefig(png_buffer, format="png", dpi=dpi, bbox_inches="tight", facecolor="white", transparent=False)
         png_buffer.seek(0)
         image = "data:image/png;base64," + base64.b64encode(png_buffer.read()).decode("utf-8")
 
         svg_buffer = io.BytesIO()
         with plt.rc_context({"svg.fonttype": "none"}):
-            fig.savefig(svg_buffer, format="svg", bbox_inches="tight", transparent=True)
+            fig.savefig(svg_buffer, format="svg", bbox_inches="tight", facecolor="white", transparent=False)
         svg_buffer.seek(0)
         svg = svg_buffer.read().decode("utf-8")
         return image, svg

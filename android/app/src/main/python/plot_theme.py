@@ -20,41 +20,49 @@ from matplotlib import font_manager
 # Garante backend headless
 matplotlib.use("Agg")
 
-# Paletas espelhando os tokens CSS do ControLAB
+# Paletas preto e branco com fundo branco para ambos os temas (estilo científico profissional)
 THEME_TOKENS: dict[str, dict[str, Any]] = {
     "dark": {
-        "bg_fig": "none",
-        "bg_card": "#0F151C",
-        "text": "#E6EDF3",
-        "text_secondary": "#8693A3",
-        "text_muted": "#6B7785",
-        "grid": "#1F2933",
-        "grid_alpha": 0.35,
-        "spine": "#3A4654",
-        "accent": "#3DD6F5",
-        "accent_secondary": "#2C7A8E",
-        "reference": "#3A4654",
-        "success": "#10b981",
-        "danger": "#ef4444",
-        "warning": "#f59e0b",
+        "bg_fig": "#FFFFFF",
+        "bg_card": "#FFFFFF",
+        "text": "#0F172A",
+        "text_secondary": "#334155",
+        "text_muted": "#64748B",
+        "grid": "#CBD5E1",
+        "grid_alpha": 0.65,
+        "spine": "#0F172A",
+        "accent": "#0284C7",
+        "accent_secondary": "#0E7490",
+        "reference": "#64748B",
+        "success": "#059669",
+        "danger": "#DC2626",
+        "warning": "#D97706",
+        "lgr_branch": "#DC2626",
+        "lgr_pole": "#1E3A8A",
+        "lgr_zero": "#1E3A8A",
+        "lgr_break": "#2563EB",
         "font_sans": "IBM Plex Sans",
         "font_mono": "JetBrains Mono",
     },
     "light": {
-        "bg_fig": "none",
+        "bg_fig": "#FFFFFF",
         "bg_card": "#FFFFFF",
-        "text": "#0E141B",
-        "text_secondary": "#526071",
-        "text_muted": "#788796",
-        "grid": "#CBD3DC",
-        "grid_alpha": 0.45,
-        "spine": "#9DA8B5",
-        "accent": "#0891B2",
+        "text": "#0F172A",
+        "text_secondary": "#334155",
+        "text_muted": "#64748B",
+        "grid": "#CBD5E1",
+        "grid_alpha": 0.65,
+        "spine": "#0F172A",
+        "accent": "#0284C7",
         "accent_secondary": "#0E7490",
-        "reference": "#9DA8B5",
+        "reference": "#64748B",
         "success": "#059669",
-        "danger": "#dc2626",
-        "warning": "#d97706",
+        "danger": "#DC2626",
+        "warning": "#D97706",
+        "lgr_branch": "#DC2626",
+        "lgr_pole": "#1E3A8A",
+        "lgr_zero": "#1E3A8A",
+        "lgr_break": "#2563EB",
         "font_sans": "IBM Plex Sans",
         "font_mono": "JetBrains Mono",
     },
@@ -103,8 +111,8 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
     """Aplica o tema visual profissional aos eixos e à figura."""
     tokens = get_theme_tokens(theme)
 
-    fig.patch.set_facecolor("none")
-    fig.patch.set_alpha(0.0)
+    fig.patch.set_facecolor("#FFFFFF")
+    fig.patch.set_alpha(1.0)
 
     # Identifica todos os eixos se não fornecidos
     if axes is None:
@@ -117,8 +125,8 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
         target_axes = [axes]
 
     for ax in target_axes:
-        ax.set_facecolor("none")
-        ax.patch.set_alpha(0.0)
+        ax.set_facecolor("#FFFFFF")
+        ax.patch.set_alpha(1.0)
 
         # Spines: remove superior e direita, suaviza inferior e esquerda
         if "top" in ax.spines:
@@ -167,9 +175,9 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
             frame = legend.get_frame()
             if frame is not None:
                 frame.set_facecolor(tokens["bg_card"])
-                frame.set_edgecolor(tokens["spine"])
+                frame.set_edgecolor(tokens["grid"])
                 frame.set_linewidth(0.8)
-                frame.set_alpha(0.92)
+                frame.set_alpha(0.95)
 
             for text in legend.get_texts():
                 text.set_color(tokens["text"])
@@ -183,8 +191,8 @@ def theme_context(theme: str = "dark"):
     tokens = get_theme_tokens(theme)
 
     rc_settings = {
-        "figure.facecolor": "none",
-        "axes.facecolor": "none",
+        "figure.facecolor": "#FFFFFF",
+        "axes.facecolor": "#FFFFFF",
         "axes.edgecolor": tokens["spine"],
         "axes.labelcolor": tokens["text"],
         "axes.linewidth": 1.0,
@@ -203,8 +211,8 @@ def theme_context(theme: str = "dark"):
         "text.color": tokens["text"],
         "legend.frameon": True,
         "legend.facecolor": tokens["bg_card"],
-        "legend.edgecolor": tokens["spine"],
-        "legend.framealpha": 0.92,
+        "legend.edgecolor": tokens["grid"],
+        "legend.framealpha": 0.95,
         "legend.fontsize": 8.5,
         "legend.title_fontsize": 9.0,
         "legend.labelcolor": tokens["text"],
