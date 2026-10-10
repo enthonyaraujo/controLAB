@@ -76,4 +76,33 @@ assert(!fixedHexMatches || fixedHexMatches.length === 0, `o diálogo não pode c
 assert(!styles.includes('#0369a1'), 'o azul #0369a1 deve ser removido de btn-action-primary');
 assert(!styles.includes('#0284c7'), 'o azul #0284c7 deve ser removido de btn-action-primary');
 
+// Valida alinhamento entre a barra de abas superior (.sci-top-bar) e a ribbon (.sci-ribbon)
+assert(styles.includes('padding: 0 0.5rem;'), '.sci-top-bar precisa ter padding horizontal de 0.5rem alinhado com .sci-ribbon');
+
+// Valida que a seção de Exemplos foi removida do Menu Início
+assert(!html.includes('home-examples-list'), 'a seção Exemplos deve ser removida do Menu Início');
+
+// Valida que o Workspace inicia limpo e os botões de limpar existem
+assert(html.includes('id="btn-clear-recent"'), 'o botão de limpar recentes precisa existir');
+assert(html.includes('id="btn-clear-workspace"'), 'o botão de limpar workspace precisa existir');
+assert(html.includes('Nenhuma variável no workspace'), 'o workspace precisa iniciar limpo');
+assert(styles.includes('.home-btn-clear'), 'os estilos do botão de limpar precisam existir');
+
+// Valida split panes e responsividade do Menu Início
+const navigation = fs.readFileSync(path.join(root, 'src', 'renderer', 'navigation.js'), 'utf8');
+const tokens = fs.readFileSync(path.join(root, 'src', 'renderer', 'tokens.css'), 'utf8');
+assert(html.includes('id="home-splitter-console"'), 'o splitter do console precisa existir no HTML');
+assert(html.includes('id="home-splitter-left"'), 'o splitter esquerdo precisa existir no HTML');
+assert(html.includes('id="home-splitter-right"'), 'o splitter direito precisa existir no HTML');
+assert(tokens.includes('--home-console-height'), 'o token de altura do console precisa existir');
+assert(styles.includes('.home-splitter-h') && styles.includes('.home-splitter-v'), 'os estilos dos splitters horizontal e vertical precisam existir');
+assert(styles.includes('height: 1px;') && styles.includes('width: 1px;'), 'os splitters devem ter linhas finas de 1px');
+assert(!html.includes('splitter-grip'), 'os grips grossos dos splitters devem ser removidos');
+assert(styles.includes('.home-console-area {\n    border-top: none !important;'), 'o console não deve duplicar borda no desktop');
+assert(styles.includes('cursor: row-resize') && styles.includes('cursor: col-resize'), 'os cursores de redimensionamento precisam estar definidos');
+assert(styles.includes('.home-splitter {\n    display: none !important;'), 'os splitters devem ser ocultados em resoluções menores');
+assert(navigation.includes('setupHomeSplitPanes'), 'a inicialização dos split panes precisa existir em navigation.js');
+assert(navigation.includes('home-splitter-console'), 'o redimensionamento do console precisa estar implementado');
+assert(navigation.includes('getMaxConsoleHeight'), 'o cálculo de altura máxima do console para não cobrir os módulos precisa existir');
+
 console.log('Integração, responsividade e navegação do renderer válidas.');

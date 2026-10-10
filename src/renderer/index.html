@@ -133,7 +133,7 @@
       <div class="home-main-content">
         <!-- Workspace Principal de 3 Colunas -->
         <div class="home-workspace">
-          <!-- Coluna Esquerda: Pasta atual e Exemplos -->
+          <!-- Coluna Esquerda: Pasta atual -->
           <aside class="home-left-col">
             <!-- Seção: Pasta atual -->
             <section class="home-section-panel">
@@ -147,25 +147,10 @@
                 <li class="home-empty-hint">Nenhum arquivo na pasta</li>
               </ul>
             </section>
-
-            <!-- Seção: Exemplos -->
-            <section class="home-section-panel">
-              <div class="home-panel-header">
-                <span class="home-panel-title">Exemplos</span>
-              </div>
-              <ul class="home-examples-list">
-                <li class="home-example-item" data-example="time" data-expr="4/(s^2+2*s+4)">
-                  <span>Segunda ordem subamortecido</span>
-                </li>
-                <li class="home-example-item" data-example="controllers" data-expr="1/(s*(s+1)*(s+5))">
-                  <span>Servo de posição</span>
-                </li>
-                <li class="home-example-item" data-example="frequency" data-expr="10/(s*(s+2)*(s+5))">
-                  <span>Filtro passa-baixas</span>
-                </li>
-              </ul>
-            </section>
           </aside>
+
+          <!-- Divisor Vertical Esquerdo (Desktop >= 1024px) -->
+          <div class="home-splitter home-splitter-v" id="home-splitter-left" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar a pasta (clique duplo para redefinir)"></div>
 
           <!-- Coluna Central: Começar e Módulos -->
           <section class="home-center-col">
@@ -273,12 +258,16 @@
             </div>
           </section>
 
+          <!-- Divisor Vertical Direito (Desktop >= 1024px) -->
+          <div class="home-splitter home-splitter-v" id="home-splitter-right" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar o painel direito (clique duplo para redefinir)"></div>
+
           <!-- Coluna Direita: Recentes e Workspace -->
           <aside class="home-right-col">
             <!-- Seção: Recentes -->
             <section class="home-section-panel">
               <div class="home-panel-header">
                 <span class="home-panel-title">Recentes</span>
+                <button type="button" class="home-btn-clear" id="btn-clear-recent" title="Limpar histórico recente">Limpar</button>
               </div>
               <ul class="home-recent-list" id="home-recent-list">
                 <li class="home-empty-hint">Nenhum cálculo recente</li>
@@ -289,32 +278,23 @@
             <section class="home-section-panel">
               <div class="home-panel-header">
                 <span class="home-panel-title">Workspace</span>
-                <span class="home-panel-hint">Nome · Tipo</span>
+                <div class="home-panel-header-right">
+                  <span class="home-panel-hint">Nome · Tipo</span>
+                  <button type="button" class="home-btn-clear" id="btn-clear-workspace" title="Limpar variáveis do workspace">Limpar</button>
+                </div>
               </div>
               <ul class="home-workspace-list" id="home-workspace-list">
-                <li class="home-workspace-item" data-var="G">
-                  <span class="var-name">G</span>
-                  <span class="var-type">tf</span>
-                </li>
-                <li class="home-workspace-item" data-var="C">
-                  <span class="var-name">C</span>
-                  <span class="var-type">pid</span>
-                </li>
-                <li class="home-workspace-item" data-var="t">
-                  <span class="var-name">t</span>
-                  <span class="var-type">vetor</span>
-                </li>
-                <li class="home-workspace-item" data-var="y">
-                  <span class="var-name">y</span>
-                  <span class="var-type">vetor</span>
-                </li>
+                <li class="home-empty-hint">Nenhuma variável no workspace</li>
               </ul>
             </section>
           </aside>
         </div>
 
+        <!-- Divisor Horizontal Console (Desktop >= 1024px) -->
+        <div class="home-splitter home-splitter-h" id="home-splitter-console" role="separator" aria-orientation="horizontal" tabindex="0" title="Arraste para redimensionar o console (clique duplo para redefinir)"></div>
+
         <!-- Área Inferior: Console e Rodapé -->
-        <section class="home-console-area">
+        <section class="home-console-area" id="home-console-area">
           <div class="home-panel-header">
             <span class="home-panel-title">Console</span>
             <span class="home-panel-hint">Histórico: ↑ ↓ &nbsp;·&nbsp; Tab completa</span>
@@ -381,24 +361,15 @@
   <div id="page-lgr" class="app-page sci-shell" data-active-tab="params">
     <!-- Barra Superior de Abas (Desktop >= 1024px) -->
     <header class="sci-top-bar">
-      <div class="sci-top-brand">
-        <b>ControLAB</b>
-        <span class="sci-version-badge">v3.1.1</span>
-      </div>
       <nav class="sci-top-tabs">
         <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
-        <button type="button" class="sci-tab" data-nav="time">TEMPO</button>
-        <button type="button" class="sci-tab" data-nav="routh">ESTAB.</button>
-        <button type="button" class="sci-tab active" data-nav="lgr">LGR</button>
-        <button type="button" class="sci-tab" data-nav="frequency">FREQ.</button>
-        <button type="button" class="sci-tab" data-nav="controllers">CONTROL.</button>
-        <button type="button" class="sci-tab" data-nav="state-space">ESTADOS</button>
+        <button type="button" class="sci-tab" data-nav="time">RESPOSTA NO TEMPO</button>
+        <button type="button" class="sci-tab" data-nav="routh">ESTABILIDADE</button>
+        <button type="button" class="sci-tab active" data-nav="lgr">LUGAR GEOMÉTRICO DAS RAÍZES</button>
+        <button type="button" class="sci-tab" data-nav="frequency">RESPOSTA EM FREQUÊNCIA</button>
+        <button type="button" class="sci-tab" data-nav="controllers">CONTROLADORES</button>
+        <button type="button" class="sci-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
       </nav>
-      <div class="sci-top-actions">
-        <button class="sci-top-btn" data-action="settings" title="Configurações" aria-label="Configurações" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-      </div>
     </header>
 
     <!-- App Bar (Tablet & Celular < 1024px) -->
@@ -713,24 +684,15 @@
   <div id="page-routh" class="app-page sci-shell" data-active-tab="params">
     <!-- Barra Superior de Abas (Desktop >= 1024px) -->
     <header class="sci-top-bar">
-      <div class="sci-top-brand">
-        <b>ControLAB</b>
-        <span class="sci-version-badge">v3.1.1</span>
-      </div>
       <nav class="sci-top-tabs">
         <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
-        <button type="button" class="sci-tab" data-nav="time">TEMPO</button>
-        <button type="button" class="sci-tab active" data-nav="routh">ESTAB.</button>
-        <button type="button" class="sci-tab" data-nav="lgr">LGR</button>
-        <button type="button" class="sci-tab" data-nav="frequency">FREQ.</button>
-        <button type="button" class="sci-tab" data-nav="controllers">CONTROL.</button>
-        <button type="button" class="sci-tab" data-nav="state-space">ESTADOS</button>
+        <button type="button" class="sci-tab" data-nav="time">RESPOSTA NO TEMPO</button>
+        <button type="button" class="sci-tab active" data-nav="routh">ESTABILIDADE</button>
+        <button type="button" class="sci-tab" data-nav="lgr">LUGAR GEOMÉTRICO DAS RAÍZES</button>
+        <button type="button" class="sci-tab" data-nav="frequency">RESPOSTA EM FREQUÊNCIA</button>
+        <button type="button" class="sci-tab" data-nav="controllers">CONTROLADORES</button>
+        <button type="button" class="sci-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
       </nav>
-      <div class="sci-top-actions">
-        <button class="sci-top-btn" data-action="settings" title="Configurações" aria-label="Configurações" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-      </div>
     </header>
 
     <!-- App Bar (Tablet & Celular < 1024px) -->
@@ -1042,24 +1004,15 @@
     <div class="sci-shell">
       <!-- Barra Superior de Abas (Desktop >= 1024px) -->
       <header class="sci-top-bar" id="sci-top-bar">
-        <div class="sci-top-brand">
-          <b>ControLAB</b>
-          <span class="sci-version-badge">v3.1.1</span>
-        </div>
         <nav class="sci-top-tabs">
           <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
-          <button type="button" class="sci-tab active" data-nav="time">TEMPO</button>
-          <button type="button" class="sci-tab" data-nav="routh">ESTAB.</button>
-          <button type="button" class="sci-tab" data-nav="lgr">LGR</button>
-          <button type="button" class="sci-tab" data-nav="frequency">FREQ.</button>
-          <button type="button" class="sci-tab" data-nav="controllers">CONTROL.</button>
-          <button type="button" class="sci-tab" data-nav="state-space">ESTADOS</button>
+          <button type="button" class="sci-tab active" data-nav="time">RESPOSTA NO TEMPO</button>
+          <button type="button" class="sci-tab" data-nav="routh">ESTABILIDADE</button>
+          <button type="button" class="sci-tab" data-nav="lgr">LUGAR GEOMÉTRICO DAS RAÍZES</button>
+          <button type="button" class="sci-tab" data-nav="frequency">RESPOSTA EM FREQUÊNCIA</button>
+          <button type="button" class="sci-tab" data-nav="controllers">CONTROLADORES</button>
+          <button type="button" class="sci-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
         </nav>
-        <div class="sci-top-actions">
-          <button type="button" class="sci-top-btn" data-action="settings" title="Configurações" aria-label="Configurações">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          </button>
-        </div>
       </header>
 
       <!-- Barra Superior App Bar (Tablet & Mobile < 1024px) -->

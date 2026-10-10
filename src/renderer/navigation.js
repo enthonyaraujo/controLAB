@@ -432,7 +432,21 @@
       window.ControLABRecents = Object.freeze({
         addRecent: addRecentItem,
         getRecents: loadRecentItems,
+        clearRecents: () => {
+          saveRecentItems([]);
+          renderRecentItems([]);
+        },
       });
+
+      // Botão para limpar itens recentes
+      const btnClearRecent = optionalElement('btn-clear-recent');
+      if (btnClearRecent) {
+        btnClearRecent.addEventListener('click', () => {
+          saveRecentItems([]);
+          renderRecentItems([]);
+          showToast('Histórico recente limpo.', 'info', 2000);
+        });
+      }
 
       // Renderiza itens recentes persistidos
       renderRecentItems(loadRecentItems());
@@ -542,6 +556,13 @@
         const list = optionalElement('home-workspace-list');
         if (!list || !Array.isArray(vars)) return;
         list.innerHTML = '';
+        if (vars.length === 0) {
+          const emptyLi = document.createElement('li');
+          emptyLi.className = 'home-empty-hint';
+          emptyLi.textContent = 'Nenhuma variável no workspace';
+          list.appendChild(emptyLi);
+          return;
+        }
         vars.forEach((v) => {
           const li = document.createElement('li');
           li.className = 'home-workspace-item';
@@ -567,6 +588,10 @@
         if (cmd === 'clc') {
           if (consoleLogs) consoleLogs.innerHTML = '';
           return;
+        }
+
+        if (cmd === 'clear') {
+          updateWorkspaceUI([]);
         }
 
         addRecentItem({
@@ -603,15 +628,19 @@
         }
       }
 
-      // Variáveis do workspace atuais
-      document.querySelectorAll('.home-workspace-item').forEach((item) => {
-        item.addEventListener('click', () => {
-          const varName = item.dataset.var;
-          if (varName) {
-            executeConsoleCommand(varName);
+      // Botão para limpar o workspace
+      const btnClearWorkspace = optionalElement('btn-clear-workspace');
+      if (btnClearWorkspace) {
+        btnClearWorkspace.addEventListener('click', async () => {
+          updateWorkspaceUI([]);
+          if (window.api?.consoleExec) {
+            try {
+              await window.api.consoleExec('clear');
+            } catch {}
           }
+          showToast('Workspace limpo.', 'info', 2000);
         });
-      });
+      }
 
       if (consoleInput) {
         consoleInput.addEventListener('keydown', async (event) => {
@@ -642,9 +671,305 @@
         });
       }
 
-      // Sincroniza estado inicial via backend
-      refreshHomeState();
-    }
+      // --- Split Panes (Apenas Desktop >= 1024px) ---
+      function setupHomeSplitPanes() {
+          const splitterConsole = optionalElement('home-splitter-console');
+          const splitterLeft = optionalElement('home-splitter-left');
+          const splitterRight = optionalElement('home-splitter-right');
+          const homeMainContent = document.querySelector('.home-main-content');
+          const consoleArea = optionalElement('home-console-area');
+          const leftCol = document.querySelector('.home-left-col');
+          const rightCol = document.querySelector('.home-right-col');
+
+          if (!splitterConsole && !splitterLeft && !splitterRight) return;
+
+          function isDesktop() {
+            return window.innerWidth >= 1024;
+          }
+
+          function getMaxConsoleHeight() {
+            if (!homeMainContent) return 300;
+            const mainRect = homeMainContent.getBoundingClientRect();
+            const modGrid = optionalElement('home-modules-grid');
+            const centerCol = document.querySelector('.home-center-col');
+
+            if (modGrid && centerCol) {
+              const centerScroll = centerCol.scrollTop || 0;
+              const modRect = modGrid.getBoundingClientRect();
+              if (modRect.height > 0) {
+                const modBottomInMain = (modRect.bottom - mainRect.top) + centerScroll;
+                const buffer = 16;
+                const maxH = mainRect.height - modBottomInMain - buffer;
+                return Math.max(70, Math.floor(maxH));
+              }
+            }
+
+            return Math.max(70, Math.floor(mainRect.height - 420));
+          }
+
+          // Recupera tamanhos salvos no localStorage (usados apenas no desktop)
+          try {
+            const maxAllowedH = getMaxConsoleHeight();
+            const savedConsoleH = parseInt(localStorage.getItem('controlab_desktop_console_height'), 10);
+            if (savedConsoleH && savedConsoleH >= 70) {
+              const clampedH = Math.min(savedConsoleH, maxAllowedH);
+              document.documentElement.style.setProperty('--home-console-height', `${clampedH}px`);
+            } else {
+              const defaultH = Math.min(160, maxAllowedH);
+              document.documentElement.style.setProperty('--home-console-height', `${defaultH}px`);
+            }
+            const savedLeftW = parseInt(localStorage.getItem('controlab_desktop_left_col_width'), 10);
+            if (savedLeftW && savedLeftW >= 140 && savedLeftW <= 450) {
+              document.documentElement.style.setProperty('--home-left-col-width', `${savedLeftW}px`);
+            }
+            const savedRightW = parseInt(localStorage.getItem('controlab_desktop_right_col_width'), 10);
+            if (savedRightW && savedRightW >= 200 && savedRightW <= 500) {
+              document.documentElement.style.setProperty('--home-right-col-width', `${savedRightW}px`);
+            }
+          } catch {}
+
+          // 1. Splitter Console (Horizontal / Arraste vertical)
+          if (splitterConsole && homeMainContent && consoleArea) {
+            let startY = 0;
+            let startHeight = 0;
+            let isDragging = false;
+            let cachedMaxH = 300;
+
+            function onPointerMove(e) {
+              if (!isDragging) return;
+              const deltaY = startY - e.clientY;
+              const newH = Math.min(Math.max(70, startHeight + deltaY), cachedMaxH);
+              document.documentElement.style.setProperty('--home-console-height', `${Math.round(newH)}px`);
+            }
+
+            function onPointerUp() {
+              if (!isDragging) return;
+              isDragging = false;
+              document.body.classList.remove('is-resizing-splitter-h');
+              splitterConsole.classList.remove('active');
+              window.removeEventListener('pointermove', onPointerMove);
+              window.removeEventListener('pointerup', onPointerUp);
+              window.removeEventListener('pointercancel', onPointerUp);
+
+              const curH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-console-height'), 10);
+              if (curH) {
+                try { localStorage.setItem('controlab_desktop_console_height', curH); } catch {}
+              }
+            }
+
+            splitterConsole.addEventListener('pointerdown', (e) => {
+              if (!isDesktop() || e.button !== 0) return;
+              e.preventDefault();
+              isDragging = true;
+              startY = e.clientY;
+              startHeight = consoleArea.getBoundingClientRect().height;
+              cachedMaxH = getMaxConsoleHeight();
+              document.body.classList.add('is-resizing-splitter-h');
+              splitterConsole.classList.add('active');
+              window.addEventListener('pointermove', onPointerMove);
+              window.addEventListener('pointerup', onPointerUp);
+              window.addEventListener('pointercancel', onPointerUp);
+            });
+
+            splitterConsole.addEventListener('dblclick', () => {
+              if (!isDesktop()) return;
+              const maxAllowedH = getMaxConsoleHeight();
+              const defaultH = Math.min(160, maxAllowedH);
+              document.documentElement.style.setProperty('--home-console-height', `${defaultH}px`);
+              try { localStorage.removeItem('controlab_desktop_console_height'); } catch {}
+              showToast('Console redefinido para a altura padrão.', 'info', 1500);
+            });
+
+            splitterConsole.addEventListener('keydown', (e) => {
+              if (!isDesktop()) return;
+              const step = e.shiftKey ? 30 : 15;
+              const curH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-console-height'), 10) || 160;
+              const maxAllowedH = getMaxConsoleHeight();
+              if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const newH = Math.min(curH + step, maxAllowedH);
+                document.documentElement.style.setProperty('--home-console-height', `${newH}px`);
+                try { localStorage.setItem('controlab_desktop_console_height', newH); } catch {}
+              } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const newH = Math.max(curH - step, 70);
+                document.documentElement.style.setProperty('--home-console-height', `${newH}px`);
+                try { localStorage.setItem('controlab_desktop_console_height', newH); } catch {}
+              }
+            });
+          }
+
+          // 2. Splitter Coluna Esquerda (Vertical / Arraste horizontal)
+          if (splitterLeft && leftCol) {
+            let startX = 0;
+            let startWidth = 0;
+            let isDragging = false;
+
+            function onPointerMove(e) {
+              if (!isDragging) return;
+              const deltaX = e.clientX - startX;
+              const newW = Math.min(Math.max(140, startWidth + deltaX), 450);
+              document.documentElement.style.setProperty('--home-left-col-width', `${Math.round(newW)}px`);
+            }
+
+            function onPointerUp() {
+              if (!isDragging) return;
+              isDragging = false;
+              document.body.classList.remove('is-resizing-splitter-v');
+              splitterLeft.classList.remove('active');
+              window.removeEventListener('pointermove', onPointerMove);
+              window.removeEventListener('pointerup', onPointerUp);
+              window.removeEventListener('pointercancel', onPointerUp);
+
+              const curW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-left-col-width'), 10);
+              if (curW) {
+                try { localStorage.setItem('controlab_desktop_left_col_width', curW); } catch {}
+              }
+            }
+
+            splitterLeft.addEventListener('pointerdown', (e) => {
+              if (!isDesktop() || e.button !== 0) return;
+              e.preventDefault();
+              isDragging = true;
+              startX = e.clientX;
+              startWidth = leftCol.getBoundingClientRect().width;
+              document.body.classList.add('is-resizing-splitter-v');
+              splitterLeft.classList.add('active');
+              window.addEventListener('pointermove', onPointerMove);
+              window.addEventListener('pointerup', onPointerUp);
+              window.addEventListener('pointercancel', onPointerUp);
+            });
+
+            splitterLeft.addEventListener('dblclick', () => {
+              if (!isDesktop()) return;
+              document.documentElement.style.setProperty('--home-left-col-width', '240px');
+              try { localStorage.removeItem('controlab_desktop_left_col_width'); } catch {}
+              showToast('Coluna esquerda redefinida.', 'info', 1500);
+            });
+
+            splitterLeft.addEventListener('keydown', (e) => {
+              if (!isDesktop()) return;
+              const step = e.shiftKey ? 30 : 15;
+              const curW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-left-col-width'), 10) || 240;
+              if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const newW = Math.min(curW + step, 450);
+                document.documentElement.style.setProperty('--home-left-col-width', `${newW}px`);
+                try { localStorage.setItem('controlab_desktop_left_col_width', newW); } catch {}
+              } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const newW = Math.max(curW - step, 140);
+                document.documentElement.style.setProperty('--home-left-col-width', `${newW}px`);
+                try { localStorage.setItem('controlab_desktop_left_col_width', newW); } catch {}
+              }
+            });
+          }
+
+          // 3. Splitter Coluna Direita (Vertical / Arraste horizontal)
+          if (splitterRight && rightCol) {
+            let startX = 0;
+            let startWidth = 0;
+            let isDragging = false;
+
+            function onPointerMove(e) {
+              if (!isDragging) return;
+              const deltaX = startX - e.clientX;
+              const newW = Math.min(Math.max(200, startWidth + deltaX), 500);
+              document.documentElement.style.setProperty('--home-right-col-width', `${Math.round(newW)}px`);
+            }
+
+            function onPointerUp() {
+              if (!isDragging) return;
+              isDragging = false;
+              document.body.classList.remove('is-resizing-splitter-v');
+              splitterRight.classList.remove('active');
+              window.removeEventListener('pointermove', onPointerMove);
+              window.removeEventListener('pointerup', onPointerUp);
+              window.removeEventListener('pointercancel', onPointerUp);
+
+              const curW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-right-col-width'), 10);
+              if (curW) {
+                try { localStorage.setItem('controlab_desktop_right_col_width', curW); } catch {}
+              }
+            }
+
+            splitterRight.addEventListener('pointerdown', (e) => {
+              if (!isDesktop() || e.button !== 0) return;
+              e.preventDefault();
+              isDragging = true;
+              startX = e.clientX;
+              startWidth = rightCol.getBoundingClientRect().width;
+              document.body.classList.add('is-resizing-splitter-v');
+              splitterRight.classList.add('active');
+              window.addEventListener('pointermove', onPointerMove);
+              window.addEventListener('pointerup', onPointerUp);
+              window.addEventListener('pointercancel', onPointerUp);
+            });
+
+            splitterRight.addEventListener('dblclick', () => {
+              if (!isDesktop()) return;
+              document.documentElement.style.setProperty('--home-right-col-width', '300px');
+              try { localStorage.removeItem('controlab_desktop_right_col_width'); } catch {}
+              showToast('Coluna direita redefinida.', 'info', 1500);
+            });
+
+            splitterRight.addEventListener('keydown', (e) => {
+              if (!isDesktop()) return;
+              const step = e.shiftKey ? 30 : 15;
+              const curW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-right-col-width'), 10) || 300;
+              if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const newW = Math.min(curW + step, 500);
+                document.documentElement.style.setProperty('--home-right-col-width', `${newW}px`);
+                try { localStorage.setItem('controlab_desktop_right_col_width', newW); } catch {}
+              } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                const newW = Math.max(curW - step, 200);
+                document.documentElement.style.setProperty('--home-right-col-width', `${newW}px`);
+                try { localStorage.setItem('controlab_desktop_right_col_width', newW); } catch {}
+              }
+            });
+          }
+
+          window.addEventListener('resize', () => {
+            if (!isDesktop()) return;
+            const maxAllowedH = getMaxConsoleHeight();
+            const curH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--home-console-height'), 10) || 160;
+            if (curH > maxAllowedH) {
+              document.documentElement.style.setProperty('--home-console-height', `${maxAllowedH}px`);
+              try { localStorage.setItem('controlab_desktop_console_height', maxAllowedH); } catch {}
+            }
+          });
+
+          window.ControLABHomeSplitters = Object.freeze({
+            setConsoleHeight: (h) => {
+              const maxAllowedH = getMaxConsoleHeight();
+              const clamped = Math.min(Math.max(70, h), maxAllowedH);
+              document.documentElement.style.setProperty('--home-console-height', `${clamped}px`);
+              try { localStorage.setItem('controlab_desktop_console_height', clamped); } catch {}
+            },
+            setLeftColWidth: (w) => document.documentElement.style.setProperty('--home-left-col-width', `${w}px`),
+            setRightColWidth: (w) => document.documentElement.style.setProperty('--home-right-col-width', `${w}px`),
+            resetAll: () => {
+              const maxAllowedH = getMaxConsoleHeight();
+              const defaultH = Math.min(160, maxAllowedH);
+              document.documentElement.style.setProperty('--home-console-height', `${defaultH}px`);
+              document.documentElement.style.setProperty('--home-left-col-width', '240px');
+              document.documentElement.style.setProperty('--home-right-col-width', '300px');
+              try {
+                localStorage.removeItem('controlab_desktop_console_height');
+                localStorage.removeItem('controlab_desktop_left_col_width');
+                localStorage.removeItem('controlab_desktop_right_col_width');
+              } catch {}
+            },
+          });
+        }
+
+        setupHomeSplitPanes();
+
+        // Sincroniza estado inicial via backend
+        refreshHomeState();
+      }
 
     setupHomeScreen();
 
