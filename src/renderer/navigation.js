@@ -213,28 +213,61 @@
     });
 
     function setupHomeScreen() {
-      // Abas da barra superior
-      document.querySelectorAll('.home-tab').forEach((tab) => {
-        tab.addEventListener('click', () => {
-          const tabKey = tab.dataset.homeTab;
-          if (tabKey === 'inicio') {
-            document.querySelectorAll('.home-tab').forEach((t) => t.classList.remove('active'));
-            tab.classList.add('active');
-          } else if (tabKey === 'console') {
-            const input = optionalElement('home-console-input');
-            input?.focus();
-            showToast('Console interativo selecionado.', 'info', 2000);
-          } else {
-            const names = {
-              editor: 'Editor de scripts',
-              pacotes: 'Gerenciador de pacotes',
-              blocos: 'Diagrama de blocos',
-              ajuda: 'Ajuda e documentação',
-            };
-            showToast(`O recurso "${names[tabKey] || tabKey}" está em desenvolvimento.`, 'info', 2800);
+      // Helper para sincronizar estado ativo entre top tabs, tablet rail e bottom nav
+      function setActiveHomeTab(tabKey) {
+        document.querySelectorAll('.home-tab, .home-rail-item, .home-bottom-nav-item').forEach((el) => {
+          if (el.dataset.homeTab) {
+            el.classList.toggle('active', el.dataset.homeTab === tabKey);
           }
         });
+      }
+
+      function handleTabAction(tabKey) {
+        if (tabKey === 'inicio') {
+          setActiveHomeTab('inicio');
+          const homePage = optionalElement('page-home');
+          if (homePage) homePage.scrollTop = 0;
+        } else if (tabKey === 'console') {
+          setActiveHomeTab('console');
+          const input = optionalElement('home-console-input');
+          input?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+          input?.focus();
+          showToast('Console interativo selecionado.', 'info', 2000);
+        } else if (tabKey === 'modulos') {
+          setActiveHomeTab('modulos');
+          const modGrid = optionalElement('home-modules-grid');
+          modGrid?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+          showToast('Módulos científicos do ControLAB.', 'info', 2000);
+        } else if (tabKey === 'mais') {
+          window.ControLABSettings?.open?.();
+        } else {
+          const names = {
+            editor: 'Editor de scripts',
+            pacotes: 'Gerenciador de pacotes',
+            blocos: 'Diagrama de blocos',
+            ajuda: 'Ajuda e documentação',
+          };
+          showToast(`O recurso "${names[tabKey] || tabKey}" está em desenvolvimento.`, 'info', 2800);
+        }
+      }
+
+      // Abas da barra superior, trilho lateral e navegação inferior
+      document.querySelectorAll('.home-tab, .home-rail-item, .home-bottom-nav-item').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const tabKey = tab.dataset.homeTab;
+          if (tabKey) handleTabAction(tabKey);
+        });
       });
+
+      // Botão "Ver todos" nos módulos (modo mobile)
+      const btnSeeAll = optionalElement('btn-see-all-modules');
+      const modulesGrid = optionalElement('home-modules-grid');
+      if (btnSeeAll && modulesGrid) {
+        btnSeeAll.addEventListener('click', () => {
+          const isExpanded = modulesGrid.classList.toggle('modules-expanded');
+          btnSeeAll.textContent = isExpanded ? 'Ver menos' : 'Ver todos';
+        });
+      }
 
       // Botões de ação em "Começar"
       optionalElement('btn-home-new-script')?.addEventListener('click', () => {

@@ -83,6 +83,8 @@
     <header class="home-top-bar">
       <div class="home-brand">
         <span class="home-brand-title">ControLAB</span>
+        <span class="home-brand-sep" aria-hidden="true">|</span>
+        <span class="home-brand-page">Início</span>
       </div>
       <nav class="home-top-tabs">
         <button type="button" class="home-tab active" data-home-tab="inicio">INÍCIO</button>
@@ -97,165 +99,270 @@
       </div>
     </header>
 
-    <!-- Workspace Principal de 3 Colunas -->
-    <div class="home-workspace">
-      <!-- Coluna Esquerda: Pasta atual e Exemplos -->
-      <aside class="home-left-col">
-        <!-- Seção: Pasta atual -->
-        <section class="home-section-panel">
-          <div class="home-panel-header">
-            <span class="home-panel-title">Pasta atual</span>
-          </div>
-          <div class="home-folder-path" id="home-folder-path" role="button" tabindex="0" title="Clique para selecionar outra pasta de trabalho">
-            <span id="home-folder-path-text">~/Documentos/ControLAB</span>
-          </div>
-          <ul class="home-file-list" id="home-file-list">
-            <li class="home-empty-hint">Nenhum arquivo na pasta</li>
-          </ul>
-        </section>
+    <!-- Contêiner Principal com Trilho Lateral (Tablet) e Conteúdo -->
+    <div class="home-main-layout">
+      <!-- Navigation Rail para Tablet (84px) -->
+      <nav class="home-nav-rail" id="home-nav-rail" aria-label="Navegação Tablet">
+        <div class="home-rail-group home-rail-top">
+          <button type="button" class="home-rail-item active" data-home-tab="inicio" title="Início">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+            <span>Início</span>
+          </button>
+          <button type="button" class="home-rail-item" data-home-tab="editor" title="Editor">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Editor</span>
+          </button>
+          <button type="button" class="home-rail-item" data-home-tab="console" title="Console">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            <span>Console</span>
+          </button>
+          <button type="button" class="home-rail-item" data-home-tab="modulos" title="Módulos">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Módulos</span>
+          </button>
+        </div>
+        <div class="home-rail-group home-rail-bottom">
+          <button type="button" class="home-rail-item" data-action="settings" title="Ajustes">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Ajustes</span>
+          </button>
+        </div>
+      </nav>
 
-        <!-- Seção: Exemplos -->
-        <section class="home-section-panel">
-          <div class="home-panel-header">
-            <span class="home-panel-title">Exemplos</span>
-          </div>
-          <ul class="home-examples-list">
-            <li class="home-example-item" data-example="time" data-expr="4/(s^2+2*s+4)">
-              <span>Segunda ordem subamortecido</span>
-            </li>
-            <li class="home-example-item" data-example="controllers" data-expr="1/(s*(s+1)*(s+5))">
-              <span>Servo de posição</span>
-            </li>
-            <li class="home-example-item" data-example="frequency" data-expr="10/(s*(s+2)*(s+5))">
-              <span>Filtro passa-baixas</span>
-            </li>
-          </ul>
-        </section>
-      </aside>
+      <!-- Conteúdo Principal -->
+      <div class="home-main-content">
+        <!-- Workspace Principal de 3 Colunas -->
+        <div class="home-workspace">
+          <!-- Coluna Esquerda: Pasta atual e Exemplos -->
+          <aside class="home-left-col">
+            <!-- Seção: Pasta atual -->
+            <section class="home-section-panel">
+              <div class="home-panel-header">
+                <span class="home-panel-title">Pasta atual</span>
+              </div>
+              <div class="home-folder-path" id="home-folder-path" role="button" tabindex="0" title="Clique para selecionar outra pasta de trabalho">
+                <span id="home-folder-path-text">~/Documentos/ControLAB</span>
+              </div>
+              <ul class="home-file-list" id="home-file-list">
+                <li class="home-empty-hint">Nenhum arquivo na pasta</li>
+              </ul>
+            </section>
 
-      <!-- Coluna Central: Começar e Módulos -->
-      <section class="home-center-col">
-        <!-- Painel: Começar -->
-        <div class="home-section-panel">
-          <div class="home-panel-header">
-            <span class="home-panel-title">Começar</span>
-            <span class="home-panel-hint">Ctrl+N &nbsp;·&nbsp; Ctrl+O</span>
-          </div>
-          <div class="home-start-body">
-            <p class="home-start-desc">
-              Execute scripts .m, analise sistemas e gere gráficos, no editor ou pela interface gráfica de cada módulo.
-            </p>
-            <div class="home-action-buttons">
-              <button type="button" class="btn-home-primary" id="btn-home-new-script">Novo script</button>
-              <button type="button" class="btn-home-secondary" id="btn-home-open-file">Abrir arquivo</button>
-              <button type="button" class="btn-home-secondary" id="btn-home-import">Importar .m / .mat</button>
+            <!-- Seção: Exemplos -->
+            <section class="home-section-panel">
+              <div class="home-panel-header">
+                <span class="home-panel-title">Exemplos</span>
+              </div>
+              <ul class="home-examples-list">
+                <li class="home-example-item" data-example="time" data-expr="4/(s^2+2*s+4)">
+                  <span>Segunda ordem subamortecido</span>
+                </li>
+                <li class="home-example-item" data-example="controllers" data-expr="1/(s*(s+1)*(s+5))">
+                  <span>Servo de posição</span>
+                </li>
+                <li class="home-example-item" data-example="frequency" data-expr="10/(s*(s+2)*(s+5))">
+                  <span>Filtro passa-baixas</span>
+                </li>
+              </ul>
+            </section>
+          </aside>
+
+          <!-- Coluna Central: Começar e Módulos -->
+          <section class="home-center-col">
+            <!-- Painel: Começar -->
+            <div class="home-section-panel">
+              <div class="home-panel-header">
+                <span class="home-panel-title">Começar</span>
+                <span class="home-panel-hint">Ctrl+N &nbsp;·&nbsp; Ctrl+O</span>
+              </div>
+              <div class="home-start-body">
+                <p class="home-start-desc">
+                  <span class="desc-full">Execute scripts .m, analise sistemas e gere gráficos, no editor ou pela interface gráfica de cada módulo.</span>
+                  <span class="desc-mobile">Execute scripts .m e analise sistemas.</span>
+                </p>
+                <div class="home-action-buttons">
+                  <button type="button" class="btn-home-primary" id="btn-home-new-script">Novo script</button>
+                  <div class="home-action-subrow">
+                    <button type="button" class="btn-home-secondary" id="btn-home-open-file">Abrir arquivo</button>
+                    <button type="button" class="btn-home-secondary" id="btn-home-import">Importar<span class="btn-lbl-full"> .m / .mat</span></button>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+
+            <!-- Painel: Módulos -->
+            <div class="home-section-panel home-modules-panel">
+              <div class="home-panel-header">
+                <span class="home-panel-title">Módulos</span>
+                <span class="home-panel-hint">Cada módulo gera o código equivalente</span>
+                <button type="button" class="home-see-all-link" id="btn-see-all-modules">Ver todos</button>
+              </div>
+              <div class="home-modules-grid" id="home-modules-grid">
+                <!-- 1. Sistemas de controle -->
+                <div class="home-module-card" id="card-mod-control" data-nav="time" role="button" tabindex="0">
+                  <div class="mod-card-header">
+                    <h3 class="mod-card-title">
+                      <span class="title-full">Sistemas de controle</span>
+                      <span class="title-mobile">Controle</span>
+                    </h3>
+                    <span class="mod-badge">control</span>
+                  </div>
+                  <p class="mod-card-desc">
+                    <span class="desc-full">Resposta no tempo, LGR, Bode, PID e espaço de estados.</span>
+                    <span class="desc-mobile">Tempo, LGR, Bode e PID.</span>
+                  </p>
+                </div>
+
+                <!-- 2. Sinais e filtros -->
+                <div class="home-module-card" id="card-mod-signals" data-module="Sinais e filtros" role="button" tabindex="0">
+                  <div class="mod-card-header">
+                    <h3 class="mod-card-title">
+                      <span class="title-full">Sinais e filtros</span>
+                      <span class="title-mobile">Sinais</span>
+                    </h3>
+                    <span class="mod-badge">signal</span>
+                  </div>
+                  <p class="mod-card-desc">
+                    <span class="desc-full">FFT, espectros e projeto de filtros.</span>
+                    <span class="desc-mobile">FFT e filtros.</span>
+                  </p>
+                </div>
+
+                <!-- 3. Otimização -->
+                <div class="home-module-card" id="card-mod-optim" data-module="Otimização" role="button" tabindex="0">
+                  <div class="mod-card-header">
+                    <h3 class="mod-card-title">Otimização</h3>
+                    <span class="mod-badge">optim</span>
+                  </div>
+                  <p class="mod-card-desc">
+                    <span class="desc-full">Mínimos quadrados, raízes e programação linear.</span>
+                    <span class="desc-mobile">Raízes e mínimos quadrados.</span>
+                  </p>
+                </div>
+
+                <!-- 4. Álgebra linear -->
+                <div class="home-module-card" id="card-mod-linalg" data-module="Álgebra linear" role="button" tabindex="0">
+                  <div class="mod-card-header">
+                    <h3 class="mod-card-title">Álgebra linear</h3>
+                    <span class="mod-badge">linalg</span>
+                  </div>
+                  <p class="mod-card-desc">
+                    <span class="desc-full">Matrizes, autovalores, decomposições e sistemas lineares.</span>
+                    <span class="desc-mobile">Matrizes e autovalores.</span>
+                  </p>
+                </div>
+
+                <!-- 5. Equações diferenciais (oculto por padrão em mobile) -->
+                <div class="home-module-card is-extra-mobile" id="card-mod-diffeq" data-module="Equações diferenciais" role="button" tabindex="0">
+                  <div class="mod-card-header">
+                    <h3 class="mod-card-title">Equações diferenciais</h3>
+                    <span class="mod-badge">ode</span>
+                  </div>
+                  <p class="mod-card-desc">Integradores para sistemas rígidos e não rígidos.</p>
+                </div>
+
+                <!-- 6. Diagrama de blocos (oculto por padrão em mobile) -->
+                <div class="home-module-card mod-card-dev is-extra-mobile" id="card-mod-blocks" data-module="Diagrama de blocos" role="button" tabindex="0">
+                  <div class="mod-card-header">
+                    <h3 class="mod-card-title">Diagrama de blocos</h3>
+                    <span class="mod-badge">blocos</span>
+                  </div>
+                  <p class="mod-card-desc">Modelagem e simulação por blocos. Em desenvolvimento.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Coluna Direita: Recentes e Workspace -->
+          <aside class="home-right-col">
+            <!-- Seção: Recentes -->
+            <section class="home-section-panel">
+              <div class="home-panel-header">
+                <span class="home-panel-title">Recentes</span>
+              </div>
+              <ul class="home-recent-list" id="home-recent-list">
+                <li class="home-empty-hint">Nenhum cálculo recente</li>
+              </ul>
+            </section>
+
+            <!-- Seção: Workspace -->
+            <section class="home-section-panel">
+              <div class="home-panel-header">
+                <span class="home-panel-title">Workspace</span>
+                <span class="home-panel-hint">Nome · Tipo</span>
+              </div>
+              <ul class="home-workspace-list" id="home-workspace-list">
+                <li class="home-workspace-item" data-var="G">
+                  <span class="var-name">G</span>
+                  <span class="var-type">tf</span>
+                </li>
+                <li class="home-workspace-item" data-var="C">
+                  <span class="var-name">C</span>
+                  <span class="var-type">pid</span>
+                </li>
+                <li class="home-workspace-item" data-var="t">
+                  <span class="var-name">t</span>
+                  <span class="var-type">vetor</span>
+                </li>
+                <li class="home-workspace-item" data-var="y">
+                  <span class="var-name">y</span>
+                  <span class="var-type">vetor</span>
+                </li>
+              </ul>
+            </section>
+          </aside>
         </div>
 
-        <!-- Painel: Módulos -->
-        <div class="home-section-panel home-modules-panel">
+        <!-- Área Inferior: Console e Rodapé -->
+        <section class="home-console-area">
           <div class="home-panel-header">
-            <span class="home-panel-title">Módulos</span>
-            <span class="home-panel-hint">Cada módulo gera o código equivalente</span>
+            <span class="home-panel-title">Console</span>
+            <span class="home-panel-hint">Histórico: ↑ ↓ &nbsp;·&nbsp; Tab completa</span>
           </div>
-          <div class="home-modules-grid">
-            <!-- 1. Sistemas de controle -->
-            <div class="home-module-card" id="card-mod-control" data-nav="time" role="button" tabindex="0">
-              <h3 class="mod-card-title">Sistemas de controle</h3>
-              <p class="mod-card-desc">Resposta no tempo, LGR, Bode, PID e espaço de estados.</p>
-            </div>
-
-            <!-- 2. Sinais e filtros -->
-            <div class="home-module-card" id="card-mod-signals" data-module="Sinais e filtros" role="button" tabindex="0">
-              <h3 class="mod-card-title">Sinais e filtros</h3>
-              <p class="mod-card-desc">FFT, espectros e projeto de filtros.</p>
-            </div>
-
-            <!-- 3. Otimização -->
-            <div class="home-module-card" id="card-mod-optim" data-module="Otimização" role="button" tabindex="0">
-              <h3 class="mod-card-title">Otimização</h3>
-              <p class="mod-card-desc">Mínimos quadrados, raízes e programação linear.</p>
-            </div>
-
-            <!-- 4. Álgebra linear -->
-            <div class="home-module-card" id="card-mod-linalg" data-module="Álgebra linear" role="button" tabindex="0">
-              <h3 class="mod-card-title">Álgebra linear</h3>
-              <p class="mod-card-desc">Matrizes, autovalores, decomposições e sistemas lineares.</p>
-            </div>
-
-            <!-- 5. Equações diferenciais -->
-            <div class="home-module-card" id="card-mod-diffeq" data-module="Equações diferenciais" role="button" tabindex="0">
-              <h3 class="mod-card-title">Equações diferenciais</h3>
-              <p class="mod-card-desc">Integradores para sistemas rígidos e não rígidos.</p>
-            </div>
-
-            <!-- 6. Diagrama de blocos (dashed border) -->
-            <div class="home-module-card mod-card-dev" id="card-mod-blocks" data-module="Diagrama de blocos" role="button" tabindex="0">
-              <h3 class="mod-card-title">Diagrama de blocos</h3>
-              <p class="mod-card-desc">Modelagem e simulação por blocos. Em desenvolvimento.</p>
+          <div class="home-console-body" id="home-console-body">
+            <div class="home-console-logs" id="home-console-logs"></div>
+            <div class="home-console-input-row">
+              <span class="console-prompt">&gt;&gt;</span>
+              <input type="text" id="home-console-input" class="home-console-input" placeholder="digite um comando" autocomplete="off" spellcheck="false" aria-label="Comando do Console" />
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- Coluna Direita: Recentes e Workspace -->
-      <aside class="home-right-col">
-        <!-- Seção: Recentes -->
-        <section class="home-section-panel">
-          <div class="home-panel-header">
-            <span class="home-panel-title">Recentes</span>
-          </div>
-          <ul class="home-recent-list" id="home-recent-list">
-            <li class="home-empty-hint">Nenhum cálculo recente</li>
-          </ul>
+          <footer class="home-footer">
+            <div class="home-footer-status">
+              <span class="status-dot-ok" aria-hidden="true"></span>
+              <span class="status-label">Pronto</span>
+            </div>
+            <span class="home-footer-text">
+              <span class="footer-tablet-text">Código aberto · MIT</span>
+              <span class="footer-desktop-text">open source</span>
+            </span>
+          </footer>
         </section>
-
-        <!-- Seção: Workspace -->
-        <section class="home-section-panel">
-          <div class="home-panel-header">
-            <span class="home-panel-title">Workspace</span>
-            <span class="home-panel-hint">Nome · Tipo</span>
-          </div>
-          <ul class="home-workspace-list" id="home-workspace-list">
-            <li class="home-workspace-item" data-var="G">
-              <span class="var-name">G</span>
-              <span class="var-type">tf</span>
-            </li>
-            <li class="home-workspace-item" data-var="C">
-              <span class="var-name">C</span>
-              <span class="var-type">pid</span>
-            </li>
-            <li class="home-workspace-item" data-var="t">
-              <span class="var-name">t</span>
-              <span class="var-type">vetor</span>
-            </li>
-            <li class="home-workspace-item" data-var="y">
-              <span class="var-name">y</span>
-              <span class="var-type">vetor</span>
-            </li>
-          </ul>
-        </section>
-      </aside>
+      </div>
     </div>
 
-    <!-- Área Inferior: Console e Rodapé -->
-    <section class="home-console-area">
-      <div class="home-panel-header">
-        <span class="home-panel-title">Console</span>
-        <span class="home-panel-hint">Histórico: ↑ ↓ &nbsp;·&nbsp; Tab completa</span>
-      </div>
-      <div class="home-console-body" id="home-console-body">
-        <div class="home-console-logs" id="home-console-logs"></div>
-        <div class="home-console-input-row">
-          <span class="console-prompt">&gt;&gt;</span>
-          <input type="text" id="home-console-input" class="home-console-input" placeholder="" autocomplete="off" spellcheck="false" aria-label="Comando do Console" />
-        </div>
-      </div>
-      <footer class="home-footer">
-        <span class="home-footer-text">open source</span>
-      </footer>
-    </section>
+    <!-- Barra de Navegação Inferior para Mobile -->
+    <nav class="home-bottom-nav" id="home-bottom-nav" aria-label="Navegação Mobile">
+      <button type="button" class="home-bottom-nav-item active" data-home-tab="inicio">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+        <span>Início</span>
+      </button>
+      <button type="button" class="home-bottom-nav-item" data-home-tab="editor">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>Editor</span>
+      </button>
+      <button type="button" class="home-bottom-nav-item" data-home-tab="console">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        <span>Console</span>
+      </button>
+      <button type="button" class="home-bottom-nav-item" data-home-tab="modulos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Módulos</span>
+      </button>
+      <button type="button" class="home-bottom-nav-item" data-home-tab="mais">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+        <span>Mais</span>
+      </button>
+    </nav>
 
     <!-- Compatibilidade semântica de módulos -->
     <div style="display:none;" aria-hidden="true">
