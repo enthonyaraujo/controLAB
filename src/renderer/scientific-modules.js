@@ -562,8 +562,9 @@
         if (result.image) plot.src = result.image;
       }
 
-      element('btn-scientific-png').hidden = !result.image;
-      element('btn-scientific-svg').hidden = !result.svg;
+      if (element('btn-scientific-copy')) element('btn-scientific-copy').hidden = !result.image;
+      if (element('btn-scientific-png')) element('btn-scientific-png').hidden = !result.image;
+      if (element('btn-scientific-svg')) element('btn-scientific-svg').hidden = !result.svg;
 
       // 3. TOP 4 PRIMARY METRICS (Métricas de destaque)
       const primaryContainer = element('scientific-primary-metrics');
@@ -688,17 +689,54 @@
       }
     });
 
+    element('btn-scientific-copy')?.addEventListener('click', async () => {
+      if (!currentResult) return;
+      const activeImg = currentResult.plots?.[currentResponseType]?.image || currentResult.image;
+      if (!activeImg) return;
+      try {
+        const res = await (global.api?.copyImageToClipboard ? global.api.copyImageToClipboard(activeImg) : Promise.reject(new Error('API indisponível')));
+        if (res && res.success !== false) {
+          showToast('Gráfico copiado para a Área de Transferência!', 'success');
+        } else if (res?.error) {
+          showToast(`Não foi possível copiar: ${res.error}`, 'error', 4000);
+        }
+      } catch (err) {
+        showToast(`Erro ao copiar: ${err.message}`, 'error', 3500);
+      }
+    });
+
     element('btn-scientific-png')?.addEventListener('click', async () => {
       if (!currentResult) return;
       const activeImg = currentResult.plots?.[currentResponseType]?.image || currentResult.image;
       if (!activeImg) return;
-      await global.api.saveImage({ base64: activeImg, defaultName: `${MODULES[currentKey].filename}.png` });
+      try {
+        const res = await global.api.saveImage({
+          base64: activeImg,
+          defaultName: `${MODULES[currentKey].filename}.png`
+        });
+        if (res && res.success !== false) {
+          showToast(res.message || 'Imagem PNG salva com sucesso!', 'success');
+        }
+      } catch (err) {
+        showToast(`Erro ao salvar: ${err.message}`, 'error', 3500);
+      }
     });
+
     element('btn-scientific-svg')?.addEventListener('click', async () => {
       if (!currentResult) return;
       const activeSvg = currentResult.plots?.[currentResponseType]?.svg || currentResult.svg;
       if (!activeSvg) return;
-      await global.api.saveSVG({ svg: activeSvg, defaultName: `${MODULES[currentKey].filename}.svg` });
+      try {
+        const res = await global.api.saveSVG({
+          svg: activeSvg,
+          defaultName: `${MODULES[currentKey].filename}.svg`
+        });
+        if (res && res.success !== false) {
+          showToast(res.message || 'Gráfico Vetorial SVG salvo com sucesso!', 'success');
+        }
+      } catch (err) {
+        showToast(`Erro ao salvar SVG: ${err.message}`, 'error', 3500);
+      }
     });
 
     function recalculate() {
