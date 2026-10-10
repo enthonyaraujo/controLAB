@@ -141,6 +141,15 @@
         renderResults(data);
         if (emptyState) emptyState.style.display = 'none';
         if (resultsContainer) resultsContainer.style.display = 'flex';
+        if (typeof window.addRecentItem === 'function') {
+          window.addRecentItem({
+            name: expr,
+            expr,
+            nav: 'routh',
+            type: 'math',
+            timestamp: Date.now(),
+          });
+        }
 
         const elapsed = ((now() - t0) / 1000).toFixed(3).replace('.', ',');
         const consoleLine = optionalElement('routh-console-line');

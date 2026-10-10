@@ -178,6 +178,63 @@ ipcMain.handle('run-scientific-analysis', async (event, action, payload) => {
   }
 });
 
+let currentWorkspaceFolder = null;
+
+function getDefaultWorkspacePath() {
+  if (process.platform === 'android') {
+    return '/sdcard/ControLAB';
+  }
+  try {
+    const docs = app.getPath('documents');
+    return path.join(docs, 'ControLAB');
+  } catch {
+    const home = app.getPath('home');
+    const ptDocs = path.join(home, 'Documentos');
+    if (fs.existsSync(ptDocs)) {
+      return path.join(ptDocs, 'ControLAB');
+    }
+    return path.join(home, 'Documents', 'ControLAB');
+  }
+}
+
+ipcMain.handle('console-exec', async (event, command) => {
+  try {
+    return await runPythonBridge({ action: 'console_exec', command });
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('get-home-state', async (event, folder) => {
+  try {
+    const targetFolder = folder || currentWorkspaceFolder || getDefaultWorkspacePath();
+    return await runPythonBridge({ action: 'home_get_state', folder: targetFolder });
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('select-workspace-folder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Selecionar pasta de trabalho',
+    defaultPath: currentWorkspaceFolder || getDefaultWorkspacePath(),
+    properties: ['openDirectory', 'createDirectory'],
+  });
+  if (!result.canceled && result.filePaths.length > 0) {
+    currentWorkspaceFolder = result.filePaths[0];
+    return { success: true, folder: currentWorkspaceFolder };
+  }
+  return { success: false, canceled: true };
+});
+
+ipcMain.handle('set-workspace-folder', async (event, folder) => {
+  if (folder && fs.existsSync(folder)) {
+    currentWorkspaceFolder = folder;
+    return { success: true, folder };
+  }
+  return { success: false, error: 'Pasta não existe.' };
+});
+
 ipcMain.handle('save-image', async (event, { base64, defaultName }) => {
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
     title: 'Salvar Gráfico do LGR',
@@ -543,6 +600,13 @@ ipcMain.handle('install-update-package', async (event, { filePath }) => {
 app.whenReady().then(() => {
   if (process.platform === 'win32') {
     app.setAppUserModelId('br.com.enthony.lgrstudio');
+  }
+
+  currentWorkspaceFolder = getDefaultWorkspacePath();
+  try {
+    fs.mkdirSync(currentWorkspaceFolder, { recursive: true });
+  } catch (err) {
+    console.error('Falha ao criar pasta de trabalho padrão:', err);
   }
 
   createWindow();

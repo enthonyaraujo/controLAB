@@ -18,6 +18,10 @@ contextBridge.exposeInMainWorld('api', {
   cancelUpdateDownload: () => ipcRenderer.invoke('cancel-update-download'),
   openUpdateFolder: (filePath) => ipcRenderer.invoke('open-update-folder', filePath),
   installUpdatePackage: (payload) => ipcRenderer.invoke('install-update-package', payload),
+  consoleExec: (command) => ipcRenderer.invoke('console-exec', command),
+  getHomeState: (folder) => ipcRenderer.invoke('get-home-state', folder),
+  selectWorkspaceFolder: () => ipcRenderer.invoke('select-workspace-folder'),
+  setWorkspaceFolder: (folder) => ipcRenderer.invoke('set-workspace-folder', folder),
   onUpdateDownloadProgress: (callback) => {
     const handler = (event, data) => callback(data);
     ipcRenderer.on('on-update-download-progress', handler);

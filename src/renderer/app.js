@@ -223,6 +223,16 @@ document.addEventListener('DOMContentLoaded', () => {
       plotImg.style.display = 'block';
       plotImg.src = res.image;
       resetZoom();
+      if (typeof window.addRecentItem === 'function') {
+        const lgrExpr = payload.expr || (payload.num && payload.den ? `(${payload.num})/(${payload.den})` : 'G(s)');
+        window.addRecentItem({
+          name: lgrExpr,
+          expr: lgrExpr,
+          nav: 'lgr',
+          type: 'math',
+          timestamp: Date.now(),
+        });
+      }
 
       // 2. Renderizar Fórmulas LaTeX via KaTeX
       renderMath(latexExpanded, res.latex_exp);

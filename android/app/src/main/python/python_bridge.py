@@ -5,6 +5,7 @@ import io
 import json
 import os
 import sys
+import tempfile
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -24,6 +25,169 @@ from lgr_engine import (
     parse_tf_parts,
     parse_zpk,
 )
+
+_CONSOLE_WORKSPACE = {
+    "G": {"type": "tf", "value": "4/(s^2 + 2*s + 4)"},
+    "C": {"type": "pid", "value": "Kp=18, Ti=1.405, Td=0.351"},
+    "t": {"type": "vetor", "value": "array([0.0, ..., 10.0])"},
+    "y": {"type": "vetor", "value": "array([0.0, ..., 1.0])"},
+}
+
+_RECENT_ITEMS = []
+_CURRENT_WORKSPACE_FOLDER = None
+
+
+def get_default_workspace():
+    """Retorna e garante a existência da pasta padrão do ControLAB conforme a plataforma."""
+    # Android (armazenamento interno /ControLAB/)
+    if "ANDROID_ROOT" in os.environ or "ANDROID_DATA" in os.environ or os.path.exists("/sdcard"):
+        for candidate in ["/sdcard/ControLAB", "/storage/emulated/0/ControLAB"]:
+            try:
+                os.makedirs(candidate, exist_ok=True)
+                return candidate
+            except Exception:
+                pass
+        fallback = os.path.join(tempfile.gettempdir(), "ControLAB")
+        os.makedirs(fallback, exist_ok=True)
+        return fallback
+
+    # Windows e Linux (Documentos/ControLAB)
+    home = os.path.expanduser("~")
+    doc_pt = os.path.join(home, "Documentos", "ControLAB")
+    doc_en = os.path.join(home, "Documents", "ControLAB")
+
+    if os.path.isdir(doc_pt):
+        target = doc_pt
+    elif os.path.isdir(doc_en):
+        target = doc_en
+    elif os.path.isdir(os.path.join(home, "Documentos")):
+        target = doc_pt
+    else:
+        target = doc_pt
+
+    try:
+        os.makedirs(target, exist_ok=True)
+    except Exception:
+        pass
+    return target
+
+
+def format_display_path(path_str):
+    """Formata caminho para exibição amigável (~/Documentos/ControLAB ou /ControLAB)."""
+    if not path_str:
+        return ""
+    home = os.path.expanduser("~")
+    norm = os.path.normpath(path_str)
+    if norm.startswith(home):
+        return "~" + norm[len(home):]
+    if "sdcard" in norm or "storage/emulated" in norm:
+        return "/ControLAB"
+    return norm
+
+
+def list_workspace_files(folder_path):
+    """Lista arquivos reais da pasta de trabalho atual classificando por extensão/tipo."""
+    if not folder_path or not os.path.isdir(folder_path):
+        return []
+
+    files = []
+    try:
+        for entry in sorted(os.listdir(folder_path)):
+            if entry.startswith(".") or entry.endswith("~") or entry.endswith(".pyc"):
+                continue
+            full_path = os.path.join(folder_path, entry)
+            if os.path.isfile(full_path):
+                ext = os.path.splitext(entry)[1].lower()
+                file_type = "arquivo"
+                if ext == ".m":
+                    try:
+                        with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+                            header = f.read(512).lower()
+                            file_type = "função" if "function" in header else "script"
+                    except Exception:
+                        file_type = "script"
+                elif ext == ".mat":
+                    file_type = "dados"
+                elif ext == ".blk":
+                    file_type = "blocos"
+                elif ext in (".csv", ".txt", ".dat", ".json"):
+                    file_type = "dados"
+                elif ext == ".py":
+                    file_type = "python"
+                elif ext in (".slx", ".mdl", ".sim"):
+                    file_type = "modelo"
+                files.append({
+                    "name": entry,
+                    "type": file_type,
+                    "path": full_path,
+                })
+    except Exception:
+        pass
+    return files
+
+
+def _format_workspace():
+    return [
+        {"name": k, "type": v["type"], "value": v["value"]}
+        for k, v in _CONSOLE_WORKSPACE.items()
+    ]
+
+
+def _eval_console_command(cmd):
+    import math
+    import sympy as sp
+
+    env = {
+        "np": np,
+        "sp": sp,
+        "math": math,
+        "s": sp.Symbol("s"),
+    }
+    for k, v in _CONSOLE_WORKSPACE.items():
+        if v["type"] == "tf":
+            try:
+                env[k] = sp.sympify(v["value"].replace("^", "**"))
+            except Exception:
+                env[k] = v["value"]
+
+    if "=" in cmd and not cmd.strip().startswith("=="):
+        parts = cmd.split("=", 1)
+        var_name = parts[0].strip()
+        expr_str = parts[1].strip()
+        if var_name.isidentifier():
+            try:
+                val = eval(expr_str.replace("^", "**"), {"__builtins__": {}}, env)
+                val_type = "escalar"
+                if isinstance(val, (np.ndarray, list)):
+                    val_type = "vetor"
+                elif hasattr(val, "free_symbols") or "s" in expr_str:
+                    val_type = "tf"
+                _CONSOLE_WORKSPACE[var_name] = {
+                    "type": val_type,
+                    "value": str(val),
+                }
+                return f"{var_name} = {val}", None
+            except Exception as e:
+                try:
+                    val = sp.sympify(expr_str.replace("^", "**"))
+                    _CONSOLE_WORKSPACE[var_name] = {
+                        "type": "tf",
+                        "value": str(val),
+                    }
+                    return f"{var_name} = {val}", None
+                except Exception:
+                    return None, str(e)
+
+    try:
+        val = eval(cmd.replace("^", "**"), {"__builtins__": {}}, env)
+        return f"ans = {val}", None
+    except Exception:
+        try:
+            val = sp.sympify(cmd.replace("^", "**"))
+            return f"ans = {val}", None
+        except Exception as e:
+            return None, str(e)
+
 
 
 def get_transfer_function(payload):
@@ -251,6 +415,92 @@ def dispatch(data):
             observer_poles=data.get("observer_poles", ""),
             theme=theme,
         )
+    if action == "home_get_state":
+        global _CURRENT_WORKSPACE_FOLDER
+        req_folder = (data.get("folder") or "").strip()
+        if req_folder:
+            _CURRENT_WORKSPACE_FOLDER = os.path.abspath(os.path.expanduser(req_folder))
+        if not _CURRENT_WORKSPACE_FOLDER:
+            _CURRENT_WORKSPACE_FOLDER = get_default_workspace()
+
+        try:
+            os.makedirs(_CURRENT_WORKSPACE_FOLDER, exist_ok=True)
+        except Exception:
+            pass
+
+        return {
+            "success": True,
+            "folder": format_display_path(_CURRENT_WORKSPACE_FOLDER),
+            "folderPath": _CURRENT_WORKSPACE_FOLDER,
+            "files": list_workspace_files(_CURRENT_WORKSPACE_FOLDER),
+            "recent": data.get("recent") or _RECENT_ITEMS,
+            "workspace": _format_workspace(),
+        }
+    if action == "console_exec":
+        cmd = (data.get("command") or "").strip()
+        if not cmd:
+            return {"success": True, "output": "", "workspace": _format_workspace()}
+
+        if cmd in ("clc", "clear"):
+            return {"success": True, "output": "__CLEAR__", "workspace": _format_workspace()}
+
+        if cmd in ("help", "ajuda"):
+            help_text = (
+                "ControLAB Console v3.1.1\n"
+                "Comandos disponíveis: help, clc, clear, whos, pwd, ls, dir, cd <pasta>\n"
+                "Exemplos: 4/(s^2+2*s+4), K = 10, 2 + 2"
+            )
+            return {"success": True, "output": help_text, "workspace": _format_workspace()}
+
+        if cmd == "pwd":
+            cur = _CURRENT_WORKSPACE_FOLDER or get_default_workspace()
+            return {"success": True, "output": cur, "workspace": _format_workspace()}
+
+        if cmd in ("ls", "dir"):
+            cur = _CURRENT_WORKSPACE_FOLDER or get_default_workspace()
+            files = list_workspace_files(cur)
+            if not files:
+                out = "(pasta vazia)"
+            else:
+                out = "\n".join(f"{f['name']:<24} {f['type']}" for f in files)
+            return {"success": True, "output": out, "workspace": _format_workspace()}
+
+        if cmd == "cd" or cmd.startswith("cd "):
+            target_path = cmd[3:].strip() if len(cmd) > 3 else get_default_workspace()
+            target_path = os.path.expanduser(target_path)
+            if not os.path.isabs(target_path):
+                target_path = os.path.join(_CURRENT_WORKSPACE_FOLDER or get_default_workspace(), target_path)
+            target_path = os.path.abspath(target_path)
+            if os.path.isdir(target_path):
+                _CURRENT_WORKSPACE_FOLDER = target_path
+                disp = format_display_path(target_path)
+                return {
+                    "success": True,
+                    "output": f"Pasta alterada para {disp}",
+                    "folder": disp,
+                    "folderPath": target_path,
+                    "files": list_workspace_files(target_path),
+                    "workspace": _format_workspace(),
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": f"Pasta não encontrada: {target_path}",
+                    "workspace": _format_workspace(),
+                }
+
+        if cmd == "whos":
+            lines = ["Nome\tTipo\tValor"]
+            for item in _format_workspace():
+                lines.append(f"{item['name']}\t{item['type']}\t{item['value']}")
+            return {"success": True, "output": "\n".join(lines), "workspace": _format_workspace()}
+
+        out, err = _eval_console_command(cmd)
+        return {
+            "success": True,
+            "output": out if out is not None else f"Erro: {err}",
+            "workspace": _format_workspace(),
+        }
     raise ValueError(f"Ação desconhecida: {action}")
 
 

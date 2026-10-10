@@ -1005,6 +1005,17 @@
         if (statusState) statusState.textContent = 'Pronto';
         const metaEl = element('sci-status-meta');
         if (metaEl) metaEl.textContent = meta.solverMeta;
+        if (typeof window.addRecentItem === 'function') {
+          const exprInput = getExpressionInput();
+          const exprStr = exprInput?.value?.trim() || config.title;
+          window.addRecentItem({
+            name: exprStr,
+            expr: exprStr,
+            nav: currentKey,
+            type: 'math',
+            timestamp: Date.now(),
+          });
+        }
         showToast(`${config.title} concluída.`, 'success');
       } catch (error) {
         if (currentRequest !== requestId) return;
