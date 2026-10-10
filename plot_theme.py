@@ -20,49 +20,49 @@ from matplotlib import font_manager
 # Garante backend headless
 matplotlib.use("Agg")
 
-# Paletas preto e branco com fundo branco para ambos os temas (estilo científico profissional)
+# Paletas unificadas no padrão científico acadêmico preto e branco (para ambos os temas)
 THEME_TOKENS: dict[str, dict[str, Any]] = {
     "dark": {
         "bg_fig": "#FFFFFF",
         "bg_card": "#FFFFFF",
-        "text": "#0F172A",
-        "text_secondary": "#334155",
-        "text_muted": "#64748B",
+        "text": "#000000",
+        "text_secondary": "#111827",
+        "text_muted": "#475569",
         "grid": "#CBD5E1",
-        "grid_alpha": 0.65,
-        "spine": "#0F172A",
-        "accent": "#0284C7",
-        "accent_secondary": "#0E7490",
+        "grid_alpha": 0.75,
+        "spine": "#000000",
+        "accent": "#000000",
+        "accent_secondary": "#334155",
         "reference": "#64748B",
-        "success": "#059669",
-        "danger": "#DC2626",
-        "warning": "#D97706",
-        "lgr_branch": "#DC2626",
-        "lgr_pole": "#1E3A8A",
-        "lgr_zero": "#1E3A8A",
-        "lgr_break": "#2563EB",
+        "success": "#0F766E",
+        "danger": "#B91C1C",
+        "warning": "#B45309",
+        "lgr_branch": "#000000",
+        "lgr_pole": "#000000",
+        "lgr_zero": "#000000",
+        "lgr_break": "#334155",
         "font_sans": "IBM Plex Sans",
         "font_mono": "JetBrains Mono",
     },
     "light": {
         "bg_fig": "#FFFFFF",
         "bg_card": "#FFFFFF",
-        "text": "#0F172A",
-        "text_secondary": "#334155",
-        "text_muted": "#64748B",
+        "text": "#000000",
+        "text_secondary": "#111827",
+        "text_muted": "#475569",
         "grid": "#CBD5E1",
-        "grid_alpha": 0.65,
-        "spine": "#0F172A",
-        "accent": "#0284C7",
-        "accent_secondary": "#0E7490",
+        "grid_alpha": 0.75,
+        "spine": "#000000",
+        "accent": "#000000",
+        "accent_secondary": "#334155",
         "reference": "#64748B",
-        "success": "#059669",
-        "danger": "#DC2626",
-        "warning": "#D97706",
-        "lgr_branch": "#DC2626",
-        "lgr_pole": "#1E3A8A",
-        "lgr_zero": "#1E3A8A",
-        "lgr_break": "#2563EB",
+        "success": "#0F766E",
+        "danger": "#B91C1C",
+        "warning": "#B45309",
+        "lgr_branch": "#000000",
+        "lgr_pole": "#000000",
+        "lgr_zero": "#000000",
+        "lgr_break": "#334155",
         "font_sans": "IBM Plex Sans",
         "font_mono": "JetBrains Mono",
     },
@@ -111,7 +111,7 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
     """Aplica o tema visual profissional aos eixos e à figura."""
     tokens = get_theme_tokens(theme)
 
-    fig.patch.set_facecolor("#FFFFFF")
+    fig.patch.set_facecolor(tokens["bg_fig"])
     fig.patch.set_alpha(1.0)
 
     # Identifica todos os eixos se não fornecidos
@@ -125,34 +125,31 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
         target_axes = [axes]
 
     for ax in target_axes:
-        ax.set_facecolor("#FFFFFF")
+        ax.set_facecolor(tokens["bg_fig"])
         ax.patch.set_alpha(1.0)
 
-        # Spines: remove superior e direita, suaviza inferior e esquerda
-        if "top" in ax.spines:
-            ax.spines["top"].set_visible(False)
-        if "right" in ax.spines:
-            ax.spines["right"].set_visible(False)
-        if "left" in ax.spines:
-            ax.spines["left"].set_color(tokens["spine"])
-            ax.spines["left"].set_linewidth(1.0)
-        if "bottom" in ax.spines:
-            ax.spines["bottom"].set_color(tokens["spine"])
-            ax.spines["bottom"].set_linewidth(1.0)
+        # Caixa de eixos completa (todas as 4 bordas visíveis em 1.0px)
+        for spine_name in ("top", "right", "bottom", "left"):
+            if spine_name in ax.spines:
+                ax.spines[spine_name].set_visible(True)
+                ax.spines[spine_name].set_color(tokens["spine"])
+                ax.spines[spine_name].set_linewidth(1.0)
 
         # Ticks e rótulos
         ax.tick_params(
             colors=tokens["text_secondary"],
-            labelsize=9,
+            labelsize=11,
             labelcolor=tokens["text_secondary"],
-            width=0.8,
-            length=4,
+            width=0.9,
+            length=4.5,
         )
 
         ax.xaxis.label.set_color(tokens["text"])
         ax.yaxis.label.set_color(tokens["text"])
-        ax.xaxis.label.set_fontsize(9.5)
-        ax.yaxis.label.set_fontsize(9.5)
+        ax.xaxis.label.set_fontsize(11.5)
+        ax.yaxis.label.set_fontsize(11.5)
+        ax.xaxis.label.set_fontweight("500")
+        ax.yaxis.label.set_fontweight("500")
 
         # Grade sutil
         ax.grid(
@@ -163,25 +160,25 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
             alpha=tokens["grid_alpha"],
         )
 
-        # Legenda com estilo profissional e legibilidade garantida
+        # Legenda interna com estilo profissional
         legend = ax.get_legend()
         if legend is not None:
             legend_title = legend.get_title()
             if legend_title is not None:
                 legend_title.set_color(tokens["text"])
-                legend_title.set_fontsize(9.0)
+                legend_title.set_fontsize(10.0)
                 legend_title.set_fontweight("bold")
 
             frame = legend.get_frame()
             if frame is not None:
                 frame.set_facecolor(tokens["bg_card"])
-                frame.set_edgecolor(tokens["grid"])
+                frame.set_edgecolor(tokens["spine"])
                 frame.set_linewidth(0.8)
                 frame.set_alpha(0.95)
 
             for text in legend.get_texts():
                 text.set_color(tokens["text"])
-                text.set_fontsize(8.5)
+                text.set_fontsize(9.5)
 
 
 @contextmanager
@@ -191,8 +188,8 @@ def theme_context(theme: str = "dark"):
     tokens = get_theme_tokens(theme)
 
     rc_settings = {
-        "figure.facecolor": "#FFFFFF",
-        "axes.facecolor": "#FFFFFF",
+        "figure.facecolor": tokens["bg_fig"],
+        "axes.facecolor": tokens["bg_fig"],
         "axes.edgecolor": tokens["spine"],
         "axes.labelcolor": tokens["text"],
         "axes.linewidth": 1.0,
@@ -203,20 +200,20 @@ def theme_context(theme: str = "dark"):
         "grid.alpha": tokens["grid_alpha"],
         "xtick.color": tokens["text_secondary"],
         "ytick.color": tokens["text_secondary"],
-        "xtick.labelsize": 9,
-        "ytick.labelsize": 9,
+        "xtick.labelsize": 11,
+        "ytick.labelsize": 11,
         "font.family": [tokens["font_sans"], "DejaVu Sans", "sans-serif"],
-        "font.size": 9.5,
-        "lines.linewidth": 2.0,
+        "font.size": 11,
+        "lines.linewidth": 1.75,
         "text.color": tokens["text"],
         "legend.frameon": True,
         "legend.facecolor": tokens["bg_card"],
-        "legend.edgecolor": tokens["grid"],
+        "legend.edgecolor": tokens["spine"],
         "legend.framealpha": 0.95,
-        "legend.fontsize": 8.5,
-        "legend.title_fontsize": 9.0,
+        "legend.fontsize": 9.5,
+        "legend.title_fontsize": 10.0,
         "legend.labelcolor": tokens["text"],
-        "svg.fonttype": "none",  # Exporta texto como elemento <text> nativo
+        "svg.fonttype": "none",
     }
 
     with plt.rc_context(rc_settings):

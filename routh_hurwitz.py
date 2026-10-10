@@ -641,12 +641,13 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.08, label="Regime Instável (SPD, Re > 0)")
         ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
 
-        # Traçado contínuo dos ramos do LGR (Vermelho clássico LGR: #dc2626)
+        # Traçado contínuo dos ramos do LGR
+        branch_color = tokens.get("lgr_branch", "#000000")
         for i in range(ramos):
             ax.plot(
                 np.real(rlist[:, i]),
                 np.imag(rlist[:, i]),
-                color="#dc2626",
+                color=branch_color,
                 linewidth=2.2,
                 label="Ramos do LGR" if i == 0 else "_nolegend_",
                 zorder=4,
@@ -814,10 +815,16 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     legend_title = "Componentes do LGR" if has_k else "Polos e Regiões de Estabilidade"
     leg = ax.legend(
         loc="lower left",
-        bbox_to_anchor=(1.02, 0.35),
+        bbox_to_anchor=(1.01, 0.35),
         borderaxespad=0,
         title=legend_title,
-        framealpha=0.92,
+        title_fontsize=7.5,
+        fontsize=7.0,
+        borderpad=0.25,
+        labelspacing=0.2,
+        handlelength=1.0,
+        handletextpad=0.3,
+        framealpha=0.90,
         facecolor=tokens["bg_card"],
         edgecolor=tokens["spine"],
     )
@@ -825,11 +832,11 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         title_obj = leg.get_title()
         if title_obj is not None:
             title_obj.set_color(tokens["text"])
-            title_obj.set_fontsize(9.0)
+            title_obj.set_fontsize(7.5)
             title_obj.set_fontweight("bold")
         for t in leg.get_texts():
             t.set_color(tokens["text"])
-            t.set_fontsize(8.5)
+            t.set_fontsize(7.0)
 
     apply_plot_theme(fig, ax, theme=theme)
     plt.tight_layout()

@@ -8,10 +8,29 @@ from python_bridge import dispatch
 
 
 class ControllerDesignTests(unittest.TestCase):
-    def test_ziegler_nichols_critical_pid(self):
+    def test_ziegler_nichols_critical_pid_auto(self):
         result = design_controller(
             "1 / (s * (s + 1) * (s + 5))",
             method="zn_critical",
+            controller_type="PID",
+            final_time=12,
+            points=300,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["kcr"], 30.0, places=3)
+        self.assertAlmostEqual(params["wcr"], 5**0.5, places=3)
+        self.assertAlmostEqual(params["kp"], 18.0, places=3)
+        self.assertAlmostEqual(params["ti"], 1.405, places=2)
+        self.assertAlmostEqual(params["td"], 0.351, places=2)
+        self.assertTrue(result["details"]["stable"])
+        self.assertIsNone(result["details"]["warning"])
+        self.assertIn("frequency_margins_after", result["details"])
+        json.dumps(result, allow_nan=False)
+
+    def test_ziegler_nichols_critical_pid_manual_unstable(self):
+        result = design_controller(
+            "1 / (s * (s + 1) * (s + 5))",
+            method="zn_critical_manual",
             controller_type="PID",
             critical_gain=6,
             critical_period=2,
@@ -22,8 +41,8 @@ class ControllerDesignTests(unittest.TestCase):
         self.assertAlmostEqual(params["kp"], 3.6)
         self.assertAlmostEqual(params["ki"], 3.6)
         self.assertAlmostEqual(params["kd"], 0.9)
-        self.assertIn("frequency_margins_after", result["details"])
-        json.dumps(result, allow_nan=False)
+        self.assertFalse(result["details"]["stable"])
+        self.assertEqual(result["details"]["warning"], "Malha fechada instável com estes parâmetros")
 
     def test_cohen_coon_and_chr_are_available(self):
         for method in ("cohen_coon", "chr", "zn_reaction"):

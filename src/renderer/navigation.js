@@ -27,19 +27,54 @@
       const isLgr = pageId === 'lgr';
       const isRouth = pageId === 'routh';
       const isScientific = ['time', 'frequency', 'controllers', 'state-space'].includes(pageId);
+      const isSciShell = isScientific || isLgr || isRouth || isHome;
 
       pageHome?.classList.toggle('active', isHome);
       pageLgr?.classList.toggle('active', isLgr);
       pageRouth?.classList.toggle('active', isRouth);
       pageScientific?.classList.toggle('active', isScientific);
 
-      const hasBack = !isHome;
+      const hasBack = !isHome && !isSciShell;
       if (btnNavHome) btnNavHome.style.display = hasBack ? 'inline-flex' : 'none';
-      if (globalBrand) globalBrand.style.display = isHome ? 'flex' : 'none';
+      if (globalBrand) globalBrand.style.display = isHome && !isSciShell ? 'flex' : 'none';
       if (globalBrandTitle) {
         globalBrandTitle.textContent = isHome ? 'ControLAB' : '';
       }
-      if (globalNavbar) globalNavbar.classList.toggle('has-back', hasBack);
+      if (globalNavbar) {
+        globalNavbar.classList.toggle('has-back', hasBack);
+        globalNavbar.style.display = isSciShell ? 'none' : '';
+      }
+      document.body.classList.toggle('in-scientific', isSciShell);
+
+      // Sincroniza abas, trilho e navegação inferior do software científico
+      document.querySelectorAll('[data-nav]').forEach((el) => {
+        const target = el.dataset.nav;
+        if (!target || target === 'more') return;
+        const matches = target === (isHome ? 'home' : pageId);
+        el.classList.toggle('active', matches);
+      });
+
+      const sciAppBarTitle = optionalElement('sci-app-bar-title');
+      const sciAppBarIcon = document.querySelector('.sci-app-bar-icon use');
+      const navTitles = {
+        time: 'Resposta no tempo',
+        frequency: 'Resposta em frequência',
+        controllers: 'Projeto de controladores',
+        'state-space': 'Espaço de estados',
+      };
+      const navIcons = {
+        time: '#s-time',
+        frequency: '#s-freq',
+        controllers: '#s-ctrl',
+        'state-space': '#s-state',
+      };
+      if (sciAppBarTitle && navTitles[pageId]) {
+        sciAppBarTitle.textContent = navTitles[pageId];
+      }
+      if (sciAppBarIcon && navIcons[pageId]) {
+        sciAppBarIcon.setAttribute('href', navIcons[pageId]);
+      }
+
       if (globalNavbarCenter) {
         globalNavbarCenter.style.display = isHome ? 'none' : 'flex';
       }
@@ -76,6 +111,23 @@
         renderPageOnce(pageHome);
       }
     }
+
+    // Delegação de cliques para botões e links com [data-nav] e ações
+    document.addEventListener('click', (event) => {
+      const settingsBtn = event.target.closest('[data-action="settings"]');
+      if (settingsBtn) {
+        event.preventDefault();
+        window.ControLABSettings?.open?.();
+        return;
+      }
+      const navBtn = event.target.closest('[data-nav]');
+      if (!navBtn) return;
+      const target = navBtn.dataset.nav;
+      if (!target || target === 'more') return;
+      event.preventDefault();
+      optionalElement('sci-more-dropdown')?.setAttribute('hidden', '');
+      navigateTo(target);
+    });
 
     optionalElement('btn-open-lgr')?.addEventListener('click', (event) => {
       event.preventDefault();
@@ -119,6 +171,47 @@
     btnNavHome?.addEventListener('click', () => navigateTo('home'));
     optionalElement('btn-sidebar-back-home')?.addEventListener('click', () => navigateTo('home'));
 
+    // Linhas móveis do Hub (< 600px)
+    document.querySelectorAll('.hub-mobile-row[data-page]').forEach((row) => {
+      row.addEventListener('click', (event) => {
+        event.preventDefault();
+        navigateTo(row.dataset.page);
+      });
+    });
+
+    // Itens de Cálculos Recentes
+    document.querySelectorAll('.hub-recent-row[data-nav]').forEach((row) => {
+      row.addEventListener('click', (event) => {
+        event.preventDefault();
+        navigateTo(row.dataset.nav);
+      });
+    });
+
+    // Exemplos rápidos da página inicial
+    document.querySelectorAll('.hub-example-row[data-example]').forEach((row) => {
+      row.addEventListener('click', () => {
+        navigateTo(row.dataset.example);
+      });
+    });
+
+    // Atalhos de Teclado Científicos (Ctrl+1 a Ctrl+6)
+    window.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey) {
+        const keyMap = {
+          '1': 'time',
+          '2': 'routh',
+          '3': 'lgr',
+          '4': 'frequency',
+          '5': 'controllers',
+          '6': 'state-space',
+        };
+        if (keyMap[event.key]) {
+          event.preventDefault();
+          navigateTo(keyMap[event.key]);
+        }
+      }
+    });
+
     document.querySelectorAll('.module-card.card-soon').forEach((card) => {
       card.addEventListener('click', () => {
         const moduleName = card.dataset.module || 'selecionado';
@@ -133,7 +226,42 @@
       });
     });
 
-    navigateTo('home');
+    const initialHash = (window.location.hash || '').replace('#', '').trim();
+    if (['time', 'routh', 'lgr', 'frequency', 'controllers', 'state-space'].includes(initialHash)) {
+      navigateTo(initialHash);
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('theme')) {
+          document.documentElement.setAttribute('data-theme', params.get('theme'));
+        }
+        if (params.get('tab')) {
+          const tabKey = params.get('tab');
+          document.querySelector(`#page-${initialHash} .sci-mobile-tab[data-tab="${tabKey}"], #sci-mobile-tabs [data-tab="${tabKey}"]`)?.click();
+          document.querySelector(`#page-${initialHash} .sci-tablet-switcher [data-view="${tabKey}"], #sci-tablet-switcher [data-view="${tabKey}"]`)?.click();
+        }
+        if (params.get('calc') === '1') {
+          const delayMs = parseInt(params.get('delay') || '1600', 10);
+          if (typeof Image !== 'undefined') {
+            const delayImg = new Image();
+            delayImg.src = `/api/delay?ms=${delayMs}`;
+            delayImg.style.display = 'none';
+            document.body.appendChild(delayImg);
+          }
+          if (initialHash === 'time') optionalElement('btn-run-scientific')?.click();
+          if (initialHash === 'routh') optionalElement('btn-calculate-routh')?.click();
+          if (initialHash === 'lgr') optionalElement('btn-calculate')?.click();
+          if (params.get('tab')) {
+            const tabKey = params.get('tab');
+            window.setTimeout(() => {
+              document.querySelector(`#page-${initialHash} .sci-mobile-tab[data-tab="${tabKey}"], #sci-mobile-tabs [data-tab="${tabKey}"]`)?.click();
+              document.querySelector(`#page-${initialHash} .sci-tablet-switcher [data-view="${tabKey}"], #sci-tablet-switcher [data-view="${tabKey}"]`)?.click();
+            }, 700);
+          }
+        }
+      } catch (e) {}
+    } else {
+      navigateTo('home');
+    }
     return Object.freeze({ navigateTo });
   }
 

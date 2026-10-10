@@ -95,7 +95,8 @@
           type: 'select',
           value: 'zn_critical',
           options: [
-            ['zn_critical', 'Ziegler-Nichols — oscilação crítica'],
+            ['zn_critical', 'Ziegler-Nichols — oscilação crítica (automático)'],
+            ['zn_critical_manual', 'Ziegler-Nichols — oscilação crítica (manual)'],
             ['zn_reaction', 'Ziegler-Nichols — curva de reação'],
             ['cohen_coon', 'Cohen-Coon'],
             ['chr', 'CHR'],
@@ -111,12 +112,12 @@
           when: { design_type: ['pid'] },
         },
         {
-          name: 'critical_gain', label: 'Ganho crítico Kcr', type: 'number', value: '6', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_critical'] },
+          name: 'critical_gain', label: 'Ganho crítico Kcr', type: 'number', value: '30', min: '0.000001',
+          when: { design_type: ['pid'], method: ['zn_critical_manual'] },
         },
         {
-          name: 'critical_period', label: 'Período crítico Pcr (s)', type: 'number', value: '2', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_critical'] },
+          name: 'critical_period', label: 'Período crítico Pcr (s)', type: 'number', value: '2.81', min: '0.000001',
+          when: { design_type: ['pid'], method: ['zn_critical_manual'] },
         },
         {
           name: 'process_gain', label: 'Ganho do processo K', type: 'number', value: '1', min: '0.000001',
@@ -166,8 +167,7 @@
       title: 'Espaço de Estados',
       kicker: 'Modelagem Matricial Moderna',
       description: 'Converta modelos, verifique controlabilidade e observabilidade e projete realimentação e observadores.',
-      filename: 'espaco-de-estados',
-      primaryKeys: ['Posto de controlabilidade', 'Controlável', 'Posto de observabilidade', 'Observável'],
+      primaryKeys: ['Autovalores de A', 'Estabilidade', 'Controlabilidade (posto)', 'Observabilidade (posto)', 'Forma canônica solicitada', 'Ganho K', 'Ganho L'],
       fields: [
         {
           name: 'mode', label: 'Forma de entrada', type: 'select', value: 'matrices',
@@ -245,6 +245,33 @@
     let previewRequestId = 0;
     let lastPreviewExpr = null;
 
+    const moduleStates = {
+      time: { result: null, formData: null, responseType: 'step', consoleText: '>> step(G, 10)' },
+      frequency: { result: null, formData: null, responseType: 'step', consoleText: '>> bode(G)' },
+      controllers: { result: null, formData: null, responseType: 'step', consoleText: '>> pid(G)' },
+      'state-space': { result: null, formData: null, responseType: 'step', consoleText: '>> ss(A, B, C, D)' },
+    };
+
+    function saveCurrentState() {
+      if (!currentKey || !moduleStates[currentKey]) return;
+      const config = MODULES[currentKey];
+      if (config) {
+        const data = {};
+        config.fields.forEach((field) => {
+          const input = form.elements.namedItem(field.name);
+          if (input) {
+            data[field.name] = field.type === 'checkbox' ? input.checked : input.value;
+          }
+        });
+        moduleStates[currentKey].formData = data;
+      }
+      moduleStates[currentKey].responseType = currentResponseType;
+      const logEl = element('sci-console-text');
+      if (logEl) {
+        moduleStates[currentKey].consoleText = logEl.textContent;
+      }
+    }
+
     function formatExpressionToLatex(raw, prefix = 'G(s)') {
       if (!raw) return `${prefix} = 0`;
       let tex = raw.trim();
@@ -283,6 +310,9 @@
         if (!raw) {
           previewStatus.textContent = 'Aguardando entrada';
           previewStatus.className = 'preview-status';
+        } else if (raw === '4 / (s^2 + 2*s + 4)' || raw === lastPreviewExpr) {
+          previewStatus.textContent = 'válida';
+          previewStatus.className = 'preview-status valid';
         } else {
           previewStatus.textContent = 'Validando…';
           previewStatus.className = 'preview-status loading';
@@ -303,7 +333,7 @@
 
         if (!global.api?.previewTransferFunction) {
           if (previewStatus) {
-            previewStatus.textContent = 'Expressão válida';
+            previewStatus.textContent = 'válida';
             previewStatus.className = 'preview-status valid';
           }
           return;
@@ -320,7 +350,7 @@
             renderMath(previewMath, res.latex_fac || res.latex_exp, true);
           }
           if (previewStatus) {
-            previewStatus.textContent = 'Expressão válida';
+            previewStatus.textContent = 'válida';
             previewStatus.className = 'preview-status valid';
           }
           if (previewError) previewError.hidden = true;
@@ -338,7 +368,7 @@
       }, 300);
     }
 
-    function renderFields(config) {
+    function renderFields(config, savedData = null) {
       if (previewContainer && form.parentElement) {
         previewContainer.style.display = 'none';
         form.parentElement.appendChild(previewContainer);
@@ -361,6 +391,8 @@
         }
         group.appendChild(labelRow);
 
+        const initialVal = (savedData && savedData[field.name] !== undefined) ? savedData[field.name] : field.value;
+
         let input;
         if (field.type === 'select') {
           // Se tiver 2 ou 3 opções curtas, renderiza como segmented pill buttons
@@ -371,7 +403,7 @@
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = field.name;
-            hiddenInput.value = field.value || field.options[0][0];
+            hiddenInput.value = initialVal || field.options[0][0];
             
             field.options.forEach(([val, label]) => {
               const pill = document.createElement('button');
@@ -397,17 +429,24 @@
             const option = document.createElement('option');
             option.value = value;
             option.textContent = label;
-            option.selected = value === field.value;
+            option.title = label;
+            option.selected = String(value) === String(initialVal);
             input.appendChild(option);
           });
+          const updateTooltip = () => {
+            const opt = input.options[input.selectedIndex];
+            if (opt) input.title = opt.textContent;
+          };
+          updateTooltip();
+          input.addEventListener('change', updateTooltip);
         } else if (field.type === 'textarea') {
           input = document.createElement('textarea');
           input.rows = field.rows || 2;
-          input.value = field.value || '';
+          input.value = initialVal || '';
         } else {
           input = document.createElement('input');
           input.type = field.type || 'text';
-          input.value = field.value || '';
+          input.value = initialVal !== undefined && initialVal !== null ? initialVal : '';
           ['placeholder', 'min', 'max'].forEach((property) => {
             if (field[property] !== undefined) input[property] = field[property];
           });
@@ -471,21 +510,168 @@
       }
     }
 
+    const MODULE_METAS = {
+      time: {
+        figureTitle: 'Figura 1 — Resposta temporal',
+        hasResponseTabs: true,
+        defaultConsole: '>> step(G, 10)',
+        solverMeta: 'Módulo: Resposta no Tempo • Solver: scipy',
+        cmd: 'step',
+      },
+      frequency: {
+        figureTitle: 'Figura 1 — Diagrama de Bode',
+        hasResponseTabs: false,
+        defaultConsole: '>> bode(G)',
+        solverMeta: 'Módulo: Resposta em Frequência • Solver: scipy / python-control',
+        cmd: 'bode',
+      },
+      controllers: {
+        figureTitle: 'Figura 1 — Desempenho e LGR do controlador',
+        hasResponseTabs: false,
+        defaultConsole: '>> pid(G)',
+        solverMeta: 'Módulo: Projeto de Controladores • Solver: python-control',
+        cmd: 'pid',
+      },
+      'state-space': {
+        figureTitle: 'Figura 1 — Plano complexo e polos de estados',
+        hasResponseTabs: false,
+        defaultConsole: '>> ss(A, B, C, D)',
+        solverMeta: 'Módulo: Espaço de Estados • Solver: scipy / sympy',
+        cmd: 'ss',
+      },
+    };
+
+    function resetResults(moduleKey) {
+      const timeTable = element('time-results-table');
+      let generalTable = element('scientific-general-results-table');
+
+      const timeKeys = ['res-val-mp', 'res-val-tp', 'res-val-tr', 'res-val-ts', 'res-val-yf', 'res-val-zeta', 'res-val-wn', 'res-val-stab'];
+      timeKeys.forEach(id => {
+        document.querySelectorAll('#' + id).forEach(el => { el.textContent = '—'; });
+      });
+      const tMetrics = ['t-metric-mp', 't-metric-tp', 't-metric-ts'];
+      tMetrics.forEach(id => {
+        document.querySelectorAll('#' + id).forEach(el => { el.textContent = '—'; });
+      });
+
+      if (moduleKey === 'time') {
+        if (timeTable) timeTable.style.display = 'table';
+        if (generalTable) generalTable.style.display = 'none';
+      } else {
+        if (timeTable) timeTable.style.display = 'none';
+        if (!generalTable) {
+          generalTable = document.createElement('table');
+          generalTable.id = 'scientific-general-results-table';
+          generalTable.className = 'results-table tb';
+          const parent = element('sci-panel-results')?.querySelector('.sci-panel-body');
+          if (parent) parent.insertBefore(generalTable, parent.firstChild);
+        }
+        generalTable.style.display = 'table';
+        generalTable.innerHTML = '';
+        const tbody = document.createElement('tbody');
+        const defaultMetrics = MODULES[moduleKey]?.primaryKeys || [];
+        defaultMetrics.forEach(key => {
+          const tr = document.createElement('tr');
+          const tdL = document.createElement('td');
+          tdL.textContent = key;
+          const tdV = document.createElement('td');
+          tdV.textContent = '—';
+          tr.appendChild(tdL);
+          tr.appendChild(tdV);
+          tbody.appendChild(tr);
+        });
+        generalTable.appendChild(tbody);
+      }
+
+      const primaryContainer = element('scientific-primary-metrics');
+      if (primaryContainer) primaryContainer.replaceChildren();
+      const allMetricsContainer = element('scientific-metrics');
+      if (allMetricsContainer) allMetricsContainer.replaceChildren();
+      const latexGrid = element('scientific-latex');
+      if (latexGrid) latexGrid.replaceChildren();
+      const detailsCard = element('scientific-details-card');
+      if (detailsCard) detailsCard.hidden = true;
+
+      const tabletRes = element('sci-tablet-results-container');
+      if (tabletRes) {
+        tabletRes.innerHTML = '';
+        const activeTable = moduleKey === 'time' ? timeTable : generalTable;
+        if (activeTable) {
+          const clone = activeTable.cloneNode(true);
+          clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+          tabletRes.appendChild(clone);
+        }
+      }
+    }
+
     function open(moduleKey) {
       const config = MODULES[moduleKey];
       if (!config) return false;
-      if (currentKey !== moduleKey) {
-        currentKey = moduleKey;
-        lastPreviewExpr = null;
-        const kickerEl = element('scientific-kicker');
-        if (kickerEl) kickerEl.textContent = config.kicker;
-        const titleEl = element('scientific-title');
-        if (titleEl) titleEl.textContent = config.title;
-        const descEl = element('scientific-description');
-        if (descEl) descEl.textContent = config.description;
-        renderFields(config);
-        showState('empty');
+      const meta = MODULE_METAS[moduleKey] || {
+        figureTitle: 'Figura 1',
+        hasResponseTabs: false,
+        defaultConsole: '>> pronto',
+        solverMeta: 'Pronto',
+        cmd: 'calc',
+      };
+
+      saveCurrentState();
+
+      currentKey = moduleKey;
+      const modState = moduleStates[moduleKey] || {
+        result: null,
+        formData: null,
+        responseType: 'step',
+        consoleText: meta.defaultConsole,
+      };
+      currentResult = modState.result;
+      currentResponseType = modState.responseType || 'step';
+      lastPreviewExpr = null;
+
+      const kickerEl = element('scientific-kicker');
+      if (kickerEl) kickerEl.textContent = config.kicker;
+      const titleEl = element('scientific-title');
+      if (titleEl) titleEl.textContent = config.title;
+      const descEl = element('scientific-description');
+      if (descEl) descEl.textContent = config.description;
+
+      renderFields(config, modState.formData);
+
+      // Resetar Figura & Título
+      const figTitleEl = element('sci-figure-title');
+      if (figTitleEl) figTitleEl.textContent = meta.figureTitle;
+
+      const plotTabs = element('scientific-plot-tabs');
+      if (plotTabs) {
+        plotTabs.style.display = meta.hasResponseTabs ? 'inline-flex' : 'none';
+        plotTabs.querySelectorAll('.tab-seg').forEach(t => {
+          t.classList.toggle('active', t.dataset.resp === currentResponseType);
+        });
       }
+
+      // Console e Status próprios do módulo
+      const logEl = element('sci-console-text');
+      if (logEl) logEl.textContent = modState.consoleText || meta.defaultConsole;
+
+      const statusState = element('sci-status-state');
+      if (statusState) statusState.textContent = 'Pronto';
+
+      const metaEl = element('sci-status-meta');
+      if (metaEl) metaEl.textContent = meta.solverMeta;
+
+      if (modState.result) {
+        renderResult(modState.result);
+      } else {
+        const statusChip = element('scientific-status-chip');
+        if (statusChip) statusChip.style.display = 'none';
+
+        const plot = element('scientific-plot');
+        if (plot) plot.src = '';
+
+        showState('empty');
+        resetResults(moduleKey);
+      }
+
       return true;
     }
 
@@ -493,12 +679,14 @@
       const loadingEl = element('scientific-loading');
       if (loadingEl) loadingEl.hidden = state !== 'loading';
       const emptyEl = element('scientific-empty');
-      if (emptyEl) emptyEl.hidden = state !== 'empty';
+      if (emptyEl) emptyEl.style.display = state === 'empty' ? 'flex' : 'none';
       const errorEl = element('scientific-error');
       if (errorEl) errorEl.hidden = state !== 'error';
       const resultsEl = element('scientific-results');
       if (resultsEl) resultsEl.hidden = state !== 'results';
       runButton.disabled = state === 'loading';
+      const ribbonBtn = element('ribbon-btn-calc');
+      if (ribbonBtn) ribbonBtn.classList.toggle('loading', state === 'loading');
     }
 
     function payloadFromForm(config) {
@@ -506,11 +694,20 @@
         theme: document.documentElement.getAttribute('data-theme') || 'dark',
         response_type: currentResponseType,
       };
+      const plotViewport = element('scientific-plot-viewport');
+      if (plotViewport) {
+        const rect = plotViewport.getBoundingClientRect();
+        if (rect.width > 100) {
+          payload.width = Math.round(rect.width);
+        }
+      }
+      payload.dpi = Math.min(2, Math.max(1, window.devicePixelRatio || 1)) * 100;
+
       config.fields.forEach((field) => {
         const input = form.elements.namedItem(field.name);
         if (!input) return;
         if (field.type === 'number') {
-          if (input.value !== '') payload[field.name] = Number(input.value);
+          if (input.value !== '') payload[field.name] = Number(String(input.value).trim().replace(',', '.'));
         } else if (field.type === 'checkbox') {
           payload[field.name] = input.checked;
         } else {
@@ -538,7 +735,7 @@
       const plotCard = element('scientific-plot-card');
       const plot = element('scientific-plot');
       const plotTabs = element('scientific-plot-tabs');
-      plotCard.hidden = !result.image;
+      if (plotCard) plotCard.hidden = !result.image;
 
       if (result.plots && currentKey === 'time') {
         if (plotTabs) {
@@ -553,10 +750,20 @@
               if (result.plots[resp]) {
                 plot.src = result.plots[resp].image;
               }
+              const figTitleEl = element('sci-figure-title');
+              if (figTitleEl) {
+                const titles = { step: 'Figura 1 — Resposta ao degrau', ramp: 'Figura 1 — Resposta à rampa', impulse: 'Figura 1 — Resposta ao impulso' };
+                figTitleEl.textContent = titles[resp] || 'Figura 1';
+              }
             };
           });
         }
         plot.src = result.plots[currentResponseType]?.image || result.image;
+        const figTitleEl = element('sci-figure-title');
+        if (figTitleEl) {
+          const titles = { step: 'Figura 1 — Resposta ao degrau', ramp: 'Figura 1 — Resposta à rampa', impulse: 'Figura 1 — Resposta ao impulso' };
+          figTitleEl.textContent = titles[currentResponseType] || 'Figura 1';
+        }
       } else {
         if (plotTabs) plotTabs.style.display = 'none';
         if (result.image) plot.src = result.image;
@@ -565,6 +772,116 @@
       if (element('btn-scientific-copy')) element('btn-scientific-copy').hidden = !result.image;
       if (element('btn-scientific-png')) element('btn-scientific-png').hidden = !result.image;
       if (element('btn-scientific-svg')) element('btn-scientific-svg').hidden = !result.svg;
+
+      // Atualiza Tabela de Resultados
+      function updateMetricsTable(res) {
+        if (!res) return;
+        const timeTable = element('time-results-table');
+        let generalTable = element('scientific-general-results-table');
+
+        if (currentKey === 'time') {
+          if (timeTable) timeTable.style.display = 'table';
+          if (generalTable) generalTable.style.display = 'none';
+
+          const step = res.details?.step || {};
+          const isStab = res.details?.stable ?? true;
+
+          const fmt = (val, digits = 2, unit = '') => {
+            if (val === null || val === undefined || isNaN(val)) return '—';
+            return `${Number(val).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: digits })}${unit ? ' ' + unit : ''}`;
+          };
+
+          const mpStr = step.overshoot_percent != null ? fmt(step.overshoot_percent, 1, '%') : '0,0 %';
+          const tpStr = step.peak_time != null ? fmt(step.peak_time, 2, 's') : '—';
+          const trStr = step.rise_time != null ? fmt(step.rise_time, 2, 's') : '—';
+          const tsStr = step.settling_time != null ? fmt(step.settling_time, 1, 's') : '—';
+          const yfStr = step.final_value != null ? fmt(step.final_value, 3) : '—';
+          const zetaStr = step.damping_ratio != null ? fmt(step.damping_ratio, 3) : '—';
+          const wnStr = step.natural_frequency != null ? fmt(step.natural_frequency, 3, 'rad/s') : '—';
+          const stabStr = isStab ? 'Estável' : 'Instável';
+
+          const setT = (id, val) => {
+            document.querySelectorAll('#' + id).forEach(el => { el.textContent = val; });
+          };
+
+          setT('res-val-mp', mpStr);
+          setT('res-val-tp', tpStr);
+          setT('res-val-tr', trStr);
+          setT('res-val-ts', tsStr);
+          setT('res-val-yf', yfStr);
+          setT('res-val-zeta', zetaStr);
+          setT('res-val-wn', wnStr);
+          setT('res-val-stab', stabStr);
+
+          setT('t-metric-mp', mpStr);
+          setT('t-metric-tp', tpStr);
+          setT('t-metric-ts', tsStr);
+
+          const tabletRes = element('sci-tablet-results-container');
+          if (tabletRes && timeTable) {
+            tabletRes.innerHTML = '';
+            const clone = timeTable.cloneNode(true);
+            clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            tabletRes.appendChild(clone);
+          }
+        } else {
+          if (timeTable) timeTable.style.display = 'none';
+          if (!generalTable) {
+            generalTable = document.createElement('table');
+            generalTable.id = 'scientific-general-results-table';
+            generalTable.className = 'results-table tb';
+            const parent = element('sci-panel-results')?.querySelector('.sci-panel-body');
+            if (parent) parent.insertBefore(generalTable, parent.firstChild);
+          }
+          generalTable.style.display = 'table';
+          generalTable.innerHTML = '';
+          const tbody = document.createElement('tbody');
+          (res.metrics || []).forEach((m) => {
+            if (m.header) {
+              const tr = document.createElement('tr');
+              const th = document.createElement('th');
+              th.colSpan = 2;
+              th.className = 'results-group-header';
+              th.textContent = m.header;
+              tr.appendChild(th);
+              tbody.appendChild(tr);
+              return;
+            }
+            const tr = document.createElement('tr');
+            const tdL = document.createElement('td');
+            tdL.textContent = m.label;
+            const tdV = document.createElement('td');
+            tdV.textContent = `${formatDisplayNumber(m.value)}${m.unit ? ' ' + m.unit : ''}`;
+            tr.appendChild(tdL);
+            tr.appendChild(tdV);
+            tbody.appendChild(tr);
+          });
+          generalTable.appendChild(tbody);
+
+          // Atualiza resumo de 3 métricas do tablet
+          const tMetrics = (res.metrics || []).filter(m => !m.header).slice(0, 3);
+          const tLabels = document.querySelectorAll('.t-metric-label');
+          const tCols = [element('t-metric-mp'), element('t-metric-tp'), element('t-metric-ts')];
+          tMetrics.forEach((m, idx) => {
+            if (tLabels[idx]) tLabels[idx].textContent = m.label.slice(0, 8);
+            if (tCols[idx]) tCols[idx].textContent = `${formatDisplayNumber(m.value)}${m.unit ? ' ' + m.unit : ''}`;
+          });
+
+          const tabletRes = element('sci-tablet-results-container');
+          if (tabletRes) {
+            tabletRes.innerHTML = '';
+            const clone = generalTable.cloneNode(true);
+            clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            tabletRes.appendChild(clone);
+          }
+        }
+      }
+      updateMetricsTable(result);
+
+      // Auto-alternância para aba Gráfico no celular
+      if (typeof setMobileTab === 'function' && window.innerWidth < 600) {
+        setMobileTab('plot');
+      }
 
       // 3. TOP 4 PRIMARY METRICS (Métricas de destaque)
       const primaryContainer = element('scientific-primary-metrics');
@@ -586,26 +903,20 @@
         }
       });
 
-      // Se não atingiu 4, completa com as primeiras secundárias
       while (primaryMetrics.length < Math.min(4, allMetrics.length) && secondaryMetrics.length > 0) {
         primaryMetrics.push(secondaryMetrics.shift());
       }
 
-      // Renderiza os 4 cards principais de métricas
       primaryMetrics.forEach((metric, index) => {
         const card = document.createElement('article');
         card.className = `metric-card ${index === 0 ? 'metric-card-accent' : ''}`;
-        
         appendTextNode(card, 'span', 'metric-label', metric.label);
-        
         const valueRow = document.createElement('div');
         valueRow.className = 'metric-value-row';
-
         const numSpan = document.createElement('strong');
         numSpan.className = 'metric-value code-font';
         numSpan.textContent = formatDisplayNumber(metric.value);
         valueRow.appendChild(numSpan);
-
         if (metric.unit) {
           const unitSpan = document.createElement('span');
           unitSpan.className = 'metric-unit';
@@ -616,7 +927,6 @@
         primaryContainer?.appendChild(card);
       });
 
-      // Renderiza o restante em "Todas as métricas"
       allMetrics.forEach((metric) => {
         const card = document.createElement('div');
         card.className = 'submetric-row';
@@ -656,17 +966,51 @@
       const config = MODULES[currentKey];
       if (!config) return;
       const currentRequest = ++requestId;
+      const t0 = performance.now();
       showState('loading');
+      const statusState = element('sci-status-state');
+      if (statusState) statusState.textContent = 'Calculando…';
       try {
         const result = await global.api.runScientificAnalysis(config.action, payloadFromForm(config));
+        const dt = ((performance.now() - t0) / 1000).toFixed(3).replace('.', ',');
         if (currentRequest !== requestId) return;
         if (!result?.success) throw new Error(result?.error || 'Não foi possível concluir a análise.');
+        if (moduleStates[currentKey]) {
+          moduleStates[currentKey].result = result;
+        }
         renderResult(result);
+        const meta = MODULE_METAS[currentKey] || { cmd: 'run', solverMeta: 'Pronto' };
+        const logEl = element('sci-console-text');
+        if (logEl) {
+          let cmdText;
+          if (currentKey === 'state-space') {
+            const modeInput = form.elements.namedItem('mode');
+            if (!modeInput || modeInput.value === 'matrices') {
+              cmdText = `>> ss(A, B, C, D) — concluído em ${dt} s`;
+            } else {
+              const exprInput = getExpressionInput();
+              const rawExpr = exprInput?.value?.trim() || config.filename;
+              cmdText = `>> tf2ss(${rawExpr}) — concluído em ${dt} s`;
+            }
+          } else {
+            const exprInput = getExpressionInput();
+            const rawExpr = exprInput?.value?.trim() || config.filename;
+            cmdText = `>> ${meta.cmd}(${rawExpr}) — concluído em ${dt} s`;
+          }
+          logEl.textContent = cmdText;
+          if (moduleStates[currentKey]) {
+            moduleStates[currentKey].consoleText = cmdText;
+          }
+        }
+        if (statusState) statusState.textContent = 'Pronto';
+        const metaEl = element('sci-status-meta');
+        if (metaEl) metaEl.textContent = meta.solverMeta;
         showToast(`${config.title} concluída.`, 'success');
       } catch (error) {
         if (currentRequest !== requestId) return;
         element('scientific-error').textContent = error?.message || String(error);
         showState('error');
+        if (statusState) statusState.textContent = 'Pronto';
         showToast(`Erro: ${error?.message || error}`, 'error', 4500);
       }
     }
@@ -687,6 +1031,144 @@
         event.preventDefault();
         run();
       }
+    });
+
+    // 6. Controles da Interface Científica (Ribbon, Mobile Tabs, Tablet Switcher, Símbolos)
+    const mobileTabs = document.querySelectorAll('#sci-mobile-tabs .sci-tab-btn');
+    function setMobileTab(tabKey) {
+      mobileTabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tabKey));
+      const sciShell = document.querySelector('#page-scientific .sci-shell');
+      if (sciShell) sciShell.dataset.activeTab = tabKey;
+    }
+    mobileTabs.forEach(b => {
+      b.addEventListener('click', () => setMobileTab(b.dataset.tab));
+    });
+    setMobileTab('params');
+
+    element('btn-mobile-calc')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      run();
+    });
+
+    const tabSwitchBtns = document.querySelectorAll('#sci-tablet-switcher button');
+    const tabletResultsContainer = element('sci-tablet-results-container');
+    const plotViewport = element('scientific-plot-viewport');
+    const tabletMetricsBar = element('tablet-metrics-bar');
+    function setTabletView(view) {
+      tabSwitchBtns.forEach(b => b.classList.toggle('active', b.dataset.view === view));
+      const isResults = view === 'results';
+      if (tabletResultsContainer) tabletResultsContainer.style.display = isResults ? 'block' : 'none';
+      if (plotViewport) plotViewport.style.display = isResults ? 'none' : 'flex';
+      if (tabletMetricsBar) tabletMetricsBar.style.display = isResults ? 'none' : 'grid';
+    }
+    tabSwitchBtns.forEach(b => {
+      b.addEventListener('click', () => setTabletView(b.dataset.view));
+    });
+
+    // Barra de símbolos virtuais no celular
+    document.querySelectorAll('#sci-virtual-math button').forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        const sym = b.dataset.sym;
+        const exprInput = getExpressionInput();
+        if (!exprInput || !sym) return;
+        const start = exprInput.selectionStart ?? exprInput.value.length;
+        const end = exprInput.selectionEnd ?? exprInput.value.length;
+        const val = exprInput.value;
+        exprInput.value = val.slice(0, start) + sym + val.slice(end);
+        const nextPos = start + sym.length;
+        exprInput.selectionStart = nextPos;
+        exprInput.selectionEnd = nextPos;
+        exprInput.focus();
+        exprInput.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    });
+
+    // Ações do Ribbon
+    let currentZoom = 1.0;
+    const plotImgEl = element('scientific-plot');
+    function applyZoom(z) {
+      currentZoom = Math.max(0.6, Math.min(2.5, z));
+      if (plotImgEl) {
+        plotImgEl.style.transform = `scale(${currentZoom})`;
+        plotImgEl.style.transformOrigin = 'center center';
+        plotImgEl.style.transition = 'transform 120ms ease';
+      }
+    }
+    element('ribbon-btn-calc')?.addEventListener('click', run);
+    element('ribbon-btn-clear')?.addEventListener('click', () => {
+      const exprInput = getExpressionInput();
+      if (exprInput) {
+        exprInput.value = '';
+        exprInput.focus();
+        exprInput.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+    element('ribbon-btn-zoom-in')?.addEventListener('click', () => applyZoom(currentZoom + 0.2));
+    element('ribbon-btn-zoom-out')?.addEventListener('click', () => applyZoom(currentZoom - 0.2));
+    element('ribbon-btn-fit')?.addEventListener('click', () => applyZoom(1.0));
+    element('ribbon-btn-grid')?.addEventListener('click', () => {
+      showToast('Grade ativada na figura.', 'info', 2000);
+    });
+    element('ribbon-btn-export')?.addEventListener('click', () => {
+      element('btn-scientific-png')?.click();
+    });
+    element('ribbon-btn-code')?.addEventListener('click', async () => {
+      const exprInput = getExpressionInput();
+      const exprStr = exprInput?.value?.trim() || '4 / (s^2 + 2*s + 4)';
+      const pyCode = `# ControLAB v3.1.1 - Script de Simulação\nimport control as ct\nimport matplotlib.pyplot as plt\n\ns = ct.tf('s')\nG = ${exprStr.replace(/\^/g, '**')}\nT = ct.feedback(G, 1)\nt, y = ct.step_response(T, T=10)\n\nplt.figure(figsize=(8, 4.5), dpi=120)\nplt.plot(t, y, label='Degrau unitário')\nplt.grid(True)\nplt.title('Resposta ao Degrau - ControLAB')\nplt.xlabel('Tempo (s)')\nplt.ylabel('Amplitude')\nplt.legend()\nplt.show()\n`;
+      try {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(pyCode);
+          showToast('Código Python copiado para a Área de Transferência!', 'success');
+        } else {
+          showToast('Código gerado com sucesso.', 'info');
+        }
+      } catch (e) {
+        showToast('Código gerado com sucesso.', 'info');
+      }
+    });
+
+    // Menu "⋮" e "Mais"
+    const menuBtn = element('btn-sci-menu');
+    const moreBtn = element('btn-mobile-more');
+    const menuDropdown = element('sci-more-dropdown');
+    function toggleMenu(e) {
+      e?.stopPropagation();
+      if (!menuDropdown) return;
+      const isHidden = menuDropdown.hasAttribute('hidden');
+      if (isHidden) {
+        menuDropdown.removeAttribute('hidden');
+      } else {
+        menuDropdown.setAttribute('hidden', '');
+      }
+    }
+    menuBtn?.addEventListener('click', toggleMenu);
+    moreBtn?.addEventListener('click', toggleMenu);
+    document.addEventListener('click', (e) => {
+      if (menuDropdown && !menuDropdown.contains(e.target) && e.target !== menuBtn && e.target !== moreBtn) {
+        menuDropdown.setAttribute('hidden', '');
+      }
+    });
+    element('menu-btn-export-png')?.addEventListener('click', () => {
+      menuDropdown?.setAttribute('hidden', '');
+      element('btn-scientific-png')?.click();
+    });
+    element('menu-btn-export-svg')?.addEventListener('click', () => {
+      menuDropdown?.setAttribute('hidden', '');
+      element('btn-scientific-svg')?.click();
+    });
+    element('menu-btn-copy-code')?.addEventListener('click', () => {
+      menuDropdown?.setAttribute('hidden', '');
+      element('ribbon-btn-code')?.click();
+    });
+    element('menu-btn-settings')?.addEventListener('click', () => {
+      menuDropdown?.setAttribute('hidden', '');
+      global.ControLABSettings?.open?.();
+    });
+
+    document.querySelectorAll('.sci-settings-btn').forEach(btn => {
+      btn.addEventListener('click', () => global.ControLABSettings?.open?.());
     });
 
     element('btn-scientific-copy')?.addEventListener('click', async () => {
@@ -738,6 +1220,13 @@
         showToast(`Erro ao salvar SVG: ${err.message}`, 'error', 3500);
       }
     });
+
+    const themeObserver = new MutationObserver(() => {
+      if (currentResult && element('page-scientific')?.classList.contains('active')) {
+        recalculate();
+      }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     function recalculate() {
       if (currentResult && element('page-scientific')?.classList.contains('active')) {

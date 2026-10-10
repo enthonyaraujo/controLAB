@@ -103,9 +103,14 @@
     function setLoading(isLoading) {
       isCalculating = isLoading;
       if (btnCalculate) btnCalculate.disabled = isLoading;
+      optionalElement('btn-ribbon-routh-calc')?.classList.toggle('loading', isLoading);
       if (loadingEl) loadingEl.style.display = isLoading ? 'flex' : 'none';
       if (isLoading && resultsContainer) resultsContainer.style.opacity = '0.5';
       else if (resultsContainer) resultsContainer.style.opacity = '1';
+      const statusState = optionalElement('routh-status-state');
+      if (statusState) {
+        statusState.textContent = isLoading ? 'Calculando...' : 'Pronto';
+      }
     }
 
     async function executeCalculation() {
@@ -119,6 +124,8 @@
       setLoading(true);
       lastExpr = expr;
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const now = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+      const t0 = now();
 
       try {
         const data = await window.api.calculateRouth({
@@ -134,6 +141,31 @@
         renderResults(data);
         if (emptyState) emptyState.style.display = 'none';
         if (resultsContainer) resultsContainer.style.display = 'flex';
+
+        const elapsed = ((now() - t0) / 1000).toFixed(3).replace('.', ',');
+        const consoleLine = optionalElement('routh-console-line');
+        if (consoleLine) {
+          consoleLine.textContent = `>> routh(${expr}) — concluído em ${elapsed} s`;
+        }
+
+        // Troca automática para a aba Gráfico em dispositivos móveis (ou a solicitada por query)
+        const requestedTab = new URLSearchParams(window.location.search).get('tab') || 'plot';
+        const pageRouth = optionalElement('page-routh');
+        if (pageRouth) {
+          pageRouth.setAttribute('data-active-tab', requestedTab);
+          pageRouth.querySelectorAll('.sci-mobile-tab').forEach((tab) => {
+            tab.classList.toggle('active', tab.dataset.tab === requestedTab);
+          });
+        }
+
+        // Atualiza métricas-chave no tablet
+        const tabDegree = optionalElement('routh-tab-degree');
+        if (tabDegree) tabDegree.textContent = `Grau ${data.degree}`;
+        const tabSignChanges = optionalElement('routh-tab-sign-changes');
+        if (tabSignChanges) tabSignChanges.textContent = `${data.sign_changes} Trocas`;
+        const tabRhp = optionalElement('routh-tab-rhp');
+        if (tabRhp) tabRhp.textContent = `${data.rhp_poles} SPD`;
+
         showToast('Estabilidade calculada com sucesso!', 'success');
       } catch (err) {
         showToast(`Erro na análise: ${err.message}`, 'error', 4500);
@@ -194,9 +226,16 @@
             renderMath(kMarginalExpr, data.k_range.marginal_latex || '\\text{Nenhum ponto marginal}', true);
           }
           if (kMarginalDesc) {
+            kMarginalDesc.innerHTML = '';
             if (data.k_range.marginal_cases && data.k_range.marginal_cases.length > 0) {
+              const textSpan = document.createElement('span');
+              textSpan.textContent = 'Oscilações sustentadas no eixo imaginário com ';
+              kMarginalDesc.appendChild(textSpan);
+              const mathSpan = document.createElement('span');
+              mathSpan.className = 'math-inline';
               const omegas = data.k_range.marginal_cases.map((m) => m.omega_latex).join(', ');
-              kMarginalDesc.textContent = `Oscilações sustentadas no eixo imaginário com ${omegas}.`;
+              kMarginalDesc.appendChild(mathSpan);
+              renderMath(mathSpan, omegas, false);
             } else {
               kMarginalDesc.textContent = 'Não há cruzamento com o eixo jω para ganhos positivos.';
             }
@@ -420,11 +459,13 @@
     btnDownloadSvg?.addEventListener('click', async () => {
       if (!lastPlotSvg) return;
       try {
-        await window.api.saveSVG({
+        const res = await window.api.saveSVG({
           svg: lastPlotSvg,
-          defaultName: 'estabilidade_routh_plano_s.svg',
+          defaultName: 'criterio_routh_hurwitz.svg',
         });
-        showToast('Gráfico SVG exportado com sucesso!', 'success');
+        if (res && res.success !== false) {
+          showToast(res.message || 'Gráfico Vetorial SVG salvo com sucesso!', 'success');
+        }
       } catch (err) {
         showToast('Erro ao exportar SVG: ' + err.message, 'error');
       }
@@ -433,11 +474,13 @@
     btnDownloadPng?.addEventListener('click', async () => {
       if (!lastPlotImage) return;
       try {
-        await window.api.saveImage({
+        const res = await window.api.saveImage({
           base64: lastPlotImage,
-          defaultName: 'estabilidade_routh_plano_s.png',
+          defaultName: 'criterio_routh_hurwitz.png',
         });
-        showToast('Gráfico PNG exportado com sucesso!', 'success');
+        if (res && res.success !== false) {
+          showToast(res.message || 'Imagem PNG salva com sucesso!', 'success');
+        }
       } catch (err) {
         showToast('Erro ao exportar gráfico: ' + err.message, 'error');
       }
@@ -504,8 +547,70 @@
       });
     });
 
-    // Ação do botão calcular
+    // Ação do botão calcular e ribbon
     btnCalculate?.addEventListener('click', executeCalculation);
+    optionalElement('btn-ribbon-routh-calc')?.addEventListener('click', () => btnCalculate?.click());
+    optionalElement('btn-routh-mobile-calc')?.addEventListener('click', () => btnCalculate?.click());
+
+    // Botão Limpar da ribbon
+    optionalElement('btn-ribbon-routh-clear')?.addEventListener('click', () => {
+      if (inputExpr) inputExpr.value = '';
+      updatePreview();
+      if (resultsContainer) resultsContainer.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'flex';
+      if (plotCard) plotCard.style.display = 'none';
+      if (plotImage) plotImage.src = '';
+      lastPlotImage = null;
+      lastPlotSvg = null;
+      const consoleLine = optionalElement('routh-console-line');
+      if (consoleLine) consoleLine.textContent = '>> pronto';
+    });
+
+    // Abas Mobile (< 600px)
+    document.querySelectorAll('#routh-mobile-tabs .sci-mobile-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+        optionalElement('page-routh')?.setAttribute('data-active-tab', targetTab);
+        document.querySelectorAll('#routh-mobile-tabs .sci-mobile-tab').forEach((t) => {
+          t.classList.toggle('active', t === tab);
+        });
+      });
+    });
+
+    // Switcher Tablet [ Figura | Resultados ]
+    document.querySelectorAll('#routh-tablet-switcher button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#routh-tablet-switcher button').forEach((b) => {
+          b.classList.toggle('active', b === btn);
+        });
+        const isFigure = btn.dataset.view === 'figure';
+        const viewport = document.querySelector('#page-routh .sci-plot-viewport');
+        const tabletResults = optionalElement('routh-tablet-results-container');
+        if (viewport) viewport.style.display = isFigure ? 'flex' : 'none';
+        if (tabletResults) {
+          tabletResults.style.display = isFigure ? 'none' : 'block';
+          if (!isFigure && resultsContainer) {
+            tabletResults.innerHTML = resultsContainer.innerHTML;
+            renderMathInContainer(tabletResults);
+          }
+        }
+      });
+    });
+
+    // Teclado virtual de símbolos matemáticos
+    document.querySelectorAll('#routh-virtual-math button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sym = btn.dataset.sym || btn.textContent.trim();
+        if (!inputExpr) return;
+        const start = inputExpr.selectionStart ?? inputExpr.value.length;
+        const end = inputExpr.selectionEnd ?? inputExpr.value.length;
+        const oldVal = inputExpr.value;
+        inputExpr.value = oldVal.slice(0, start) + sym + oldVal.slice(end);
+        inputExpr.focus();
+        inputExpr.setSelectionRange(start + sym.length, start + sym.length);
+        updatePreview();
+      });
+    });
 
     // Atalho Enter no input
     inputExpr?.addEventListener('keydown', (event) => {

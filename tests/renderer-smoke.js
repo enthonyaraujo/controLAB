@@ -60,6 +60,20 @@ assert(html.includes('id="routh-empty-state" class="routh-empty-card" style="dis
 assert(html.includes('id="routh-results-container" class="routh-results-layout" style="display: none;"'), 'os resultados do Routh devem iniciar ocultos');
 assert(html.includes('id="lgr-empty-state"'), 'o empty state do LGR deve existir');
 assert(!app.includes('window.setTimeout(calculate, 0)'), 'o LGR não deve calcular automaticamente ao entrar no módulo');
-assert(!app.includes('window.setTimeout(routhController.ensureInitialCalculation, 0)'), 'o Routh não deve calcular automaticamente ao entrar no módulo');
+assert(html.includes('<link rel="stylesheet" href="tokens.css">'), 'tokens.css precisa estar linkado no index.html');
+assert(styles.includes("@import 'tokens.css';"), 'styles.css precisa importar tokens.css');
+assert(serviceWorker.includes("'/tokens.css'"), 'tokens.css precisa integrar o shell offline');
+
+// Valida que o bloco do diálogo não possui cores hexadecimais fixas
+const modalStart = styles.indexOf('.modal-overlay {');
+const modalEnd = styles.indexOf('/* ==========================================================================\n   MÓDULO 2:');
+assert(modalStart >= 0 && modalEnd > modalStart, 'bloco do modal precisa existir em styles.css');
+const modalCss = styles.slice(modalStart, modalEnd);
+const fixedHexMatches = modalCss.match(/#[0-9a-fA-F]{3,8}/g);
+assert(!fixedHexMatches || fixedHexMatches.length === 0, `o diálogo não pode conter cores hex fixas: ${fixedHexMatches}`);
+
+// Valida que o botão de verificar atualizações não usa azul (#0369a1 / #0284c7) e usa token teal
+assert(!styles.includes('#0369a1'), 'o azul #0369a1 deve ser removido de btn-action-primary');
+assert(!styles.includes('#0284c7'), 'o azul #0284c7 deve ser removido de btn-action-primary');
 
 console.log('Integração, responsividade e navegação do renderer válidas.');

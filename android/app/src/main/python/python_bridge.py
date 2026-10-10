@@ -194,6 +194,8 @@ def dispatch(data):
             settling_threshold=data.get("settling_threshold", 0.02),
             theme=theme,
             response_type=data.get("response_type", "step"),
+            width=data.get("width"),
+            dpi=data.get("dpi"),
         )
     if action == "frequency_response_presets":
         from frequency_response import get_frequency_presets

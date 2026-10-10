@@ -28,13 +28,24 @@ CONTROLLER_PRESETS = {
 
 
 def _positive(value, label):
+    if isinstance(value, str):
+        value = value.strip().replace(",", ".")
     number = float(value)
     if not np.isfinite(number) or number <= 0:
         raise ValueError(f"{label} deve ser maior que zero.")
     return number
 
 
-def _pid_parameters(method, controller_type, *, process_gain, delay, time_constant, critical_gain, critical_period, chr_response):
+def _calculate_critical_params(plant):
+    gm, _, _, wpc, _, _ = ct.stability_margins(plant)
+    if not (math.isfinite(gm) and gm > 0 and math.isfinite(wpc) and wpc > 0):
+        raise ValueError("A planta não possui frequência de oscilação crítica (-180°). Utilize a opção Manual ou sintonia por curva de reação.")
+    ku = float(gm)
+    pu = float(2.0 * math.pi / wpc)
+    return ku, pu, float(wpc)
+
+
+def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, delay=1.0, time_constant=4.0, critical_gain=6.0, critical_period=2.0, chr_response="0"):
     method = str(method).lower()
     controller_type = str(controller_type).upper()
     if controller_type not in {"P", "PI", "PID"}:
@@ -42,6 +53,10 @@ def _pid_parameters(method, controller_type, *, process_gain, delay, time_consta
 
     ti = None
     td = 0.0
+    ku = None
+    pu = None
+    w_osc = None
+
     if method == "zn_reaction":
         gain = _positive(process_gain, "O ganho do processo")
         lag = _positive(delay, "O atraso L")
@@ -53,16 +68,31 @@ def _pid_parameters(method, controller_type, *, process_gain, delay, time_consta
         else:
             kp, ti, td = 1.2 * tau / (gain * lag), 2.0 * lag, 0.5 * lag
         method_label = "Ziegler-Nichols — curva de reação"
-    elif method == "zn_critical":
-        ku = _positive(critical_gain, "O ganho crítico Kcr")
-        pu = _positive(critical_period, "O período crítico Pcr")
+    elif method in {"zn_critical", "zn_critical_auto"}:
+        if plant is not None:
+            ku, pu, w_osc = _calculate_critical_params(plant)
+        else:
+            ku = _positive(critical_gain, "O ganho crítico Kcr")
+            pu = _positive(critical_period, "O período crítico Pcr")
+            w_osc = 2.0 * math.pi / pu
         if controller_type == "P":
             kp = 0.5 * ku
         elif controller_type == "PI":
             kp, ti = 0.45 * ku, pu / 1.2
         else:
             kp, ti, td = 0.6 * ku, pu / 2.0, pu / 8.0
-        method_label = "Ziegler-Nichols — oscilação crítica"
+        method_label = "Ziegler-Nichols — oscilação crítica (automático)"
+    elif method == "zn_critical_manual":
+        ku = _positive(critical_gain, "O ganho crítico Kcr")
+        pu = _positive(critical_period, "O período crítico Pcr")
+        w_osc = 2.0 * math.pi / pu
+        if controller_type == "P":
+            kp = 0.5 * ku
+        elif controller_type == "PI":
+            kp, ti = 0.45 * ku, pu / 1.2
+        else:
+            kp, ti, td = 0.6 * ku, pu / 2.0, pu / 8.0
+        method_label = "Ziegler-Nichols — oscilação crítica (manual)"
     elif method == "cohen_coon":
         gain = _positive(process_gain, "O ganho do processo")
         lag = _positive(delay, "O atraso L")
@@ -103,16 +133,34 @@ def _pid_parameters(method, controller_type, *, process_gain, delay, time_consta
 
     ki = 0.0 if ti is None else kp / ti
     kd = kp * td
-    return {"kp": kp, "ki": ki, "kd": kd, "ti": ti, "td": td, "method_label": method_label}
+    return {
+        "kp": kp,
+        "ki": ki,
+        "kd": kd,
+        "ti": ti,
+        "td": td,
+        "kcr": ku,
+        "pcr": pu,
+        "wcr": w_osc,
+        "method_label": method_label,
+    }
 
 
 def _pid_transfer(parameters, controller_type):
     kp, ki, kd = parameters["kp"], parameters["ki"], parameters["kd"]
+    ti, td = parameters.get("ti"), parameters.get("td", 0.0)
     if controller_type == "P":
         return ct.tf([kp], [1])
     if controller_type == "PI":
         return ct.tf([kp, ki], [1, 0])
-    return ct.tf([kd, kp, ki], [1, 0])
+    # PID com derivada filtrada (N=10) para tornar a função de transferência própria
+    N = 10.0
+    if td is not None and td > 0:
+        tau_d = td / N
+        num = [kp * (tau_d + td), kp + ki * tau_d, ki]
+        den = [tau_d, 1.0, 0.0]
+        return ct.tf(num, den)
+    return ct.tf([kp, ki], [1, 0])
 
 
 def _step_metrics(system, time):
@@ -193,6 +241,7 @@ def design_controller(
         parameters = _pid_parameters(
             method,
             controller_type,
+            plant=plant,
             process_gain=process_gain,
             delay=delay,
             time_constant=time_constant,
@@ -221,6 +270,10 @@ def design_controller(
     uncompensated = ct.feedback(plant, 1)
     compensated_loop = controller * plant
     compensated = ct.feedback(compensated_loop, 1)
+    compensated_poles = ct.poles(compensated)
+    compensated_stable = bool(np.all(np.real(compensated_poles) < -1e-9))
+    warning = "Malha fechada instável com estes parâmetros" if not compensated_stable else None
+
     time = recommended_time_vector(compensated, final_time, points)
     t_before, y_before = response_arrays(ct.step_response(uncompensated, timepts=time))
     t_after, y_after = response_arrays(ct.step_response(compensated, timepts=time))
@@ -283,33 +336,43 @@ def design_controller(
         return "Não definido" if value is None else str(value)
 
     metric_rows = [
-        {"label": "Projeto", "value": design_label},
-        {"label": "Sobressinal antes", "value": metric_value(metrics_before, "overshoot_percent"), "unit": "%"},
-        {"label": "Sobressinal depois", "value": metric_value(metrics_after, "overshoot_percent"), "unit": "%"},
-        {"label": "Acomodação antes", "value": metric_value(metrics_before, "settling_time"), "unit": "s"},
-        {"label": "Acomodação depois", "value": metric_value(metrics_after, "settling_time"), "unit": "s"},
-        {"label": "Margem de ganho antes", "value": str(margins_before["gain_margin_db"]), "unit": "dB"},
-        {"label": "Margem de ganho depois", "value": str(margins_after["gain_margin_db"]), "unit": "dB"},
-        {"label": "Margem de fase antes", "value": str(margins_before["phase_margin_deg"]), "unit": "°"},
-        {"label": "Margem de fase depois", "value": str(margins_after["phase_margin_deg"]), "unit": "°"},
+        {"label": "Estabilidade", "value": "Estável" if compensated_stable else "Instável"},
     ]
+    if warning:
+        metric_rows.append({"label": "Aviso", "value": warning})
+
     if parameters:
         metric_rows.extend([
-            {"label": "Kp", "value": f"{parameters['kp']:.6g}"},
-            {"label": "Ki", "value": f"{parameters['ki']:.6g}"},
-            {"label": "Kd", "value": f"{parameters['kd']:.6g}"},
+            {"label": "Kp", "value": f"{parameters['kp']:.5g}"},
+            {"label": "Ki", "value": f"{parameters['ki']:.5g}"},
+            {"label": "Kd", "value": f"{parameters['kd']:.5g}"},
+            {"label": "Ti", "value": f"{parameters['ti']:.5g}" if parameters["ti"] is not None else "—", "unit": "s" if parameters["ti"] is not None else ""},
+            {"label": "Td", "value": f"{parameters['td']:.5g}" if parameters["td"] is not None else "—", "unit": "s" if parameters["td"] is not None else ""},
         ])
+
+    metric_rows.extend([
+        {"label": "Sobressinal (%OS)", "value": metric_value(metrics_after, "overshoot_percent"), "unit": "%"},
+        {"label": "Tempo de acomodação (ts)", "value": metric_value(metrics_after, "settling_time"), "unit": "s"},
+        {"label": "Margem de ganho (MG)", "value": str(margins_after.get("gain_margin_db")), "unit": "dB"},
+        {"label": "Margem de fase (MF)", "value": str(margins_after.get("phase_margin_deg")), "unit": "°"},
+        {"label": "Projeto", "value": design_label},
+    ])
 
     details = {
         "design_type": design_type,
         "design_label": design_label,
+        "stable": compensated_stable,
+        "warning": warning,
         "controller_parameters": parameters,
+        "kcr": parameters.get("kcr") if parameters else None,
+        "pcr": parameters.get("pcr") if parameters else None,
+        "wcr": parameters.get("wcr") if parameters else None,
         "before": metrics_before,
         "after": metrics_after,
         "frequency_margins_before": margins_before,
         "frequency_margins_after": margins_after,
         "closed_loop_poles_before": serialize_complex(ct.poles(uncompensated)),
-        "closed_loop_poles_after": serialize_complex(ct.poles(compensated)),
+        "closed_loop_poles_after": serialize_complex(compensated_poles),
         "plant_latex_expanded": plant_latex_expanded,
     }
     return {

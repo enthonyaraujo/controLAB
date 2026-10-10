@@ -61,7 +61,9 @@ def parse_poles(value, expected, label):
     if isinstance(value, (list, tuple, np.ndarray)):
         poles = [complex(item) for item in value]
     else:
-        poles = [complex(item.strip().replace("i", "j")) for item in str(value).split(",") if item.strip()]
+        import re
+        val_str = re.sub(r"(?<=\d),(?=\d)", ".", str(value))
+        poles = [complex(item.strip().replace("i", "j")) for item in val_str.split(",") if item.strip()]
     if len(poles) != expected:
         raise ValueError(f"{label} exige exatamente {expected} polos.")
     return poles
@@ -92,6 +94,29 @@ def _serialize_matrix(matrix):
                 serialized_row.append(f"{candidate.real:.6g}{candidate.imag:+.6g}j")
         result.append(serialized_row)
     return result
+
+
+def format_matrix_repr(mat):
+    if mat is None:
+        return "—"
+    arr = np.asarray(mat)
+    def fmt_num(val):
+        c = complex(val)
+        if abs(c.imag) < 1e-9:
+            r = c.real
+            return f"{int(round(r))}" if abs(r - round(r)) < 1e-9 else f"{r:.4g}"
+        return f"{c.real:.4g}{c.imag:+.4g}j"
+
+    if arr.ndim == 1:
+        return "[" + ", ".join(fmt_num(x) for x in arr) + "]"
+    if arr.ndim == 2:
+        if arr.shape[0] == 1:
+            return "[" + ", ".join(fmt_num(x) for x in arr[0]) + "]"
+        if arr.shape[1] == 1:
+            return "[" + "; ".join(fmt_num(x) for x in arr[:, 0]) + "]"
+        rows = ["[" + ", ".join(fmt_num(x) for x in row) + "]" for row in arr]
+        return "[" + ", ".join(rows) + "]"
+    return str(arr)
 
 
 def _matrix_latex(name, matrix):
@@ -229,6 +254,7 @@ def analyze_state_space(
         observer_error_poles = np.linalg.eigvals(system.A - observer_gain @ system.C)
 
     original_poles = np.linalg.eigvals(system.A)
+    is_stable = bool(np.all(np.real(original_poles) < -1e-9))
     tokens = get_theme_tokens(theme)
     fig, axis = plt.subplots(figsize=(8.4, 5.2), dpi=140)
     axis.scatter(np.real(original_poles), np.imag(original_poles), marker="x", s=85, linewidths=2.2, color=tokens["reference"], label="Sistema original", zorder=5)
@@ -236,6 +262,16 @@ def analyze_state_space(
         axis.scatter(np.real(feedback_poles), np.imag(feedback_poles), marker="o", s=70, facecolors="none", linewidths=2.0, color=tokens["accent"], label="A - BK", zorder=5)
     if len(observer_error_poles):
         axis.scatter(np.real(observer_error_poles), np.imag(observer_error_poles), marker="s", s=55, facecolors="none", linewidths=2.0, color=tokens.get("accent_secondary", tokens["accent"]), label="A - LC", zorder=5)
+
+    all_poles = list(original_poles)
+    if len(feedback_poles):
+        all_poles.extend(feedback_poles)
+    if len(observer_error_poles):
+        all_poles.extend(observer_error_poles)
+    max_imag = max([abs(p.imag) for p in all_poles]) if len(all_poles) else 0.0
+    if max_imag < 1e-4:
+        axis.set_ylim(-1.0, 1.0)
+
     axis.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     axis.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     axis.set_xlabel("Parte real")
@@ -245,16 +281,27 @@ def analyze_state_space(
     image, svg = figure_payload(fig, theme=theme)
 
     transfer_details = _transfer_details(system)
+    eig_formatted = "; ".join([
+        f"{int(round(p.real))}" if abs(p.real - round(p.real)) < 1e-9 else f"{p.real:.4g}"
+        if abs(p.imag) < 1e-9 else f"{p.real:.4g}{p.imag:+.4g}j"
+        for p in original_poles
+    ])
     metrics = [
-        {"label": "Estados", "value": str(states)},
-        {"label": "Entradas", "value": str(system.ninputs)},
-        {"label": "Saídas", "value": str(system.noutputs)},
-        {"label": "Posto de controlabilidade", "value": f"{controllability_rank} / {states}"},
-        {"label": "Controlável", "value": "Sim" if controllability_rank == states else "Não"},
-        {"label": "Posto de observabilidade", "value": f"{observability_rank} / {states}"},
-        {"label": "Observável", "value": "Sim" if observability_rank == states else "Não"},
-        {"label": "Representação", "value": canonical_label},
+        {"label": "Autovalores de A", "value": eig_formatted},
+        {"label": "Estabilidade", "value": "Estável" if is_stable else "Instável"},
+        {"label": "Controlabilidade (posto)", "value": f"{controllability_rank} / {states}"},
+        {"label": "Observabilidade (posto)", "value": f"{observability_rank} / {states}"},
+        {"label": "Forma canônica solicitada", "value": canonical_label},
     ]
+    if canonical_label != "Original":
+        metrics.append({
+            "label": "Matrizes canônicas",
+            "value": f"Ac={format_matrix_repr(canonical.A)}, Bc={format_matrix_repr(canonical.B)}, Cc={format_matrix_repr(canonical.C)}, Dc={format_matrix_repr(canonical.D)}",
+        })
+    metrics.extend([
+        {"label": "Ganho K", "value": format_matrix_repr(gain_k) if gain_k is not None else "—"},
+        {"label": "Ganho L", "value": format_matrix_repr(observer_gain) if observer_gain is not None else "—"},
+    ])
     if placement_method:
         metrics.append({"label": "Realimentação", "value": placement_method})
     if observer_method:
@@ -275,6 +322,7 @@ def analyze_state_space(
     details = {
         "source_mode": mode,
         "source_latex": source_latex,
+        "stable": is_stable,
         "A": _serialize_matrix(system.A),
         "B": _serialize_matrix(system.B),
         "C": _serialize_matrix(system.C),

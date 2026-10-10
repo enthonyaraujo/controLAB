@@ -9,6 +9,13 @@ from state_space import analyze_state_space
 
 class StateSpaceTests(unittest.TestCase):
     def test_structural_analysis_and_ackermann(self):
+        import numpy as np
+        import scipy.signal as signal
+
+        A = np.array([[0, 1], [-2, -3]], dtype=float)
+        B = np.array([[0], [1]], dtype=float)
+        C = np.array([[1, 0]], dtype=float)
+
         result = analyze_state_space(
             a="[[0, 1], [-2, -3]]",
             b="[[0], [1]]",
@@ -17,10 +24,27 @@ class StateSpaceTests(unittest.TestCase):
             desired_poles="-4, -5",
             observer_poles="-6, -7",
         )
+        self.assertTrue(result["details"]["stable"])
         self.assertEqual(result["details"]["controllability_rank"], 2)
         self.assertEqual(result["details"]["observability_rank"], 2)
         self.assertEqual(result["details"]["state_feedback_method"], "Fórmula de Ackermann")
         self.assertIn("Luenberger", result["details"]["observer_method"])
+
+        # Validação com scipy.signal.place_poles
+        scipy_k = signal.place_poles(A, B, [-4, -5]).gain_matrix
+        scipy_l = signal.place_poles(A.T, C.T, [-6, -7]).gain_matrix.T
+        k_val = np.array(result["details"]["state_feedback_gain"], dtype=float)
+        l_val = np.array(result["details"]["observer_gain"], dtype=float)
+        np.testing.assert_allclose(k_val, scipy_k, rtol=1e-3)
+        np.testing.assert_allclose(l_val, scipy_l, rtol=1e-3)
+        np.testing.assert_allclose(k_val, [[18.0, 6.0]], rtol=1e-3)
+        np.testing.assert_allclose(l_val, [[10.0], [10.0]], rtol=1e-3)
+
+        metric_dict = {m["label"]: m["value"] for m in result["metrics"]}
+        self.assertIn("Autovalores de A", metric_dict)
+        self.assertEqual(metric_dict["Estabilidade"], "Estável")
+        self.assertEqual(metric_dict["Ganho K"], "[18, 6]")
+        self.assertEqual(metric_dict["Ganho L"], "[10; 10]")
         json.dumps(result, allow_nan=False)
 
     def test_transfer_function_conversion_and_diagonal_form(self):

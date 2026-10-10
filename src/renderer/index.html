@@ -14,10 +14,29 @@
   <!-- KaTeX Local CSS -->
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   
+  <!-- Design Tokens Centralizados -->
+  <link rel="stylesheet" href="tokens.css">
+
   <!-- App Styles -->
   <link rel="stylesheet" href="styles.css">
+  <script src="appearance.js"></script>
 </head>
 <body>
+  <!-- ========================================================= -->
+  <!-- DEFINIÇÕES DE SÍMBOLOS SVG DOS MÓDULOS CIENTÍFICOS        -->
+  <!-- ========================================================= -->
+  <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+    <defs>
+      <symbol id="s-time" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M5 18C6.5 18 7 7.5 10 7.5c2 0 2.5 5 4.5 5 1.6 0 2.2-1.5 5.5-1.5"></path><path d="M5 11h15" stroke-dasharray="1.5 2.5" stroke-width="1.25"></path></symbol>
+      <symbol id="s-stab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"></path><path d="M13 3v18"></path><path d="M5.5 6.5l3 3m0-3l-3 3"></path><path d="M5.5 14.5l3 3m0-3l-3 3"></path></symbol>
+      <symbol id="s-root" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2"></path><path d="M7 12h4"></path><path d="M11 12c2 0 2.5-5 5-8"></path><path d="M11 12c2 0 2.5 5 5 8"></path><path d="M18.5 4v16" stroke-dasharray="1.5 2.5" stroke-width="1.25"></path><path d="M5 10.5l2 3m0-3l-2 3"></path></symbol>
+      <symbol id="s-freq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M6 8h5c2 0 3 1 4 3l3 6"></path><path d="M6 17h4" stroke-dasharray="1.5 2.5" stroke-width="1.25"></path></symbol>
+      <symbol id="s-ctrl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="10" r="2"></circle><path d="M2 10h2"></path><path d="M8 10h3"></path><rect x="11" y="6.5" width="8" height="7" rx="1.5"></rect><path d="M19 10h3"></path><path d="M21 10v8H6v-6"></path><path d="M4.8 13.2L6 12l1.2 1.2"></path></symbol>
+      <symbol id="s-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/></symbol>
+      <symbol id="s-state" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"></path><path d="M16 4h3v16h-3"></path><circle cx="10" cy="9.5" r="0.9" fill="currentColor"></circle><circle cx="14" cy="9.5" r="0.9" fill="currentColor"></circle><circle cx="10" cy="14.5" r="0.9" fill="currentColor"></circle><circle cx="14" cy="14.5" r="0.9" fill="currentColor"></circle></symbol>
+    </defs>
+  </svg>
+
   <!-- ========================================================= -->
   <!-- BARRA SUPERIOR GLOBAL                                     -->
   <!-- ========================================================= -->
@@ -45,22 +64,6 @@
     </div>
 
     <div class="global-navbar-right">
-      <button id="theme-toggle" class="theme-toggle-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
-        <svg class="theme-icon sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2"/>
-          <path d="M12 20v2"/>
-          <path d="M4.93 4.93l1.41 1.41"/>
-          <path d="M17.66 17.66l1.41 1.41"/>
-          <path d="M2 12h2"/>
-          <path d="M20 12h2"/>
-          <path d="M6.34 17.66l-1.41 1.41"/>
-          <path d="M19.07 4.93l-1.41 1.41"/>
-        </svg>
-        <svg class="theme-icon moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-        </svg>
-      </button>
 
       <button id="btn-open-settings" class="nav-icon-btn" title="Configurações e atualizações" aria-label="Abrir configurações">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -75,275 +78,498 @@
   <!-- ========================================================= -->
   <!-- PÁGINA INICIAL: HUB CENTRAL DE SISTEMAS DE CONTROLE       -->
   <!-- ========================================================= -->
-  <main id="page-home" class="app-page active">
-    <div class="hub-container">
-      <section class="modules-grid">
-        
-        <!-- CARD 1: RESPOSTA NO TEMPO -->
-        <a id="card-module-time" class="module-card card-active" data-page="time" href="#time" role="button" aria-label="Resposta no Tempo">
-          <div class="card-title-row">
-            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 3v18h18"></path>
-              <path d="M5 18C6.5 18 7 7.5 10 7.5c2 0 2.5 5 4.5 5 1.6 0 2.2-1.5 5.5-1.5"></path>
-              <path d="M5 11h15" stroke-dasharray="1.5 2.5" stroke-width="1.25"></path>
-            </svg>
-            <h2 class="module-title">Resposta no Tempo</h2>
+  <main id="page-home" class="app-page sci-shell active">
+    <!-- Barra Superior de Abas (Desktop >= 1024px) -->
+    <header class="sci-top-bar">
+      <div class="sci-top-brand">
+        <b>ControLAB</b>
+        <span class="sci-version-badge">v3.1.1</span>
+      </div>
+      <nav class="sci-top-tabs">
+        <button class="sci-tab active" data-nav="home" type="button">INÍCIO</button>
+        <button class="sci-tab" data-nav="time" type="button">TEMPO</button>
+        <button class="sci-tab" data-nav="routh" type="button">ESTAB.</button>
+        <button class="sci-tab" data-nav="lgr" type="button">LGR</button>
+        <button class="sci-tab" data-nav="frequency" type="button">FREQ.</button>
+        <button class="sci-tab" data-nav="controllers" type="button">CONTROL.</button>
+        <button class="sci-tab" data-nav="state-space" type="button">ESTADOS</button>
+      </nav>
+      <div class="sci-top-actions">
+        <button class="sci-top-btn" data-action="settings" title="Configurações" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- App Bar (Tablet & Celular < 1024px) -->
+    <header class="sci-app-bar">
+      <div class="sci-app-bar-left">
+        <svg class="sci-app-bar-icon" width="22" height="22"><use href="#s-home"></use></svg>
+        <b class="sci-app-bar-title">ControLAB</b>
+        <span class="sci-version-badge">v3.1.1</span>
+      </div>
+      <div class="sci-app-bar-right">
+        <button type="button" class="sci-icon-btn" data-action="settings" title="Configurações">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace do Hub -->
+    <div class="hub-workspace">
+      <!-- Trilho Lateral de Navegação (Tablet 600-1023px) -->
+      <nav class="sci-rail">
+        <div class="sci-rail-item active" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+        <div class="sci-rail-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+        <div class="sci-rail-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+        <div class="sci-rail-item" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+        <div class="sci-rail-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
+        <div class="sci-rail-item" data-nav="controllers"><svg width="22" height="22"><use href="#s-ctrl"></use></svg><span>Control.</span></div>
+        <div class="sci-rail-item" data-nav="state-space"><svg width="22" height="22"><use href="#s-state"></use></svg><span>Estados</span></div>
+      </nav>
+
+      <!-- Área Principal com Módulos e Painel Lateral -->
+      <div class="hub-main-area">
+        <div class="hub-modules-pane">
+          <div class="sci-panel-header">
+            <span>Módulos</span>
+            <span class="hub-shortcut-hint">Ctrl+1 a Ctrl+6</span>
           </div>
 
-          <div class="module-preview-box" aria-hidden="true">
-            <svg viewBox="0 0 280 80" class="preview-svg">
-              <line x1="20" y1="68" x2="260" y2="68" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
-              <line x1="20" y1="40" x2="260" y2="40" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
-              <path d="M 20 68 C 30 68, 40 45, 52 30 C 60 20, 72 20, 82 28 C 94 38, 104 46, 116 46 C 128 46, 138 38, 150 38 C 162 38, 172 40, 186 40 L 260 40" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-        </a>
+          <!-- Grade de 6 Cards dos Módulos (Desktop: 3 colunas, Tablet: 2 colunas) -->
+          <div class="hub-cards-grid">
+            <!-- CARD 1: RESPOSTA NO TEMPO -->
+            <a id="card-module-time" class="module-card card-active" data-page="time" href="#time" role="button" aria-label="Resposta no Tempo">
+              <div class="hub-card-header">
+                <svg width="18" height="18"><use href="#s-time"></use></svg>
+                <h2 class="module-title">Resposta no Tempo</h2>
+              </div>
+              <div class="hub-card-thumb">
+                <svg viewBox="4 4 112 50" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 50H112" stroke="var(--border-strong)"/>
+                  <path d="M8 25H112" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M8 50C18 50 20 8 34 8C44 8 46 34 56 34C64 34 66 22 78 22C92 22 100 25 112 25" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-card-footer">
+                <span>Degrau, sobressinal e acomodação</span>
+                <code>Ctrl+1</code>
+              </div>
+            </a>
 
-        <!-- CARD 2: ESTABILIDADE -->
-        <a id="card-module-routh" class="module-card card-active" data-page="routh" href="#routh" role="button" aria-label="Estabilidade">
-          <div class="card-title-row">
-            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 12h18"></path>
-              <path d="M13 3v18"></path>
-              <path d="M5.5 6.5l3 3m0-3l-3 3"></path>
-              <path d="M5.5 14.5l3 3m0-3l-3 3"></path>
-            </svg>
-            <h2 class="module-title">Estabilidade</h2>
-          </div>
+            <!-- CARD 2: ESTABILIDADE -->
+            <a id="card-module-routh" class="module-card card-active" data-page="routh" href="#routh" role="button" aria-label="Estabilidade">
+              <div class="hub-card-header">
+                <svg width="18" height="18"><use href="#s-stab"></use></svg>
+                <h2 class="module-title">Estabilidade</h2>
+              </div>
+              <div class="hub-card-thumb">
+                <svg viewBox="4 4 112 50" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                  <rect x="8" y="6" width="62" height="44" fill="var(--accent)" opacity=".12"/>
+                  <path d="M8 28H112" stroke="var(--border-strong)"/>
+                  <path d="M70 6V50" stroke="var(--accent)" stroke-width="1.5"/>
+                  <path d="M37 13l6 6m0-6l-6 6M37 37l6 6m0-6l-6 6" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="hub-card-footer">
+                <span>Critério de Routh-Hurwitz</span>
+                <code>Ctrl+2</code>
+              </div>
+            </a>
 
-          <div class="module-preview-box" aria-hidden="true">
-            <svg viewBox="0 0 280 80" class="preview-svg">
-              <rect x="65" y="16" width="75" height="48" fill="var(--accent)" fill-opacity="0.07" />
-              <line x1="40" y1="40" x2="240" y2="40" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
-              <line x1="140" y1="16" x2="140" y2="64" stroke="var(--axis)" stroke-width="1.5" stroke-linecap="round" />
-              <g class="thumb-markers">
-                <path d="M 119 25 L 125 31 M 125 25 L 119 31" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
-                <path d="M 119 49 L 125 55 M 125 49 L 119 55" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
-                <path d="M 99 37 L 105 43 M 105 37 L 99 43" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
-              </g>
-            </svg>
-          </div>
-        </a>
+            <!-- CARD 3: LUGAR GEOMÉTRICO DAS RAÍZES -->
+            <a id="card-module-lgr" class="module-card card-active" data-page="lgr" href="#lgr" role="button" aria-label="Lugar Geométrico das Raízes">
+              <div class="hub-card-header">
+                <svg width="18" height="18"><use href="#s-root"></use></svg>
+                <h2 class="module-title">Lugar Geométrico das Raízes</h2>
+              </div>
+              <div class="hub-card-thumb">
+                <svg viewBox="4 4 112 50" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 28H112" stroke="var(--border-strong)"/>
+                  <path d="M82 6V50" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M20 28H44M44 28C56 28 58 14 66 6M44 28C56 28 58 42 66 50M100 28H112" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                  <path d="M17 25l6 6m0-6l-6 6M41 25l6 6m0-6l-6 6M97 25l6 6m0-6l-6 6" fill="none" stroke="var(--text)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="hub-card-footer">
+                <span>LGR, assíntotas e ramos</span>
+                <code>Ctrl+3</code>
+              </div>
+            </a>
 
-        <!-- CARD 3: LUGAR DAS RAÍZES -->
-        <a id="card-module-lgr" class="module-card card-active" data-page="lgr" href="#lgr" role="button" aria-label="Lugar Geométrico das Raízes">
-          <div class="card-title-row">
-            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 12h2"></path>
-              <path d="M7 12h4"></path>
-              <path d="M11 12c2 0 2.5-5 5-8"></path>
-              <path d="M11 12c2 0 2.5 5 5 8"></path>
-              <path d="M18.5 4v16" stroke-dasharray="1.5 2.5" stroke-width="1.25"></path>
-              <path d="M3.5 10.5l2 3m0-3l-2 3" transform="translate(1.5 0)"></path>
-            </svg>
-            <h2 class="module-title">Lugar Geométrico das Raízes</h2>
-          </div>
+            <!-- CARD 4: RESPOSTA EM FREQUÊNCIA -->
+            <a id="card-module-frequency" class="module-card card-active" data-page="frequency" href="#frequency" role="button" aria-label="Resposta em Frequência">
+              <div class="hub-card-header">
+                <svg width="18" height="18"><use href="#s-freq"></use></svg>
+                <h2 class="module-title">Resposta em Frequência</h2>
+              </div>
+              <div class="hub-card-thumb">
+                <svg viewBox="4 4 112 50" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 6V50H112" fill="none" stroke="var(--border-strong)"/>
+                  <path d="M40 18L110 47" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M10 18H40C56 18 64 24 74 32L108 46" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-card-footer">
+                <span>Bode e margens de estabilidade</span>
+                <code>Ctrl+4</code>
+              </div>
+            </a>
 
-          <div class="module-preview-box" aria-hidden="true">
-            <svg viewBox="0 0 280 80" class="preview-svg">
-              <line x1="25" y1="40" x2="255" y2="40" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
-              <line x1="182" y1="16" x2="182" y2="64" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="3 3" />
-              <line x1="55" y1="40" x2="105" y2="40" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
-              <line x1="186" y1="40" x2="232" y2="40" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" />
-              <path d="M 105 40 C 114 40, 126 30, 128 15" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" />
-              <path d="M 105 40 C 114 40, 126 50, 128 65" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" />
-              <g class="thumb-markers">
-                <path d="M 52 37 L 58 43 M 58 37 L 52 43" stroke="var(--text)" stroke-width="2" stroke-linecap="round" />
-                <path d="M 102 37 L 108 43 M 108 37 L 102 43" stroke="var(--text)" stroke-width="2" stroke-linecap="round" />
-                <path d="M 229 37 L 235 43 M 235 37 L 229 43" stroke="var(--text)" stroke-width="2" stroke-linecap="round" />
-              </g>
-            </svg>
-          </div>
-        </a>
+            <!-- CARD 5: PROJETO DE CONTROLADORES -->
+            <a id="card-module-controllers" class="module-card card-active" data-page="controllers" href="#controllers" role="button" aria-label="Projeto de Controladores">
+              <div class="hub-card-header">
+                <svg width="18" height="18"><use href="#s-ctrl"></use></svg>
+                <h2 class="module-title">Projeto de Controladores</h2>
+              </div>
+              <div class="hub-card-thumb">
+                <svg viewBox="4 4 112 50" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 26H112" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M8 50C40 50 60 38 80 31C94 27 104 26 112 26" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/>
+                  <path d="M8 50C18 50 22 8 38 8C50 8 54 30 66 30C78 30 84 26 112 26" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-card-footer">
+                <span>Sintonia P, PI e PID</span>
+                <code>Ctrl+5</code>
+              </div>
+            </a>
 
-        <!-- CARD 4: RESPOSTA EM FREQUÊNCIA -->
-        <a id="card-module-frequency" class="module-card card-active" data-page="frequency" href="#frequency" role="button" aria-label="Resposta em Frequência">
-          <div class="card-title-row">
-            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3 3v18h18"></path>
-              <path d="M6 8h5c2 0 3 1 4 3l3 6"></path>
-              <path d="M6 17h4" stroke-dasharray="1.5 2.5" stroke-width="1.25"></path>
-            </svg>
-            <h2 class="module-title">Resposta em Frequência</h2>
-          </div>
-
-          <div class="module-preview-box" aria-hidden="true">
-            <svg viewBox="0 0 280 80" class="preview-svg">
-              <line x1="25" y1="68" x2="255" y2="68" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" />
-              <line x1="25" y1="30" x2="110" y2="30" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
-              <line x1="110" y1="30" x2="250" y2="66" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
-              <path d="M 25 30 L 85 30 C 110 30, 130 38, 160 46 C 190 54, 220 60, 250 64" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-        </a>
-
-        <!-- CARD 5: PROJETO DE CONTROLADORES -->
-        <a id="card-module-controllers" class="module-card card-active" data-page="controllers" href="#controllers" role="button" aria-label="Projeto de Controladores">
-          <div class="card-title-row">
-            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="6" cy="10" r="2"></circle>
-              <path d="M2 10h2"></path>
-              <path d="M8 10h3"></path>
-              <rect x="11" y="6.5" width="8" height="7" rx="1.5"></rect>
-              <path d="M19 10h3"></path>
-              <path d="M21 10v8H6v-6"></path>
-              <path d="M4.8 13.2L6 12l1.2 1.2"></path>
-            </svg>
-            <h2 class="module-title">Projeto de Controladores</h2>
-          </div>
-
-          <div class="module-preview-box" aria-hidden="true">
-            <svg viewBox="0 0 280 80" class="preview-svg">
-              <line x1="25" y1="36" x2="255" y2="36" stroke="var(--axis)" stroke-width="1.5" stroke-dasharray="4 4" />
-              <path d="M 25 66 C 70 66, 110 58, 150 48 C 180 40, 210 36, 255 36" stroke="var(--text-faint)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M 25 66 C 40 66, 50 35, 62 25 C 72 17, 85 17, 98 25 C 112 34, 125 40, 142 40 C 160 40, 185 36, 255 36" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-        </a>
-
-        <!-- CARD 6: ESPAÇO DE ESTADOS -->
-        <a id="card-module-state-space" class="module-card card-active" data-page="state-space" href="#state-space" role="button" aria-label="Espaço de Estados">
-          <div class="card-title-row">
-            <svg class="module-title-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M8 4H5v16h3"></path>
-              <path d="M16 4h3v16h-3"></path>
-              <circle cx="10" cy="9.5" r="0.9" fill="currentColor"></circle>
-              <circle cx="14" cy="9.5" r="0.9" fill="currentColor"></circle>
-              <circle cx="10" cy="14.5" r="0.9" fill="currentColor"></circle>
-              <circle cx="14" cy="14.5" r="0.9" fill="currentColor"></circle>
-            </svg>
-            <h2 class="module-title">Espaço de Estados</h2>
+            <!-- CARD 6: ESPAÇO DE ESTADOS -->
+            <a id="card-module-state-space" class="module-card card-active" data-page="state-space" href="#state-space" role="button" aria-label="Espaço de Estados">
+              <div class="hub-card-header">
+                <svg width="18" height="18"><use href="#s-state"></use></svg>
+                <h2 class="module-title">Espaço de Estados</h2>
+              </div>
+              <div class="hub-card-thumb">
+                <svg viewBox="4 4 112 50" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                  <path d="M24 10H14V46H24M46 10H56V46H46" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/>
+                  <circle cx="30" cy="24" r="1.8" fill="var(--accent)"/>
+                  <circle cx="40" cy="24" r="1.8" fill="var(--accent)"/>
+                  <circle cx="30" cy="34" r="1.8" fill="var(--accent)"/>
+                  <circle cx="40" cy="34" r="1.8" fill="var(--accent)"/>
+                  <path d="M68 30C74 10 84 10 90 30S102 48 108 32" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-card-footer">
+                <span>Realimentação e observador</span>
+                <code>Ctrl+6</code>
+              </div>
+            </a>
           </div>
 
-          <div class="module-preview-box" aria-hidden="true">
-            <svg viewBox="0 0 280 80" class="preview-svg">
-              <path d="M 76 22 L 66 22 L 66 58 L 76 58" stroke="var(--text-faint)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              <path d="M 106 22 L 116 22 L 116 58 L 106 58" stroke="var(--text-faint)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-              <circle cx="81" cy="33" r="2.8" fill="var(--accent)" />
-              <circle cx="101" cy="33" r="2.8" fill="var(--accent)" />
-              <circle cx="81" cy="47" r="2.8" fill="var(--accent)" />
-              <circle cx="101" cy="47" r="2.8" fill="var(--accent)" />
-              <path d="M 148 48 C 158 48, 164 24, 178 24 C 192 24, 196 62, 208 62 C 220 62, 226 34, 234 34 C 240 34, 244 46, 252 46 L 260 46" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </div>
-        </a>
+          <!-- Lista de Módulos para Celular (< 600px: 1 coluna com linhas horizontais) -->
+          <div class="hub-mobile-list">
+            <a class="hub-mobile-row" data-page="time" href="#time">
+              <div class="hub-mobile-thumb">
+                <svg viewBox="0 0 120 56" width="100%" height="44" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 50H112" stroke="var(--border-strong)"/>
+                  <path d="M8 25H112" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M8 50C18 50 20 8 34 8C44 8 46 34 56 34C64 34 66 22 78 22C92 22 100 25 112 25" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-mobile-text">
+                <b class="module-title">Resposta no tempo</b>
+                <span>Degrau, sobressinal e acomodação</span>
+              </div>
+              <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
 
-      </section>
+            <a class="hub-mobile-row" data-page="routh" href="#routh">
+              <div class="hub-mobile-thumb">
+                <svg viewBox="0 0 120 56" width="100%" height="44" preserveAspectRatio="xMidYMid meet">
+                  <rect x="8" y="6" width="62" height="44" fill="var(--accent)" opacity=".12"/>
+                  <path d="M8 28H112" stroke="var(--border-strong)"/>
+                  <path d="M70 6V50" stroke="var(--accent)" stroke-width="1.5"/>
+                  <path d="M37 13l6 6m0-6l-6 6M37 37l6 6m0-6l-6 6" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="hub-mobile-text">
+                <b class="module-title">Estabilidade</b>
+                <span>Critério de Routh-Hurwitz</span>
+              </div>
+              <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+
+            <a class="hub-mobile-row" data-page="lgr" href="#lgr">
+              <div class="hub-mobile-thumb">
+                <svg viewBox="0 0 120 56" width="100%" height="44" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 28H112" stroke="var(--border-strong)"/>
+                  <path d="M82 6V50" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M20 28H44M44 28C56 28 58 14 66 6M44 28C56 28 58 42 66 50M100 28H112" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                  <path d="M17 25l6 6m0-6l-6 6M41 25l6 6m0-6l-6 6M97 25l6 6m0-6l-6 6" fill="none" stroke="var(--text)" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="hub-mobile-text">
+                <h2 class="module-title" style="font-size: 14px; font-weight: 600; margin: 0 0 2px 0;">Lugar Geométrico das Raízes</h2>
+                <span>LGR, assíntotas e ramos</span>
+              </div>
+              <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+
+            <a class="hub-mobile-row" data-page="frequency" href="#frequency">
+              <div class="hub-mobile-thumb">
+                <svg viewBox="0 0 120 56" width="100%" height="44" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 6V50H112" fill="none" stroke="var(--border-strong)"/>
+                  <path d="M40 18L110 47" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M10 18H40C56 18 64 24 74 32L108 46" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-mobile-text">
+                <b class="module-title">Resposta em frequência</b>
+                <span>Bode e margens de estabilidade</span>
+              </div>
+              <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+
+            <a class="hub-mobile-row" data-page="controllers" href="#controllers">
+              <div class="hub-mobile-thumb">
+                <svg viewBox="0 0 120 56" width="100%" height="44" preserveAspectRatio="xMidYMid meet">
+                  <path d="M8 26H112" stroke="var(--border-strong)" stroke-dasharray="3 3"/>
+                  <path d="M8 50C40 50 60 38 80 31C94 27 104 26 112 26" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/>
+                  <path d="M8 50C18 50 22 8 38 8C50 8 54 30 66 30C78 30 84 26 112 26" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-mobile-text">
+                <b class="module-title">Projeto de controladores</b>
+                <span>Sintonia P, PI e PID</span>
+              </div>
+              <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+
+            <a class="hub-mobile-row" data-page="state-space" href="#state-space">
+              <div class="hub-mobile-thumb">
+                <svg viewBox="0 0 120 56" width="100%" height="44" preserveAspectRatio="xMidYMid meet">
+                  <path d="M24 10H14V46H24M46 10H56V46H46" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/>
+                  <circle cx="30" cy="24" r="1.8" fill="var(--accent)"/>
+                  <circle cx="40" cy="24" r="1.8" fill="var(--accent)"/>
+                  <circle cx="30" cy="34" r="1.8" fill="var(--accent)"/>
+                  <circle cx="40" cy="34" r="1.8" fill="var(--accent)"/>
+                  <path d="M68 30C74 10 84 10 90 30S102 48 108 32" fill="none" stroke="var(--accent)" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="hub-mobile-text">
+                <b class="module-title">Espaço de estados</b>
+                <span>Realimentação e observador</span>
+              </div>
+              <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Painel Lateral: Recentes & Exemplos -->
+        <aside class="hub-side-pane">
+          <div class="sci-panel-header"><span>Recentes</span></div>
+          <div class="hub-recent-list">
+            <div class="hub-recent-row" data-nav="time" role="button">
+              <svg width="16" height="16"><use href="#s-time"></use></svg>
+              <code>4/(s^2+2*s+4)</code>
+              <em>12 min</em>
+            </div>
+            <div class="hub-recent-row" data-nav="routh" role="button">
+              <svg width="16" height="16"><use href="#s-stab"></use></svg>
+              <code>s^3+3*s^2+2*s+K</code>
+              <em>1 h</em>
+            </div>
+            <div class="hub-recent-row" data-nav="lgr" role="button">
+              <svg width="16" height="16"><use href="#s-root"></use></svg>
+              <code>(s+2)/(s*(s+1)*(s+4))</code>
+              <em>ontem</em>
+            </div>
+            <div class="hub-recent-row" data-nav="frequency" role="button">
+              <svg width="16" height="16"><use href="#s-freq"></use></svg>
+              <code>10/(s*(s+2)*(s+5))</code>
+              <em>ontem</em>
+            </div>
+          </div>
+
+          <div class="sci-panel-header hub-examples-header"><span>Exemplos</span></div>
+          <div class="hub-examples-list">
+            <div class="hub-example-row" data-example="time">
+              <span>Segunda ordem subamortecido</span>
+              <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="hub-example-row" data-example="lgr">
+              <span>Planta com integrador</span>
+              <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+            <div class="hub-example-row" data-example="controllers">
+              <span>Servo de posição</span>
+              <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
+
+    <!-- Barra de Status (Desktop & Tablet) -->
+    <footer class="sci-status-bar">
+      <div class="sci-status-left">
+        <span class="sci-status-indicator"></span>
+        <span>Pronto</span>
+      </div>
+      <div class="sci-status-right">
+        <span>Offline · v3.1.1</span>
+      </div>
+    </footer>
+
+    <!-- Barra Inferior Mobile (< 600px) -->
+    <nav class="sci-bottom-nav">
+      <div class="sci-bottom-nav-item active" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+      <div class="sci-bottom-nav-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+      <div class="sci-bottom-nav-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estabil.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+      <div class="sci-bottom-nav-item" data-nav="more"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>Mais</span></div>
+    </nav>
   </main>
 
   <!-- ========================================================= -->
   <!-- MÓDULO 1: LUGAR GEOMÉTRICO DAS RAÍZES (WORKSPACE)         -->
   <!-- ========================================================= -->
-  <div id="page-lgr" class="app-page">
-    <div class="app-container">
-      
-      <!-- ========================================================= -->
-      <!-- SIDEBAR DE ENTRADA E CONTROLE                             -->
-      <!-- ========================================================= -->
-      <aside class="sidebar">
-        <div class="sidebar-content">
-        <!-- Seleção de Modo de Entrada -->
-        <div class="input-mode-tabs">
-          <button class="mode-tab active" data-mode="expr">Expressão</button>
-          <button class="mode-tab" data-mode="parts">Fração</button>
-          <button class="mode-tab" data-mode="coeffs">Coeficientes</button>
-          <button class="mode-tab" data-mode="zpk">Polos/Zeros</button>
-        </div>
+  <div id="page-lgr" class="app-page sci-shell" data-active-tab="params">
+    <!-- Barra Superior de Abas (Desktop >= 1024px) -->
+    <header class="sci-top-bar">
+      <div class="sci-top-brand">
+        <b>ControLAB</b>
+        <span class="sci-version-badge">v3.1.1</span>
+      </div>
+      <nav class="sci-top-tabs">
+        <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
+        <button type="button" class="sci-tab" data-nav="time">TEMPO</button>
+        <button type="button" class="sci-tab" data-nav="routh">ESTAB.</button>
+        <button type="button" class="sci-tab active" data-nav="lgr">LGR</button>
+        <button type="button" class="sci-tab" data-nav="frequency">FREQ.</button>
+        <button type="button" class="sci-tab" data-nav="controllers">CONTROL.</button>
+        <button type="button" class="sci-tab" data-nav="state-space">ESTADOS</button>
+      </nav>
+      <div class="sci-top-actions">
+        <button class="sci-top-btn" data-action="settings" title="Configurações" aria-label="Configurações" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
 
-        <!-- Formulários Dinâmicos por Modo -->
-        <div class="form-container">
-          
-          <!-- Modo 1: Expressão Simbólica -->
-          <div id="form-expr" class="form-panel active">
-            <label for="input-expr" class="form-label">
-              Função de Transferência $G(s)$:
-            </label>
-            <div class="input-with-hint">
-              <input 
-                type="text" 
-                id="input-expr" 
-                class="form-input code-font" 
-                value="(s + 2) / (s * (s + 1) * (s + 4))" 
-                placeholder="Ex: G(s) = (s+2)/(s(s+1)(s+4))"
-                autocomplete="off"
-                spellcheck="false"
-              />
+    <!-- App Bar (Tablet & Celular < 1024px) -->
+    <header class="sci-app-bar">
+      <svg class="sci-app-bar-icon" width="22" height="22"><use href="#s-root"></use></svg>
+      <b class="sci-app-bar-title">Lugar Geométrico das Raízes</b>
+      <div class="sci-app-bar-actions">
+        <button class="sci-btn-icon" data-action="settings" title="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Abas Mobile (< 600px) -->
+    <nav class="sci-mobile-tabs" id="lgr-mobile-tabs">
+      <button type="button" class="sci-mobile-tab active" data-tab="params">Parâmetros</button>
+      <button type="button" class="sci-mobile-tab" data-tab="plot">Gráfico</button>
+      <button type="button" class="sci-mobile-tab" data-tab="results">Resultados</button>
+    </nav>
+
+    <!-- Ribbon de Ações -->
+    <div class="sci-ribbon">
+      <button type="button" class="sci-ribbon-btn primary" id="btn-ribbon-lgr-calc">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Calcular</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-ribbon-lgr-clear">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <span>Limpar</span>
+      </button>
+      <div class="sci-ribbon-sep"></div>
+      <button type="button" class="sci-ribbon-btn" id="btn-zoom-in">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <span>Zoom +</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-zoom-out">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <span>Zoom −</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-zoom-reset">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span>Ajustar</span>
+      </button>
+      <div class="sci-ribbon-sep"></div>
+      <button type="button" class="sci-ribbon-btn" id="btn-download-svg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>SVG</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-download-png">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>PNG</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-copy-img">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span>Copiar</span>
+      </button>
+    </div>
+
+    <!-- Área de Trabalho Científica -->
+    <div class="scientific-workspace">
+      <!-- Trilho Lateral de Navegação (Tablet 600-1023px) -->
+      <nav class="sci-rail">
+        <div class="sci-rail-item" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+        <div class="sci-rail-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+        <div class="sci-rail-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+        <div class="sci-rail-item active" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+        <div class="sci-rail-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
+        <div class="sci-rail-item" data-nav="controllers"><svg width="22" height="22"><use href="#s-ctrl"></use></svg><span>Control.</span></div>
+        <div class="sci-rail-item" data-nav="state-space"><svg width="22" height="22"><use href="#s-state"></use></svg><span>Estados</span></div>
+      </nav>
+
+      <!-- Painel 1: Parâmetros (280px padrão) -->
+      <aside class="sci-panel sci-panel-params">
+        <div class="sci-panel-header"><span>Parâmetros</span></div>
+        <div class="sci-panel-body">
+          <div class="input-mode-tabs" style="display: flex; gap: 2px; margin-bottom: 6px;">
+            <button class="mode-tab active" data-mode="expr" type="button">Expressão</button>
+            <button class="mode-tab" data-mode="parts" type="button">Fração</button>
+            <button class="mode-tab" data-mode="coeffs" type="button">Coefs</button>
+            <button class="mode-tab" data-mode="zpk" type="button">Polos/Zeros</button>
+          </div>
+
+          <div class="form-container">
+            <div id="form-expr" class="form-panel active">
+              <label for="input-expr" class="form-label">Função de Transferência G(s):</label>
+              <input type="text" id="input-expr" class="form-input code-font" value="(s + 2) / (s * (s + 1) * (s + 4))" placeholder="Ex: (s+2)/(s(s+1)(s+4))" autocomplete="off" spellcheck="false" />
+              <p class="input-help">Aceita multiplicação implícita (<code>2s</code>, <code>s(s+1)</code>), <code>^</code> e expoentes Unicode.</p>
             </div>
-            <p class="input-help">Aceita <code>G(s)=</code>, multiplicação implícita (<code>2s</code>, <code>s(s+1)</code>), <code>^</code> e expoentes Unicode como <code>s²</code>.</p>
+            <div id="form-parts" class="form-panel" style="display: none;">
+              <label for="input-numerator" class="form-label">Numerador N(s):</label>
+              <input type="text" id="input-numerator" class="form-input code-font" value="s + 2" autocomplete="off" spellcheck="false" />
+              <label for="input-denominator" class="form-label" style="margin-top: 6px;">Denominador D(s):</label>
+              <input type="text" id="input-denominator" class="form-input code-font" value="s(s + 1)(s + 4)" autocomplete="off" spellcheck="false" />
+            </div>
+            <div id="form-coeffs" class="form-panel" style="display: none;">
+              <label class="form-label">Numerador N(s) [decrescente]:</label>
+              <input type="text" id="input-num" class="form-input code-font" value="1, 2" />
+              <label class="form-label" style="margin-top: 6px;">Denominador D(s) [decrescente]:</label>
+              <input type="text" id="input-den" class="form-input code-font" value="1, 5, 4, 0" />
+            </div>
+            <div id="form-zpk" class="form-panel" style="display: none;">
+              <label class="form-label">Ganho Escalar K:</label>
+              <input type="number" id="input-k" class="form-input" value="1.0" step="0.5" />
+              <label class="form-label" style="margin-top: 6px;">Zeros (vírgula):</label>
+              <input type="text" id="input-zeros" class="form-input code-font" value="-2" />
+              <label class="form-label" style="margin-top: 6px;">Polos (vírgula):</label>
+              <input type="text" id="input-poles" class="form-input code-font" value="0, -1, -4" />
+            </div>
           </div>
 
-          <!-- Modo 2: Numerador e denominador escritos separadamente -->
-          <div id="form-parts" class="form-panel">
-            <label for="input-numerator" class="form-label">Numerador $N(s)$:</label>
-            <input
-              type="text"
-              id="input-numerator"
-              class="form-input code-font"
-              value="s + 2"
-              placeholder="Ex: s + 2"
-              autocomplete="off"
-              spellcheck="false"
-            />
-
-            <label for="input-denominator" class="form-label field-spaced">Denominador $D(s)$:</label>
-            <input
-              type="text"
-              id="input-denominator"
-              class="form-input code-font"
-              value="s(s + 1)(s + 4)"
-              placeholder="Ex: s(s + 1)(s + 4)"
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <p class="input-help">A barra da fração é montada automaticamente. Escreva apenas os dois polinômios.</p>
+          <!-- Barra de símbolos virtuais (< 600px) -->
+          <div class="sci-virtual-math" id="lgr-virtual-math">
+            <button type="button" data-sym="^">^</button>
+            <button type="button" data-sym="*">*</button>
+            <button type="button" data-sym="/">/</button>
+            <button type="button" data-sym="(">(</button>
+            <button type="button" data-sym=")">)</button>
+            <button type="button" data-sym="+">+</button>
+            <button type="button" data-sym="-">−</button>
+            <button type="button" data-sym="s">s</button>
           </div>
 
-          <!-- Modo 3: Coeficientes Polinomiais -->
-          <div id="form-coeffs" class="form-panel">
-            <label class="form-label">Numerador $N(s)$ [ordem decrescente]:</label>
-            <input 
-              type="text" 
-              id="input-num" 
-              class="form-input code-font" 
-              value="1, 2" 
-              placeholder="Ex: 1, 2 para (s + 2)"
-            />
-
-            <label class="form-label" style="margin-top: 12px;">Denominador $D(s)$ [ordem decrescente]:</label>
-            <input 
-              type="text" 
-              id="input-den" 
-              class="form-input code-font" 
-              value="1, 5, 4, 0" 
-              placeholder="Ex: 1, 5, 4, 0 para s³ + 5s² + 4s"
-            />
-          </div>
-
-          <!-- Modo 4: ZPK (Zeros, Polos e Ganho) -->
-          <div id="form-zpk" class="form-panel">
-            <label class="form-label">Ganho Escalar $K$:</label>
-            <input type="number" id="input-k" class="form-input" value="1.0" step="0.5" />
-
-            <label class="form-label" style="margin-top: 10px;">Zeros $z_i$ (separados por vírgula):</label>
-            <input 
-              type="text" 
-              id="input-zeros" 
-              class="form-input code-font" 
-              value="-2" 
-              placeholder="Ex: -2 ou -1+2j, -1-2j"
-            />
-
-            <label class="form-label" style="margin-top: 10px;">Polos $p_i$ (separados por vírgula):</label>
-            <input 
-              type="text" 
-              id="input-poles" 
-              class="form-input code-font" 
-              value="0, -1, -4" 
-              placeholder="Ex: 0, -1, -4 ou -1+1j, -1-1j"
-            />
-          </div>
-
+          <!-- Prévia KaTeX -->
           <div class="function-preview" id="function-preview" aria-live="polite">
             <div class="preview-heading">
               <span>Prévia matemática</span>
@@ -353,484 +579,470 @@
             <div id="preview-error" class="preview-error" hidden></div>
           </div>
 
-          <!-- Título Customizado -->
-          <details class="custom-title-section">
-            <summary>Opções do gráfico</summary>
-            <label class="form-label" for="input-title">Título:</label>
-            <input type="text" id="input-title" class="form-input" value="Lugar Geométrico das Raízes" />
+          <details class="custom-title-section" style="margin-top: 6px;">
+            <summary style="font-size: 0.8125rem; cursor: pointer; color: var(--text-muted);">Opções do gráfico</summary>
+            <input type="text" id="input-title" class="form-input" value="Lugar Geométrico das Raízes" style="margin-top: 4px;" />
           </details>
 
+          <div class="sci-params-action" style="display: none;">
+            <button id="btn-calculate" class="sci-btn sci-btn-primary" type="button">
+              <span class="btn-text">Calcular</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </aside>
 
-      <!-- Rodapé da Sidebar: Botão de Ação Principal -->
-      <div class="sidebar-footer">
-        <button id="btn-calculate" class="btn btn-primary btn-calc-action" type="button">
-          <span class="btn-text">Traçar LGR</span>
-        </button>
-      </div>
-    </aside>
+      <!-- Painel 2: Figura (Centro) -->
+      <main class="sci-panel sci-panel-plot">
+        <!-- Switcher Tablet [ Figura | Resultados ] -->
+        <div class="sci-tablet-switcher" id="lgr-tablet-switcher">
+          <button type="button" class="active" data-view="figure">Figura</button>
+          <button type="button" data-view="results">Resultados</button>
+        </div>
 
-    <!-- ========================================================= -->
-    <!-- ÁREA PRINCIPAL                                            -->
-    <!-- ========================================================= -->
-    <main class="main-content">
-      
-      <!-- Banner de Equação e Status -->
-      <header class="equation-banner">
-        <div class="equation-container">
-          <div class="eq-header-row">
-            <span class="eq-label">G(s)</span>
-            <div class="tabs-segmented eq-representation-toggle" role="tablist" aria-label="Representação de G(s)">
+        <div class="sci-panel-header">
+          <span>Figura 1 — Lugar Geométrico das Raízes</span>
+          <div class="sci-plot-header-actions">
+            <div class="sci-segmented-mini">
               <button type="button" class="tab-seg active" id="btn-toggle-lgr-factored" data-eq="factored">Fatorada</button>
               <button type="button" class="tab-seg" id="btn-toggle-lgr-expanded" data-eq="expanded">Expandida</button>
             </div>
           </div>
-          <div class="eq-active-wrap">
+        </div>
+
+        <!-- Equação G(s) e Badges -->
+        <div style="padding: 4px 10px; background: var(--bg-surface-1); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div style="overflow-x: auto; font-size: 0.8125rem;">
             <div id="latex-factored" class="math-render active"></div>
             <div id="latex-expanded" class="math-render" style="display: none;"></div>
           </div>
+          <div class="badges-row" id="stats-badges" style="display: flex; gap: 4px;">
+            <span class="stat-badge badge-blue" id="badge-poles">Polos: <b>—</b></span>
+            <span class="stat-badge badge-purple" id="badge-zeros">Zeros: <b>—</b></span>
+            <span class="stat-badge badge-emerald" id="badge-branches">Ramos: <b>—</b></span>
+            <span class="stat-badge badge-amber" id="badge-centroid">σₐ: <b>—</b></span>
+          </div>
         </div>
 
-        <!-- Badges de Resumo do Sistema -->
-        <div class="badges-row" id="stats-badges">
-          <span class="stat-badge badge-blue" id="badge-poles">Polos: <b>0</b></span>
-          <span class="stat-badge badge-purple" id="badge-zeros">Zeros: <b>0</b></span>
-          <span class="stat-badge badge-emerald" id="badge-branches">Ramos: <b>0</b></span>
-          <span class="stat-badge badge-amber" id="badge-centroid">Centroide: <b>-</b></span>
+        <!-- Abas Internas da Figura: Gráfico / Memorial / Teoria -->
+        <div class="view-tabs" style="display: flex; gap: 2px; padding: 3px 8px; background: var(--bg-surface-1); border-bottom: 1px solid var(--border);">
+          <button class="view-tab active" data-view="plot" type="button" style="padding: 3px 8px; font-size: 0.8125rem;">
+            <span>Gráfico</span>
+          </button>
+          <button class="view-tab" data-view="memorial" type="button" style="padding: 3px 8px; font-size: 0.8125rem;">
+            <span>Passo a passo (7 Passos)</span>
+          </button>
+          <button class="view-tab" data-view="theory" type="button" style="padding: 3px 8px; font-size: 0.8125rem;">
+            <span>Regras Clássicas</span>
+          </button>
         </div>
-      </header>
 
-      <!-- Abas Principais: Gráfico x Memorial dos 7 Passos -->
-      <div class="view-tabs">
-        <button class="view-tab active" data-view="plot">
-          <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          <span>Gráfico do LGR</span>
-        </button>
-        <button class="view-tab" data-view="memorial">
-          <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span>Passo a passo</span>
-        </button>
-        <button class="view-tab" data-view="theory">
-          <svg class="view-tab-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-          <span>Regras Clássicas</span>
-        </button>
-      </div>
-
-      <!-- Conteúdo das Visualizações -->
-      <div class="views-wrapper">
-        
-        <!-- VISUALIZAÇÃO 1: GRÁFICO INTERATIVO -->
-        <section id="view-plot" class="view-panel active">
-          <div class="plot-card">
-            <!-- Barra de Ferramentas do Gráfico -->
-            <div class="plot-toolbar">
-              <div class="toolbar-left">
-                <button class="tool-btn" id="btn-zoom-in" title="Aumentar Zoom">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                  <span>Zoom +</span>
-                </button>
-                <button class="tool-btn" id="btn-zoom-out" title="Diminuir Zoom">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                  <span>Zoom -</span>
-                </button>
-                <button class="tool-btn" id="btn-zoom-reset" title="Ajustar ao Tamanho">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                  <span>Ajustar</span>
-                </button>
-              </div>
-              <div class="toolbar-right">
-                <button class="tool-btn" id="btn-copy-img" title="Copiar Gráfico para Área de Transferência">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  <span>Copiar</span>
-                </button>
-                <button class="tool-btn tool-btn-accent" id="btn-download-svg" title="Exportar como Vetorial SVG">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                  <span>SVG</span>
-                </button>
-                <button class="tool-btn tool-btn-primary" id="btn-download-png" title="Exportar Imagem em Alta Resolução">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  <span>PNG</span>
-                </button>
-              </div>
+        <div class="sci-plot-viewport" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <!-- View 1: Gráfico -->
+          <div id="view-plot" class="view-panel active" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+            <div id="plot-loading" class="loading-overlay" style="display: none;">
+              <div class="spinner"></div>
+              <span>Calculando Lugar Geométrico das Raízes...</span>
             </div>
-
-            <!-- Área da Imagem do Gráfico -->
-            <div class="plot-viewport" id="plot-viewport">
-              <div id="plot-loading" class="loading-overlay">
-                <div class="spinner"></div>
-                <span>Calculando Lugar Geométrico das Raízes...</span>
-              </div>
-              <div id="lgr-empty-state" class="routh-empty-card" style="display: flex; margin: auto; max-width: 440px; text-align: center;">
-                <p>Insira a função de transferência e clique em <strong>Traçar LGR</strong> para visualizar o gráfico e o memorial de cálculo.</p>
-              </div>
-              <img id="plot-image" src="" alt="Lugar Geométrico das Raízes" class="plot-img" style="display: none;" />
+            <!-- Empty State (Smoke Test Assertion: id="lgr-empty-state") -->
+            <div id="lgr-empty-state" class="routh-empty-card" style="display: flex; margin: auto; max-width: 440px; text-align: center;">
+              <p>Insira a função de transferência e clique em <b>Calcular</b> para visualizar o gráfico e o memorial de cálculo.</p>
+            </div>
+            <div class="plot-viewport" id="plot-viewport" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; overflow: hidden;">
+              <img id="plot-image" src="" alt="Lugar Geométrico das Raízes" class="plot-img" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;" />
             </div>
           </div>
-        </section>
 
-        <!-- VISUALIZAÇÃO 2: MEMORIAL DE CÁLCULO DOS 7 PASSOS -->
-        <section id="view-memorial" class="view-panel">
-          
-          <!-- Barra Superior do Memorial com Toggle da Sidebar de Deduções -->
-          <div class="memorial-toolbar">
-            <div class="memorial-toolbar-info">
-              <span class="toolbar-badge">7 Passos Clássicos</span>
-              <span class="toolbar-desc">Resultados numéricos e deduções algébricas passo a passo</span>
+          <!-- View 2: Memorial dos 7 Passos -->
+          <div id="view-memorial" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto;">
+            <div class="memorial-toolbar" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span class="toolbar-badge" style="font-size: 0.8125rem; font-weight: 500;">7 Passos Clássicos de Evans</span>
+              <button id="btn-toggle-deductions" class="sci-btn-mini" type="button">Deduções detalhadas →</button>
             </div>
-            <button id="btn-toggle-deductions" class="btn-toggle-deductions" type="button" aria-expanded="false" title="Alternar painel lateral com deduções algébricas passo a passo">
-              <svg class="toggle-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="15" y1="3" x2="15" y2="21"></line>
-              </svg>
-              <span>Passo a Passo Algébrico</span>
-              <span class="badge-status-dot"></span>
-            </button>
+            <div id="memorial-empty-state" class="routh-empty-card" style="display: flex; margin: auto; max-width: 440px; text-align: center;">
+              <p>Nenhum memorial calculado ainda. Insira a função de transferência e clique em <b>Calcular</b>.</p>
+            </div>
+            <div class="steps-grid" style="display: none; flex-direction: column; gap: 8px;">
+              <div class="step-card" id="card-step-1"><div class="step-card-header"><span style="font-weight: 600;">Passos 1, 2, 3:</span> Ramos, Polos, Zeros e Eixo Real</div><div class="step-card-body" id="step-content-1"></div></div>
+              <div class="step-card" id="card-step-4"><div class="step-card-header"><span style="font-weight: 600;">Passo 4:</span> Assíntotas e Centroide (σₐ)</div><div class="step-card-body" id="step-content-4"></div></div>
+              <div class="step-card" id="card-step-5"><div class="step-card-header"><span style="font-weight: 600;">Passo 5:</span> Pontos de Ruptura (Break-in/Breakaway)</div><div class="step-card-body" id="step-content-5"></div></div>
+              <div class="step-card" id="card-step-6"><div class="step-card-header"><span style="font-weight: 600;">Passo 6:</span> Cruzamento do Eixo Imaginário (jω)</div><div class="step-card-body" id="step-content-6"></div></div>
+              <div class="step-card" id="card-step-7"><div class="step-card-header"><span style="font-weight: 600;">Passo 7:</span> Ângulos de Partida e Chegada</div><div class="step-card-body" id="step-content-7"></div></div>
+            </div>
           </div>
 
-            <div class="steps-grid">
-
-              <!-- Card Passo 1, 2 e 3 -->
-              <div class="step-card" id="card-step-1">
-                <div class="step-card-header">
-                  <div class="step-number">1, 2, 3</div>
-                  <div class="step-title">
-                    <h3>Ramos, Polos, Zeros e Simetria</h3>
-                    <span>Início e término dos ramos e simetria conjugada</span>
-                  </div>
-                  <button class="btn-step-breakdown" data-step="1" type="button" title="Ver dedução passo a passo de Polos, Zeros e Eixo Real">
-                    Dedução →
-                  </button>
-                </div>
-                <div class="step-card-body" id="step-content-1"></div>
-              </div>
-
-              <!-- Card Passo 4 -->
-              <div class="step-card" id="card-step-4">
-                <div class="step-card-header">
-                  <div class="step-number">4</div>
-                  <div class="step-title">
-                    <h3>Assíntotas e Centroide ($\sigma_a$)</h3>
-                    <span>Comportamento assintótico para $K \to \infty$</span>
-                  </div>
-                  <button class="btn-step-breakdown" data-step="4" type="button" title="Ver dedução passo a passo de Assíntotas e Centroide">
-                    Dedução →
-                  </button>
-                </div>
-                <div class="step-card-body" id="step-content-4"></div>
-              </div>
-
-              <!-- Card Passo 5 -->
-              <div class="step-card" id="card-step-5">
-                <div class="step-card-header">
-                  <div class="step-number">5</div>
-                  <div class="step-title">
-                    <h3>Pontos de Partida e Chegada (Break-in / Breakaway)</h3>
-                    <span>Pontos no eixo real onde $\frac{dK}{ds} = 0$</span>
-                  </div>
-                  <button class="btn-step-breakdown" data-step="5" type="button" title="Ver dedução passo a passo de Break-in / Breakaway">
-                    Dedução →
-                  </button>
-                </div>
-                <div class="step-card-body" id="step-content-5"></div>
-              </div>
-
-              <!-- Card Passo 6 -->
-              <div class="step-card" id="card-step-6">
-                <div class="step-card-header">
-                  <div class="step-number">6</div>
-                  <div class="step-title">
-                    <h3>Cruzamento do Eixo Imaginário ($j\omega$)</h3>
-                    <span>Frequência de oscilação e ganho crítico de estabilidade $K_{crit}$</span>
-                  </div>
-                  <button class="btn-step-breakdown" data-step="6" type="button" title="Ver dedução passo a passo do Cruzamento jw">
-                    Dedução →
-                  </button>
-                </div>
-                <div class="step-card-body" id="step-content-6"></div>
-              </div>
-
-              <!-- Card Passo 7 -->
-              <div class="step-card" id="card-step-7">
-                <div class="step-card-header">
-                  <div class="step-number">7</div>
-                  <div class="step-title">
-                    <h3>Ângulos de Partida ($\theta_d$) e Chegada ($\theta_a$)</h3>
-                    <span>Ângulos tangenciais em polos e zeros complexos</span>
-                  </div>
-                  <button class="btn-step-breakdown" data-step="7" type="button" title="Ver dedução passo a passo de Ângulos de Partida/Chegada">
-                    Dedução →
-                  </button>
-                </div>
-                <div class="step-card-body" id="step-content-7"></div>
-              </div>
-
-            </div>
-        </section>
-
-        <!-- VISUALIZAÇÃO 3: REGRAS TEÓRICAS -->
-        <section id="view-theory" class="view-panel">
-          <div class="theory-card">
-            <h2>Os 7 Passos Clássicos do Lugar Geométrico das Raízes (LGR)</h2>
-            <div class="theory-list">
-              <div class="theory-item">
-                <span class="theory-num">Passo 1</span>
-                <div>
-                  <h4>Número de Ramos e Polos/Zeros</h4>
-                  <p>O número de ramos do LGR é igual a $n = \max(P, Z)$. Os ramos iniciam nos polos de malha aberta ($K = 0$) e terminam nos zeros finitos ou no infinito ($K \to \infty$).</p>
-                </div>
-              </div>
-              <div class="theory-item">
-                <span class="theory-num">Passo 2</span>
-                <div>
-                  <h4>Simetria em Relação ao Eixo Real</h4>
-                  <p>O LGR é perfeitamente simétrico em relação ao eixo horizontal $\sigma$, pois raízes complexas de polinômios com coeficientes reais sempre ocorrem em pares conjugados.</p>
-                </div>
-              </div>
-              <div class="theory-item">
-                <span class="theory-num">Passo 3</span>
-                <div>
-                  <h4>Segmentos no Eixo Real</h4>
-                  <p>Um ponto no eixo real pertence ao LGR se, e somente se, o número total de polos e zeros reais à sua direita for ímpar.</p>
-                </div>
-              </div>
-              <div class="theory-item">
-                <span class="theory-num">Passo 4</span>
-                <div>
-                  <h4>Assíntotas e Centroide</h4>
-                  <p>Se $P > Z$, existem $P - Z$ ramos que tendem ao infinito ao longo de assíntotas com centroide $\sigma_a = \frac{\sum p_i - \sum z_i}{P - Z}$ e ângulos $\theta_k = \frac{(2k+1)180^\circ}{P - Z}$.</p>
-                </div>
-              </div>
-              <div class="theory-item">
-                <span class="theory-num">Passo 5</span>
-                <div>
-                  <h4>Pontos de Entrada e Saída (Breakaway / Break-in)</h4>
-                  <p>Pontos de ramificação no eixo real satisfazem $\frac{dK}{ds} = 0 \iff N'(s)D(s) - N(s)D'(s) = 0$ com ganho correspondente $K = -\frac{D(s)}{N(s)} > 0$.</p>
-                </div>
-              </div>
-              <div class="theory-item">
-                <span class="theory-num">Passo 6</span>
-                <div>
-                  <h4>Cruzamento com o Eixo $j\omega$</h4>
-                  <p>Os pontos onde os ramos cruzam o eixo imaginário determinam os limites de estabilidade em malha fechada ($s = \pm j\omega_{cruz}$) e o ganho máximo admissível $K_{crit}$.</p>
-                </div>
-              </div>
-              <div class="theory-item">
-                <span class="theory-num">Passo 7</span>
-                <div>
-                  <h4>Ângulos de Partida e Chegada</h4>
-                  <p>Para polos complexos $p_i$, o ângulo de partida é $\theta_d = 180^\circ + \sum \angle(p_i - z_j) - \sum_{k \neq i} \angle(p_i - p_k)$.</p>
-                </div>
+          <!-- View 3: Teoria Clássica -->
+          <div id="view-theory" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto;">
+            <div class="theory-card">
+              <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 6px;">Os 7 Passos Clássicos do Lugar Geométrico das Raízes (LGR)</h4>
+              <div class="theory-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8125rem;">
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 1:</span> Ramos = max(P, Z). Início nos polos (K=0) e término nos zeros ou infinito.</div>
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 2:</span> Simetria em relação ao eixo real.</div>
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 3:</span> Pertencem ao eixo real os pontos à esquerda de um número ímpar de polos e zeros reais.</div>
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 4:</span> P - Z assíntotas com centroide σₐ = (Σp - Σz)/(P - Z) e ângulos θ_k = (2k+1)180°/(P - Z).</div>
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 5:</span> Pontos de dispersão/confluência onde dK/ds = 0.</div>
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 6:</span> Cruzamento do eixo imaginário jω com ganho crítico K_crit.</div>
+                <div class="theory-item"><span class="theory-num" style="font-weight: 600; color: var(--accent);">Passo 7:</span> Ângulos de partida e chegada para polos/zeros complexos.</div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-      </div>
-    </main>
+        <!-- Faixa Fixa 3 Métricas no Tablet -->
+        <div class="tablet-metrics-bar" id="lgr-tablet-metrics">
+          <div class="t-metric-col">
+            <span class="t-metric-label">Polos</span>
+            <b class="t-metric-val" id="lgr-tab-poles">—</b>
+          </div>
+          <div class="t-metric-col">
+            <span class="t-metric-label">Zeros</span>
+            <b class="t-metric-val" id="lgr-tab-zeros">—</b>
+          </div>
+          <div class="t-metric-col">
+            <span class="t-metric-label">Ramos</span>
+            <b class="t-metric-val" id="lgr-tab-branches">—</b>
+          </div>
+        </div>
+
+        <div class="sci-tablet-results-container" id="lgr-tablet-results-container" style="display: none;"></div>
+      </main>
+
+      <!-- Painel 3: Resultados -->
+      <aside class="sci-panel sci-panel-results" id="lgr-panel-results">
+        <div class="sci-panel-header"><span>Resultados</span></div>
+        <div class="sci-panel-body" style="overflow-y: auto; overflow-x: auto;">
+          <table class="results-table tb" id="lgr-results-table">
+            <tbody>
+              <tr><td>Polos em malha aberta</td><td id="lgr-res-poles">—</td></tr>
+              <tr><td>Zeros em malha aberta</td><td id="lgr-res-zeros">—</td></tr>
+              <tr><td>Número de ramos</td><td id="lgr-res-branches">—</td></tr>
+              <tr><td>Centroide (σₐ)</td><td id="lgr-res-centroid">—</td></tr>
+              <tr><td>Assíntotas</td><td id="lgr-res-asymptotes">—</td></tr>
+              <tr><td>Pontos de ruptura</td><td id="lgr-res-breakaway">—</td></tr>
+              <tr><td>Cruzamento jω</td><td id="lgr-res-jw">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </aside>
     </div>
+
+    <!-- Console / Log -->
+    <div class="sci-console" id="lgr-console">
+      <span class="sci-console-line" id="lgr-console-line">&gt;&gt; rlocus(tf([1 2], [1 5 4 0]))</span>
+    </div>
+
+    <!-- Barra de Status -->
+    <footer class="sci-status-bar">
+      <span id="lgr-status-state">Pronto</span>
+      <span>Módulo: Lugar Geométrico das Raízes • Solver: python-control</span>
+    </footer>
+
+    <!-- Botão de Ação no Rodapé para Celular -->
+    <div class="sci-mobile-calc-bar">
+      <button type="button" class="sci-btn sci-btn-primary" id="btn-lgr-mobile-calc">
+        <span class="btn-text">Calcular</span>
+      </button>
+    </div>
+
+    <!-- Barra de Navegação Inferior (Celular < 600px) -->
+    <nav class="sci-bottom-nav">
+      <div class="sci-bottom-nav-item" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+      <div class="sci-bottom-nav-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+      <div class="sci-bottom-nav-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+      <div class="sci-bottom-nav-item active" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+      <div class="sci-bottom-nav-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="more"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg><span>Mais</span></div>
+    </nav>
   </div>
 
   <!-- ========================================================= -->
   <!-- MÓDULO 2: CRITÉRIO DE ROUTH-HURWITZ (WORKSPACE)           -->
   <!-- ========================================================= -->
-  <div id="page-routh" class="app-page">
-    <div class="app-container routh-workspace-container">
-      
-      <!-- SIDEBAR DE ENTRADA DO ROUTH-HURWITZ -->
-      <aside class="sidebar routh-sidebar">
-        <div class="sidebar-content">
-          <div class="sidebar-section-title">
-            <span>Parâmetros de Análise</span>
+  <div id="page-routh" class="app-page sci-shell" data-active-tab="params">
+    <!-- Barra Superior de Abas (Desktop >= 1024px) -->
+    <header class="sci-top-bar">
+      <div class="sci-top-brand">
+        <b>ControLAB</b>
+        <span class="sci-version-badge">v3.1.1</span>
+      </div>
+      <nav class="sci-top-tabs">
+        <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
+        <button type="button" class="sci-tab" data-nav="time">TEMPO</button>
+        <button type="button" class="sci-tab active" data-nav="routh">ESTAB.</button>
+        <button type="button" class="sci-tab" data-nav="lgr">LGR</button>
+        <button type="button" class="sci-tab" data-nav="frequency">FREQ.</button>
+        <button type="button" class="sci-tab" data-nav="controllers">CONTROL.</button>
+        <button type="button" class="sci-tab" data-nav="state-space">ESTADOS</button>
+      </nav>
+      <div class="sci-top-actions">
+        <button class="sci-top-btn" data-action="settings" title="Configurações" aria-label="Configurações" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- App Bar (Tablet & Celular < 1024px) -->
+    <header class="sci-app-bar">
+      <svg class="sci-app-bar-icon" width="22" height="22"><use href="#s-stab"></use></svg>
+      <b class="sci-app-bar-title">Critério de Routh-Hurwitz</b>
+      <div class="sci-app-bar-actions">
+        <button class="sci-btn-icon" data-action="settings" title="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Abas Mobile (< 600px) -->
+    <nav class="sci-mobile-tabs" id="routh-mobile-tabs">
+      <button type="button" class="sci-mobile-tab active" data-tab="params">Parâmetros</button>
+      <button type="button" class="sci-mobile-tab" data-tab="plot">Gráfico</button>
+      <button type="button" class="sci-mobile-tab" data-tab="results">Resultados</button>
+    </nav>
+
+    <!-- Ribbon de Ações -->
+    <div class="sci-ribbon">
+      <button type="button" class="sci-ribbon-btn primary" id="btn-ribbon-routh-calc">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span>Calcular</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-ribbon-routh-clear">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <span>Limpar</span>
+      </button>
+      <div class="sci-ribbon-sep"></div>
+      <button type="button" class="sci-ribbon-btn" id="btn-routh-download-png">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>PNG</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-routh-download-svg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>SVG</span>
+      </button>
+      <button type="button" class="sci-ribbon-btn" id="btn-routh-copy-img">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span>Copiar</span>
+      </button>
+    </div>
+
+    <!-- Área de Trabalho Científica -->
+    <div class="scientific-workspace">
+      <!-- Trilho Lateral de Navegação (Tablet 600-1023px) -->
+      <nav class="sci-rail">
+        <div class="sci-rail-item" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+        <div class="sci-rail-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+        <div class="sci-rail-item active" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+        <div class="sci-rail-item" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+        <div class="sci-rail-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
+        <div class="sci-rail-item" data-nav="controllers"><svg width="22" height="22"><use href="#s-ctrl"></use></svg><span>Control.</span></div>
+        <div class="sci-rail-item" data-nav="state-space"><svg width="22" height="22"><use href="#s-state"></use></svg><span>Estados</span></div>
+      </nav>
+
+      <!-- Painel 1: Parâmetros (280px padrão) -->
+      <aside class="sci-panel sci-panel-params">
+        <div class="sci-panel-header"><span>Parâmetros</span></div>
+        <div class="sci-panel-body">
+          <label for="input-routh-expr" class="form-label">Função de Transferência ou Polinômio:</label>
+          <input type="text" id="input-routh-expr" class="form-input code-font" value="s^3 + 3*s^2 + 2*s + K" placeholder="Ex: s^3 + 3s^2 + 2s + K ou 1/(s*(s+1)*(s+2))" autocomplete="off" spellcheck="false" />
+          <p class="input-help">Aceita polinômio característico direto, função racional com numerador/denominador e ganho <code>K</code>.</p>
+
+          <!-- Barra de símbolos matemáticos virtuais (< 600px no celular) -->
+          <div class="sci-virtual-math" id="routh-virtual-math">
+            <button type="button" data-sym="^">^</button>
+            <button type="button" data-sym="*">*</button>
+            <button type="button" data-sym="/">/</button>
+            <button type="button" data-sym="(">(</button>
+            <button type="button" data-sym=")">)</button>
+            <button type="button" data-sym="+">+</button>
+            <button type="button" data-sym="-">−</button>
+            <button type="button" data-sym="s">s</button>
+            <button type="button" data-sym="K">K</button>
           </div>
 
-          <div class="form-container">
-            <label for="input-routh-expr" class="form-label">
-              Função de Transferência ou Polinômio:
-            </label>
-            <div class="input-with-hint">
-              <input
-                type="text"
-                id="input-routh-expr"
-                class="form-input code-font"
-                value="s^3 + 3*s^2 + 2*s + K"
-                placeholder="Ex: s^3 + 3s^2 + 2s + K ou 1/(s*(s+1)*(s+2))"
-                autocomplete="off"
-                spellcheck="false"
-              />
+          <!-- Prévia Matemática em Tempo Real -->
+          <div class="function-preview" id="routh-function-preview" aria-live="polite">
+            <div class="preview-heading">
+              <span>Prévia matemática</span>
+              <span id="routh-preview-status" class="preview-status valid">Expressão válida</span>
             </div>
-            <p class="input-help">Aceita polinômio característico direto, função racional com numerador/denominador e ganho <code>K</code>.</p>
-
-            <!-- Prévia Matemática em Tempo Real (Padrão LGR) -->
-            <div class="function-preview" id="routh-function-preview" aria-live="polite">
-              <div class="preview-heading">
-                <span>Prévia matemática</span>
-                <span id="routh-preview-status" class="preview-status valid">Expressão válida</span>
-              </div>
-              <div id="routh-latex-preview" class="preview-math">P(s) = 0</div>
-            </div>
+            <div id="routh-latex-preview" class="preview-math">P(s) = 0</div>
           </div>
-        </div>
 
-        <!-- Rodapé da Sidebar: Botão de Ação Primária idêntico ao LGR -->
-        <div class="sidebar-footer">
-          <button id="btn-calculate-routh" class="btn btn-primary btn-calc-action" type="button">
-            <span class="btn-text">Calcular Estabilidade</span>
-          </button>
+          <div class="sci-params-action" style="display: none;">
+            <button id="btn-calculate-routh" class="sci-btn sci-btn-primary" type="button">
+              <span class="btn-text">Calcular</span>
+            </button>
+          </div>
         </div>
       </aside>
 
-      <!-- ÁREA PRINCIPAL DE RESULTADOS -->
-      <main class="views-wrapper routh-main-area">
-        <div class="routh-results-scrollable">
-          
-          <!-- Loading Indicator -->
+      <!-- Painel 2: Figura -->
+      <main class="sci-panel sci-panel-plot">
+        <!-- Switcher Tablet [ Figura | Resultados ] -->
+        <div class="sci-tablet-switcher" id="routh-tablet-switcher">
+          <button type="button" class="active" data-view="figure">Figura</button>
+          <button type="button" data-view="results">Resultados</button>
+        </div>
+
+        <div class="sci-panel-header">
+          <span>Figura 1 — Raízes no plano complexo s</span>
+        </div>
+
+        <div class="sci-plot-viewport" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <!-- Loading -->
           <div id="routh-loading" class="routh-loading-overlay" style="display: none;">
             <div class="spinner"></div>
             <span>Calculando Critério de Routh-Hurwitz...</span>
           </div>
 
-          <!-- Empty State -->
+          <!-- Empty State (Smoke Test Assertion: class="routh-empty-card" style="display: flex;") -->
           <div id="routh-empty-state" class="routh-empty-card" style="display: flex;">
-            <p>Insira uma função de transferência ou selecione um exemplo para calcular a estabilidade.</p>
+            <p>Insira uma função de transferência ou polinômio e clique em <b>Calcular</b>.</p>
           </div>
 
-          <!-- Results Container -->
+          <!-- Plot Card -->
+          <div id="routh-plot-card" class="routh-plot-card" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; overflow: hidden;">
+            <img id="routh-plot-image" alt="Mapeamento Gráfico de Estabilidade" class="plot-img" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+          </div>
+
+          <!-- K Simulator -->
+          <div id="routh-k-slider-container" style="display: none; width: 100%; padding: 8px 12px; background: var(--bg-surface-1); border-top: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 0.8125rem; font-weight: 500;">Ganho K: <b id="routh-k-live-badge">1.0</b></span>
+              <span id="routh-k-live-status" class="status-chip" style="font-size: 0.8125rem;">Estável</span>
+            </div>
+            <input type="range" id="routh-k-slider" min="0" max="10" step="0.1" value="1" style="width: 100%;" />
+            <div style="display: flex; gap: 4px; margin-top: 4px;">
+              <button type="button" class="sci-btn-mini" id="btn-k-preset-stable">Estável</button>
+              <button type="button" class="sci-btn-mini" id="btn-k-preset-crit">Crítico</button>
+              <button type="button" class="sci-btn-mini" id="btn-k-preset-unstable">Instável</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Faixa Fixa 3 Métricas no Tablet -->
+        <div class="tablet-metrics-bar" id="routh-tablet-metrics">
+          <div class="t-metric-col">
+            <span class="t-metric-label">Grau</span>
+            <b class="t-metric-val" id="routh-tab-degree">Grau 3</b>
+          </div>
+          <div class="t-metric-col">
+            <span class="t-metric-label">Trocas Sinal</span>
+            <b class="t-metric-val" id="routh-tab-sign-changes">0 Trocas</b>
+          </div>
+          <div class="t-metric-col">
+            <span class="t-metric-label">Raízes SPD</span>
+            <b class="t-metric-val" id="routh-tab-rhp">0 SPD</b>
+          </div>
+        </div>
+
+        <div class="sci-tablet-results-container" id="routh-tablet-results-container" style="display: none;"></div>
+      </main>
+
+      <!-- Painel 3: Resultados (Smoke Test Assertion: class="routh-results-layout" style="display: none;") -->
+      <aside class="sci-panel sci-panel-results">
+        <div class="sci-panel-header"><span>Resultados</span></div>
+        <div class="sci-panel-body" style="overflow-y: auto;">
           <div id="routh-results-container" class="routh-results-layout" style="display: none;">
-            
-            <!-- Veredito e Estatísticas -->
-            <section class="routh-card routh-verdict-section">
-              <div class="verdict-header">
+            <!-- Veredito -->
+            <div class="routh-card routh-verdict-section" style="border: 1px solid var(--border); border-radius: 4px; padding: 10px; background: var(--bg-surface-1);">
+              <div class="verdict-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                 <div>
-                  <span class="section-kicker">Resultado da Análise</span>
-                  <div id="routh-verdict-badge" class="verdict-badge verdict-stable">
+                  <span class="section-kicker" style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block;">Resultado da Análise</span>
+                  <div id="routh-verdict-badge" class="verdict-badge verdict-stable" style="margin-top: 2px;">
                     <span id="routh-verdict-title">Estável</span>
                   </div>
                 </div>
-                <div class="routh-badges-group">
+                <div class="routh-badges-group" style="display: flex; flex-wrap: wrap; gap: 4px;">
                   <span id="routh-badge-degree" class="stat-badge badge-blue">Grau 3</span>
-                  <span id="routh-badge-sign-changes" class="stat-badge badge-amber">0 Trocas de Sinal</span>
-                  <span id="routh-badge-rhp" class="stat-badge badge-purple">0 Raízes no SPD</span>
+                  <span id="routh-badge-sign-changes" class="stat-badge badge-amber">0 Trocas</span>
+                  <span id="routh-badge-rhp" class="stat-badge badge-purple">0 SPD</span>
                 </div>
               </div>
-              <p id="routh-verdict-summary" class="verdict-desc-text">
+              <p id="routh-verdict-summary" class="verdict-desc-text" style="margin-top: 8px; font-size: 0.8125rem; line-height: 1.5; color: var(--text);">
                 Todos os elementos da primeira coluna possuem o mesmo sinal.
               </p>
-            </section>
+            </div>
 
             <!-- Equação Característica -->
-            <section class="routh-card">
-              <div class="card-section-label">Equação Característica $P(s) = 0$:</div>
-              <div id="routh-char-poly" class="char-poly-display"></div>
-            </section>
+            <div class="routh-card" style="border: 1px solid var(--border); border-radius: 4px; padding: 10px; background: var(--bg-surface-1);">
+              <div class="card-section-label" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">Equação Característica P(s) = 0:</div>
+              <div id="routh-char-poly" class="char-poly-display" style="padding: 6px; overflow-x: auto;"></div>
+            </div>
 
-            <!-- Regimes de Estabilidade por Ganho K (quando aplicável) -->
-            <section id="routh-k-range-banner" class="routh-card" style="display: none;">
-              <div class="card-section-label">Regimes de Estabilidade em Função do Ganho $K$:</div>
-              <div class="k-regimes-grid">
-                
-                <!-- Regime Estável -->
-                <div class="k-regime-card k-regime-stable">
-                  <div class="regime-header">
-                    <span class="regime-badge badge-stable">Estável</span>
-                    <span class="regime-zone">Polos no SPE ($\text{Re} < 0$)</span>
-                  </div>
-                  <div class="regime-math" id="routh-k-stable-expr"></div>
-                  <p class="regime-desc" id="routh-k-stable-desc">Todos os polos no semiplano esquerdo. Resposta amortecida.</p>
+            <!-- Regimes de K -->
+            <div id="routh-k-range-banner" class="routh-card" style="display: none; border: 1px solid var(--border); border-radius: 4px; padding: 10px; background: var(--bg-surface-1);">
+              <div class="card-section-label" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px;">Regimes de Estabilidade por Ganho K:</div>
+              <div class="k-regimes-grid" style="display: flex; flex-direction: column; gap: 6px;">
+                <div class="k-regime-card k-regime-stable" style="border-left: 3px solid var(--success, #10b981); padding-left: 8px;">
+                  <span class="regime-badge badge-stable" style="font-size: 0.75rem; font-weight: 600;">Estável</span>
+                  <div id="routh-k-stable-expr" class="k-expr-math" style="margin-top: 2px;"></div>
+                  <p id="routh-k-stable-desc" class="regime-desc" style="font-size: 0.8125rem; margin: 2px 0 0; color: var(--text-muted);"></p>
                 </div>
-
-                <!-- Regime Marginalmente Estável -->
-                <div class="k-regime-card k-regime-marginal">
-                  <div class="regime-header">
-                    <span class="regime-badge badge-marginal">Marginalmente Estável</span>
-                    <span class="regime-zone">Polos no Eixo $j\omega$ ($\text{Re} = 0$)</span>
-                  </div>
-                  <div class="regime-math" id="routh-k-marginal-expr"></div>
-                  <p class="regime-desc" id="routh-k-marginal-desc">Oscilações harmônicas sustentadas na frequência crítica.</p>
+                <div class="k-regime-card k-regime-marginal" style="border-left: 3px solid var(--warning, #f59e0b); padding-left: 8px;">
+                  <span class="regime-badge badge-marginal" style="font-size: 0.75rem; font-weight: 600;">Marginalmente Estável</span>
+                  <div id="routh-k-marginal-expr" class="k-expr-math" style="margin-top: 2px;"></div>
+                  <p id="routh-k-marginal-desc" class="regime-desc" style="font-size: 0.8125rem; margin: 2px 0 0; color: var(--text-muted);"></p>
                 </div>
-
-                <!-- Regime Instável -->
-                <div class="k-regime-card k-regime-unstable">
-                  <div class="regime-header">
-                    <span class="regime-badge badge-unstable">Instável</span>
-                    <span class="regime-zone">Polos no SPD ($\text{Re} > 0$)</span>
-                  </div>
-                  <div class="regime-math" id="routh-k-unstable-expr"></div>
-                  <p class="regime-desc" id="routh-k-unstable-desc">Presença de polo(s) no semiplano direito com divergência temporal.</p>
-                </div>
-
-              </div>
-
-              <!-- Teste Interativo de Ponto de Operação K -->
-              <div class="k-interactive-tester">
-                <div class="tester-title">
-                  <span>Simulador do Ponto de Operação ($K$):</span>
-                  <span id="routh-k-live-badge" class="stat-badge badge-blue">K = 1.0</span>
-                </div>
-                <div class="tester-controls">
-                  <input type="range" id="routh-k-slider" min="0.1" max="20" step="0.1" value="1.0" class="k-slider" />
-                  <div class="tester-presets">
-                    <button type="button" class="chip chip-k-preset" id="btn-k-preset-stable">K Estável</button>
-                    <button type="button" class="chip chip-k-preset" id="btn-k-preset-crit">K Crítico</button>
-                    <button type="button" class="chip chip-k-preset" id="btn-k-preset-unstable">K Instável</button>
-                  </div>
-                </div>
-                <div id="routh-k-live-status" class="tester-live-status"></div>
-              </div>
-            </section>
-
-            <!-- Mapeamento Gráfico de Estabilidade no Plano Complexo s -->
-            <section id="routh-plot-card" class="routh-card plot-card" style="display: none;">
-              <div class="plot-card-header">
-                <div class="card-section-label" style="margin-bottom: 0;">Mapeamento no Plano Complexo $s$:</div>
-                <div class="plot-toolbar">
-                  <div class="toolbar-right">
-                    <button class="tool-btn" id="btn-routh-copy-img" title="Copiar Gráfico">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                      <span>Copiar</span>
-                    </button>
-                    <button class="tool-btn tool-btn-accent" id="btn-routh-download-svg" title="Exportar como Vetorial SVG">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                      <span>SVG</span>
-                    </button>
-                    <button class="tool-btn tool-btn-primary" id="btn-routh-download-png" title="Baixar PNG em Alta Resolução">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      <span>PNG</span>
-                    </button>
-                  </div>
+                <div class="k-regime-card k-regime-unstable" style="border-left: 3px solid var(--danger, #ef4444); padding-left: 8px;">
+                  <span class="regime-badge badge-unstable" style="font-size: 0.75rem; font-weight: 600;">Instável</span>
+                  <div id="routh-k-unstable-expr" class="k-expr-math" style="margin-top: 2px;"></div>
+                  <p id="routh-k-unstable-desc" class="regime-desc" style="font-size: 0.8125rem; margin: 2px 0 0; color: var(--text-muted);"></p>
                 </div>
               </div>
-              <div class="plot-viewport routh-plot-viewport">
-                <img id="routh-plot-image" src="" alt="Mapeamento Gráfico de Estabilidade" class="plot-img" />
-              </div>
-            </section>
-
-            <!-- Casos Especiais (Alerta quando ocorrer epsilon ou linha de zeros) -->
-            <div id="routh-special-cases" class="routh-special-cases-group" style="display: none;"></div>
+            </div>
 
             <!-- Tabela de Routh -->
-            <section class="routh-card">
-              <div class="card-section-label">Tabela de Routh:</div>
-              <div id="routh-table-container" class="routh-table-wrapper"></div>
-            </section>
+            <div class="routh-card" style="border: 1px solid var(--border); border-radius: 4px; padding: 10px; background: var(--bg-surface-1);">
+              <div class="card-section-label" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">Tabela de Routh:</div>
+              <div id="routh-table-container" class="routh-table-wrapper" style="overflow-x: auto;"></div>
+            </div>
 
-            <!-- Memorial de Cálculo Passo a Passo -->
-            <section class="routh-card">
-              <div class="card-section-label">Passo a Passo das Linhas:</div>
-              <div id="routh-steps-list" class="routh-steps-container"></div>
-            </section>
+            <!-- Casos Especiais -->
+            <div id="routh-special-cases" class="routh-special-cases-group" style="display: none;"></div>
 
-            <!-- Raízes Numéricas Exatas (quando aplicável) -->
-            <section id="routh-exact-roots-container" class="routh-card" style="display: none;">
-              <div class="card-section-label">Polos do Polinômio para Conferência:</div>
-              <ul id="routh-exact-roots-list" class="exact-roots-grid"></ul>
-            </section>
+            <!-- Passo a Passo das Linhas -->
+            <div class="routh-card" style="border: 1px solid var(--border); border-radius: 4px; padding: 10px; background: var(--bg-surface-1);">
+              <div class="card-section-label" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">Passo a Passo das Linhas:</div>
+              <div id="routh-steps-list" class="routh-steps-container" style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8125rem;"></div>
+            </div>
 
+            <!-- Raízes Exatas -->
+            <div id="routh-exact-roots-container" class="routh-card" style="display: none; border: 1px solid var(--border); border-radius: 4px; padding: 10px; background: var(--bg-surface-1);">
+              <div class="card-section-label" style="font-size: 0.8125rem; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">Polos do Polinômio para Conferência:</div>
+              <ul id="routh-exact-roots-list" class="exact-roots-grid" style="display: flex; flex-direction: column; gap: 4px; font-size: 0.8125rem; font-family: var(--font-code); padding-left: 16px;"></ul>
+            </div>
           </div>
         </div>
-      </main>
-
+      </aside>
     </div>
+
+    <!-- Console / Log -->
+    <div class="sci-console" id="routh-console">
+      <span class="sci-console-line" id="routh-console-line">&gt;&gt; routh(s^3 + 3*s^2 + 2*s + K)</span>
+    </div>
+
+    <!-- Barra de Status -->
+    <footer class="sci-status-bar">
+      <span id="routh-status-state">Pronto</span>
+      <span>Módulo: Estabilidade • Solver: sympy</span>
+    </footer>
+
+    <!-- Botão de Ação no Rodapé para Celular -->
+    <div class="sci-mobile-calc-bar">
+      <button type="button" class="sci-btn sci-btn-primary" id="btn-routh-mobile-calc">
+        <span class="btn-text">Calcular</span>
+      </button>
+    </div>
+
+    <!-- Barra de Navegação Inferior (Celular < 600px) -->
+    <nav class="sci-bottom-nav">
+      <div class="sci-bottom-nav-item" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+      <div class="sci-bottom-nav-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+      <div class="sci-bottom-nav-item active" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+      <div class="sci-bottom-nav-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="more"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg><span>Mais</span></div>
+    </nav>
   </div>
 
   <!-- Backdrop translúcido da Sidebar de Deduções -->
@@ -875,123 +1087,348 @@
   <!-- WORKSPACE COMPARTILHADO DOS MÓDULOS CIENTÍFICOS           -->
   <!-- ========================================================= -->
   <div id="page-scientific" class="app-page">
-    <div class="scientific-workspace">
-      <aside class="scientific-sidebar">
-        <div class="scientific-sidebar-content">
-          <span id="scientific-kicker" class="section-kicker" style="display: none;"></span>
-          <h1 id="scientific-title" class="scientific-title" style="display: none;"></h1>
-          <p id="scientific-description" class="scientific-description" style="display: none;"></p>
-          <form id="scientific-form" class="scientific-form"></form>
-          <!-- Prévia Matemática em Tempo Real (Resposta no tempo, Resposta em frequência, Projeto de controladores) -->
-          <div class="function-preview" id="scientific-function-preview" aria-live="polite" style="display: none;">
-            <div class="preview-heading">
-              <span>Prévia matemática</span>
-              <span id="scientific-preview-status" class="preview-status valid">Expressão válida</span>
-            </div>
-            <div id="scientific-latex-preview" class="preview-math">G(s) = 0</div>
-            <div id="scientific-preview-error" class="preview-error" hidden></div>
-          </div>
+    <div class="sci-shell">
+      <!-- Barra Superior de Abas (Desktop >= 1024px) -->
+      <header class="sci-top-bar" id="sci-top-bar">
+        <div class="sci-top-brand">
+          <b>ControLAB</b>
+          <span class="sci-version-badge">v3.1.1</span>
         </div>
-        <div class="scientific-sidebar-footer">
-          <button id="btn-run-scientific" class="btn btn-primary btn-calc-action" type="submit" form="scientific-form">
-            <span class="btn-text">Calcular</span>
+        <nav class="sci-top-tabs">
+          <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
+          <button type="button" class="sci-tab active" data-nav="time">TEMPO</button>
+          <button type="button" class="sci-tab" data-nav="routh">ESTAB.</button>
+          <button type="button" class="sci-tab" data-nav="lgr">LGR</button>
+          <button type="button" class="sci-tab" data-nav="frequency">FREQ.</button>
+          <button type="button" class="sci-tab" data-nav="controllers">CONTROL.</button>
+          <button type="button" class="sci-tab" data-nav="state-space">ESTADOS</button>
+        </nav>
+        <div class="sci-top-actions">
+          <button type="button" class="sci-top-btn" data-action="settings" title="Configurações" aria-label="Configurações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
         </div>
-      </aside>
+      </header>
 
-      <main class="scientific-main">
-        <div id="scientific-loading" class="scientific-state" hidden>
-          <div class="skeleton-layout" aria-busy="true" aria-label="Calculando resposta do sistema">
-            <div class="skeleton skeleton-plot"></div>
-            <div class="skeleton-metrics-row">
-              <div class="skeleton skeleton-metric"></div>
-              <div class="skeleton skeleton-metric"></div>
-              <div class="skeleton skeleton-metric"></div>
-              <div class="skeleton skeleton-metric"></div>
+      <!-- Barra Superior App Bar (Tablet & Mobile < 1024px) -->
+      <header class="sci-app-bar" id="sci-app-bar">
+        <div class="sci-app-bar-left">
+          <svg class="sci-app-bar-icon" width="22" height="22"><use href="#s-time"></use></svg>
+          <b class="sci-app-bar-title" id="sci-app-bar-title">Resposta no tempo</b>
+        </div>
+        <div class="sci-app-bar-right">
+          <button type="button" class="sci-icon-btn sci-menu-btn" id="btn-sci-menu" title="Menu de opções" aria-label="Menu de opções">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Abas Segmentadas do Celular (< 600px) -->
+      <nav class="sci-mobile-tabs" id="sci-mobile-tabs">
+        <button type="button" class="sci-tab-btn active" data-tab="params">Parâmetros</button>
+        <button type="button" class="sci-tab-btn" data-tab="plot">Gráfico</button>
+        <button type="button" class="sci-tab-btn" data-tab="results">Resultados</button>
+      </nav>
+
+      <!-- Ribbon (Desktop >= 1024px & Tablet 600-1023px) -->
+      <div class="sci-ribbon" id="sci-ribbon">
+        <div class="sci-ribbon-btn primary" id="ribbon-btn-calc" role="button" tabindex="0" title="Calcular">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Calcular</span>
+        </div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-clear" role="button" tabindex="0" title="Limpar parâmetros">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>
+          <span>Limpar</span>
+        </div>
+        <div class="sci-ribbon-sep"></div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-zoom-in" role="button" tabindex="0" title="Aumentar zoom">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <span>Zoom +</span>
+        </div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-zoom-out" role="button" tabindex="0" title="Diminuir zoom">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <span>Zoom −</span>
+        </div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-fit" role="button" tabindex="0" title="Ajustar figura">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><polyline points="21 15 21 21 15 21"/><polyline points="3 9 3 3 9 3"/></svg>
+          <span>Ajustar</span>
+        </div>
+        <div class="sci-ribbon-sep"></div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-grid" role="button" tabindex="0" title="Alternar grade do gráfico">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="5" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="19" cy="5" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="19" r="1.5"/><circle cx="12" cy="19" r="1.5"/><circle cx="19" cy="19" r="1.5"/></svg>
+          <span>Grade</span>
+        </div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-export" role="button" tabindex="0" title="Exportar figura">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Exportar</span>
+        </div>
+        <div class="sci-ribbon-btn" id="ribbon-btn-code" role="button" tabindex="0" title="Copiar código Python">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Código</span>
+        </div>
+      </div>
+
+      <!-- Área de Trabalho Científica -->
+      <div class="scientific-workspace" id="scientific-workspace">
+        
+        <!-- Trilho Lateral de Navegação (Tablet 600-1023px) -->
+        <nav class="sci-rail" id="sci-rail">
+          <div class="sci-rail-item" data-nav="home">
+            <svg width="22" height="22"><use href="#s-home"></use></svg>
+            <span>Início</span>
+          </div>
+          <div class="sci-rail-item active" data-nav="time">
+            <svg width="22" height="22"><use href="#s-time"></use></svg>
+            <span>Tempo</span>
+          </div>
+          <div class="sci-rail-item" data-nav="routh">
+            <svg width="22" height="22"><use href="#s-stab"></use></svg>
+            <span>Estab.</span>
+          </div>
+          <div class="sci-rail-item" data-nav="lgr">
+            <svg width="22" height="22"><use href="#s-root"></use></svg>
+            <span>LGR</span>
+          </div>
+          <div class="sci-rail-item" data-nav="frequency">
+            <svg width="22" height="22"><use href="#s-freq"></use></svg>
+            <span>Freq.</span>
+          </div>
+          <div class="sci-rail-item" data-nav="controllers">
+            <svg width="22" height="22"><use href="#s-ctrl"></use></svg>
+            <span>Control.</span>
+          </div>
+          <div class="sci-rail-item" data-nav="state-space">
+            <svg width="22" height="22"><use href="#s-state"></use></svg>
+            <span>Estados</span>
+          </div>
+        </nav>
+
+        <!-- Painel 1: Parâmetros -->
+        <aside class="sci-panel sci-panel-params" id="sci-panel-params">
+          <div class="sci-panel-header">
+            <span>Parâmetros</span>
+          </div>
+          <div class="sci-panel-body">
+            <span id="scientific-kicker" class="section-kicker" style="display: none;"></span>
+            <h1 id="scientific-title" class="scientific-title" style="display: none;"></h1>
+            <p id="scientific-description" class="scientific-description" style="display: none;"></p>
+            
+            <form id="scientific-form" class="scientific-form"></form>
+
+            <!-- Barra de símbolos matemáticos virtuais (< 600px no celular) -->
+            <div class="sci-virtual-math" id="sci-virtual-math">
+              <button type="button" data-sym="^">^</button>
+              <button type="button" data-sym="*">*</button>
+              <button type="button" data-sym="/">/</button>
+              <button type="button" data-sym="(">(</button>
+              <button type="button" data-sym=")">)</button>
+              <button type="button" data-sym="+">+</button>
+              <button type="button" data-sym="-">−</button>
+              <button type="button" data-sym="s">s</button>
             </div>
-          </div>
-        </div>
-        <div id="scientific-empty" class="scientific-state scientific-empty-state">
-          <div class="empty-state-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="16" x2="12" y2="12"/>
-              <line x1="12" y1="8" x2="12.01" y2="8"/>
-            </svg>
-          </div>
-          <h3>Configure os parâmetros</h3>
-          <p>Preencha a função de transferência ou selecione um exemplo para calcular.</p>
-        </div>
-        <div id="scientific-error" class="scientific-state scientific-error" hidden></div>
-        <div id="scientific-results" class="scientific-results" hidden>
-          <span id="scientific-result-title" style="display: none;"></span>
-          <span id="scientific-result-description" style="display: none;"></span>
 
-          <!-- Gráfico primeiro e maior -->
-          <section id="scientific-plot-card" class="scientific-result-card scientific-plot-card">
-            <div class="plot-card-header">
-              <div class="plot-header-left">
-                <div id="scientific-plot-tabs" class="tabs-segmented" style="display: none;">
-                  <button type="button" class="tab-seg active" data-resp="step">Degrau</button>
-                  <button type="button" class="tab-seg" data-resp="ramp">Rampa</button>
-                  <button type="button" class="tab-seg" data-resp="impulse">Impulso</button>
-                </div>
+            <!-- Prévia Matemática em Tempo Real -->
+            <div class="function-preview" id="scientific-function-preview" aria-live="polite">
+              <div class="preview-heading">
+                <span>Prévia</span>
+                <span id="scientific-preview-status" class="preview-status valid">válida</span>
               </div>
-              <div class="plot-header-right">
-                <div id="scientific-status-chip" class="status-chip" style="display: none;">
-                  <span class="status-dot"></span>
-                  <span id="scientific-status-text">Estável</span>
-                </div>
-                <button class="tool-btn" id="btn-scientific-copy" title="Copiar Gráfico para Área de Transferência" type="button">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  <span>Copiar</span>
-                </button>
-                <button class="tool-btn tool-btn-accent" id="btn-scientific-svg" title="Exportar como Vetorial SVG" type="button">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                  <span>SVG</span>
-                </button>
-                <button class="tool-btn tool-btn-primary" id="btn-scientific-png" title="Exportar Imagem em Alta Resolução" type="button">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  <span>PNG</span>
-                </button>
+              <div id="scientific-latex-preview" class="preview-math">G(s) = 0</div>
+              <div id="scientific-preview-error" class="preview-error" hidden></div>
+            </div>
+
+            <!-- Botão de Ação no Painel de Parâmetros -->
+            <div class="sci-params-action" style="display: none;">
+              <button id="btn-run-scientific" class="sci-btn sci-btn-primary" type="submit" form="scientific-form">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span class="btn-text">Calcular</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Painel 2: Figura -->
+        <main class="sci-panel sci-panel-plot" id="sci-panel-plot">
+          <!-- Switcher de visualização no Tablet [ Figura | Resultados ] -->
+          <div class="sci-tablet-switcher" id="sci-tablet-switcher">
+            <button type="button" class="active" data-view="figure">Figura</button>
+            <button type="button" data-view="results">Resultados</button>
+          </div>
+
+          <!-- Barra de Título da Figura -->
+          <div class="sci-panel-header" id="sci-plot-header">
+            <span id="sci-figure-title">Figura 1 — Resposta ao degrau</span>
+            <div class="sci-plot-header-actions">
+              <div id="scientific-plot-tabs" class="sci-segmented-mini">
+                <button type="button" class="tab-seg active" data-resp="step">Degrau</button>
+                <button type="button" class="tab-seg" data-resp="ramp">Rampa</button>
+                <button type="button" class="tab-seg" data-resp="impulse">Impulso</button>
+              </div>
+              <div id="scientific-status-chip" class="status-chip" style="display: none;">
+                <span class="status-dot"></span>
+                <span id="scientific-status-text">Estável</span>
               </div>
             </div>
-            <div class="plot-viewport scientific-plot-viewport">
-              <img id="scientific-plot" alt="Gráfico da resposta do sistema" class="plot-img" />
-            </div>
-          </section>
-
-          <!-- Métricas Principais (Top 4) -->
-          <section id="scientific-primary-metrics" class="scientific-primary-grid"></section>
-
-          <!-- Seções Colapsáveis: Todas as métricas e Memorial de cálculo -->
-          <div class="scientific-accordions">
-            <details id="details-all-metrics" class="scientific-accordion">
-              <summary class="accordion-summary">
-                <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                <span>Todas as métricas</span>
-              </summary>
-              <section id="scientific-metrics" class="submetrics-list"></section>
-            </details>
-
-            <details id="details-memorial" class="scientific-accordion">
-              <summary class="accordion-summary">
-                <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                <span>Memorial de cálculo</span>
-              </summary>
-              <section id="scientific-latex" class="scientific-latex-grid"></section>
-            </details>
-
-            <details id="scientific-details-card" class="scientific-accordion" hidden>
-              <summary class="accordion-summary">
-                <svg class="accordion-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                <span>Dados técnicos estruturados (JSON)</span>
-              </summary>
-              <pre id="scientific-details"></pre>
-            </details>
           </div>
+
+          <!-- Área de visualização do gráfico -->
+          <div class="sci-plot-viewport" id="scientific-plot-viewport">
+            <div id="scientific-loading" class="scientific-state" hidden>
+              <div class="skeleton-layout" aria-busy="true" aria-label="Calculando resposta do sistema">
+                <div class="skeleton skeleton-plot"></div>
+              </div>
+            </div>
+
+            <div id="scientific-empty" class="scientific-empty-discrete" style="display: flex;">
+              <div class="empty-discrete-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Aguardando cálculo. Clique em <b>Calcular</b> para gerar a resposta.</span>
+              </div>
+            </div>
+
+            <div id="scientific-error" class="scientific-state scientific-error" hidden></div>
+
+            <div id="scientific-results" class="scientific-results" hidden>
+              <section id="scientific-plot-card" class="scientific-plot-card">
+                <img id="scientific-plot" alt="Gráfico da resposta temporal" class="plot-img" src="" />
+              </section>
+            </div>
+          </div>
+
+          <!-- Faixa Fixa de 3 Métricas-Chave no Tablet -->
+          <div class="tablet-metrics-bar" id="tablet-metrics-bar">
+            <div class="t-metric-col">
+              <span class="t-metric-label">Sobress.</span>
+              <b class="t-metric-val" id="t-metric-mp">—</b>
+            </div>
+            <div class="t-metric-col">
+              <span class="t-metric-label">T. pico</span>
+              <b class="t-metric-val" id="t-metric-tp">—</b>
+            </div>
+            <div class="t-metric-col">
+              <span class="t-metric-label">T. acom.</span>
+              <b class="t-metric-val" id="t-metric-ts">—</b>
+            </div>
+          </div>
+
+          <!-- Container para alternar para visualização de resultados no Tablet -->
+          <div class="sci-tablet-results-container" id="sci-tablet-results-container" style="display: none;"></div>
+        </main>
+
+        <!-- Painel 3: Resultados -->
+        <aside class="sci-panel sci-panel-results" id="sci-panel-results">
+          <div class="sci-panel-header">
+            <span>Resultados</span>
+          </div>
+          <div class="sci-panel-body">
+            <table class="results-table tb" id="time-results-table">
+              <tbody>
+                <tr><td>Sobressinal</td><td id="res-val-mp">—</td></tr>
+                <tr><td>Tempo de pico</td><td id="res-val-tp">—</td></tr>
+                <tr><td>Tempo de subida</td><td id="res-val-tr">—</td></tr>
+                <tr><td>Tempo de acomodação</td><td id="res-val-ts">—</td></tr>
+                <tr><td>Valor final</td><td id="res-val-yf">—</td></tr>
+                <tr><td>Razão de amortecimento (ζ)</td><td id="res-val-zeta">—</td></tr>
+                <tr><td>Frequência natural (ωn)</td><td id="res-val-wn">—</td></tr>
+                <tr><td>Estabilidade</td><td id="res-val-stab">—</td></tr>
+              </tbody>
+            </table>
+
+            <!-- Elementos preservados para compatibilidade com testes e outros módulos -->
+            <div id="scientific-primary-metrics" class="scientific-primary-grid" style="display: none;"></div>
+            <div id="scientific-metrics" class="submetrics-list" style="display: none;"></div>
+            <div id="scientific-latex" class="scientific-latex-grid" style="display: none;"></div>
+            <div id="scientific-details-card" class="scientific-accordion" style="display: none;"><pre id="scientific-details"></pre></div>
+            <div style="display: none;">
+              <button id="btn-scientific-copy" type="button"></button>
+              <button id="btn-scientific-png" type="button"></button>
+              <button id="btn-scientific-svg" type="button"></button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- Console / Log de Execução -->
+      <div class="sci-console" id="sci-console">
+        <div class="sci-console-line" id="sci-console-text">&gt;&gt; step(G, 10)</div>
+      </div>
+
+      <!-- Barra de Status -->
+      <footer class="sci-status-bar" id="sci-status-bar">
+        <span class="sci-status-left" id="sci-status-state">Pronto</span>
+        <span class="sci-status-right" id="sci-status-meta">Módulo: Resposta no Tempo • Solver: scipy</span>
+      </footer>
+
+      <!-- Botão Calcular Fixo no Rodapé do Celular (< 600px) -->
+      <div class="sci-mobile-calc-bar" id="sci-mobile-calc-bar">
+        <button type="button" id="btn-mobile-calc" class="sci-btn-mobile-calc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Calcular</span>
+        </button>
+      </div>
+
+      <!-- Navegação Inferior do Celular (< 600px) -->
+      <nav class="sci-bottom-nav" id="sci-bottom-nav">
+        <div class="sci-bottom-nav-item" data-nav="home">
+          <svg width="22" height="22"><use href="#s-home"></use></svg>
+          <span>Início</span>
         </div>
-      </main>
+        <div class="sci-bottom-nav-item active" data-nav="time">
+          <svg width="22" height="22"><use href="#s-time"></use></svg>
+          <span>Tempo</span>
+        </div>
+        <div class="sci-bottom-nav-item" data-nav="routh">
+          <svg width="22" height="22"><use href="#s-stab"></use></svg>
+          <span>Estabil.</span>
+        </div>
+        <div class="sci-bottom-nav-item" data-nav="lgr">
+          <svg width="22" height="22"><use href="#s-root"></use></svg>
+          <span>LGR</span>
+        </div>
+        <div class="sci-bottom-nav-item" data-nav="frequency">
+          <svg width="22" height="22"><use href="#s-freq"></use></svg>
+          <span>Freq.</span>
+        </div>
+        <div class="sci-bottom-nav-item" id="btn-mobile-more" data-nav="more">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+          <span>Mais</span>
+        </div>
+      </nav>
+
+      <!-- Menu Dropdown para Celular/Tablet -->
+      <div class="sci-dropdown-menu" id="sci-more-dropdown" hidden>
+        <button type="button" class="sci-menu-item" data-nav="controllers">
+          <svg width="18" height="18"><use href="#s-ctrl"></use></svg>
+          <span>Projeto de Controladores</span>
+        </button>
+        <button type="button" class="sci-menu-item" data-nav="state-space">
+          <svg width="18" height="18"><use href="#s-state"></use></svg>
+          <span>Espaço de Estados</span>
+        </button>
+        <button type="button" class="sci-menu-item" data-nav="home">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <span>Início (Hub de Módulos)</span>
+        </button>
+        <div class="sci-menu-divider"></div>
+        <button type="button" class="sci-menu-item" id="menu-btn-export-png">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Exportar Imagem PNG</span>
+        </button>
+        <button type="button" class="sci-menu-item" id="menu-btn-export-svg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Exportar Vetorial SVG</span>
+        </button>
+        <button type="button" class="sci-menu-item" id="menu-btn-copy-code">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Copiar Código Python</span>
+        </button>
+        <button type="button" class="sci-menu-item" id="menu-btn-settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Configurações</span>
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -1035,6 +1472,31 @@
       <!-- Corpo do Modal -->
       <div class="modal-body">
         
+        <!-- SEÇÃO: APARÊNCIA -->
+        <section class="modal-section">
+          <div class="section-label"><span>Aparência</span></div>
+          <div class="settings-card appearance-card">
+            <div class="appearance-row">
+              <span class="appearance-label" id="appearance-theme-label">Tema</span>
+              <div class="appearance-seg" role="group" aria-labelledby="appearance-theme-label">
+                <button type="button" data-appearance-theme="light" aria-pressed="false">Claro</button>
+                <button type="button" data-appearance-theme="dark" aria-pressed="false">Escuro</button>
+                <button type="button" data-appearance-theme="system" aria-pressed="false">Sistema</button>
+              </div>
+            </div>
+            <div class="appearance-row">
+              <span class="appearance-label" id="appearance-scale-label">Tamanho da interface</span>
+              <div class="appearance-seg" role="group" aria-labelledby="appearance-scale-label">
+                <button type="button" data-appearance-scale="90" aria-pressed="false">90%</button>
+                <button type="button" data-appearance-scale="100" aria-pressed="false">100%</button>
+                <button type="button" data-appearance-scale="110" aria-pressed="false">110%</button>
+                <button type="button" data-appearance-scale="125" aria-pressed="false">125%</button>
+                <button type="button" data-appearance-scale="150" aria-pressed="false">150%</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- SEÇÃO: ATUALIZAÇÕES -->
         <section class="modal-section">
           <div class="section-label">

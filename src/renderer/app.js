@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let startY = 0;
 
   // DOM Elements
-  const themeToggleBtn = document.getElementById('theme-toggle');
   const modeTabs = document.querySelectorAll('.mode-tab');
   const formPanels = document.querySelectorAll('.form-panel');
   const viewTabs = document.querySelectorAll('.view-tab');
@@ -65,19 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // TEMA (DARK / LIGHT)
   // =========================================================================
-  function initTheme() {
-    const savedTheme = localStorage.getItem('lgr-theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-  }
-
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('lgr-theme', next);
-    updateThemeIcon(next);
-
+  // O tema é aplicado por appearance.js (antes da primeira pintura) e alterado em Configurações.
+  function onThemeChanged() {
     // Re-render ou recalcula gráfico no tema ativo
     if (document.getElementById('page-lgr')?.classList.contains('active')) {
       if (lastCalculationKey) {
@@ -91,14 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function updateThemeIcon(theme) {
-    const isDark = theme === 'dark';
-    themeToggleBtn.setAttribute('title', isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro');
-    themeToggleBtn.setAttribute('aria-label', isDark ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro');
-  }
-
-  themeToggleBtn.addEventListener('click', toggleTheme);
-  initTheme();
+  window.addEventListener('controlab:themechange', onThemeChanged);
 
   // =========================================================================
   // NAVEGAÇÃO POR ABAS (MODO DE ENTRADA & VIEWS)
@@ -194,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (currentMode === 'zpk') {
       return {
         mode: 'zpk',
-        k: Number.isFinite(Number.parseFloat(inputK.value)) ? Number.parseFloat(inputK.value) : 1.0,
+        k: Number.isFinite(Number.parseFloat(String(inputK.value).replace(',', '.'))) ? Number.parseFloat(String(inputK.value).replace(',', '.')) : 1.0,
         zeros: inputZeros.value.trim(),
         poles: inputPoles.value.trim(),
         title,
@@ -213,6 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.clearTimeout(previewTimer);
     ++previewRequestId;
     showLoading(true);
+    const now = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
+    const t0 = now();
 
     try {
       const res = await window.api.calculateLGR(payload);
@@ -236,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentSVGData = res.svg;
       const lgrEmptyState = document.getElementById('lgr-empty-state');
       if (lgrEmptyState) lgrEmptyState.style.display = 'none';
+      if (plotViewport) plotViewport.style.display = 'flex';
       plotImg.style.display = 'block';
       plotImg.src = res.image;
       resetZoom();
@@ -258,6 +242,76 @@ document.addEventListener('DOMContentLoaded', () => {
       pendingMemorial = det;
       if (document.getElementById('view-memorial').classList.contains('active')) ensureMemorial();
 
+      const elapsed = ((now() - t0) / 1000).toFixed(3).replace('.', ',');
+      const consoleLine = document.getElementById('lgr-console-line');
+      if (consoleLine) {
+        const repr = payload.expr || (payload.mode === 'coeffs' ? `[${payload.num}]/[${payload.den}]` : 'LGR');
+        consoleLine.textContent = `>> rlocus(${repr}) — concluído em ${elapsed} s`;
+      }
+      const statusState = document.getElementById('lgr-status-state');
+      if (statusState) {
+        statusState.textContent = 'Pronto';
+      }
+
+      // Troca automática para a aba Gráfico em dispositivos móveis (ou a solicitada por query)
+      const requestedTab = new URLSearchParams(window.location.search).get('tab') || 'plot';
+      const pageLgr = document.getElementById('page-lgr');
+      if (pageLgr) {
+        pageLgr.setAttribute('data-active-tab', requestedTab);
+        pageLgr.querySelectorAll('.sci-mobile-tab').forEach((tab) => {
+          tab.classList.toggle('active', tab.dataset.tab === requestedTab);
+        });
+      }
+
+      // Atualiza métricas no tablet
+      const tabPoles = document.getElementById('lgr-tab-poles');
+      if (tabPoles) tabPoles.textContent = `${det.P}`;
+      const tabZeros = document.getElementById('lgr-tab-zeros');
+      if (tabZeros) tabZeros.textContent = `${det.Z}`;
+      const tabBranches = document.getElementById('lgr-tab-branches');
+      if (tabBranches) tabBranches.textContent = `${det.ramos}`;
+
+      // Atualiza tabela de resultados do LGR
+      const polesList = det.polos?.map((p) => p.str).join('; ') || '—';
+      const zerosList = det.zeros?.length ? det.zeros.map((z) => z.str).join('; ') : 'Nenhum';
+      const resPoles = document.getElementById('lgr-res-poles');
+      if (resPoles) resPoles.textContent = det.P ? `${det.P} (${polesList})` : '—';
+      const resZeros = document.getElementById('lgr-res-zeros');
+      if (resZeros) resZeros.textContent = det.Z ? `${det.Z} (${zerosList})` : '0 (Nenhum)';
+      const resBranches = document.getElementById('lgr-res-branches');
+      if (resBranches) resBranches.textContent = `${det.ramos ?? det.P ?? '—'}`;
+      const resCentroid = document.getElementById('lgr-res-centroid');
+      if (resCentroid) resCentroid.textContent = det.centroide !== null ? det.centroide.toFixed(3).replace('.', ',') : 'N/A';
+      const resAsymptotes = document.getElementById('lgr-res-asymptotes');
+      if (resAsymptotes) {
+        const numAsymp = det.P - det.Z;
+        if (numAsymp > 0) {
+          const angles = det.angulos_assintotas?.map((a) => `${Math.round(a.graus)}°`).join(', ');
+          resAsymptotes.textContent = angles ? `${numAsymp} assíntotas (${angles})` : `${numAsymp} assíntotas`;
+        } else {
+          resAsymptotes.textContent = 'Nenhuma assíntota';
+        }
+      }
+      const resBreakaway = document.getElementById('lgr-res-breakaway');
+      if (resBreakaway) {
+        const breakPts = det.break_points || det.ruptura || [];
+        resBreakaway.textContent = breakPts.length
+          ? breakPts.map((r) => {
+              const sVal = typeof r === 'object' ? r.s : r;
+              const kVal = typeof r === 'object' ? r.K : null;
+              const sStr = typeof sVal === 'number' ? sVal.toFixed(3).replace('.', ',') : sVal;
+              return kVal != null ? `${sStr} (K=${kVal.toFixed(2).replace('.', ',')})` : sStr;
+            }).join('; ')
+          : 'Nenhum no eixo real';
+      }
+      const resJw = document.getElementById('lgr-res-jw');
+      if (resJw) {
+        const jwPts = det.jw_cruzamentos || det.cruzamento_jw || [];
+        resJw.textContent = jwPts.length
+          ? jwPts.map((c) => `±j${c.w.toFixed(2)} (K=${c.K.toFixed(1)})`).join('; ')
+          : 'Sem cruzamento';
+      }
+
       showToast('LGR calculado e traçado com sucesso!', 'success');
 
     } catch (err) {
@@ -271,6 +325,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function ensureMemorial() {
     if (!pendingMemorial) return;
+    const emptyMemorial = document.getElementById('memorial-empty-state');
+    if (emptyMemorial) emptyMemorial.style.display = 'none';
+    const stepsGrid = document.querySelector('.steps-grid');
+    if (stepsGrid) stepsGrid.style.display = 'flex';
     populateMemorialSteps(pendingMemorial);
     populateMemorialDeductions(pendingMemorial.passo_a_passo);
     pendingMemorial = null;
@@ -521,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!pap || Object.keys(pap).length === 0) {
       container.innerHTML = `
         <div class="deduction-empty">
-          <span>Nenhuma dedução calculada ainda. Clique em Traçar LGR para processar.</span>
+          <span>Nenhuma dedução calculada ainda. Clique em Calcular para processar.</span>
         </div>
       `;
       return;
@@ -1098,9 +1156,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (show) {
       plotLoading.classList.add('active');
       btnCalculate.disabled = true;
+      document.getElementById('btn-ribbon-lgr-calc')?.classList.add('loading');
     } else {
       plotLoading.classList.remove('active');
       btnCalculate.disabled = false;
+      document.getElementById('btn-ribbon-lgr-calc')?.classList.remove('loading');
+    }
+    const statusState = document.getElementById('lgr-status-state');
+    if (statusState) {
+      statusState.textContent = show ? 'Calculando...' : 'Pronto';
     }
   }
 
@@ -1132,6 +1196,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnCalculate.addEventListener('click', calculate);
 
+  // Ações de Ribbon e Mobile do LGR
+  document.getElementById('btn-ribbon-lgr-calc')?.addEventListener('click', () => btnCalculate.click());
+  document.getElementById('btn-lgr-mobile-calc')?.addEventListener('click', () => btnCalculate.click());
+  document.getElementById('btn-ribbon-lgr-clear')?.addEventListener('click', () => {
+    if (inputExpr) inputExpr.value = '';
+    schedulePreview();
+    const lgrEmptyState = document.getElementById('lgr-empty-state');
+    if (lgrEmptyState) lgrEmptyState.style.display = 'flex';
+    if (plotViewport) plotViewport.style.display = 'none';
+    if (plotImg) {
+      plotImg.style.display = 'none';
+      plotImg.src = '';
+    }
+    const emptyMemorial = document.getElementById('memorial-empty-state');
+    if (emptyMemorial) emptyMemorial.style.display = 'flex';
+    const stepsGrid = document.querySelector('.steps-grid');
+    if (stepsGrid) stepsGrid.style.display = 'none';
+
+    if (badgePoles) badgePoles.innerHTML = 'Polos: <b>—</b>';
+    if (badgeZeros) badgeZeros.innerHTML = 'Zeros: <b>—</b>';
+    if (badgeBranches) badgeBranches.innerHTML = 'Ramos: <b>—</b>';
+    if (badgeCentroid) badgeCentroid.innerHTML = 'σₐ: <b>—</b>';
+    const tabPoles = document.getElementById('lgr-tab-poles');
+    if (tabPoles) tabPoles.textContent = '—';
+    const tabZeros = document.getElementById('lgr-tab-zeros');
+    if (tabZeros) tabZeros.textContent = '—';
+    const tabBranches = document.getElementById('lgr-tab-branches');
+    if (tabBranches) tabBranches.textContent = '—';
+    ['lgr-res-poles', 'lgr-res-zeros', 'lgr-res-branches', 'lgr-res-centroid', 'lgr-res-asymptotes', 'lgr-res-breakaway', 'lgr-res-jw'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '—';
+    });
+    const consoleLine = document.getElementById('lgr-console-line');
+    if (consoleLine) consoleLine.textContent = '>> pronto';
+  });
+
+  // Abas Mobile do LGR (< 600px)
+  document.querySelectorAll('#lgr-mobile-tabs .sci-mobile-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const targetTab = tab.dataset.tab;
+      document.getElementById('page-lgr')?.setAttribute('data-active-tab', targetTab);
+      document.querySelectorAll('#lgr-mobile-tabs .sci-mobile-tab').forEach((t) => {
+        t.classList.toggle('active', t === tab);
+      });
+    });
+  });
+
+  // Switcher Tablet [ Figura | Resultados ] do LGR
+  document.querySelectorAll('#lgr-tablet-switcher button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#lgr-tablet-switcher button').forEach((b) => {
+        b.classList.toggle('active', b === btn);
+      });
+      const isFigure = btn.dataset.view === 'figure';
+      const viewport = document.querySelector('#page-lgr .sci-plot-viewport');
+      const tabletResults = document.getElementById('lgr-tablet-results-container');
+      if (viewport) viewport.style.display = isFigure ? 'flex' : 'none';
+      if (tabletResults) {
+        tabletResults.style.display = isFigure ? 'none' : 'block';
+        const resultsPanel = document.getElementById('lgr-panel-results');
+        if (!isFigure && resultsPanel) {
+          tabletResults.innerHTML = resultsPanel.innerHTML;
+        }
+      }
+    });
+  });
+
+  // Teclado virtual de símbolos matemáticos do LGR
+  document.querySelectorAll('#lgr-virtual-math button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sym = btn.dataset.sym || btn.textContent.trim();
+      if (!inputExpr) return;
+      const start = inputExpr.selectionStart ?? inputExpr.value.length;
+      const end = inputExpr.selectionEnd ?? inputExpr.value.length;
+      const oldVal = inputExpr.value;
+      inputExpr.value = oldVal.slice(0, start) + sym + oldVal.slice(end);
+      inputExpr.focus();
+      inputExpr.setSelectionRange(start + sym.length, start + sym.length);
+      schedulePreview();
+    });
+  });
+
   [
     inputExpr,
     inputNumerator,
@@ -1141,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inputK,
     inputZeros,
     inputPoles,
-  ].forEach((input) => input.addEventListener('input', schedulePreview));
+  ].forEach((input) => input?.addEventListener('input', schedulePreview));
 
   let lgrModuleStarted = false;
   function startLgrModule() {

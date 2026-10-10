@@ -79,6 +79,8 @@ def normalize_tf_expression(expr_str: str) -> str:
         .replace("[", "(")
         .replace("]", ")")
     )
+    # Normaliza vírgula decimal entre dígitos (ex: 2,5 -> 2.5)
+    expr = re.sub(r"(?<=\d),(?=\d)", ".", expr)
 
     def replace_superscript(match):
         exponent = match.group(0).translate(_SUPERSCRIPT_DIGITS)
@@ -693,22 +695,22 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     # ========================================================
     # PASSO 1, 2 e 3: Ramos, Polos, Zeros e Simetria
     # ========================================================
-    # Traça os ramos (Vermelho clássico LGR)
-    branch_color = tokens.get("lgr_branch", "#DC2626")
+    # Traça os ramos do LGR
+    branch_color = tokens.get("lgr_branch", "#000000")
     for i in range(ramos):
         ax.plot(np.real(rlist[:, i]), np.imag(rlist[:, i]), color=branch_color, linewidth=2.0, 
                 label='Ramos do LGR' if i == 0 else "_nolegend_")
         
-    # Marca polos (x) em azul escuro clássico
-    pole_color = tokens.get("lgr_pole", "#1E3A8A")
-    zero_color = tokens.get("lgr_zero", "#1E3A8A")
+    # Marca polos (x) em preto de alto contraste
+    pole_color = tokens.get("lgr_pole", "#000000")
+    zero_color = tokens.get("lgr_zero", "#000000")
     ax.plot(np.real(polos), np.imag(polos), 'x', color=pole_color, markersize=8.5, markeredgewidth=2.2, label='Polos (Início)', zorder=5)
     
-    # Marca zeros (o)
+    # Marca zeros (o) com interior branco
     if Z > 0:
-        ax.plot(np.real(zeros), np.imag(zeros), 'o', color=zero_color, markerfacecolor='none', markersize=7.5, markeredgewidth=2.0, label='Zeros (Término)', zorder=5)
+        ax.plot(np.real(zeros), np.imag(zeros), 'o', color=zero_color, markerfacecolor='white', markersize=7.5, markeredgewidth=2.0, label='Zeros (Término)', zorder=5)
     else:
-        ax.plot([], [], 'o', color=zero_color, markerfacecolor='none', markersize=7.5, markeredgewidth=2.0, label='Zeros (Nenhum nesta FT)')
+        ax.plot([], [], 'o', color=zero_color, markerfacecolor='white', markersize=7.5, markeredgewidth=2.0, label='Zeros (Nenhum nesta FT)')
 
     # ========================================================
     # PASSO 4: Assíntotas e Centroide
@@ -814,10 +816,10 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     # ========================================================
     bg_badge = tokens.get("bg_card", "#FFFFFF")
     edge_badge = tokens.get("grid", "#CBD5E1")
-    text_badge = tokens.get("text", "#0F172A")
-    text_sec_badge = tokens.get("text_secondary", "#334155")
-    accent_badge = tokens.get("accent", "#0284C7")
-    danger_badge = tokens.get("danger", "#DC2626")
+    text_badge = tokens.get("text", "#000000")
+    text_sec_badge = tokens.get("text_secondary", "#111827")
+    accent_badge = tokens.get("accent", "#000000")
+    danger_badge = tokens.get("danger", "#B91C1C")
 
     # Mapeia coordenadas reais para detecção de proximidade
     real_polos_x = [float(np.real(p)) for p in polos if abs(np.imag(p)) < 1e-5]

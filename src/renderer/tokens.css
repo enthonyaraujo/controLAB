@@ -1,0 +1,272 @@
+/**
+ * ControLAB v3.1.1 - Tokens de Design Centralizados
+ * Cores, raios, espaçamentos, fontes, bordas e sombras unificados para o app e diálogos.
+ */
+
+:root,
+[data-theme="dark"] {
+  /* =========================================================================
+     TIPOGRAFIA
+     ========================================================================= */
+  --font-main: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-code: 'JetBrains Mono', "Fira Code", monospace;
+  --font-title: 1.125rem;
+  --font-ui: 0.875rem;
+  --font-ui-sm: 0.8125rem;
+  --font-mono-val: 0.875rem;
+  --font-input: 0.875rem;
+  --font-caption: 0.75rem;
+
+  /* =========================================================================
+     ESPAÇAMENTOS
+     ========================================================================= */
+  --space-2xs: 0.125rem; /* 2px */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 0.75rem;   /* 12px */
+  --space-lg: 1rem;      /* 16px */
+  --space-xl: 1.25rem;   /* 20px */
+  --space-2xl: 1.5rem;   /* 24px */
+
+  /* =========================================================================
+     CORES: FUNDOS E SUPERFÍCIES (DARK)
+     ========================================================================= */
+  --bg: #11161C;
+  --surface: #161C24;
+  --surface-header: #1C232D;
+  --surface-title: #1C232D;
+  --surface-inset: #0F141B;
+
+  /* Aliases de compatibilidade */
+  --bg-app: var(--bg);
+  --bg-sidebar: var(--surface);
+  --bg-card: var(--surface);
+  --bg-card-hover: var(--surface-inset);
+  --bg-input: var(--surface-inset);
+  --bg-surface: var(--surface);
+  --bg-surface-elevated: var(--surface-header);
+  --bg-workspace: var(--bg);
+  --bg-panel: var(--surface);
+  --bg-panel-header: var(--surface-header);
+  --tab-active-bg: var(--bg-panel-header);
+
+  /* =========================================================================
+     BORDAS
+     ========================================================================= */
+  --border: #232C37;
+  --border-strong: #2D3745;
+  --border-color: var(--border);
+  --border-subtle: var(--border);
+  --border-focus: var(--accent);
+  --border-width: 1px;
+
+  /* =========================================================================
+     TEXTOS
+     ========================================================================= */
+  --text: #E6EDF3;
+  --text-muted: #8693A3;
+  --text-faint: #637182;
+  --text-main: var(--text);
+  --text-dim: var(--text-faint);
+
+  /* =========================================================================
+     EIXOS E REFERÊNCIAS
+     ========================================================================= */
+  --axis: #3A4654;
+  --reference-color: var(--axis);
+
+  /* =========================================================================
+     COR PRIMÁRIA: TEAL CIENTÍFICO SÓBRIO (Idêntico ao botão Calcular e abas)
+     ========================================================================= */
+  --accent: #3DD6F5;
+  --accent-hover: #26BBD9;
+  --accent-border-hover: #26BBD9;
+  --accent-contrast: #0A0E13;
+  --accent-primary: var(--accent);
+  --accent-primary-hover: var(--accent-hover);
+  --accent-gradient: var(--accent);
+
+  /* Shell Superior / Barra de Abas */
+  --bg-shell: #0B4F61;
+  --on-shell: #FFFFFF;
+  --on-shell-muted: rgba(255, 255, 255, 0.85);
+  --shell-hover: rgba(255, 255, 255, 0.14);
+  --shell-badge-bg: rgba(0, 0, 0, 0.3);
+
+  /* =========================================================================
+     STATUS SEMÂNTICOS SÓBRIOS
+     ========================================================================= */
+  --status-valid: #10B981;
+  --status-pending: #F59E0B;
+  --status-error: #EF4444;
+
+  --accent-emerald: #10B981;
+  --accent-purple: #8B5CF6;
+  --accent-amber: #F59E0B;
+  --accent-rose: #EF4444;
+
+  --status-stable-color: #10B981;
+  --status-stable-bg: rgba(16, 185, 129, 0.12);
+  --status-stable-border: rgba(16, 185, 129, 0.3);
+
+  --status-unstable-color: #EF4444;
+  --status-unstable-bg: rgba(239, 68, 68, 0.12);
+  --status-unstable-border: rgba(239, 68, 68, 0.3);
+
+  /* =========================================================================
+     RAIOS DE BORDA (4 a 6 px no diálogo, botões e cartões, alinhado ao app)
+     ========================================================================= */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-card: 6px;
+  --radius-dialog: 6px;
+  --radius-btn: 4px;
+  --radius-input: 4px;
+  --radius-badge: 4px;
+  --radius-pill: 6px;
+
+  /* =========================================================================
+     SOMBRAS (Sombra apenas no diálogo, nenhuma nos cartões internos)
+     ========================================================================= */
+  --shadow-dialog: 0 20px 45px rgba(0, 0, 0, 0.55);
+  --shadow-card: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-glow: none;
+  --shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  /* Diálogo: Overlay e Cabeçalho */
+  --modal-backdrop-bg: rgba(3, 7, 18, 0.72);
+  --modal-header-bg: var(--surface-header);
+  --border-dialog: 1px solid var(--border-strong);
+  --border-card: 1px solid var(--border);
+
+  /* =========================================================================
+     DENSIDADE: PADRÃO MOUSE (pointer: fine)
+     ========================================================================= */
+  --h-control: 2rem;
+  --h-btn: 2rem;
+  --h-btn-primary: 2rem;
+  --h-panel-header: 1.875rem;
+  --h-ribbon-btn: 3.5rem;
+  --pad-control-x: 0.5rem;
+  --pad-control-y: 0.25rem;
+  --gap-control: 0.5rem;
+  --min-touch-target: 2rem;
+}
+
+/* ===========================================================================
+   TEMA CLARO (LIGHT THEME)
+   =========================================================================== */
+[data-theme="light"] {
+  /* Cores: Superfícies e Fundos (Light) */
+  --bg: #F4F6F8;
+  --surface: #FFFFFF;
+  --surface-header: #ECEFF2;
+  --surface-title: #ECEFF2;
+  --surface-inset: #F8FAFC;
+
+  /* Aliases de compatibilidade */
+  --bg-app: var(--bg);
+  --bg-sidebar: var(--surface);
+  --bg-card: var(--surface);
+  --bg-card-hover: var(--surface-inset);
+  --bg-input: var(--surface-inset);
+  --bg-surface: var(--surface);
+  --bg-surface-elevated: var(--surface-header);
+  --bg-workspace: var(--bg);
+  --bg-panel: var(--surface);
+  --bg-panel-header: var(--surface-header);
+  --tab-active-bg: var(--bg-panel-header);
+
+  /* Bordas */
+  --border: #CBD3DC;
+  --border-strong: #B4BFCB;
+  --border-color: var(--border);
+  --border-subtle: var(--border);
+  --border-focus: var(--accent);
+
+  /* Textos */
+  --text: #0E141B;
+  --text-muted: #526071;
+  --text-faint: #788796;
+  --text-main: var(--text);
+  --text-dim: var(--text-faint);
+
+  /* Eixos e Referências */
+  --axis: #9DA8B5;
+  --reference-color: var(--axis);
+
+  /* Cor Primária / Destaque (Teal Científico) */
+  --accent: #0F6E86;
+  --accent-hover: #0C586B;
+  --accent-border-hover: #0C586B;
+  --accent-contrast: #FFFFFF;
+  --accent-primary: var(--accent);
+  --accent-primary-hover: var(--accent-hover);
+  --accent-gradient: var(--accent);
+
+  /* Shell Superior / Barra de Abas */
+  --bg-shell: var(--accent);
+  --on-shell: #FFFFFF;
+  --on-shell-muted: rgba(255, 255, 255, 0.85);
+  --shell-hover: rgba(255, 255, 255, 0.16);
+  --shell-badge-bg: rgba(0, 0, 0, 0.25);
+
+  /* Status Semânticos */
+  --status-valid: #059669;
+  --status-pending: #D97706;
+  --status-error: #DC2626;
+
+  --accent-emerald: #059669;
+  --accent-purple: #6D28D9;
+  --accent-amber: #B45309;
+  --accent-rose: #DC2626;
+
+  --status-stable-color: #059669;
+  --status-stable-bg: rgba(5, 150, 105, 0.1);
+  --status-stable-border: rgba(5, 150, 105, 0.25);
+
+  --status-unstable-color: #DC2626;
+  --status-unstable-bg: rgba(220, 38, 38, 0.1);
+  --status-unstable-border: rgba(220, 38, 38, 0.25);
+
+  /* Sombras */
+  --shadow-dialog: 0 20px 45px rgba(0, 0, 0, 0.16);
+  --shadow-card: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-glow: none;
+  --shadow-menu: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  /* Diálogo: Overlay e Cabeçalho */
+  --modal-backdrop-bg: rgba(14, 20, 27, 0.45);
+  --modal-header-bg: var(--surface-header);
+  --border-dialog: 1px solid var(--border-strong);
+  --border-card: 1px solid var(--border);
+}
+
+/* ===========================================================================
+   TOKENS DE DENSIDADE PARA DISPOSITIVOS DE TOQUE
+   =========================================================================== */
+@media (pointer: coarse) {
+  :root,
+  [data-theme="dark"],
+  [data-theme="light"] {
+    --h-control: max(44px, 2.75rem);
+    --h-btn: max(44px, 2.75rem);
+    --h-btn-primary: max(48px, 3rem);
+    --h-panel-header: 2.25rem;
+    --h-ribbon-btn: 3rem;
+    --font-ui: 0.9375rem;
+    --font-ui-sm: 0.8125rem;
+    --font-mono-val: 0.875rem;
+    --font-input: max(16px, 1rem);
+    --pad-control-x: 0.625rem;
+    --pad-control-y: 0.5rem;
+  }
+}

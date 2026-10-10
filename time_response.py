@@ -79,7 +79,7 @@ def _crossing_time(time, signal, level):
     return float(time[indices[0]]) if indices.size else None
 
 
-def _step_metrics(time, output, poles, threshold):
+def _step_metrics(time, output, poles, threshold, num=None, den=None):
     final_value = finite_float(output[-1], 0.0)
     peak_index = int(np.argmax(output))
     peak_value = finite_float(output[peak_index], 0.0)
@@ -101,15 +101,18 @@ def _step_metrics(time, output, poles, threshold):
     elif outside[-1] < len(time) - 1:
         settling_time = float(time[outside[-1] + 1])
 
-    pole_array = np.asarray(poles, dtype=complex)
-    stable_poles = pole_array[np.real(pole_array) < -1e-9]
-    dominant = stable_poles[np.argmax(np.real(stable_poles))] if stable_poles.size else None
-    natural_frequency = float(abs(dominant)) if dominant is not None else None
-    damping_ratio = (
-        float(-np.real(dominant) / abs(dominant))
-        if dominant is not None and abs(dominant) > 1e-12
-        else None
-    )
+    # zeta e wn calculados estritamente quando o sistema for de 2ª ordem
+    natural_frequency = None
+    damping_ratio = None
+    if den is not None:
+        trimmed_den = np.trim_zeros(np.asarray(den, dtype=float), "f")
+        if len(trimmed_den) == 3:
+            a2, a1, a0 = float(trimmed_den[0]), float(trimmed_den[1]), float(trimmed_den[2])
+            if a2 != 0 and (a0 / a2) > 0:
+                wn = math.sqrt(a0 / a2)
+                zeta = (a1 / a2) / (2.0 * wn)
+                natural_frequency = float(wn)
+                damping_ratio = float(zeta)
 
     return {
         "final_value": final_value,
@@ -125,7 +128,7 @@ def _step_metrics(time, output, poles, threshold):
 
 def _display_value(value, digits=5):
     if value is None:
-        return "Não definido"
+        return "—"
     if isinstance(value, (float, np.floating)) and math.isinf(float(value)):
         return "∞"
     if isinstance(value, (float, np.floating)):
@@ -133,17 +136,17 @@ def _display_value(value, digits=5):
     return str(value)
 
 
-def _plot_step(time, output, metrics, tokens, theme):
-    fig, ax = plt.subplots(figsize=(9.2, 5.2), dpi=140)
+def _plot_step(time, output, metrics, tokens, theme, figsize=(9.2, 5.2), dpi=140):
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     accent = tokens["accent"]
     ref_color = tokens["reference"]
     mono_font = tokens["font_mono"]
 
-    ax.plot(time, output, color=accent, linewidth=2.2, label="Resposta ao degrau y(t)")
+    ax.plot(time, output, color=accent, linewidth=2.0, label="Resposta ao degrau y(t)")
 
     final_val = metrics.get("final_value")
     if final_val is not None and math.isfinite(final_val):
-        ax.axhline(final_val, color=ref_color, linestyle="--", linewidth=1.5, alpha=0.85)
+        ax.axhline(final_val, color=ref_color, linestyle="--", linewidth=1.2, alpha=0.85)
         ax.annotate(
             f"{final_val:.2f}".replace(".", ","),
             xy=(time[-1], final_val),
@@ -152,7 +155,7 @@ def _plot_step(time, output, metrics, tokens, theme):
             va="center",
             ha="left",
             color=tokens["text_secondary"],
-            fontsize=9,
+            fontsize=10,
             fontfamily=mono_font,
         )
 
@@ -161,7 +164,7 @@ def _plot_step(time, output, metrics, tokens, theme):
     overshoot = metrics.get("overshoot_percent")
     if peak_val is not None and peak_time is not None and math.isfinite(peak_val) and math.isfinite(peak_time):
         ax.plot([peak_time, peak_time], [0, peak_val], linestyle=":", color=tokens.get("accent_secondary", accent), linewidth=1.1, alpha=0.7)
-        ax.plot(peak_time, peak_val, marker="o", markersize=6.5, color=accent, markeredgecolor=tokens["text"], markeredgewidth=1.2, zorder=5)
+        ax.plot(peak_time, peak_val, marker="o", markersize=6.0, color=accent, markeredgecolor=tokens["text"], markeredgewidth=1.2, zorder=5)
         mp_label = f"Mp {overshoot:.1f}%".replace(".", ",") if overshoot is not None and overshoot > 0 else f"{peak_val:.2f}".replace(".", ",")
         ax.annotate(
             mp_label,
@@ -169,61 +172,79 @@ def _plot_step(time, output, metrics, tokens, theme):
             xytext=(10, 8),
             textcoords="offset points",
             color=tokens["text"],
-            fontsize=9,
+            fontsize=10,
             fontweight="bold",
             fontfamily=mono_font,
         )
 
     ax.set_xlabel("Tempo (s)")
     ax.set_ylabel("y(t)")
+    ax.legend(loc="lower right")
     fig.tight_layout()
-    return figure_payload(fig, theme=theme)
+    return figure_payload(fig, dpi=dpi, theme=theme)
 
 
-def _plot_ramp(time, output, tokens, theme):
-    fig, ax = plt.subplots(figsize=(9.2, 5.2), dpi=140)
+def _plot_ramp(time, output, tokens, theme, figsize=(9.2, 5.2), dpi=140):
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.plot(time, time, color=tokens["reference"], linestyle="--", linewidth=1.5, label="Entrada r(t) = t", alpha=0.85)
-    ax.plot(time, output, color=tokens["accent"], linewidth=2.2, label="Resposta à rampa y(t)")
+    ax.plot(time, output, color=tokens["accent"], linewidth=2.0, label="Resposta à rampa y(t)")
     ax.set_xlabel("Tempo (s)")
     ax.set_ylabel("y(t)")
     ax.legend(loc="upper left")
     fig.tight_layout()
-    return figure_payload(fig, theme=theme)
+    return figure_payload(fig, dpi=dpi, theme=theme)
 
 
-def _plot_impulse(time, output, tokens, theme):
-    fig, ax = plt.subplots(figsize=(9.2, 5.2), dpi=140)
-    ax.plot(time, output, color=tokens["accent"], linewidth=2.2, label="Resposta ao impulso y_δ(t)")
+def _plot_impulse(time, output, tokens, theme, figsize=(9.2, 5.2), dpi=140):
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+    ax.plot(time, output, color=tokens["accent"], linewidth=2.0, label="Resposta ao impulso y_δ(t)")
     ax.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     ax.set_xlabel("Tempo (s)")
     ax.set_ylabel("y_δ(t)")
     fig.tight_layout()
-    return figure_payload(fig, theme=theme)
+    return figure_payload(fig, dpi=dpi, theme=theme)
 
 
-def analyze_time_response(expression, *, final_time=None, points=900, settling_threshold=0.02, theme="dark", response_type="step"):
+def analyze_time_response(expression, *, final_time=None, points=900, settling_threshold=0.02, theme="dark", response_type="step", width=None, dpi=None):
     """Analisa a resposta de malha fechada e os erros da malha aberta."""
     threshold = float(settling_threshold)
     if threshold not in (0.02, 0.05):
         raise ValueError("O critério de acomodação deve ser 0,02 ou 0,05.")
 
+    target_dpi = int(dpi) if dpi and str(dpi).isdigit() else 140
+    fig_w = 9.2
+    fig_h = 5.2
+    if width:
+        try:
+            w_px = float(width)
+            if 200 <= w_px <= 2400:
+                fig_w = max(4.0, min(12.0, w_px / target_dpi))
+                fig_h = max(2.6, fig_w * 0.56)
+        except (ValueError, TypeError):
+            pass
+
     plant, num, den, latex_expanded, latex_factored = parse_siso_transfer_function(expression)
-    closed_loop = ct.feedback(plant, 1)
-    poles = ct.poles(closed_loop)
+    trimmed_num = np.trim_zeros(np.asarray(num, dtype=float), "f")
+    trimmed_den = np.trim_zeros(np.asarray(den, dtype=float), "f")
+    if len(trimmed_num) > len(trimmed_den):
+        raise ValueError("A função de transferência deve ser própria (grau do numerador ≤ grau do denominador) para análise temporal.")
+
+    sys = plant
+    poles = ct.poles(sys)
     stable = bool(np.all(np.real(poles) < -1e-9))
-    time = recommended_time_vector(closed_loop, final_time, points)
+    time = recommended_time_vector(sys, final_time, points)
 
-    t_step, y_step = response_arrays(ct.step_response(closed_loop, timepts=time))
-    t_impulse, y_impulse = response_arrays(ct.impulse_response(closed_loop, timepts=time))
-    t_ramp, y_ramp = response_arrays(ct.forced_response(closed_loop, timepts=time, inputs=time))
+    t_step, y_step = response_arrays(ct.step_response(sys, timepts=time))
+    t_impulse, y_impulse = response_arrays(ct.impulse_response(sys, timepts=time))
+    t_ramp, y_ramp = response_arrays(ct.forced_response(sys, timepts=time, inputs=time))
 
-    metrics = _step_metrics(t_step, y_step, poles, threshold)
+    metrics = _step_metrics(t_step, y_step, poles, threshold, num=trimmed_num, den=trimmed_den)
     errors = _static_error_analysis(num, den)
 
     tokens = get_theme_tokens(theme)
-    img_step, svg_step = _plot_step(t_step, y_step, metrics, tokens, theme)
-    img_ramp, svg_ramp = _plot_ramp(t_ramp, y_ramp, tokens, theme)
-    img_impulse, svg_impulse = _plot_impulse(t_impulse, y_impulse, tokens, theme)
+    img_step, svg_step = _plot_step(t_step, y_step, metrics, tokens, theme, figsize=(fig_w, fig_h), dpi=target_dpi)
+    img_ramp, svg_ramp = _plot_ramp(t_ramp, y_ramp, tokens, theme, figsize=(fig_w, fig_h), dpi=target_dpi)
+    img_impulse, svg_impulse = _plot_impulse(t_impulse, y_impulse, tokens, theme, figsize=(fig_w, fig_h), dpi=target_dpi)
 
     plots = {
         "step": {"image": img_step, "svg": svg_step},
@@ -241,7 +262,7 @@ def analyze_time_response(expression, *, final_time=None, points=900, settling_t
         {"label": "Tempo de subida (tr)", "value": _display_value(metrics["rise_time"]), "unit": "s"},
         {"label": "Tempo de pico (tp)", "value": _display_value(metrics["peak_time"]), "unit": "s"},
         {"label": "Amortecimento (ζ)", "value": _display_value(metrics["damping_ratio"])},
-        {"label": "Frequência natural (ωn)", "value": _display_value(metrics["natural_frequency"]), "unit": "rad/s"},
+        {"label": "Frequência natural (ωn)", "value": _display_value(metrics["natural_frequency"]), "unit": "rad/s" if metrics["natural_frequency"] is not None else ""},
         {"label": "Tipo do sistema", "value": f"Tipo {errors['type']}"},
         {"label": "Kp", "value": _display_value(errors["kp"])},
         {"label": "Kv", "value": _display_value(errors["kv"])},
@@ -255,13 +276,13 @@ def analyze_time_response(expression, *, final_time=None, points=900, settling_t
         "success": True,
         "module": "time_response",
         "title": "Resposta no Domínio do Tempo",
-        "description": "Degrau, impulso e rampa da malha fechada com análise de regime permanente da malha aberta.",
+        "description": "Resposta temporal contínua com métricas de desempenho transitório e permanente.",
         "image": image,
         "svg": svg,
         "plots": plots,
         "latex": [
-            {"label": "Planta", "value": latex_factored.replace("G(s) = ", "")},
-            {"label": "Malha fechada", "value": r"T(s)=\frac{G(s)}{1+G(s)}"},
+            {"label": "Função de transferência", "value": latex_factored.replace("G(s) = ", "")},
+            {"label": "Forma polinomial", "value": latex_expanded.replace("G(s) = ", "")},
             {"label": "Constantes de erro", "value": r"K_p=\lim_{s\to0}G(s),\quad K_v=\lim_{s\to0}sG(s),\quad K_a=\lim_{s\to0}s^2G(s)"},
         ],
         "metrics": metric_rows,
