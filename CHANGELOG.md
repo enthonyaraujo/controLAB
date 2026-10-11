@@ -3,6 +3,17 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.0.2] - 2026-10-11
+
+### Corrigido
+- **Serialização JSON e Estabilidade no Motor Chaquopy Android (`android_bridge.py`, `LgrPythonPlugin.java`):**
+  - Sanitização recursiva de dados em `android_bridge.py` (`_json_safe`), tratando `inf` / `-inf` como `"∞"` / `"-∞"`, `nan` como `None`, tipos escalares do NumPy para primitivos Python e números complexos para dicionários `{real, imag}` com `allow_nan=False`.
+  - Elimina o Erro 500 no Android ao pressionar "Calcular" nos módulos de *Resposta no Tempo*, *Resposta em Frequência*, *Projeto de Controladores* e *Espaço de Estados* decorrente de falha de desserialização em `org.json.JSONObject`.
+  - Melhoria na propagação e diagnóstico de mensagens de erro no plugin nativo Java.
+- **Scroll por Toque no Android (Lugar Geométrico das Raízes e Estabilidade / Routh-Hurwitz):**
+  - Ajuste de overflow e layout responsivo móvel (`@media (max-width: 1000px)`) para `#page-lgr.active` e `#page-routh.active`, habilitando rolagem vertical nativa por toque nos contêineres de Parâmetros e Resultados.
+  - Layout desktop (> 1000px) mantido 100% inalterado e preservado.
+
 ---
 
 ## [4.0.1] - 2026-10-11

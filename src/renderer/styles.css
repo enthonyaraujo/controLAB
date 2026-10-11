@@ -8734,3 +8734,31 @@ body.in-scientific .global-navbar {
   padding: 4px 0 !important;
   border-top: 1px solid var(--border-strong) !important;
 }
+
+/* ==========================================================================
+   SCROLL POR TOQUE EM LGR E ESTABILIDADE (celular/tablet <= 1000px)
+   A regra global "#page-lgr.active, #page-routh.active" fixa a página em
+   100dvh com overflow hidden e anulava o layout em fluxo dos breakpoints
+   móveis. Aqui a própria página vira o contêiner rolável (desktop > 1000px
+   permanece intacto).
+   ========================================================================== */
+@media (max-width: 1000px) {
+  #page-lgr.active,
+  #page-routh.active {
+    display: block;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+  }
+
+  #page-lgr.active .app-container,
+  #page-routh.active .routh-workspace-container {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+}

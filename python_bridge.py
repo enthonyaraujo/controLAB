@@ -446,7 +446,7 @@ def dispatch(data):
 
         if cmd in ("help", "ajuda"):
             help_text = (
-                "ControLAB Console v4.0.1\n"
+                "ControLAB Console v4.0.2\n"
                 "Comandos disponíveis: help, clc, clear, whos, pwd, ls, dir, cd <pasta>\n"
                 "Exemplos: 4/(s^2+2*s+4), K = 10, 2 + 2"
             )
