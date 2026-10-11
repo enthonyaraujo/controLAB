@@ -34,6 +34,7 @@ module.exports = {
   },
   win: {
     executableName: 'ControLAB',
+    icon: 'build/icon.ico',
     target: ['nsis'],
   },
   nsis: {
@@ -44,6 +45,8 @@ module.exports = {
     createStartMenuShortcut: true,
     shortcutName: 'ControLAB',
     uninstallDisplayName: 'ControLAB',
+    installerIcon: 'build/icon.ico',
+    uninstallerIcon: 'build/icon.ico',
     runAfterFinish: true,
   },
 };
