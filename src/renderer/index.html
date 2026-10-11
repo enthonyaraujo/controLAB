@@ -551,7 +551,7 @@
           </button>
         </div>
 
-        <div class="sci-plot-viewport" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+        <div class="sci-plot-viewport" style="display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; position: relative;">
           <!-- View 1: Gráfico -->
           <div id="view-plot" class="view-panel active" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
             <div id="plot-loading" class="loading-overlay" style="display: none;">
@@ -568,7 +568,7 @@
           </div>
 
           <!-- View 2: Memorial dos 7 Passos -->
-          <div id="view-memorial" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto;">
+          <div id="view-memorial" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
             <div class="memorial-toolbar" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span class="toolbar-badge" style="font-size: 0.8125rem; font-weight: 500;">7 Passos Clássicos de Evans</span>
               <button id="btn-toggle-deductions" class="sci-btn-mini btn-toggle-deductions" type="button">Deduções detalhadas →</button>
@@ -586,7 +586,7 @@
           </div>
 
           <!-- View 3: Teoria Clássica -->
-          <div id="view-theory" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto;">
+          <div id="view-theory" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y;">
             <div class="theory-card">
               <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 6px;">Os 7 Passos Clássicos do Lugar Geométrico das Raízes (LGR)</h4>
               <div class="theory-list" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8125rem;">

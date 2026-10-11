@@ -3489,7 +3489,7 @@ textarea::placeholder {
 .memorial-sidebar-content {
   flex: 1 1 0px;
   min-height: 0;
-  height: 0;
+  height: auto;
   overflow-y: auto !important;
   overflow-x: hidden;
   padding: 20px 22px 48px;
@@ -4016,7 +4016,6 @@ textarea::placeholder {
     min-height: 70vh;
   }
 
-  .view-panel,
   .plot-card {
     height: auto;
     overflow: visible;
@@ -8737,28 +8736,162 @@ body.in-scientific .global-navbar {
 
 /* ==========================================================================
    SCROLL POR TOQUE EM LGR E ESTABILIDADE (celular/tablet <= 1000px)
-   A regra global "#page-lgr.active, #page-routh.active" fixa a página em
-   100dvh com overflow hidden e anulava o layout em fluxo dos breakpoints
-   móveis. Aqui a própria página vira o contêiner rolável (desktop > 1000px
-   permanece intacto).
+   Mantém a casca (.sci-shell) estruturada com cabeçalho/abas fixos e garante
+   que os painéis internos (.sci-panel-params, .sci-panel-results, e no painel
+   de figura o #view-memorial e #view-theory) tenham altura definida,
+   rolagem nativa por toque e overflow-y: auto.
+   Desktop (> 1000px) permanece 100% intacto.
    ========================================================================== */
 @media (max-width: 1000px) {
   #page-lgr.active,
   #page-routh.active {
-    display: block;
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    touch-action: pan-y;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
   }
 
-  #page-lgr.active .app-container,
-  #page-routh.active .routh-workspace-container {
-    height: auto;
-    min-height: 0;
-    overflow: visible;
+  #page-lgr.active .scientific-workspace,
+  #page-routh.active .scientific-workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
   }
+
+  /* Painel de Parâmetros e Resultados */
+  #page-lgr.active .sci-panel-params,
+  #page-lgr.active .sci-panel-results,
+  #page-routh.active .sci-panel-params,
+  #page-routh.active .sci-panel-results {
+    display: flex;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #page-lgr.active .sci-panel-params .sci-panel-body,
+  #page-lgr.active .sci-panel-results .sci-panel-body,
+  #page-routh.active .sci-panel-params .sci-panel-body,
+  #page-routh.active .sci-panel-results .sci-panel-body {
+    flex: 1 1 0px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    padding-bottom: calc(1rem + var(--sab)) !important;
+  }
+
+  /* Painel de Figura (Centro) */
+  #page-lgr.active .sci-panel-plot,
+  #page-routh.active .sci-panel-plot {
+    display: flex;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #page-lgr.active .sci-plot-viewport,
+  #page-routh.active .sci-plot-viewport {
+    flex: 1 1 0px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  /* View 2: Memorial dos 7 Passos e View 3: Teoria Clássica */
+  #page-lgr #view-memorial,
+  #page-lgr #view-theory {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    flex: 1 1 0px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    box-sizing: border-box !important;
+    padding: 10px 10px calc(28px + var(--sab)) 10px !important;
+  }
+
+  #page-lgr #view-memorial.active,
+  #page-lgr #view-theory.active {
+    display: block !important;
+  }
+
+  #page-lgr #view-memorial .steps-grid,
+  #page-lgr #view-memorial .step-card,
+  #page-lgr #view-memorial .step-card-header,
+  #page-lgr #view-memorial .step-card-body,
+  #page-lgr #view-memorial .step-item-box,
+  #page-lgr #view-theory .theory-card,
+  #page-lgr #view-theory .theory-list,
+  #page-lgr #view-theory .theory-item {
+    touch-action: pan-y !important;
+  }
+
+  /* Sidebar Lateral de Deduções Passo a Passo */
+  .memorial-sidebar {
+    height: 100dvh !important;
+  }
+
+  .memorial-sidebar-content {
+    flex: 1 1 0px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    padding-bottom: calc(36px + var(--sab)) !important;
+  }
+
+  .memorial-sidebar-content * {
+    touch-action: pan-y !important;
+  }
+
+  /* Contêiner de Resultados do Switcher Tablet */
+  .sci-tablet-results-container {
+    flex: 1 1 0px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    padding: 0.5rem !important;
+    padding-bottom: calc(1rem + var(--sab)) !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Nos smartphones (< 600px), alternar painel pela aba ativa */
+@media (max-width: 599.98px) {
+  .sci-shell[data-active-tab="params"] .sci-panel-params { display: flex !important; }
+  .sci-shell[data-active-tab="params"] .sci-panel-plot { display: none !important; }
+  .sci-shell[data-active-tab="params"] .sci-panel-results { display: none !important; }
+
+  .sci-shell[data-active-tab="plot"] .sci-panel-params { display: none !important; }
+  .sci-shell[data-active-tab="plot"] .sci-panel-plot { display: flex !important; }
+  .sci-shell[data-active-tab="plot"] .sci-panel-results { display: none !important; }
+
+  .sci-shell[data-active-tab="results"] .sci-panel-params { display: none !important; }
+  .sci-shell[data-active-tab="results"] .sci-panel-plot { display: none !important; }
+  .sci-shell[data-active-tab="results"] .sci-panel-results { display: flex !important; }
 }
