@@ -171,6 +171,14 @@ def _transfer_details(system):
     if system.ninputs == 1 and system.noutputs == 1:
         num = np.asarray(ct.tfdata(transfer)[0][0][0], dtype=float)
         den = np.asarray(ct.tfdata(transfer)[1][0][0], dtype=float)
+        num = np.where(np.abs(num) < 1e-9, 0.0, num)
+        den = np.where(np.abs(den) < 1e-9, 0.0, den)
+        num = np.trim_zeros(num, "f")
+        if len(num) == 0:
+            num = np.array([0.0])
+        den = np.trim_zeros(den, "f")
+        if len(den) == 0:
+            den = np.array([1.0])
         num_out, den_out, latex_expanded, latex_factored = format_transfer_function(num.tolist(), den.tolist())
         return {
             "siso": True,

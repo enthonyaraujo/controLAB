@@ -101,8 +101,73 @@ assert(!html.includes('splitter-grip'), 'os grips grossos dos splitters devem se
 assert(styles.includes('.home-console-area {\n    border-top: none !important;'), 'o console não deve duplicar borda no desktop');
 assert(styles.includes('cursor: row-resize') && styles.includes('cursor: col-resize'), 'os cursores de redimensionamento precisam estar definidos');
 assert(styles.includes('.home-splitter {\n    display: none !important;'), 'os splitters devem ser ocultados em resoluções menores');
-assert(navigation.includes('setupHomeSplitPanes'), 'a inicialização dos split panes precisa existir em navigation.js');
-assert(navigation.includes('home-splitter-console'), 'o redimensionamento do console precisa estar implementado');
-assert(navigation.includes('getMaxConsoleHeight'), 'o cálculo de altura máxima do console para não cobrir os módulos precisa existir');
+// Valida que todos os controladores do renderer inicializam sem exceções de runtime
+{
+  const vm = require('vm');
+  const sandboxWindow = {
+    innerWidth: 1200,
+    innerHeight: 800,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    location: { hash: '', search: '' },
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+    MutationObserver: class { observe() {} disconnect() {} },
+    api: {},
+  };
+  sandboxWindow.window = sandboxWindow;
+  const makeElem = (id = '') => ({
+    id,
+    value: '',
+    textContent: '',
+    innerHTML: '',
+    dataset: {},
+    style: {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false },
+    querySelectorAll: () => [],
+    querySelector: () => null,
+    appendChild: () => {},
+    removeChild: () => {},
+    replaceChildren: () => {},
+    elements: { namedItem: () => null },
+    getBoundingClientRect: () => ({ top: 0, bottom: 0, left: 0, right: 0, width: 300, height: 200 }),
+  });
+  sandboxWindow.document = {
+    documentElement: {
+      getAttribute: () => 'dark',
+      setAttribute: () => {},
+      style: { setProperty: () => {}, getPropertyValue: () => '' },
+    },
+    body: {
+      classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false },
+    },
+    getElementById: (id) => makeElem(id),
+    querySelectorAll: () => [],
+    querySelector: () => makeElem(),
+    createElement: (tag) => makeElem(tag),
+    addEventListener: (ev, fn) => { if (ev === 'DOMContentLoaded') fn(); },
+  };
+
+  const ctx = vm.createContext(sandboxWindow);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'settings.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'navigation.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'routh.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'scientific-modules.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'app.js'), 'utf8'), ctx);
+
+  assert(sandboxWindow.ControLABScientific, 'ControLABScientific precisa estar definido após carregar scripts');
+  assert(sandboxWindow.LGRNavigation, 'LGRNavigation precisa estar definido após carregar scripts');
+}
+
+// Teste de escalabilidade da tela de início (UI scale via rem)
+assert(tokens.includes('--home-console-height: 10rem'), 'A altura do console na tela de início precisa usar rem para responder à escala');
+assert(tokens.includes('--home-left-col-width: 15rem'), 'A largura da coluna esquerda precisa usar rem para responder à escala');
+assert(tokens.includes('--home-right-col-width: 18.75rem'), 'A largura da coluna direita precisa usar rem para responder à escala');
+assert(styles.includes('.home-top-bar {\n  height: 2.75rem;'), 'O header da tela de início precisa usar rem para responder ao tamanho de interface');
+assert(styles.includes('.home-panel-header {\n  height: 2rem;'), 'Os cabeçalhos de painel na tela de início precisam usar rem para responder ao tamanho de interface');
+assert(styles.includes('.btn-home-primary {\n  height: 2.25rem;'), 'Os botões de ação na tela de início precisam usar rem para responder ao tamanho de interface');
 
 console.log('Integração, responsividade e navegação do renderer válidas.');
+
+

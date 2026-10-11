@@ -694,17 +694,14 @@
             const centerCol = document.querySelector('.home-center-col');
 
             if (modGrid && centerCol) {
-              const centerScroll = centerCol.scrollTop || 0;
-              const modRect = modGrid.getBoundingClientRect();
-              if (modRect.height > 0) {
-                const modBottomInMain = (modRect.bottom - mainRect.top) + centerScroll;
-                const buffer = 16;
-                const maxH = mainRect.height - modBottomInMain - buffer;
-                return Math.max(70, Math.floor(maxH));
+              const gridRect = modGrid.getBoundingClientRect();
+              if (gridRect.bottom > 0 && mainRect.bottom > 0) {
+                const spaceBelow = mainRect.bottom - gridRect.bottom - 16;
+                return Math.max(70, Math.floor(spaceBelow));
               }
             }
 
-            return Math.max(70, Math.floor(mainRect.height - 420));
+            return Math.max(70, Math.floor((mainRect.height || 600) - 400));
           }
 
           // Recupera tamanhos salvos no localStorage (usados apenas no desktop)
@@ -714,9 +711,6 @@
             if (savedConsoleH && savedConsoleH >= 70) {
               const clampedH = Math.min(savedConsoleH, maxAllowedH);
               document.documentElement.style.setProperty('--home-console-height', `${clampedH}px`);
-            } else {
-              const defaultH = Math.min(160, maxAllowedH);
-              document.documentElement.style.setProperty('--home-console-height', `${defaultH}px`);
             }
             const savedLeftW = parseInt(localStorage.getItem('controlab_desktop_left_col_width'), 10);
             if (savedLeftW && savedLeftW >= 140 && savedLeftW <= 450) {
@@ -737,8 +731,13 @@
 
             function onPointerMove(e) {
               if (!isDragging) return;
-              const deltaY = startY - e.clientY;
-              const newH = Math.min(Math.max(70, startHeight + deltaY), cachedMaxH);
+              const mainRect = homeMainContent.getBoundingClientRect();
+              const modGrid = optionalElement('home-modules-grid');
+              const minAllowedY = (modGrid && modGrid.getBoundingClientRect().bottom > 0)
+                ? (modGrid.getBoundingClientRect().bottom + 16)
+                : (mainRect.top + 380);
+              const clampedY = Math.max(minAllowedY, e.clientY);
+              const newH = Math.max(70, Math.min(mainRect.bottom - clampedY, mainRect.height - 100));
               document.documentElement.style.setProperty('--home-console-height', `${Math.round(newH)}px`);
             }
 
@@ -773,9 +772,7 @@
 
             splitterConsole.addEventListener('dblclick', () => {
               if (!isDesktop()) return;
-              const maxAllowedH = getMaxConsoleHeight();
-              const defaultH = Math.min(160, maxAllowedH);
-              document.documentElement.style.setProperty('--home-console-height', `${defaultH}px`);
+              document.documentElement.style.removeProperty('--home-console-height');
               try { localStorage.removeItem('controlab_desktop_console_height'); } catch {}
               showToast('Console redefinido para a altura padrão.', 'info', 1500);
             });
@@ -842,7 +839,7 @@
 
             splitterLeft.addEventListener('dblclick', () => {
               if (!isDesktop()) return;
-              document.documentElement.style.setProperty('--home-left-col-width', '240px');
+              document.documentElement.style.removeProperty('--home-left-col-width');
               try { localStorage.removeItem('controlab_desktop_left_col_width'); } catch {}
               showToast('Coluna esquerda redefinida.', 'info', 1500);
             });
@@ -908,7 +905,7 @@
 
             splitterRight.addEventListener('dblclick', () => {
               if (!isDesktop()) return;
-              document.documentElement.style.setProperty('--home-right-col-width', '300px');
+              document.documentElement.style.removeProperty('--home-right-col-width');
               try { localStorage.removeItem('controlab_desktop_right_col_width'); } catch {}
               showToast('Coluna direita redefinida.', 'info', 1500);
             });
