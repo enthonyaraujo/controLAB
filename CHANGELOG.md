@@ -3,6 +3,17 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.0.3] - 2026-10-11
+
+### Corrigido
+- **Eliminação do Erro `KeyError: 500` no Android (Módulos Científicos):**
+  - Ajuste tipográfico em `plot_theme.py`: rótulos dos eixos passaram de `"500"` para `"medium"`. No Matplotlib 3.6.0 do Android (Chaquopy), `backend_svg.py` executava `fm.weight_dict[prop.get_weight()]` sem tolerar o inteiro `500` gerado por textos não-matemáticos (sem `$`), disparando `KeyError: 500` ao exportar SVG.
+  - Blindagem do `matplotlib.font_manager.weight_dict` com `_SafeWeightDict` e pré-população de inteiros de 0 a 1000 em `plot_theme.py` e `android_bridge.py`, prevenindo falhas futuras com pesos numéricos no Android.
+  - Adicionado log detalhado com `traceback.print_exc()` no motor nativo da bridge Android.
+  - Criada nova suíte de testes unitários de compatibilidade tipográfica em `tests/test_font_compat.py`.
+
+---
+
 ## [4.0.2] - 2026-10-11
 
 ### Corrigido
