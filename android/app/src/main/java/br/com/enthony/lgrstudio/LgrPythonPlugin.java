@@ -56,7 +56,7 @@ public class LgrPythonPlugin extends Plugin {
             PyObject result = module.callAttr("dispatch_json", payload.toString());
             call.resolve(new JSObject(result.toString()));
         } catch (Exception error) {
-            call.reject("Falha no motor Python do LGR", error);
+            call.reject("Falha no motor Python: " + error.getMessage(), error);
         }
     }
 

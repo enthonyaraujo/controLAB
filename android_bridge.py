@@ -19,10 +19,47 @@ os.environ.setdefault("MPLCONFIGDIR", str(cache_root / "matplotlib"))
 from python_bridge import dispatch  # noqa: E402
 
 
+def _json_safe(value):
+    """Converte a resposta em JSON estrito.
+
+    O org.json do Android lança JSONException para NaN/Infinity e o json do
+    Python não serializa tipos NumPy; ambos derrubavam o cálculo no celular.
+    """
+    import math
+
+    import numpy as np
+
+    if value is None or isinstance(value, (bool, str)):
+        return value
+    if isinstance(value, (np.bool_,)):
+        return bool(value)
+    if isinstance(value, (int, np.integer)):
+        return int(value)
+    if isinstance(value, (float, np.floating)):
+        number = float(value)
+        if math.isnan(number):
+            return None
+        if math.isinf(number):
+            return "∞" if number > 0 else "-∞"
+        return number
+    if isinstance(value, (complex, np.complexfloating)):
+        return {"re": _json_safe(value.real), "im": _json_safe(value.imag)}
+    if isinstance(value, np.ndarray):
+        return [_json_safe(item) for item in value.tolist()]
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_json_safe(item) for item in value]
+    return str(value)
+
+
 def dispatch_json(payload_json):
     """Recebe e devolve JSON para evitar conversões ambíguas entre Java e Python."""
     try:
         result = dispatch(json.loads(str(payload_json)))
     except Exception as exc:
-        result = {"success": False, "error": str(exc)}
-    return json.dumps(result)
+        result = {"success": False, "error": f"{type(exc).__name__}: {exc}"}
+    try:
+        return json.dumps(_json_safe(result), allow_nan=False)
+    except Exception as exc:
+        return json.dumps({"success": False, "error": f"Falha ao serializar resultado: {exc}"})
