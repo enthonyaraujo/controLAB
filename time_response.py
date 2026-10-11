@@ -145,6 +145,23 @@ def _plot_step(time, output, metrics, tokens, theme, figsize=(9.2, 5.2), dpi=140
     ax.plot(time, output, color=accent, linewidth=2.0, label="Resposta ao degrau y(t)")
 
     final_val = metrics.get("final_value")
+    peak_val = metrics.get("peak_value")
+
+    # Ajusta limites para garantir que Mp e o valor final tenham espaço amplo e nunca fiquem cortados
+    y_max_data = float(np.max(output)) if len(output) else 1.0
+    if peak_val is not None and math.isfinite(peak_val):
+        y_max_data = max(y_max_data, float(peak_val))
+    if final_val is not None and math.isfinite(final_val):
+        y_max_data = max(y_max_data, float(final_val))
+    y_min_data = float(np.min(output)) if len(output) else 0.0
+    y_range = max(1e-3, y_max_data - y_min_data)
+    ax.set_ylim(min(0.0, y_min_data - 0.04 * y_range), y_max_data + 0.20 * y_range)
+
+    t_start = float(time[0]) if len(time) else 0.0
+    t_end = float(time[-1]) if len(time) else 1.0
+    t_range = max(1e-3, t_end - t_start)
+    ax.set_xlim(t_start, t_end + 0.09 * t_range)
+
     if final_val is not None and math.isfinite(final_val):
         ax.axhline(final_val, color=ref_color, linestyle="--", linewidth=1.2, alpha=0.85)
         ax.annotate(
@@ -157,6 +174,7 @@ def _plot_step(time, output, metrics, tokens, theme, figsize=(9.2, 5.2), dpi=140
             color=tokens["text_secondary"],
             fontsize=10,
             fontfamily=mono_font,
+            clip_on=False,
         )
 
     peak_val = metrics.get("peak_value")
@@ -175,6 +193,7 @@ def _plot_step(time, output, metrics, tokens, theme, figsize=(9.2, 5.2), dpi=140
             fontsize=10,
             fontweight="bold",
             fontfamily=mono_font,
+            clip_on=False,
         )
 
     ax.set_xlabel("Tempo (s)")

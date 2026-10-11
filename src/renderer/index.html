@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="appearance.js"></script>
 </head>
-<body>
+<body class="in-scientific">
   <!-- ========================================================= -->
   <!-- DEFINIÇÕES DE SÍMBOLOS SVG DOS MÓDULOS CIENTÍFICOS        -->
   <!-- ========================================================= -->
@@ -95,7 +95,9 @@
         <button type="button" class="home-tab" data-home-tab="ajuda">AJUDA</button>
       </nav>
       <div class="home-top-actions">
-        <button type="button" class="btn-top-settings" data-action="settings">Configurações</button>
+        <button type="button" class="btn-top-settings" data-action="settings" title="Configurações" aria-label="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
       </div>
     </header>
 
@@ -190,7 +192,6 @@
                       <span class="title-full">Sistemas de controle</span>
                       <span class="title-mobile">Controle</span>
                     </h3>
-                    <span class="mod-badge">control</span>
                   </div>
                   <p class="mod-card-desc">
                     <span class="desc-full">Resposta no tempo, LGR, Bode, PID e espaço de estados.</span>
@@ -205,7 +206,6 @@
                       <span class="title-full">Sinais e filtros</span>
                       <span class="title-mobile">Sinais</span>
                     </h3>
-                    <span class="mod-badge">signal</span>
                   </div>
                   <p class="mod-card-desc">
                     <span class="desc-full">FFT, espectros e projeto de filtros.</span>
@@ -217,7 +217,6 @@
                 <div class="home-module-card" id="card-mod-optim" data-module="Otimização" role="button" tabindex="0">
                   <div class="mod-card-header">
                     <h3 class="mod-card-title">Otimização</h3>
-                    <span class="mod-badge">optim</span>
                   </div>
                   <p class="mod-card-desc">
                     <span class="desc-full">Mínimos quadrados, raízes e programação linear.</span>
@@ -229,7 +228,6 @@
                 <div class="home-module-card" id="card-mod-linalg" data-module="Álgebra linear" role="button" tabindex="0">
                   <div class="mod-card-header">
                     <h3 class="mod-card-title">Álgebra linear</h3>
-                    <span class="mod-badge">linalg</span>
                   </div>
                   <p class="mod-card-desc">
                     <span class="desc-full">Matrizes, autovalores, decomposições e sistemas lineares.</span>
@@ -241,7 +239,6 @@
                 <div class="home-module-card is-extra-mobile" id="card-mod-diffeq" data-module="Equações diferenciais" role="button" tabindex="0">
                   <div class="mod-card-header">
                     <h3 class="mod-card-title">Equações diferenciais</h3>
-                    <span class="mod-badge">ode</span>
                   </div>
                   <p class="mod-card-desc">Integradores para sistemas rígidos e não rígidos.</p>
                 </div>
@@ -250,7 +247,6 @@
                 <div class="home-module-card mod-card-dev is-extra-mobile" id="card-mod-blocks" data-module="Diagrama de blocos" role="button" tabindex="0">
                   <div class="mod-card-header">
                     <h3 class="mod-card-title">Diagrama de blocos</h3>
-                    <span class="mod-badge">blocos</span>
                   </div>
                   <p class="mod-card-desc">Modelagem e simulação por blocos. Em desenvolvimento.</p>
                 </div>
@@ -445,13 +441,6 @@
       <aside class="sci-panel sci-panel-params">
         <div class="sci-panel-header"><span>Parâmetros</span></div>
         <div class="sci-panel-body">
-          <div class="input-mode-tabs" style="display: flex; gap: 2px; margin-bottom: 6px;">
-            <button class="mode-tab active" data-mode="expr" type="button">Expressão</button>
-            <button class="mode-tab" data-mode="parts" type="button">Fração</button>
-            <button class="mode-tab" data-mode="coeffs" type="button">Coefs</button>
-            <button class="mode-tab" data-mode="zpk" type="button">Polos/Zeros</button>
-          </div>
-
           <div class="form-container">
             <div id="form-expr" class="form-panel active">
               <label for="input-expr" class="form-label">Função de Transferência G(s):</label>
@@ -514,6 +503,8 @@
           </div>
         </div>
       </aside>
+
+      <div class="sci-split-handle" data-split="left" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar painel"></div>
 
       <!-- Painel 2: Figura (Centro) -->
       <main class="sci-panel sci-panel-plot">
@@ -580,7 +571,7 @@
           <div id="view-memorial" class="view-panel" style="display: none; width: 100%; height: 100%; padding: 8px; overflow-y: auto;">
             <div class="memorial-toolbar" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span class="toolbar-badge" style="font-size: 0.8125rem; font-weight: 500;">7 Passos Clássicos de Evans</span>
-              <button id="btn-toggle-deductions" class="sci-btn-mini" type="button">Deduções detalhadas →</button>
+              <button id="btn-toggle-deductions" class="sci-btn-mini btn-toggle-deductions" type="button">Deduções detalhadas →</button>
             </div>
             <div id="memorial-empty-state" class="routh-empty-card" style="display: flex; margin: auto; max-width: 440px; text-align: center;">
               <p>Nenhum memorial calculado ainda. Insira a função de transferência e clique em <b>Calcular</b>.</p>
@@ -611,24 +602,10 @@
           </div>
         </div>
 
-        <!-- Faixa Fixa 3 Métricas no Tablet -->
-        <div class="tablet-metrics-bar" id="lgr-tablet-metrics">
-          <div class="t-metric-col">
-            <span class="t-metric-label">Polos</span>
-            <b class="t-metric-val" id="lgr-tab-poles">—</b>
-          </div>
-          <div class="t-metric-col">
-            <span class="t-metric-label">Zeros</span>
-            <b class="t-metric-val" id="lgr-tab-zeros">—</b>
-          </div>
-          <div class="t-metric-col">
-            <span class="t-metric-label">Ramos</span>
-            <b class="t-metric-val" id="lgr-tab-branches">—</b>
-          </div>
-        </div>
-
         <div class="sci-tablet-results-container" id="lgr-tablet-results-container" style="display: none;"></div>
       </main>
+
+      <div class="sci-split-handle" data-split="right" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar painel"></div>
 
       <!-- Painel 3: Resultados -->
       <aside class="sci-panel sci-panel-results" id="lgr-panel-results">
@@ -649,15 +626,9 @@
       </aside>
     </div>
 
-    <!-- Console / Log -->
-    <div class="sci-console" id="lgr-console">
-      <span class="sci-console-line" id="lgr-console-line">&gt;&gt; rlocus(tf([1 2], [1 5 4 0]))</span>
-    </div>
-
     <!-- Barra de Status -->
     <footer class="sci-status-bar">
-      <span id="lgr-status-state">Pronto</span>
-      <span>Módulo: Lugar Geométrico das Raízes • Solver: python-control</span>
+      <span style="margin-left: auto;">Módulo: Lugar Geométrico das Raízes • Solver: python-control</span>
     </footer>
 
     <!-- Botão de Ação no Rodapé para Celular -->
@@ -789,6 +760,8 @@
         </div>
       </aside>
 
+      <div class="sci-split-handle" data-split="left" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar painel"></div>
+
       <!-- Painel 2: Figura -->
       <main class="sci-panel sci-panel-plot">
         <!-- Switcher Tablet [ Figura | Resultados ] -->
@@ -833,24 +806,10 @@
           </div>
         </div>
 
-        <!-- Faixa Fixa 3 Métricas no Tablet -->
-        <div class="tablet-metrics-bar" id="routh-tablet-metrics">
-          <div class="t-metric-col">
-            <span class="t-metric-label">Grau</span>
-            <b class="t-metric-val" id="routh-tab-degree">Grau 3</b>
-          </div>
-          <div class="t-metric-col">
-            <span class="t-metric-label">Trocas Sinal</span>
-            <b class="t-metric-val" id="routh-tab-sign-changes">0 Trocas</b>
-          </div>
-          <div class="t-metric-col">
-            <span class="t-metric-label">Raízes SPD</span>
-            <b class="t-metric-val" id="routh-tab-rhp">0 SPD</b>
-          </div>
-        </div>
-
         <div class="sci-tablet-results-container" id="routh-tablet-results-container" style="display: none;"></div>
       </main>
+
+      <div class="sci-split-handle" data-split="right" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar painel"></div>
 
       <!-- Painel 3: Resultados (Smoke Test Assertion: class="routh-results-layout" style="display: none;") -->
       <aside class="sci-panel sci-panel-results">
@@ -928,11 +887,6 @@
           </div>
         </div>
       </aside>
-    </div>
-
-    <!-- Console / Log -->
-    <div class="sci-console" id="routh-console">
-      <span class="sci-console-line" id="routh-console-line">&gt;&gt; routh(s^3 + 3*s^2 + 2*s + K)</span>
     </div>
 
     <!-- Barra de Status -->
@@ -1152,6 +1106,8 @@
           </div>
         </aside>
 
+        <div class="sci-split-handle" data-split="left" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar painel"></div>
+
         <!-- Painel 2: Figura -->
         <main class="sci-panel sci-panel-plot" id="sci-panel-plot">
           <!-- Switcher de visualização no Tablet [ Figura | Resultados ] -->
@@ -1168,10 +1124,6 @@
                 <button type="button" class="tab-seg active" data-resp="step">Degrau</button>
                 <button type="button" class="tab-seg" data-resp="ramp">Rampa</button>
                 <button type="button" class="tab-seg" data-resp="impulse">Impulso</button>
-              </div>
-              <div id="scientific-status-chip" class="status-chip" style="display: none;">
-                <span class="status-dot"></span>
-                <span id="scientific-status-text">Estável</span>
               </div>
             </div>
           </div>
@@ -1200,25 +1152,10 @@
             </div>
           </div>
 
-          <!-- Faixa Fixa de 3 Métricas-Chave no Tablet -->
-          <div class="tablet-metrics-bar" id="tablet-metrics-bar">
-            <div class="t-metric-col">
-              <span class="t-metric-label">Sobress.</span>
-              <b class="t-metric-val" id="t-metric-mp">—</b>
-            </div>
-            <div class="t-metric-col">
-              <span class="t-metric-label">T. pico</span>
-              <b class="t-metric-val" id="t-metric-tp">—</b>
-            </div>
-            <div class="t-metric-col">
-              <span class="t-metric-label">T. acom.</span>
-              <b class="t-metric-val" id="t-metric-ts">—</b>
-            </div>
-          </div>
-
-          <!-- Container para alternar para visualização de resultados no Tablet -->
           <div class="sci-tablet-results-container" id="sci-tablet-results-container" style="display: none;"></div>
         </main>
+
+        <div class="sci-split-handle" data-split="right" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar painel"></div>
 
         <!-- Painel 3: Resultados -->
         <aside class="sci-panel sci-panel-results" id="sci-panel-results">
@@ -1238,6 +1175,9 @@
                 <tr><td>Estabilidade</td><td id="res-val-stab">—</td></tr>
               </tbody>
             </table>
+            <table class="results-table tb" id="scientific-general-results-table" style="display: none;">
+              <tbody></tbody>
+            </table>
 
             <!-- Elementos preservados para compatibilidade com testes e outros módulos -->
             <div id="scientific-primary-metrics" class="scientific-primary-grid" style="display: none;"></div>
@@ -1254,15 +1194,9 @@
 
       </div>
 
-      <!-- Console / Log de Execução -->
-      <div class="sci-console" id="sci-console">
-        <div class="sci-console-line" id="sci-console-text">&gt;&gt; step(G, 10)</div>
-      </div>
-
       <!-- Barra de Status -->
       <footer class="sci-status-bar" id="sci-status-bar">
-        <span class="sci-status-left" id="sci-status-state">Pronto</span>
-        <span class="sci-status-right" id="sci-status-meta">Módulo: Resposta no Tempo • Solver: scipy</span>
+        <span class="sci-status-right" id="sci-status-meta" style="margin-left: auto;">Módulo: Resposta no Tempo • Solver: scipy</span>
       </footer>
 
       <!-- Botão Calcular Fixo no Rodapé do Celular (< 600px) -->

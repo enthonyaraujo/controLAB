@@ -31,9 +31,9 @@
   /* =========================================================================
      SPLIT PANES (DESKTOP)
      ========================================================================= */
-  --home-console-height: 160px;
-  --home-left-col-width: 240px;
-  --home-right-col-width: 300px;
+  --home-console-height: 10rem;
+  --home-left-col-width: 15rem;
+  --home-right-col-width: 18.75rem;
 
   /* =========================================================================
      CORES: FUNDOS E SUPERFÍCIES (DARK)

@@ -193,8 +193,12 @@ def _root_locus_roots(system, gains):
 
 
 def _controller_latex(controller):
-    num = np.asarray(ct.tfdata(controller)[0][0][0], dtype=float).tolist()
-    den = np.asarray(ct.tfdata(controller)[1][0][0], dtype=float).tolist()
+    num = np.asarray(ct.tfdata(controller)[0][0][0], dtype=float)
+    den = np.asarray(ct.tfdata(controller)[1][0][0], dtype=float)
+    num = np.where(np.abs(num) < 1e-9, 0.0, num)
+    den = np.where(np.abs(den) < 1e-9, 0.0, den)
+    num = [float(f"{c:.4g}") for c in num]
+    den = [float(f"{c:.4g}") for c in den]
     _, _, latex_expanded, _ = format_transfer_function(num, den)
     return latex_expanded.replace("G(s) = ", "")
 

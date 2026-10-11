@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastCalculationKey = null;
   let lastPreviewKey = null;
   let pendingMemorial = null;
+  let lastMemorialData = null;
   let routhController = null;
   let scientificController = null;
 
@@ -103,13 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
   viewTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       viewTabs.forEach((t) => t.classList.remove('active'));
-      viewPanels.forEach((p) => p.classList.remove('active'));
+      viewPanels.forEach((p) => {
+        p.classList.remove('active');
+        p.style.display = 'none';
+      });
 
       tab.classList.add('active');
       const targetView = document.getElementById(`view-${tab.dataset.view}`);
       if (targetView) {
-        if (tab.dataset.view === 'memorial') ensureMemorial();
         targetView.classList.add('active');
+        targetView.style.display = (tab.dataset.view === 'plot') ? 'flex' : 'block';
+        if (tab.dataset.view === 'memorial') ensureMemorial();
         renderMathInContainer(targetView);
       }
       if (tab.dataset.view !== 'memorial') {
@@ -123,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chip.addEventListener('click', () => {
       inputExpr.value = chip.dataset.example;
       // Muda para aba de expressão se não estiver
-      document.querySelector('.mode-tab[data-mode="expr"]').click();
+      document.querySelector('.mode-tab[data-mode="expr"]')?.click();
       calculate();
     });
   });
@@ -250,7 +255,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 4. Preencher o Memorial de Cálculo dos 7 Passos e Deduções
       pendingMemorial = det;
-      if (document.getElementById('view-memorial').classList.contains('active')) ensureMemorial();
+      lastMemorialData = det;
+      ensureMemorial();
 
       const elapsed = ((now() - t0) / 1000).toFixed(3).replace('.', ',');
       const consoleLine = document.getElementById('lgr-console-line');
@@ -334,13 +340,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function ensureMemorial() {
-    if (!pendingMemorial) return;
+    const data = pendingMemorial || lastMemorialData;
+    if (!data) return;
     const emptyMemorial = document.getElementById('memorial-empty-state');
     if (emptyMemorial) emptyMemorial.style.display = 'none';
     const stepsGrid = document.querySelector('.steps-grid');
     if (stepsGrid) stepsGrid.style.display = 'flex';
-    populateMemorialSteps(pendingMemorial);
-    populateMemorialDeductions(pendingMemorial.passo_a_passo);
+    populateMemorialSteps(data);
+    populateMemorialDeductions(data.passo_a_passo);
+    lastMemorialData = data;
     pendingMemorial = null;
   }
 

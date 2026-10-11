@@ -543,7 +543,7 @@
 
     function resetResults(moduleKey) {
       const timeTable = element('time-results-table');
-      let generalTable = element('scientific-general-results-table');
+      let generalTable = document.querySelector('#sci-panel-results #scientific-general-results-table') || element('scientific-general-results-table');
 
       const timeKeys = ['res-val-mp', 'res-val-tp', 'res-val-tr', 'res-val-ts', 'res-val-yf', 'res-val-zeta', 'res-val-wn', 'res-val-stab'];
       timeKeys.forEach(id => {
@@ -588,7 +588,10 @@
       const allMetricsContainer = element('scientific-metrics');
       if (allMetricsContainer) allMetricsContainer.replaceChildren();
       const latexGrid = element('scientific-latex');
-      if (latexGrid) latexGrid.replaceChildren();
+      if (latexGrid) {
+        latexGrid.replaceChildren();
+        latexGrid.style.display = 'none';
+      }
       const detailsCard = element('scientific-details-card');
       if (detailsCard) detailsCard.hidden = true;
 
@@ -598,6 +601,7 @@
         const activeTable = moduleKey === 'time' ? timeTable : generalTable;
         if (activeTable) {
           const clone = activeTable.cloneNode(true);
+          clone.removeAttribute('id');
           clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
           tabletRes.appendChild(clone);
         }
@@ -720,24 +724,60 @@
     function renderResult(result) {
       currentResult = result;
       const config = MODULES[currentKey];
+      const meta = MODULE_METAS[currentKey] || {};
 
-      // 1. STATUS CHIP (Estável / Instável)
-      const statusChip = element('scientific-status-chip');
-      const statusText = element('scientific-status-text');
-      const isStable = result.details?.stable ?? (result.metrics?.find(m => m.label === 'Estabilidade')?.value === 'Estável');
-      if (statusChip && statusText) {
-        statusChip.className = `status-chip ${isStable ? 'status-stable' : 'status-unstable'}`;
-        statusText.textContent = isStable ? 'Estável' : 'Instável';
-        statusChip.style.display = 'inline-flex';
-      }
-
-      // 2. PLOT & TABS (Degrau / Rampa / Impulso para Resposta no Tempo)
+      // 1. PLOT & TABS (Degrau / Rampa / Impulso para Resposta no Tempo)
+      const resultsContainer = element('scientific-results');
       const plotCard = element('scientific-plot-card');
       const plot = element('scientific-plot');
       const plotTabs = element('scientific-plot-tabs');
       if (plotCard) plotCard.hidden = !result.image;
 
-      if (result.plots && currentKey === 'time') {
+      const plotKeys = (result.plots && typeof result.plots === 'object') ? Object.keys(result.plots) : [];
+      const hasMultiplePlots = plotKeys.length > 1;
+
+      if (hasMultiplePlots) {
+        if (resultsContainer) {
+          resultsContainer.replaceChildren();
+          resultsContainer.classList.add('multi-plots-scroll');
+
+          plotKeys.forEach((key, idx) => {
+            const p = result.plots[key];
+            if (!p || !p.image) return;
+
+            const card = document.createElement('section');
+            card.className = 'scientific-plot-card stacked-plot-card';
+            card.id = `plot-card-${key}`;
+
+            const header = document.createElement('div');
+            header.className = 'stacked-plot-header';
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'stacked-plot-title';
+            const titles = {
+              step: 'Figura 1 — Resposta ao degrau',
+              ramp: 'Figura 2 — Resposta à rampa',
+              impulse: 'Figura 3 — Resposta ao impulso',
+            };
+            titleSpan.textContent = p.title ? `Figura — ${p.title}` : (titles[key] || `Figura — ${key}`);
+            header.appendChild(titleSpan);
+            card.appendChild(header);
+
+            const body = document.createElement('div');
+            body.className = 'stacked-plot-body';
+            const img = document.createElement('img');
+            img.className = 'plot-img';
+            img.src = p.image;
+            img.alt = p.title || key;
+            if (idx === 0 || key === 'step') {
+              img.id = 'scientific-plot';
+            }
+            body.appendChild(img);
+            card.appendChild(body);
+
+            resultsContainer.appendChild(card);
+          });
+        }
+
         if (plotTabs) {
           plotTabs.style.display = 'inline-flex';
           plotTabs.querySelectorAll('.tab-seg').forEach((tab) => {
@@ -747,26 +787,46 @@
               currentResponseType = resp;
               plotTabs.querySelectorAll('.tab-seg').forEach(t => t.classList.remove('active'));
               tab.classList.add('active');
-              if (result.plots[resp]) {
-                plot.src = result.plots[resp].image;
+              const targetCard = element(`plot-card-${resp}`);
+              if (targetCard) {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
               }
               const figTitleEl = element('sci-figure-title');
               if (figTitleEl) {
-                const titles = { step: 'Figura 1 — Resposta ao degrau', ramp: 'Figura 1 — Resposta à rampa', impulse: 'Figura 1 — Resposta ao impulso' };
+                const titles = { step: 'Figura 1 — Resposta ao degrau', ramp: 'Figura 2 — Resposta à rampa', impulse: 'Figura 3 — Resposta ao impulso' };
                 figTitleEl.textContent = titles[resp] || 'Figura 1';
               }
             };
           });
         }
-        plot.src = result.plots[currentResponseType]?.image || result.image;
+
         const figTitleEl = element('sci-figure-title');
         if (figTitleEl) {
-          const titles = { step: 'Figura 1 — Resposta ao degrau', ramp: 'Figura 1 — Resposta à rampa', impulse: 'Figura 1 — Resposta ao impulso' };
-          figTitleEl.textContent = titles[currentResponseType] || 'Figura 1';
+          figTitleEl.textContent = 'Figuras — Resposta no tempo';
         }
       } else {
+        if (resultsContainer) {
+          resultsContainer.classList.remove('multi-plots-scroll');
+          if (!element('scientific-plot-card')) {
+            resultsContainer.replaceChildren();
+            const singleCard = document.createElement('section');
+            singleCard.id = 'scientific-plot-card';
+            singleCard.className = 'scientific-plot-card';
+            const singleImg = document.createElement('img');
+            singleImg.id = 'scientific-plot';
+            singleImg.className = 'plot-img';
+            singleImg.alt = 'Gráfico da resposta';
+            singleCard.appendChild(singleImg);
+            resultsContainer.appendChild(singleCard);
+          }
+          const pImg = element('scientific-plot');
+          if (pImg && result.image) pImg.src = result.image;
+        }
         if (plotTabs) plotTabs.style.display = 'none';
-        if (result.image) plot.src = result.image;
+        const figTitleEl = element('sci-figure-title');
+        if (figTitleEl) {
+          figTitleEl.textContent = meta.figureTitle || (result.title ? `Figura 1 — ${result.title}` : 'Figura 1');
+        }
       }
 
       if (element('btn-scientific-copy')) element('btn-scientific-copy').hidden = !result.image;
@@ -777,7 +837,7 @@
       function updateMetricsTable(res) {
         if (!res) return;
         const timeTable = element('time-results-table');
-        let generalTable = element('scientific-general-results-table');
+        let generalTable = document.querySelector('#sci-panel-results #scientific-general-results-table') || element('scientific-general-results-table');
 
         if (currentKey === 'time') {
           if (timeTable) timeTable.style.display = 'table';
@@ -821,6 +881,7 @@
           if (tabletRes && timeTable) {
             tabletRes.innerHTML = '';
             const clone = timeTable.cloneNode(true);
+            clone.removeAttribute('id');
             clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
             tabletRes.appendChild(clone);
           }
@@ -849,9 +910,13 @@
             }
             const tr = document.createElement('tr');
             const tdL = document.createElement('td');
+            tdL.className = 'metric-cell-label';
             tdL.textContent = m.label;
             const tdV = document.createElement('td');
-            tdV.textContent = `${formatDisplayNumber(m.value)}${m.unit ? ' ' + m.unit : ''}`;
+            tdV.className = 'metric-cell-value';
+            const valFormatted = `${formatDisplayNumber(m.value)}${m.unit ? ' ' + m.unit : ''}`;
+            tdV.textContent = valFormatted;
+            if (m.value != null) tdV.title = String(m.value);
             tr.appendChild(tdL);
             tr.appendChild(tdV);
             tbody.appendChild(tr);
@@ -871,6 +936,7 @@
           if (tabletRes) {
             tabletRes.innerHTML = '';
             const clone = generalTable.cloneNode(true);
+            clone.removeAttribute('id');
             clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
             tabletRes.appendChild(clone);
           }
@@ -889,13 +955,13 @@
       if (primaryContainer) primaryContainer.replaceChildren();
       if (allMetricsContainer) allMetricsContainer.replaceChildren();
 
-      const allMetrics = result.metrics || [];
+      const allMetrics = (result.metrics || []).filter((m) => m && !m.header && m.label);
       const primaryKeys = config?.primaryKeys || [];
       const primaryMetrics = [];
       const secondaryMetrics = [];
 
       allMetrics.forEach((metric) => {
-        const matchesPrimary = primaryKeys.some((k) => metric.label.toLowerCase().includes(k.toLowerCase()));
+        const matchesPrimary = metric.label && primaryKeys.some((k) => metric.label.toLowerCase().includes(k.toLowerCase()));
         if (matchesPrimary && primaryMetrics.length < 4) {
           primaryMetrics.push(metric);
         } else {
@@ -927,7 +993,16 @@
         primaryContainer?.appendChild(card);
       });
 
-      allMetrics.forEach((metric) => {
+      (result.metrics || []).forEach((metric) => {
+        if (!metric) return;
+        if (metric.header) {
+          const hdr = document.createElement('div');
+          hdr.className = 'submetric-header';
+          hdr.textContent = metric.header;
+          allMetricsContainer?.appendChild(hdr);
+          return;
+        }
+        if (!metric.label) return;
         const card = document.createElement('div');
         card.className = 'submetric-row';
         appendTextNode(card, 'span', 'submetric-label', metric.label);
@@ -940,16 +1015,29 @@
       const latexGrid = element('scientific-latex');
       if (latexGrid) {
         latexGrid.replaceChildren();
-        (result.latex || []).forEach((item) => {
-          const card = document.createElement('article');
-          card.className = 'scientific-latex-card';
-          appendTextNode(card, 'span', 'scientific-card-label', item.label || 'Equação');
-          const math = document.createElement('div');
-          math.className = 'scientific-math';
-          card.appendChild(math);
-          renderMath(math, item.value || '', true);
-          latexGrid.appendChild(card);
-        });
+        const latexItems = result.latex || [];
+        if (latexItems.length > 0) {
+          latexGrid.style.display = 'grid';
+          latexItems.forEach((item) => {
+            const card = document.createElement('article');
+            card.className = 'scientific-latex-card';
+            appendTextNode(card, 'span', 'scientific-card-label', item.label || 'Equação');
+            const math = document.createElement('div');
+            math.className = 'scientific-math';
+            card.appendChild(math);
+            renderMath(math, item.value || '', true);
+            latexGrid.appendChild(card);
+          });
+          const tabletRes = element('sci-tablet-results-container');
+          if (tabletRes) {
+            const latexClone = latexGrid.cloneNode(true);
+            latexClone.removeAttribute('id');
+            latexClone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+            tabletRes.appendChild(latexClone);
+          }
+        } else {
+          latexGrid.style.display = 'none';
+        }
       }
 
       // 5. DETALHES JSON
@@ -1238,6 +1326,144 @@
       }
     });
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    function setupScientificSplitPanes() {
+      const workspaces = document.querySelectorAll('.scientific-workspace');
+      if (!workspaces.length) return;
+
+      workspaces.forEach((ws) => {
+        const splitLeft = ws.querySelector('.sci-split-handle[data-split="left"]');
+        const splitRight = ws.querySelector('.sci-split-handle[data-split="right"]');
+        const paramsPanel = ws.querySelector('.sci-panel-params');
+        const resultsPanel = ws.querySelector('.sci-panel-results');
+
+        if (!splitLeft || !splitRight || !paramsPanel || !resultsPanel) return;
+
+        try {
+          if (window.innerWidth >= 1024) {
+            const savedParams = parseInt(localStorage.getItem('controlab_sci_params_width'), 10);
+            if (savedParams && savedParams >= 200 && savedParams <= 480) {
+              paramsPanel.style.width = `${savedParams}px`;
+              paramsPanel.style.flex = `0 0 ${savedParams}px`;
+            }
+            const savedResults = parseInt(localStorage.getItem('controlab_sci_results_width'), 10);
+            if (savedResults && savedResults >= 200 && savedResults <= 560) {
+              resultsPanel.style.width = `${savedResults}px`;
+              resultsPanel.style.flex = `0 0 ${savedResults}px`;
+            } else {
+              // Padrão de primeira execução: tamanho máximo/amplo (480px)
+              resultsPanel.style.width = '480px';
+              resultsPanel.style.flex = '0 0 480px';
+            }
+          }
+        } catch {}
+
+        // Splitter Esquerdo (Params <-> Plot)
+        let isDraggingLeft = false;
+
+        function onPointerMoveLeft(e) {
+          if (!isDraggingLeft) return;
+          const wsRect = ws.getBoundingClientRect();
+          const resultsW = resultsPanel.getBoundingClientRect().width;
+          const maxParamsW = Math.max(200, Math.floor(wsRect.width - resultsW - 300));
+          const desiredW = e.clientX - wsRect.left;
+          const clampedW = Math.max(200, Math.min(Math.min(480, maxParamsW), desiredW));
+          paramsPanel.style.width = `${Math.round(clampedW)}px`;
+          paramsPanel.style.flex = `0 0 ${Math.round(clampedW)}px`;
+        }
+
+        function onPointerUpLeft() {
+          if (!isDraggingLeft) return;
+          isDraggingLeft = false;
+          splitLeft.classList.remove('is-dragging');
+          document.body.classList.remove('is-resizing-splitter-v');
+          window.removeEventListener('pointermove', onPointerMoveLeft);
+          window.removeEventListener('pointerup', onPointerUpLeft);
+          window.removeEventListener('pointercancel', onPointerUpLeft);
+          try {
+            const finalW = parseInt(paramsPanel.style.width, 10);
+            if (finalW) localStorage.setItem('controlab_sci_params_width', String(finalW));
+          } catch {}
+        }
+
+        splitLeft.addEventListener('pointerdown', (e) => {
+          if (window.innerWidth < 1024 || e.button !== 0) return;
+          isDraggingLeft = true;
+          splitLeft.classList.add('is-dragging');
+          document.body.classList.add('is-resizing-splitter-v');
+          window.addEventListener('pointermove', onPointerMoveLeft);
+          window.addEventListener('pointerup', onPointerUpLeft);
+          window.addEventListener('pointercancel', onPointerUpLeft);
+          e.preventDefault();
+        });
+
+        splitLeft.addEventListener('dblclick', () => {
+          if (window.innerWidth < 1024) return;
+          paramsPanel.style.width = '';
+          paramsPanel.style.flex = '';
+          try { localStorage.removeItem('controlab_sci_params_width'); } catch {}
+        });
+
+        // Splitter Direito (Plot <-> Results)
+        let isDraggingRight = false;
+
+        function onPointerMoveRight(e) {
+          if (!isDraggingRight) return;
+          const wsRect = ws.getBoundingClientRect();
+          const paramsW = paramsPanel.getBoundingClientRect().width;
+          const maxResultsW = Math.max(200, Math.floor(wsRect.width - paramsW - 300));
+          const desiredW = wsRect.right - e.clientX;
+          const clampedW = Math.max(200, Math.min(Math.min(560, maxResultsW), desiredW));
+          resultsPanel.style.width = `${Math.round(clampedW)}px`;
+          resultsPanel.style.flex = `0 0 ${Math.round(clampedW)}px`;
+        }
+
+        function onPointerUpRight() {
+          if (!isDraggingRight) return;
+          isDraggingRight = false;
+          splitRight.classList.remove('is-dragging');
+          document.body.classList.remove('is-resizing-splitter-v');
+          window.removeEventListener('pointermove', onPointerMoveRight);
+          window.removeEventListener('pointerup', onPointerUpRight);
+          window.removeEventListener('pointercancel', onPointerUpRight);
+          try {
+            const finalW = parseInt(resultsPanel.style.width, 10);
+            if (finalW) localStorage.setItem('controlab_sci_results_width', String(finalW));
+          } catch {}
+        }
+
+        splitRight.addEventListener('pointerdown', (e) => {
+          if (window.innerWidth < 1024 || e.button !== 0) return;
+          isDraggingRight = true;
+          splitRight.classList.add('is-dragging');
+          document.body.classList.add('is-resizing-splitter-v');
+          window.addEventListener('pointermove', onPointerMoveRight);
+          window.addEventListener('pointerup', onPointerUpRight);
+          window.addEventListener('pointercancel', onPointerUpRight);
+          e.preventDefault();
+        });
+
+        splitRight.addEventListener('dblclick', () => {
+          if (window.innerWidth < 1024) return;
+          resultsPanel.style.width = '480px';
+          resultsPanel.style.flex = '0 0 480px';
+          try { localStorage.removeItem('controlab_sci_results_width'); } catch {}
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth < 1024) {
+          workspaces.forEach((ws) => {
+            const p = ws.querySelector('.sci-panel-params');
+            const r = ws.querySelector('.sci-panel-results');
+            if (p) { p.style.width = ''; p.style.flex = ''; }
+            if (r) { r.style.width = ''; r.style.flex = ''; }
+          });
+        }
+      });
+    }
+
+    setupScientificSplitPanes();
 
     function recalculate() {
       if (currentResult && element('page-scientific')?.classList.contains('active')) {
