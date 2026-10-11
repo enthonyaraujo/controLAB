@@ -62,6 +62,10 @@
     getRouthPresets: () => request('routh_presets'),
     evaluateRouthK: (payload) => request('routh_evaluate_k', payload),
     runScientificAnalysis: (action, payload) => request(action, payload),
+    consoleExec: (command) => request('console_exec', { command }),
+    getHomeState: (folder) => request('home_get_state', { folder }),
+    selectWorkspaceFolder: async () => ({ success: false, canceled: true }),
+    setWorkspaceFolder: async (folder) => ({ success: true, folder }),
     saveImage: async ({ base64, defaultName }) => {
       if (nativeLgr) {
         return nativeLgr.saveImage({ base64, defaultName: defaultName || 'lgr_grafico.png' });

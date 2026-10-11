@@ -104,6 +104,8 @@ def analyze_frequency_response(expression, *, omega_min=0.01, omega_max=100.0, p
     p_count = int(np.count_nonzero(np.real(open_poles) > 1e-8))
     z_count = int(np.count_nonzero(np.real(closed_poles) > 1e-8))
     n_count = z_count - p_count
+    closed_stable = bool(np.all(np.real(closed_poles) < -1e-9))
+    has_origin_pole = bool(np.any(np.abs(open_poles) < 1e-8))
 
     tokens = get_theme_tokens(theme)
     accent = tokens["accent"]
@@ -130,25 +132,88 @@ def analyze_frequency_response(expression, *, omega_min=0.01, omega_max=100.0, p
     ax_nyquist.scatter([-1], [0], marker="x", s=80, linewidths=2.2, color=danger_color, label="Ponto crítico (-1, 0)", zorder=5)
     ax_nyquist.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
     ax_nyquist.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)
+
+    # Identifica assíntota vertical quando há polo na origem e limita eixos inteligentemente
+    asymptote_re = None
+    if has_origin_pole:
+        asymptote_re = float(np.real(ct.evalfr(plant, 1e-6j)))
+        if math.isfinite(asymptote_re):
+            ax_nyquist.axvline(asymptote_re, color=ref_color, linestyle=":", linewidth=1.2, alpha=0.7, label=f"Assíntota Re ≈ {asymptote_re:.2f}")
+
+    re_vals = np.real(complex_response)
+    im_vals = np.imag(complex_response)
+    ref_x = [-1.0, 0.0]
+    if math.isfinite(gain_margin) and gain_margin > 0:
+        ref_x.append(-1.0 / gain_margin)
+    if asymptote_re is not None and math.isfinite(asymptote_re):
+        ref_x.append(asymptote_re)
+
+    finite_mask = (np.abs(complex_response) <= 8.0) & np.isfinite(re_vals) & np.isfinite(im_vals)
+    if np.any(finite_mask):
+        re_rel = re_vals[finite_mask]
+        im_rel = im_vals[finite_mask]
+        x_min = min(float(np.min(re_rel)), min(ref_x)) - 0.4
+        x_max = max(float(np.max(re_rel)), max(ref_x)) + 0.4
+        y_max = max(float(np.max(np.abs(im_rel))), 1.2) + 0.3
+    else:
+        x_min, x_max = -2.0, 1.0
+        y_max = 1.5
+
+    x_min = max(-50.0, min(-1.2, x_min))
+    x_max = min(50.0, max(0.5, x_max))
+    y_max = min(50.0, max(1.2, y_max))
+
+    # Limita proporção máxima para manter visualização sem esmagar
+    span_x = x_max - x_min
+    span_y = 2.0 * y_max
+    if span_x / span_y > 3.0:
+        y_max = span_x / 3.0
+    elif span_y / span_x > 3.0:
+        span = span_y / 3.0
+        mid = (x_max + x_min) / 2.0
+        x_min = mid - span / 2.0
+        x_max = mid + span / 2.0
+
+    ax_nyquist.set_xlim(x_min, x_max)
+    ax_nyquist.set_ylim(-y_max, y_max)
     ax_nyquist.set_xlabel("Parte real")
     ax_nyquist.set_ylabel("Parte imaginária")
     ax_nyquist.legend(loc="upper right")
-    ax_nyquist.set_aspect("equal", adjustable="datalim")
     fig.subplots_adjust(left=0.08, right=0.96, top=0.96, bottom=0.09, hspace=0.28, wspace=0.25)
     image, svg = figure_payload(fig, theme=theme)
 
+    # Separação nos grupos: Margens e Estimativas no tempo
     metrics = [
+        {"header": "Margens"},
+        {"label": "Estabilidade (malha fechada)", "value": "Estável" if closed_stable else "Instável"},
         {"label": "Margem de ganho (MG)", "value": _display(gain_margin_db), "unit": "dB"},
         {"label": "Cruzamento de fase (ωcf)", "value": _display(phase_cross), "unit": "rad/s"},
         {"label": "Margem de fase (MF)", "value": _display(phase_margin), "unit": "°"},
         {"label": "Cruzamento de ganho (ωcg)", "value": _display(gain_cross), "unit": "rad/s"},
-        {"label": "Largura de banda (ωBW)", "value": _display(bandwidth), "unit": "rad/s"},
-        {"label": "Pico de ressonância (Mr)", "value": _display(resonance_peak)},
-        {"label": "Frequência de ressonância", "value": _display(resonance_frequency), "unit": "rad/s"},
-        {"label": "Nyquist (Z = N + P)", "value": f"{z_count} = {n_count} + {p_count}"},
+        {"label": "Critério de Nyquist (Z = N + P)", "value": f"{z_count} = {n_count} + {p_count}"},
     ]
+    if has_origin_pole:
+        metrics.append({"label": "Observação", "value": "Malha aberta com polo na origem"})
+
+    # Estimativas no domínio do tempo (ocultas se não se aplicarem)
+    if closed_stable and 0 < phase_margin < 90:
+        zeta_est = phase_margin / 100.0
+        overshoot_est = math.exp(-math.pi * zeta_est / math.sqrt(1.0 - zeta_est**2)) * 100.0
+        metrics.append({"header": "Estimativas no tempo"})
+        metrics.append({"label": "Amortecimento estimado (ζ)", "value": _display(zeta_est)})
+        metrics.append({"label": "Sobressinal estimado (%OS)", "value": _display(overshoot_est), "unit": "%"})
+        if bandwidth is not None and math.isfinite(bandwidth) and bandwidth > 0:
+            metrics.append({"label": "Largura de banda (ωBW)", "value": _display(bandwidth), "unit": "rad/s"})
+            metrics.append({"label": "Tempo de subida estimado (tr)", "value": _display(1.8 / bandwidth), "unit": "s"})
+            metrics.append({"label": "Tempo de acomodação (ts, 2%)", "value": _display(4.0 / (zeta_est * bandwidth)), "unit": "s"})
+        if resonance_peak is not None and math.isfinite(resonance_peak):
+            metrics.append({"label": "Pico de ressonância (Mr)", "value": _display(resonance_peak)})
+            metrics.append({"label": "Frequência de ressonância", "value": _display(resonance_frequency), "unit": "rad/s"})
 
     details = {
+        "stable": closed_stable,
+        "has_origin_pole": has_origin_pole,
+        "asymptote_re": json_safe_number(asymptote_re),
         "gain_margin": json_safe_number(gain_margin),
         "gain_margin_db": json_safe_number(gain_margin_db),
         "phase_margin_deg": json_safe_number(phase_margin),

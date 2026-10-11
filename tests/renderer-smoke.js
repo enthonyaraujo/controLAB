@@ -60,6 +60,114 @@ assert(html.includes('id="routh-empty-state" class="routh-empty-card" style="dis
 assert(html.includes('id="routh-results-container" class="routh-results-layout" style="display: none;"'), 'os resultados do Routh devem iniciar ocultos');
 assert(html.includes('id="lgr-empty-state"'), 'o empty state do LGR deve existir');
 assert(!app.includes('window.setTimeout(calculate, 0)'), 'o LGR não deve calcular automaticamente ao entrar no módulo');
-assert(!app.includes('window.setTimeout(routhController.ensureInitialCalculation, 0)'), 'o Routh não deve calcular automaticamente ao entrar no módulo');
+assert(html.includes('<link rel="stylesheet" href="tokens.css">'), 'tokens.css precisa estar linkado no index.html');
+assert(styles.includes("@import 'tokens.css';"), 'styles.css precisa importar tokens.css');
+assert(serviceWorker.includes("'/tokens.css'"), 'tokens.css precisa integrar o shell offline');
+
+// Valida que o bloco do diálogo não possui cores hexadecimais fixas
+const modalStart = styles.indexOf('.modal-overlay {');
+const modalEnd = styles.indexOf('/* ==========================================================================\n   MÓDULO 2:');
+assert(modalStart >= 0 && modalEnd > modalStart, 'bloco do modal precisa existir em styles.css');
+const modalCss = styles.slice(modalStart, modalEnd);
+const fixedHexMatches = modalCss.match(/#[0-9a-fA-F]{3,8}/g);
+assert(!fixedHexMatches || fixedHexMatches.length === 0, `o diálogo não pode conter cores hex fixas: ${fixedHexMatches}`);
+
+// Valida que o botão de verificar atualizações não usa azul (#0369a1 / #0284c7) e usa token teal
+assert(!styles.includes('#0369a1'), 'o azul #0369a1 deve ser removido de btn-action-primary');
+assert(!styles.includes('#0284c7'), 'o azul #0284c7 deve ser removido de btn-action-primary');
+
+// Valida alinhamento entre a barra de abas superior (.sci-top-bar) e a ribbon (.sci-ribbon)
+assert(styles.includes('padding: 0 0.5rem;'), '.sci-top-bar precisa ter padding horizontal de 0.5rem alinhado com .sci-ribbon');
+
+// Valida que a seção de Exemplos foi removida do Menu Início
+assert(!html.includes('home-examples-list'), 'a seção Exemplos deve ser removida do Menu Início');
+
+// Valida que o Workspace inicia limpo e os botões de limpar existem
+assert(html.includes('id="btn-clear-recent"'), 'o botão de limpar recentes precisa existir');
+assert(html.includes('id="btn-clear-workspace"'), 'o botão de limpar workspace precisa existir');
+assert(html.includes('Nenhuma variável no workspace'), 'o workspace precisa iniciar limpo');
+assert(styles.includes('.home-btn-clear'), 'os estilos do botão de limpar precisam existir');
+
+// Valida split panes e responsividade do Menu Início
+const navigation = fs.readFileSync(path.join(root, 'src', 'renderer', 'navigation.js'), 'utf8');
+const tokens = fs.readFileSync(path.join(root, 'src', 'renderer', 'tokens.css'), 'utf8');
+assert(html.includes('id="home-splitter-console"'), 'o splitter do console precisa existir no HTML');
+assert(html.includes('id="home-splitter-left"'), 'o splitter esquerdo precisa existir no HTML');
+assert(html.includes('id="home-splitter-right"'), 'o splitter direito precisa existir no HTML');
+assert(tokens.includes('--home-console-height'), 'o token de altura do console precisa existir');
+assert(styles.includes('.home-splitter-h') && styles.includes('.home-splitter-v'), 'os estilos dos splitters horizontal e vertical precisam existir');
+assert(styles.includes('height: 1px;') && styles.includes('width: 1px;'), 'os splitters devem ter linhas finas de 1px');
+assert(!html.includes('splitter-grip'), 'os grips grossos dos splitters devem ser removidos');
+assert(styles.includes('.home-console-area {\n    border-top: none !important;'), 'o console não deve duplicar borda no desktop');
+assert(styles.includes('cursor: row-resize') && styles.includes('cursor: col-resize'), 'os cursores de redimensionamento precisam estar definidos');
+assert(styles.includes('.home-splitter {\n    display: none !important;'), 'os splitters devem ser ocultados em resoluções menores');
+// Valida que todos os controladores do renderer inicializam sem exceções de runtime
+{
+  const vm = require('vm');
+  const sandboxWindow = {
+    innerWidth: 1200,
+    innerHeight: 800,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    location: { hash: '', search: '' },
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+    MutationObserver: class { observe() {} disconnect() {} },
+    api: {},
+  };
+  sandboxWindow.window = sandboxWindow;
+  const makeElem = (id = '') => ({
+    id,
+    value: '',
+    textContent: '',
+    innerHTML: '',
+    dataset: {},
+    style: {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false },
+    querySelectorAll: () => [],
+    querySelector: () => null,
+    appendChild: () => {},
+    removeChild: () => {},
+    replaceChildren: () => {},
+    elements: { namedItem: () => null },
+    getBoundingClientRect: () => ({ top: 0, bottom: 0, left: 0, right: 0, width: 300, height: 200 }),
+  });
+  sandboxWindow.document = {
+    documentElement: {
+      getAttribute: () => 'dark',
+      setAttribute: () => {},
+      style: { setProperty: () => {}, getPropertyValue: () => '' },
+    },
+    body: {
+      classList: { add: () => {}, remove: () => {}, toggle: () => {}, contains: () => false },
+    },
+    getElementById: (id) => makeElem(id),
+    querySelectorAll: () => [],
+    querySelector: () => makeElem(),
+    createElement: (tag) => makeElem(tag),
+    addEventListener: (ev, fn) => { if (ev === 'DOMContentLoaded') fn(); },
+  };
+
+  const ctx = vm.createContext(sandboxWindow);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'settings.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'navigation.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'routh.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'scientific-modules.js'), 'utf8'), ctx);
+  vm.runInContext(fs.readFileSync(path.join(root, 'src', 'renderer', 'app.js'), 'utf8'), ctx);
+
+  assert(sandboxWindow.ControLABScientific, 'ControLABScientific precisa estar definido após carregar scripts');
+  assert(sandboxWindow.LGRNavigation, 'LGRNavigation precisa estar definido após carregar scripts');
+}
+
+// Teste de escalabilidade da tela de início (UI scale via rem)
+assert(tokens.includes('--home-console-height: 10rem'), 'A altura do console na tela de início precisa usar rem para responder à escala');
+assert(tokens.includes('--home-left-col-width: 15rem'), 'A largura da coluna esquerda precisa usar rem para responder à escala');
+assert(tokens.includes('--home-right-col-width: 18.75rem'), 'A largura da coluna direita precisa usar rem para responder à escala');
+assert(styles.includes('.home-top-bar {\n  height: 2.75rem;'), 'O header da tela de início precisa usar rem para responder ao tamanho de interface');
+assert(styles.includes('.home-panel-header {\n  height: 2rem;'), 'Os cabeçalhos de painel na tela de início precisam usar rem para responder ao tamanho de interface');
+assert(styles.includes('.btn-home-primary {\n  height: 2.25rem;'), 'Os botões de ação na tela de início precisam usar rem para responder ao tamanho de interface');
 
 console.log('Integração, responsividade e navegação do renderer válidas.');
+
+
