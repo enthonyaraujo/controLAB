@@ -5,6 +5,20 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [4.0.1] - 2026-10-11
+
+### Corrigido
+- **Áreas Seguras e Edge-to-Edge no Android (Capacitor):**
+  - Integração com o plugin Capacitor SystemBars (`insetsHandling = 'css'`) e variáveis `--sat`, `--sab`, `--sal`, `--sar` centralizadas para ajuste sob a barra de status e barra de navegação/gestos sem sobrepor o conteúdo.
+  - Correção do contraste de ícones das barras do sistema nos temas claro e escuro.
+  - Preservação exata de 100% das proporções, margens e paddings originais na versão desktop.
+- **Scroll por Toque no Android:**
+  - Remoção de regras restritivas de altura e flex-shrink em contêineres móveis, restaurando rolagem natural por toque com `touch-action: pan-y pan-x` e `-webkit-overflow-scrolling: touch` em todos os painéis e telas.
+- **Cálculo nos Módulos Científicos no Android:**
+  - Resolução robusta do plugin nativo `LgrPython` no Android WebView, impedindo fallback indevido para requisições HTTP (`fetch('/api')`) que causavam erro 500 no dispositivo móvel.
+
+---
+
 ## [4.0.0] - 2026-10-11
 
 ### Adicionado
