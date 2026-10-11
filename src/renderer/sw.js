@@ -1,10 +1,12 @@
-const CACHE_NAME = 'controlab-shell-v3.1.1-1';
+const CACHE_NAME = 'controlab-shell-v3.1.1-2';
 const SHELL_FILES = [
   '/',
   '/index.html',
+  '/tokens.css',
   '/styles.css',
   '/app.js',
   '/settings.js',
+  '/appearance.js',
   '/navigation.js',
   '/routh.js',
   '/scientific-modules.js',

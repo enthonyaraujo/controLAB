@@ -302,11 +302,17 @@
       performStartupUpdateCheck();
     });
 
+    let lastFocused = null;
+    const FOCUSABLE = 'button:not([disabled]), a[href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
     function openModal() {
       if (!modalSettings) return;
+      lastFocused = document.activeElement;
       modalSettings.classList.add('active');
       modalSettings.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      syncAppearanceControls();
+      (btnCloseSettings || modalSettings.querySelector(FOCUSABLE))?.focus();
     }
 
     function closeModal() {
@@ -314,7 +320,39 @@
       modalSettings.classList.remove('active');
       modalSettings.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
     }
+
+    // Aparência: tema e tamanho da interface (persistidos por appearance.js)
+    function syncAppearanceControls() {
+      const appearance = global.ControLABAppearance;
+      if (!appearance) return;
+      const themeValue = appearance.getTheme();
+      const scaleValue = String(appearance.getScale());
+      modalSettings?.querySelectorAll('[data-appearance-theme]').forEach((btn) => {
+        const active = btn.dataset.appearanceTheme === themeValue;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+      modalSettings?.querySelectorAll('[data-appearance-scale]').forEach((btn) => {
+        const active = btn.dataset.appearanceScale === scaleValue;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+    }
+
+    modalSettings?.querySelectorAll('[data-appearance-theme]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        global.ControLABAppearance?.setTheme(btn.dataset.appearanceTheme);
+        syncAppearanceControls();
+      });
+    });
+    modalSettings?.querySelectorAll('[data-appearance-scale]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        global.ControLABAppearance?.setScale(btn.dataset.appearanceScale);
+        syncAppearanceControls();
+      });
+    });
 
     btnOpenSettings?.addEventListener('click', openModal);
     btnCloseSettings?.addEventListener('click', closeModal);
@@ -326,8 +364,23 @@
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && modalSettings?.classList.contains('active')) {
+      if (!modalSettings?.classList.contains('active')) return;
+      if (event.key === 'Escape') {
         closeModal();
+        return;
+      }
+      if (event.key === 'Tab') {
+        const items = Array.from(modalSettings.querySelectorAll(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+        if (!items.length) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     });
 
@@ -671,5 +724,14 @@
     });
   }
 
-  global.ControLABSettings = Object.freeze({ initialize: initializeSettings });
+  let instance = null;
+  global.ControLABSettings = Object.freeze({
+    initialize(options) {
+      instance = initializeSettings(options);
+      return instance;
+    },
+    open() { instance?.open(); },
+    close() { instance?.close(); },
+  });
+
 }(window));
