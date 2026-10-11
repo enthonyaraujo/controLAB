@@ -285,7 +285,7 @@ ipcMain.handle('open-external', async (event, url) => {
 function getSystemInfo() {
   const platform = process.platform;
   const arch = process.arch;
-  const appVersion = app.getVersion() || '3.1.1';
+  const appVersion = app.getVersion() || '4.0.0';
 
   if (platform === 'win32') {
     return {
