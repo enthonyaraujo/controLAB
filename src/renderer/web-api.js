@@ -1,9 +1,20 @@
 (function configurePlatformApi() {
   if (window.api) return;
 
-  const nativeLgr = window.Capacitor?.isNativePlatform?.()
-    ? window.Capacitor.Plugins?.LgrPython
-    : null;
+  // No Android (Capacitor) os cálculos rodam no Python embarcado via plugin nativo.
+  // Resolve o plugin de forma robusta: Plugins.LgrPython pode não existir como proxy,
+  // então usa registerPlugin como alternativa. Sem isso o app cai no fetch('/api'),
+  // que não existe no WebView local e retorna HTTP 500.
+  function resolveNativeLgr() {
+    const cap = window.Capacitor;
+    if (!cap) return null;
+    const isNative = cap.isNativePlatform?.()
+      || (typeof cap.getPlatform === 'function' && cap.getPlatform() !== 'web');
+    if (!isNative) return null;
+    return cap.Plugins?.LgrPython || cap.registerPlugin?.('LgrPython') || null;
+  }
+  const nativeLgr = resolveNativeLgr();
+  const isCapacitorShell = Boolean(window.Capacitor?.isNativePlatform?.());
 
   async function readJsonResponse(response) {
     const body = await response.text();
@@ -19,6 +30,9 @@
     const mergedPayload = { theme: currentTheme, ...payload };
     if (nativeLgr) {
       return nativeLgr.dispatch({ payload: { action, ...mergedPayload } });
+    }
+    if (isCapacitorShell) {
+      throw new Error('Motor Python nativo indisponível no Android. Reinstale o aplicativo.');
     }
 
     const response = await fetch('/api', {
@@ -142,14 +156,14 @@
         }
       : undefined,
     getSystemInfo: async () => {
-      if (global.Capacitor?.isNativePlatform?.()) {
+      if (window.Capacitor?.isNativePlatform?.()) {
         return {
           os: 'android',
           osName: 'Android Nativo',
           packageType: 'apk',
           packageLabel: 'Android (.apk)',
           arch: 'arm64',
-          appVersion: '4.0.0',
+          appVersion: '4.0.1',
         };
       }
       const ua = (navigator.userAgent || '').toLowerCase();
@@ -160,7 +174,7 @@
           packageType: 'apk',
           packageLabel: 'Android (.apk)',
           arch: '',
-          appVersion: '4.0.0',
+          appVersion: '4.0.1',
         };
       }
       if (ua.includes('win')) {
@@ -170,7 +184,7 @@
           packageType: 'exe',
           packageLabel: 'Instalador Windows (.exe)',
           arch: 'x64',
-          appVersion: '4.0.0',
+          appVersion: '4.0.1',
         };
       }
       if (ua.includes('linux')) {
@@ -180,7 +194,7 @@
           packageType: 'deb',
           packageLabel: 'Debian / Ubuntu (.deb)',
           arch: 'x64',
-          appVersion: '4.0.0',
+          appVersion: '4.0.1',
         };
       }
       return {
@@ -189,7 +203,7 @@
         packageType: 'web',
         packageLabel: 'Web',
         arch: '',
-        appVersion: '4.0.0',
+        appVersion: '4.0.1',
       };
     },
   };

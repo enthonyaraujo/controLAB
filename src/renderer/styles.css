@@ -1178,7 +1178,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px));
+  padding: 0 calc(1.5rem + var(--sar)) 0 calc(1.5rem + var(--sal));
   z-index: 100;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -1588,7 +1588,7 @@ body {
   left: 0;
   right: 0;
   height: 3.5rem;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: var(--sab);
   background-color: var(--surface);
   border-top: 1px solid var(--border);
   align-items: center;
@@ -2146,7 +2146,7 @@ body.is-resizing-splitter-v {
 .home-console-area {
   height: var(--home-console-height, 10rem);
   min-height: 4.375rem;
-  max-height: calc(100vh - 10rem);
+  max-height: calc(100dvh - 10rem);
   background-color: var(--surface);
   border-top: 1px solid var(--border);
   display: flex;
@@ -2935,7 +2935,7 @@ textarea::placeholder {
 .equation-banner {
   background-color: var(--bg-sidebar);
   border-bottom: 1px solid var(--border-color);
-  padding: max(14px, calc(14px + env(safe-area-inset-top, 0px))) max(24px, env(safe-area-inset-right, 0px)) 14px max(24px, env(safe-area-inset-left, 0px));
+  padding: calc(14px + var(--sat)) calc(24px + var(--sar)) 14px calc(24px + var(--sal));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3401,7 +3401,7 @@ textarea::placeholder {
 
 .memorial-sidebar-header {
   flex-shrink: 0;
-  padding: max(16px, calc(16px + env(safe-area-inset-top, 0px))) 20px 16px;
+  padding: calc(16px + var(--sat)) calc(20px + var(--sar)) 16px 20px;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -3934,13 +3934,13 @@ textarea::placeholder {
 
   .app-page {
     height: auto;
-    min-height: calc(100vh - 54px);
+    min-height: calc(100dvh - 54px);
     overflow: visible;
   }
 
   #page-home {
     height: auto;
-    min-height: calc(100vh - 54px);
+    min-height: calc(100dvh - 54px);
     overflow: visible;
   }
 
@@ -3956,7 +3956,7 @@ textarea::placeholder {
 
   #page-lgr {
     height: auto;
-    min-height: calc(100vh - 54px);
+    min-height: calc(100dvh - 54px);
     overflow: visible;
   }
 
@@ -3985,7 +3985,7 @@ textarea::placeholder {
     bottom: 0;
     z-index: 30;
     background: var(--bg-sidebar);
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-bottom: calc(1rem + var(--sab));
   }
 
   .main-content {
@@ -4033,8 +4033,8 @@ textarea::placeholder {
 
 @media (max-width: 640px) {
   .global-navbar {
-    padding-left: max(12px, env(safe-area-inset-left, 0px));
-    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-left: calc(0.75rem + var(--sal));
+    padding-right: calc(0.75rem + var(--sar));
   }
 
   .hub-container {
@@ -4064,21 +4064,21 @@ textarea::placeholder {
   }
 
   .equation-banner {
-    padding-top: max(14px, calc(14px + env(safe-area-inset-top, 0px)));
-    padding-left: max(14px, env(safe-area-inset-left, 0px));
-    padding-right: max(14px, env(safe-area-inset-right, 0px));
+    padding-top: calc(14px + var(--sat));
+    padding-left: calc(14px + var(--sal));
+    padding-right: calc(14px + var(--sar));
   }
 
   .sidebar-content,
   .views-wrapper {
-    padding-left: max(14px, env(safe-area-inset-left, 0px));
-    padding-right: max(14px, env(safe-area-inset-right, 0px));
+    padding-left: calc(14px + var(--sal));
+    padding-right: calc(14px + var(--sar));
   }
 
   .sidebar-footer {
-    padding-left: max(14px, env(safe-area-inset-left, 0px));
-    padding-right: max(14px, env(safe-area-inset-right, 0px));
-    padding-bottom: max(16px, calc(16px + env(safe-area-inset-bottom, 0px)));
+    padding-left: calc(14px + var(--sal));
+    padding-right: calc(14px + var(--sar));
+    padding-bottom: calc(16px + var(--sab));
   }
 
   .input-mode-tabs {
@@ -4165,7 +4165,7 @@ textarea::placeholder {
 
   .toast {
     right: 14px;
-    bottom: max(14px, env(safe-area-inset-bottom));
+    bottom: calc(14px + var(--sab));
     left: 14px;
   }
 }
@@ -4194,7 +4194,7 @@ textarea::placeholder {
 /* Botão Flutuante de Retorno ao Topo no Mobile */
 .floating-top-btn {
   position: fixed;
-  bottom: max(20px, env(safe-area-inset-bottom));
+  bottom: calc(20px + var(--sab));
   right: 20px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -4249,11 +4249,7 @@ textarea::placeholder {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding:
-    max(16px, env(safe-area-inset-top, 0px))
-    max(16px, env(safe-area-inset-right, 0px))
-    max(16px, env(safe-area-inset-bottom, 0px))
-    max(16px, env(safe-area-inset-left, 0px));
+  padding: calc(1rem + var(--sat)) calc(1rem + var(--sar)) calc(1rem + var(--sab)) calc(1rem + var(--sal));
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -4271,7 +4267,7 @@ textarea::placeholder {
   box-shadow: var(--shadow-dialog);
   width: min(680px, 94vw);
   max-width: 680px;
-  max-height: min(90vh, calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
+  max-height: min(90dvh, calc(100dvh - 32px - var(--sat) - var(--sab)));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -4673,7 +4669,7 @@ textarea::placeholder {
 @media (max-width: 640px) {
   .modal-container {
     width: 100%;
-    max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - 32px - var(--sat) - var(--sab));
   }
 
   .project-info-grid {
@@ -6312,7 +6308,7 @@ textarea::placeholder {
 }
 
 .scientific-sidebar-footer {
-  padding: 16px 20px max(16px, env(safe-area-inset-bottom));
+  padding: 16px 20px calc(1rem + var(--sab));
   border-top: 1px solid var(--border-color);
   background: var(--bg-sidebar);
 }
@@ -6829,7 +6825,7 @@ textarea::placeholder {
 
 @media (max-width: 1000px) {
   #page-scientific {
-    min-height: calc(100vh - 54px);
+    min-height: calc(100dvh - 54px);
   }
 
   .scientific-workspace {
@@ -6969,9 +6965,8 @@ textarea::placeholder {
 #page-scientific.active,
 #page-routh.active,
 #page-lgr.active {
-  height: 100vh;
   height: 100dvh;
-  max-height: 100vh;
+  max-height: 100dvh;
   overflow: hidden;
   padding: 0;
   margin: 0;
@@ -8499,4 +8494,243 @@ body.in-scientific .global-navbar {
     border-left: none;
     border-right: none;
   }
+}
+
+/* ==========================================================================
+   PONTO CENTRALIZADO: ÁREAS SEGURAS (SAFE AREA INSETS) & EDGE-TO-EDGE
+   Capacitor SystemBars + Viewport-fit=cover + Teclado Virtual + Orientação
+   ========================================================================== */
+
+:root {
+  --sat: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --sab: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --sal: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+  --sar: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --viewport-h: var(--visual-viewport-height, 100dvh);
+}
+
+/* 1. Altura dinâmica: os shells já usam 100dvh nas regras originais; não forçar
+   min-height/height aqui para não impedir o encolhimento flex (scroll por toque). */
+
+/* 1b. Scroll por toque (somente dispositivos touch; desktop com mouse não é afetado) */
+@media (hover: none) and (pointer: coarse) {
+  .pb,
+  .sci-panel-body,
+  .sci-panel-results .sci-panel-body,
+  .home-left-col,
+  .home-left-col .home-file-list,
+  .home-center-col,
+  .home-right-col,
+  .home-console-body,
+  .home-console-logs,
+  .home-workspace,
+  .sidebar-content,
+  .view-panel,
+  .memorial-sidebar-content,
+  .modal-body,
+  .routh-main-area,
+  .scientific-sidebar-content,
+  .scientific-main,
+  #scientific-details,
+  .scientific-results.multi-plots-scroll,
+  .hub-modules-pane,
+  .hub-side-pane,
+  .hub-main-area,
+  .hub-workspace {
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y pan-x;
+  }
+
+  .sci-panel-body,
+  .sci-panel-results,
+  .sci-panel-params,
+  .scientific-workspace,
+  .sci-workspace {
+    min-height: 0;
+  }
+}
+
+
+/* 2. Barras de Título / Cabeçalhos (Fundo até a borda superior sob a barra de status) */
+.global-navbar {
+  padding-top: var(--sat) !important;
+  padding-left: calc(1.5rem + var(--sal)) !important;
+  padding-right: calc(1.5rem + var(--sar)) !important;
+  height: calc(60px + var(--sat)) !important;
+  min-height: calc(60px + var(--sat)) !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 767.98px) {
+  .global-navbar {
+    padding-left: calc(1rem + var(--sal)) !important;
+    padding-right: calc(1rem + var(--sar)) !important;
+  }
+}
+
+.home-top-bar {
+  padding-top: var(--sat) !important;
+  padding-left: var(--sal) !important;
+  padding-right: calc(1rem + var(--sar)) !important;
+  height: calc(2.75rem + var(--sat)) !important;
+  min-height: calc(2.75rem + var(--sat)) !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 767.98px) {
+  .home-top-bar {
+    padding-left: calc(0.75rem + var(--sal)) !important;
+    padding-right: calc(0.75rem + var(--sar)) !important;
+  }
+}
+
+.sci-top-bar {
+  padding-top: var(--sat) !important;
+  padding-left: calc(0.5rem + var(--sal)) !important;
+  padding-right: calc(0.5rem + var(--sar)) !important;
+  height: calc(2.25rem + var(--sat)) !important;
+  min-height: calc(2.25rem + var(--sat)) !important;
+  box-sizing: border-box !important;
+}
+
+.sci-app-bar {
+  padding-top: var(--sat) !important;
+  padding-left: calc(0.75rem + var(--sal)) !important;
+  padding-right: calc(0.5rem + var(--sar)) !important;
+  height: calc(2.75rem + var(--sat)) !important;
+  min-height: calc(2.75rem + var(--sat)) !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. Navegação Inferior (Fundo até a borda inferior sob a barra de gestos / 3 botões) */
+.home-bottom-nav {
+  padding-bottom: var(--sab) !important;
+  padding-left: calc(0.5rem + var(--sal)) !important;
+  padding-right: calc(0.5rem + var(--sar)) !important;
+  height: 3.5rem !important;
+  box-sizing: content-box !important;
+}
+
+@media (max-width: 767.98px) {
+  #page-home .home-bottom-nav {
+    display: flex !important;
+  }
+}
+
+.sci-bottom-nav {
+  padding-bottom: var(--sab) !important;
+  padding-left: calc(0.5rem + var(--sal)) !important;
+  padding-right: calc(0.5rem + var(--sar)) !important;
+  height: calc(3.5rem + var(--sab)) !important;
+  min-height: calc(3.5rem + var(--sab)) !important;
+  box-sizing: border-box !important;
+}
+
+/* 4. Container do Botão "Calcular" no Rodapé */
+.sci-mobile-calc-bar {
+  padding-left: calc(0.75rem + var(--sal)) !important;
+  padding-right: calc(0.75rem + var(--sar)) !important;
+}
+
+/* Quando o botão calcular estiver diretamente na borda inferior (sem bottom nav visível) */
+.sci-bottom-nav[style*="display: none"] ~ .sci-mobile-calc-bar,
+.sci-shell:not(:has(.sci-bottom-nav)) .sci-mobile-calc-bar,
+.keyboard-open .sci-mobile-calc-bar {
+  padding-bottom: calc(0.5rem + var(--sab)) !important;
+}
+
+/* 5. Elementos com position: fixed */
+.modal-overlay {
+  padding: calc(1rem + var(--sat)) calc(1rem + var(--sar)) calc(1rem + var(--sab)) calc(1rem + var(--sal)) !important;
+}
+
+.modal-dialog,
+.modal-container {
+  max-height: calc(100dvh - 2rem - var(--sat) - var(--sab)) !important;
+}
+
+.memorial-sidebar {
+  padding-top: var(--sat) !important;
+  padding-bottom: var(--sab) !important;
+  padding-right: var(--sar) !important;
+  height: 100dvh !important;
+}
+
+.toast {
+  bottom: calc(56px + var(--sab)) !important;
+  right: calc(16px + var(--sar)) !important;
+  left: calc(16px + var(--sal)) !important;
+}
+
+.floating-top-btn {
+  bottom: calc(20px + var(--sab)) !important;
+  right: calc(20px + var(--sar)) !important;
+}
+
+.sci-dropdown-menu {
+  bottom: calc(3.5rem + var(--sab) + 8px) !important;
+  right: calc(12px + var(--sar)) !important;
+}
+
+/* 6. Cobertura de Laterais em Paisagem (Landscape) e Recortes (Notch / Cutout) */
+@media (orientation: landscape) and (max-width: 1023.98px) {
+  .sci-rail {
+    padding-left: var(--sal) !important;
+    width: calc(3.625rem + var(--sal)) !important;
+    min-width: calc(3.625rem + var(--sal)) !important;
+    box-sizing: border-box !important;
+  }
+
+  .home-nav-rail {
+    padding-left: var(--sal) !important;
+    width: calc(5.25rem + var(--sal)) !important;
+    min-width: calc(5.25rem + var(--sal)) !important;
+    box-sizing: border-box !important;
+  }
+
+  .scientific-workspace {
+    padding-right: var(--sar) !important;
+  }
+
+  .sci-panel:last-child {
+    padding-right: var(--sar);
+  }
+
+  .hub-workspace {
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+}
+
+/* 7. Teclado Virtual: Garante que G(s) e a fileira ^ * / ( ) + - s continuem visíveis */
+.keyboard-open .sci-bottom-nav,
+.keyboard-open .home-bottom-nav {
+  display: none !important;
+}
+
+.keyboard-open .sci-mobile-calc-bar {
+  display: none !important;
+}
+
+.keyboard-open .sci-panel-params {
+  height: auto !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important;
+}
+
+.keyboard-open .sci-panel-body {
+  overflow-y: auto !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.keyboard-open .sci-virtual-math {
+  display: flex !important;
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 20 !important;
+  background: var(--surface) !important;
+  padding: 4px 0 !important;
+  border-top: 1px solid var(--border-strong) !important;
 }
