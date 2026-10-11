@@ -10,9 +10,13 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
   - Sanitização recursiva de dados em `android_bridge.py` (`_json_safe`), tratando `inf` / `-inf` como `"∞"` / `"-∞"`, `nan` como `None`, tipos escalares do NumPy para primitivos Python e números complexos para dicionários `{real, imag}` com `allow_nan=False`.
   - Elimina o Erro 500 no Android ao pressionar "Calcular" nos módulos de *Resposta no Tempo*, *Resposta em Frequência*, *Projeto de Controladores* e *Espaço de Estados* decorrente de falha de desserialização em `org.json.JSONObject`.
   - Melhoria na propagação e diagnóstico de mensagens de erro no plugin nativo Java.
-- **Scroll por Toque no Android (Lugar Geométrico das Raízes e Estabilidade / Routh-Hurwitz):**
-  - Ajuste de overflow e layout responsivo móvel (`@media (max-width: 1000px)`) para `#page-lgr.active` e `#page-routh.active`, habilitando rolagem vertical nativa por toque nos contêineres de Parâmetros e Resultados.
+- **Scroll por Toque no Android (Lugar Geométrico das Raízes e Estabilidade):**
+  - Correção da rolagem por toque no *Passo a passo (7 Passos)* e *Regras Clássicas* do LGR (`#view-memorial` e `#view-theory`), removendo restrição de `overflow: visible` e garantindo contêiner com `overflow-y: auto`, `touch-action: pan-y` e preenchimento de altura no `.sci-plot-viewport`.
+  - Habilitada rolagem nativa fluida por toque nos painéis de Parâmetros e Resultados em LGR e Critério de Routh-Hurwitz, além da gaveta lateral de deduções detalhadas.
   - Layout desktop (> 1000px) mantido 100% inalterado e preservado.
+- **Empacotamento Windows e CI:**
+  - Configuração explícita de `icon: 'build/icon.ico'` e ícones de instalador NSIS em `electron-builder.config.cjs`, eliminando conversão em tempo de execução.
+  - Adoção de Node.js 22 LTS no workflow do GitHub Actions para máxima estabilidade de build.
 
 ---
 
