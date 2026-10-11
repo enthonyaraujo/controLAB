@@ -5,6 +5,28 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ---
 
+## [4.0.0] - 2026-10-11
+
+### Adicionado
+- **Novo Menu Início e Hub Central com Split Pane:**
+  - Navegação redesenhada com divisor interativo (Split Pane), pré-visualização em tempo real de cada módulo científico e layout responsivo para desktop, tablets e smartphones.
+  - Ícones vetoriais customizados de Engenharia de Controle para todos os cards de módulos.
+  - Painel de visualização de resultados em split pane persistente e adaptável sem necessidade de scroll vertical forçado no maior nível de expansão.
+- **Suíte de Testes Numéricos Integrada ao CI:**
+  - Nova suíte de testes de validação analítica e numérica em `tests/test_numerico.py` padronizada sobre `unittest.TestCase`, cobrindo resposta no tempo, critério de Routh-Hurwitz, LGR, diagramas de Bode/Nyquist, projeto de controladores (Ziegler-Nichols) e espaço de estados.
+
+### Aprimorado
+- **Design System e Refinamento de Interface:**
+  - Padronização estética de botões de ação com contornos discretos, tipografia refinada e contraste balanceado em modo claro (`#ebeef2`) e escuro (`#222831`).
+  - Suporte completo a redimensionamento de interface (*UI Scale*) proporcional baseado em unidades `rem`, funcionando de forma consistente desde a tela inicial até os módulos de cálculo.
+  - Remoção de badges redundantes nos cards de módulos, conferindo um visual mais limpo e profissional.
+- **Plataformas e Empacotamento:**
+  - Atualização do Android para `versionCode 13` e `versionName 4.0.0`.
+  - Cache do Service Worker atualizado para `controlab-shell-v4.0.0-1`.
+  - Sincronização dos metadados de versão em todos os módulos e bridges da aplicação.
+
+---
+
 ## [3.1.1] - 2026-10-08
 
 ### Corrigido
