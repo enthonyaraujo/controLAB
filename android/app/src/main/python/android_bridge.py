@@ -16,6 +16,35 @@ except ImportError:
 cache_root.mkdir(parents=True, exist_ok=True)
 os.environ.setdefault("MPLCONFIGDIR", str(cache_root / "matplotlib"))
 
+import matplotlib  # noqa: E402
+matplotlib.use("Agg")
+from matplotlib import font_manager  # noqa: E402
+
+
+class _SafeWeightDict(dict):
+    """Protege contra KeyError no backend_svg.py do matplotlib 3.6.0 no Android."""
+
+    def __getitem__(self, key):
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            if isinstance(key, (int, float)):
+                return int(key)
+            try:
+                return int(key)
+            except (ValueError, TypeError):
+                return 400
+
+    def __missing__(self, key):
+        return self.__getitem__(key)
+
+
+if not isinstance(font_manager.weight_dict, _SafeWeightDict):
+    font_manager.weight_dict = _SafeWeightDict(font_manager.weight_dict)
+for _w in range(0, 1001, 50):
+    font_manager.weight_dict[_w] = _w
+    font_manager.weight_dict[str(_w)] = _w
+
 from python_bridge import dispatch  # noqa: E402
 
 
@@ -58,6 +87,8 @@ def dispatch_json(payload_json):
     try:
         result = dispatch(json.loads(str(payload_json)))
     except Exception as exc:
+        import traceback
+        traceback.print_exc()
         result = {"success": False, "error": f"{type(exc).__name__}: {exc}"}
     try:
         return json.dumps(_json_safe(result), allow_nan=False)

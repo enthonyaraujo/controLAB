@@ -20,6 +20,38 @@ from matplotlib import font_manager
 # Garante backend headless
 matplotlib.use("Agg")
 
+
+class _SafeWeightDict(dict):
+    """Dicionário de pesos tipográficos tolerante a números e chaves ausentes.
+
+    Compatibilidade com matplotlib <= 3.6.0 (utilizado no Chaquopy Android):
+    No matplotlib 3.6.0, o backend_svg.py executa `fm.weight_dict[prop.get_weight()]`
+    sem verificar se o peso retornado por FontProperties já é numérico (int),
+    disparando KeyError: 500 ao exportar gráficos com textos não-matemáticos (sem '$').
+    """
+
+    def __getitem__(self, key):
+        try:
+            return super().__getitem__(key)
+        except KeyError:
+            if isinstance(key, (int, float)):
+                return int(key)
+            try:
+                return int(key)
+            except (ValueError, TypeError):
+                return 400
+
+    def __missing__(self, key):
+        return self.__getitem__(key)
+
+
+if not isinstance(font_manager.weight_dict, _SafeWeightDict):
+    font_manager.weight_dict = _SafeWeightDict(font_manager.weight_dict)
+for _w in range(0, 1001, 50):
+    font_manager.weight_dict[_w] = _w
+    font_manager.weight_dict[str(_w)] = _w
+
+
 # Paletas unificadas no padrão científico acadêmico preto e branco (para ambos os temas)
 THEME_TOKENS: dict[str, dict[str, Any]] = {
     "dark": {
@@ -148,8 +180,8 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
         ax.yaxis.label.set_color(tokens["text"])
         ax.xaxis.label.set_fontsize(11.5)
         ax.yaxis.label.set_fontsize(11.5)
-        ax.xaxis.label.set_fontweight("500")
-        ax.yaxis.label.set_fontweight("500")
+        ax.xaxis.label.set_fontweight("medium")
+        ax.yaxis.label.set_fontweight("medium")
 
         # Grade sutil
         ax.grid(
