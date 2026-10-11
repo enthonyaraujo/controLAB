@@ -1,7 +1,7 @@
 {
   "name": "controlab",
   "desktopName": "controlab.desktop",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "ControLAB - Suíte interativa e didática de Engenharia e Sistemas de Controle",
   "repository": {
     "type": "git",
@@ -44,6 +44,8 @@
     "@capacitor/android": "8.5.1",
     "@capacitor/cli": "8.4.3",
     "electron": "44.1.0",
-    "electron-builder": "26.15.7"
+    "electron-builder": "26.15.7",
+    "puppeteer": "^25.13.0",
+    "typescript": "~5.7.2"
   }
 }
