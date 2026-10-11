@@ -3,11 +3,11 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.join(__dirname, '..');
-const html = fs.readFileSync(path.join(root, 'src', 'renderer', 'index.html'), 'utf8');
-const app = fs.readFileSync(path.join(root, 'src', 'renderer', 'app.js'), 'utf8');
-const serviceWorker = fs.readFileSync(path.join(root, 'src', 'renderer', 'sw.js'), 'utf8');
-const styles = fs.readFileSync(path.join(root, 'src', 'renderer', 'styles.css'), 'utf8');
-const scientificModules = fs.readFileSync(path.join(root, 'src', 'renderer', 'scientific-modules.js'), 'utf8');
+const html = fs.readFileSync(path.join(root, 'src', 'renderer', 'index.html'), 'utf8').replace(/\r\n/g, '\n');
+const app = fs.readFileSync(path.join(root, 'src', 'renderer', 'app.js'), 'utf8').replace(/\r\n/g, '\n');
+const serviceWorker = fs.readFileSync(path.join(root, 'src', 'renderer', 'sw.js'), 'utf8').replace(/\r\n/g, '\n');
+const styles = fs.readFileSync(path.join(root, 'src', 'renderer', 'styles.css'), 'utf8').replace(/\r\n/g, '\n');
+const scientificModules = fs.readFileSync(path.join(root, 'src', 'renderer', 'scientific-modules.js'), 'utf8').replace(/\r\n/g, '\n');
 
 const settingsPosition = html.indexOf('<script src="settings.js"></script>');
 const navigationPosition = html.indexOf('<script src="navigation.js"></script>');
