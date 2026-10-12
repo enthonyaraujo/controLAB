@@ -594,6 +594,7 @@
       }
       const detailsCard = element('scientific-details-card');
       if (detailsCard) detailsCard.hidden = true;
+      element('scientific-results')?.classList.remove('multi-plots-scroll');
 
       const tabletRes = element('sci-tablet-results-container');
       if (tabletRes) {
@@ -669,6 +670,22 @@
         const statusChip = element('scientific-status-chip');
         if (statusChip) statusChip.style.display = 'none';
 
+        const resultsContainer = element('scientific-results');
+        if (resultsContainer) {
+          resultsContainer.classList.remove('multi-plots-scroll');
+          resultsContainer.replaceChildren();
+          const singleCard = document.createElement('section');
+          singleCard.id = 'scientific-plot-card';
+          singleCard.className = 'scientific-plot-card';
+          const singleImg = document.createElement('img');
+          singleImg.id = 'scientific-plot';
+          singleImg.className = 'plot-img';
+          singleImg.alt = 'Gráfico da resposta';
+          singleImg.src = '';
+          singleCard.appendChild(singleImg);
+          resultsContainer.appendChild(singleCard);
+        }
+
         const plot = element('scientific-plot');
         if (plot) plot.src = '';
 
@@ -687,7 +704,10 @@
       const errorEl = element('scientific-error');
       if (errorEl) errorEl.hidden = state !== 'error';
       const resultsEl = element('scientific-results');
-      if (resultsEl) resultsEl.hidden = state !== 'results';
+      if (resultsEl) {
+        resultsEl.hidden = state !== 'results';
+        resultsEl.style.display = state === 'results' ? '' : 'none';
+      }
       runButton.disabled = state === 'loading';
       const ribbonBtn = element('ribbon-btn-calc');
       if (ribbonBtn) ribbonBtn.classList.toggle('loading', state === 'loading');
