@@ -266,7 +266,6 @@
 
       let card = element('scientific-plot-card');
       let img = element('scientific-plot');
-      let floatZoom = card?.querySelector('#sci-floating-zoom') || element('sci-floating-zoom');
 
       if (!card || !img || !resultsContainer.contains(card)) {
         resultsContainer.replaceChildren();
@@ -283,28 +282,12 @@
         img.style.cssText = 'max-width: 100%; max-height: 100%; object-fit: contain; display: block;';
         if (imageSrc) img.src = imageSrc;
         card.appendChild(img);
-
-        floatZoom = document.createElement('div');
-        floatZoom.className = 'plot-floating-zoom';
-        floatZoom.id = 'sci-floating-zoom';
-        floatZoom.innerHTML = `
-          <button type="button" id="btn-sci-float-zoom-in" title="Aumentar zoom (+)" aria-label="Aumentar zoom">+</button>
-          <button type="button" id="btn-sci-float-zoom-out" title="Diminuir zoom (−)" aria-label="Diminuir zoom">−</button>
-          <button type="button" id="btn-sci-float-zoom-reset" title="Ajustar figura (100%)" aria-label="Ajustar figura">⟲</button>
-        `;
-        ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(evt => {
-          floatZoom.addEventListener(evt, e => e.stopPropagation(), { passive: evt === 'wheel' ? false : true });
-        });
-        card.appendChild(floatZoom);
         resultsContainer.appendChild(card);
 
         if (createPlotZoom) {
           singleZoomCtrl = createPlotZoom({
             viewport: card,
             image: img,
-            btnZoomIn: card.querySelector('#btn-sci-float-zoom-in'),
-            btnZoomOut: card.querySelector('#btn-sci-float-zoom-out'),
-            btnReset: card.querySelector('#btn-sci-float-zoom-reset'),
           });
         }
       } else {
@@ -314,43 +297,16 @@
         img.style.cssText = 'max-width: 100%; max-height: 100%; object-fit: contain; display: block;';
         if (imageSrc) img.src = imageSrc;
 
-        if (!floatZoom || !card.contains(floatZoom)) {
-          floatZoom = document.createElement('div');
-          floatZoom.className = 'plot-floating-zoom';
-          floatZoom.id = 'sci-floating-zoom';
-          floatZoom.innerHTML = `
-            <button type="button" id="btn-sci-float-zoom-in" title="Aumentar zoom (+)" aria-label="Aumentar zoom">+</button>
-            <button type="button" id="btn-sci-float-zoom-out" title="Diminuir zoom (−)" aria-label="Diminuir zoom">−</button>
-            <button type="button" id="btn-sci-float-zoom-reset" title="Ajustar figura (100%)" aria-label="Ajustar figura">⟲</button>
-          `;
-          ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(evt => {
-            floatZoom.addEventListener(evt, e => e.stopPropagation(), { passive: evt === 'wheel' ? false : true });
-          });
-          card.appendChild(floatZoom);
-        }
-
         if (!singleZoomCtrl || (typeof singleZoomCtrl.getViewport === 'function' && singleZoomCtrl.getViewport() !== card)) {
           if (createPlotZoom) {
             singleZoomCtrl = createPlotZoom({
               viewport: card,
               image: img,
-              btnZoomIn: card.querySelector('#btn-sci-float-zoom-in'),
-              btnZoomOut: card.querySelector('#btn-sci-float-zoom-out'),
-              btnReset: card.querySelector('#btn-sci-float-zoom-reset'),
             });
           }
         } else {
           singleZoomCtrl.setImage(img);
-          singleZoomCtrl.bindButtons?.({
-            btnZoomIn: card.querySelector('#btn-sci-float-zoom-in'),
-            btnZoomOut: card.querySelector('#btn-sci-float-zoom-out'),
-            btnReset: card.querySelector('#btn-sci-float-zoom-reset'),
-          });
         }
-      }
-
-      if (floatZoom) {
-        floatZoom.style.display = imageSrc ? 'flex' : 'none';
       }
 
       singleZoomCtrl?.resetZoom();
@@ -900,27 +856,12 @@
             if (idx === 0 || key === 'step') {
               img.id = 'scientific-plot';
             }
-            body.appendChild(img);
-            const floatZoom = document.createElement('div');
-            floatZoom.className = 'plot-floating-zoom';
-            floatZoom.innerHTML = `
-              <button type="button" class="btn-stacked-zoom-in" title="Aumentar zoom (+)" aria-label="Aumentar zoom">+</button>
-              <button type="button" class="btn-stacked-zoom-out" title="Diminuir zoom (−)" aria-label="Diminuir zoom">−</button>
-              <button type="button" class="btn-stacked-zoom-reset" title="Ajustar figura (100%)" aria-label="Ajustar figura">⟲</button>
-            `;
-            ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(evt => {
-              floatZoom.addEventListener(evt, e => e.stopPropagation(), { passive: evt === 'wheel' ? false : true });
-            });
-            body.appendChild(floatZoom);
             card.appendChild(body);
 
             if (createPlotZoom) {
               const ctrl = createPlotZoom({
                 viewport: body,
                 image: img,
-                btnZoomIn: floatZoom.querySelector('.btn-stacked-zoom-in'),
-                btnZoomOut: floatZoom.querySelector('.btn-stacked-zoom-out'),
-                btnReset: floatZoom.querySelector('.btn-stacked-zoom-reset'),
               });
               stackedZoomCtrls.set(key, ctrl);
             }
