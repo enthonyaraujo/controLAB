@@ -517,6 +517,7 @@
         defaultConsole: '>> step(G, 10)',
         solverMeta: 'Módulo: Resposta no Tempo • Solver: scipy',
         cmd: 'step',
+        loadingText: 'Calculando Resposta no Tempo...',
       },
       frequency: {
         figureTitle: 'Figura 1 — Diagrama de Bode',
@@ -524,6 +525,7 @@
         defaultConsole: '>> bode(G)',
         solverMeta: 'Módulo: Resposta em Frequência • Solver: scipy / python-control',
         cmd: 'bode',
+        loadingText: 'Calculando Resposta em Frequência (Bode)...',
       },
       controllers: {
         figureTitle: 'Figura 1 — Desempenho e LGR do controlador',
@@ -531,6 +533,7 @@
         defaultConsole: '>> pid(G)',
         solverMeta: 'Módulo: Projeto de Controladores • Solver: python-control',
         cmd: 'pid',
+        loadingText: 'Calculando Projeto de Controladores...',
       },
       'state-space': {
         figureTitle: 'Figura 1 — Plano complexo e polos de estados',
@@ -538,6 +541,7 @@
         defaultConsole: '>> ss(A, B, C, D)',
         solverMeta: 'Módulo: Espaço de Estados • Solver: scipy / sympy',
         cmd: 'ss',
+        loadingText: 'Calculando Espaço de Estados...',
       },
     };
 
@@ -646,6 +650,11 @@
       const figTitleEl = element('sci-figure-title');
       if (figTitleEl) figTitleEl.textContent = meta.figureTitle;
 
+      const loadingTextEl = element('scientific-loading-text');
+      if (loadingTextEl && meta.loadingText) {
+        loadingTextEl.textContent = meta.loadingText;
+      }
+
       const plotTabs = element('scientific-plot-tabs');
       if (plotTabs) {
         plotTabs.style.display = meta.hasResponseTabs ? 'inline-flex' : 'none';
@@ -698,7 +707,10 @@
 
     function showState(state) {
       const loadingEl = element('scientific-loading');
-      if (loadingEl) loadingEl.hidden = state !== 'loading';
+      if (loadingEl) {
+        loadingEl.hidden = state !== 'loading';
+        loadingEl.style.display = state === 'loading' ? 'flex' : 'none';
+      }
       const emptyEl = element('scientific-empty');
       if (emptyEl) emptyEl.style.display = state === 'empty' ? 'flex' : 'none';
       const errorEl = element('scientific-error');
@@ -1073,6 +1085,12 @@
     async function run() {
       const config = MODULES[currentKey];
       if (!config) return;
+      const meta = MODULE_METAS[currentKey] || { cmd: 'run', solverMeta: 'Pronto' };
+      const loadingTextEl = element('scientific-loading-text');
+      if (loadingTextEl) {
+        loadingTextEl.textContent = meta.loadingText || `Calculando ${config.title}...`;
+      }
+      setMobileTab('plot');
       const currentRequest = ++requestId;
       const t0 = performance.now();
       showState('loading');

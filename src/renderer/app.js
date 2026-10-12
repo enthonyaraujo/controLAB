@@ -1172,13 +1172,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   function showLoading(show) {
     if (show) {
-      plotLoading.classList.add('active');
+      if (plotLoading) {
+        plotLoading.style.display = 'flex';
+        plotLoading.classList.add('active');
+      }
       btnCalculate.disabled = true;
       document.getElementById('btn-ribbon-lgr-calc')?.classList.add('loading');
+      const emptyState = document.getElementById('lgr-empty-state');
+      if (emptyState) emptyState.style.display = 'none';
     } else {
-      plotLoading.classList.remove('active');
+      if (plotLoading) {
+        plotLoading.style.display = 'none';
+        plotLoading.classList.remove('active');
+      }
       btnCalculate.disabled = false;
       document.getElementById('btn-ribbon-lgr-calc')?.classList.remove('loading');
+      const emptyState = document.getElementById('lgr-empty-state');
+      if (emptyState && (!plotImg || !plotImg.src || plotImg.style.display === 'none')) {
+        emptyState.style.display = 'flex';
+      }
     }
     const statusState = document.getElementById('lgr-status-state');
     if (statusState) {

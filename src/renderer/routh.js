@@ -107,6 +107,8 @@
       if (loadingEl) loadingEl.style.display = isLoading ? 'flex' : 'none';
       if (isLoading && resultsContainer) resultsContainer.style.opacity = '0.5';
       else if (resultsContainer) resultsContainer.style.opacity = '1';
+      if (isLoading && emptyState) emptyState.style.display = 'none';
+      else if (!isLoading && !lastPlotImage && emptyState) emptyState.style.display = 'flex';
       const statusState = optionalElement('routh-status-state');
       if (statusState) {
         statusState.textContent = isLoading ? 'Calculando...' : 'Pronto';
