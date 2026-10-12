@@ -3,6 +3,23 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.0.4] - 2026-10-12
+
+### Adicionado
+- **Zoom e Pan Interativo Unificado em Todos os Gráficos (Desktop e Android):**
+  - Implementado suporte completo a zoom interativo em *Resposta no Tempo*, *Resposta em Frequência* (Bode e Nyquist), *Projeto de Controladores* e *Espaço de Estados*.
+  - Gestos touch no Android (celulares e tablets): pinça (pinch-to-zoom com 2 dedos), duplo toque para alternar zoom (2×/1×) e arraste (pan com 1 dedo) quando ampliado, mantendo rolagem vertical natural da página quando em 1×.
+  - Controles de desktop: roda do mouse (wheel) para zoom in/out suave, clique e arraste para pan quando ampliado e botões integrados na barra superior (Ribbon).
+  - Remoção de latência visual com transição nula (`transition: none !important`) durante arrasto e pinça ativa, atingindo 60 fps fluidos.
+
+### Corrigido e Aprimorado
+- **Padronização Visual e Alinhamento de Gráficos:**
+  - Padronização do card de loading e transições de cálculo em todos os módulos com base no padrão limpo de Estabilidade (Routh-Hurwitz).
+  - Remoção da barra redundante de equação e badges do topo do gráfico em LGR, ampliando a área útil do viewport mantendo todas as deduções e dados detalhados na aba lateral de Resultados e no Memorial dos 7 Passos.
+  - Correção no reset e isolamento de gráficos em módulos científicos ao alternar entre abas, evitando que gráficos de Resposta no Tempo continuassem visíveis em Resposta em Frequência, Controladores ou Espaço de Estados.
+
+---
+
 ## [4.0.3] - 2026-10-11
 
 ### Corrigido

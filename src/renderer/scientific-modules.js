@@ -1298,7 +1298,7 @@
     element('ribbon-btn-code')?.addEventListener('click', async () => {
       const exprInput = getExpressionInput();
       const exprStr = exprInput?.value?.trim() || '4 / (s^2 + 2*s + 4)';
-      const pyCode = `# ControLAB v4.0.3 - Script de Simulação\nimport control as ct\nimport matplotlib.pyplot as plt\n\ns = ct.tf('s')\nG = ${exprStr.replace(/\^/g, '**')}\nT = ct.feedback(G, 1)\nt, y = ct.step_response(T, T=10)\n\nplt.figure(figsize=(8, 4.5), dpi=120)\nplt.plot(t, y, label='Degrau unitário')\nplt.grid(True)\nplt.title('Resposta ao Degrau - ControLAB')\nplt.xlabel('Tempo (s)')\nplt.ylabel('Amplitude')\nplt.legend()\nplt.show()\n`;
+      const pyCode = `# ControLAB v4.0.4 - Script de Simulação\nimport control as ct\nimport matplotlib.pyplot as plt\n\ns = ct.tf('s')\nG = ${exprStr.replace(/\^/g, '**')}\nT = ct.feedback(G, 1)\nt, y = ct.step_response(T, T=10)\n\nplt.figure(figsize=(8, 4.5), dpi=120)\nplt.plot(t, y, label='Degrau unitário')\nplt.grid(True)\nplt.title('Resposta ao Degrau - ControLAB')\nplt.xlabel('Tempo (s)')\nplt.ylabel('Amplitude')\nplt.legend()\nplt.show()\n`;
       try {
         if (navigator.clipboard) {
           await navigator.clipboard.writeText(pyCode);
