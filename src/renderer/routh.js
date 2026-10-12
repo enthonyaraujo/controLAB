@@ -271,12 +271,14 @@
       // 4. Gráfico no Plano Complexo s
       if (plotCard && plotImage) {
         if (data.plot_image) {
-          plotCard.style.display = 'block';
+          plotCard.style.display = 'flex';
+          plotImage.style.display = 'block';
           plotImage.src = data.plot_image;
           lastPlotImage = data.plot_image;
           lastPlotSvg = data.plot_svg || null;
         } else {
           plotCard.style.display = 'none';
+          plotImage.style.display = 'none';
           lastPlotImage = null;
           lastPlotSvg = null;
         }
@@ -568,7 +570,10 @@
       if (resultsContainer) resultsContainer.style.display = 'none';
       if (emptyState) emptyState.style.display = 'flex';
       if (plotCard) plotCard.style.display = 'none';
-      if (plotImage) plotImage.src = '';
+      if (plotImage) {
+        plotImage.style.display = 'none';
+        plotImage.src = '';
+      }
       lastPlotImage = null;
       lastPlotSvg = null;
       const consoleLine = optionalElement('routh-console-line');
