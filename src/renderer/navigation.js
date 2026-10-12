@@ -1009,5 +1009,211 @@
     return Object.freeze({ navigateTo });
   }
 
+  // =========================================================================
+  // CONTROLADOR UNIFICADO DE ZOOM E PAN INTERATIVO (MOUSE DESKTOP & TOUCH ANDROID)
+  // =========================================================================
+  function createPlotZoomController({
+    viewport,
+    image,
+    btnZoomIn,
+    btnZoomOut,
+    btnReset,
+    onTransformChange,
+  }) {
+    let zoomLevel = 1.0;
+    let panX = 0;
+    let panY = 0;
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+    let initialPinchDistance = 0;
+    let initialPinchZoom = 1.0;
+    let initialPinchMidX = 0;
+    let initialPinchMidY = 0;
+    let startPinchPanX = 0;
+    let startPinchPanY = 0;
+    let lastTapTime = 0;
+    let currentImage = image;
+
+    function updateImageTransform() {
+      if (zoomLevel <= 1.0) {
+        zoomLevel = 1.0;
+        panX = 0;
+        panY = 0;
+      }
+      if (currentImage) {
+        currentImage.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+      }
+
+      const isZoomed = zoomLevel > 1.0;
+      if (viewport) {
+        viewport.classList.toggle('zoomed', isZoomed);
+        viewport.style.touchAction = isZoomed ? 'none' : 'pan-y';
+      }
+
+      if (btnZoomOut) {
+        btnZoomOut.disabled = !isZoomed;
+        btnZoomOut.style.opacity = isZoomed ? '1' : '0.45';
+        btnZoomOut.style.cursor = isZoomed ? 'pointer' : 'not-allowed';
+      }
+
+      if (typeof onTransformChange === 'function') {
+        onTransformChange({ zoomLevel, panX, panY, isZoomed });
+      }
+    }
+
+    function resetZoom() {
+      zoomLevel = 1.0;
+      panX = 0;
+      panY = 0;
+      updateImageTransform();
+    }
+
+    function zoomIn() {
+      zoomLevel = Math.min(zoomLevel * 1.25, 5.0);
+      updateImageTransform();
+    }
+
+    function zoomOut() {
+      zoomLevel = Math.max(zoomLevel / 1.25, 1.0);
+      if (zoomLevel === 1.0) {
+        panX = 0;
+        panY = 0;
+      }
+      updateImageTransform();
+    }
+
+    btnZoomIn?.addEventListener('click', zoomIn);
+    btnZoomOut?.addEventListener('click', zoomOut);
+    btnReset?.addEventListener('click', resetZoom);
+
+    if (viewport) {
+      // Scroll do Mouse para Zoom (Desktop)
+      viewport.addEventListener('wheel', (e) => {
+        if (!currentImage || !currentImage.src || currentImage.style.display === 'none') return;
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.15 : 0.85;
+        zoomLevel = Math.min(Math.max(zoomLevel * factor, 1.0), 6.0);
+        if (zoomLevel === 1.0) {
+          panX = 0;
+          panY = 0;
+        }
+        updateImageTransform();
+      }, { passive: false });
+
+      // Pan com Mouse no Desktop
+      viewport.addEventListener('mousedown', (e) => {
+        if (zoomLevel <= 1.0 || e.button !== 0) return;
+        isPanning = true;
+        startX = e.clientX - panX;
+        startY = e.clientY - panY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isPanning || zoomLevel <= 1.0) return;
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        updateImageTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isPanning = false;
+      });
+
+      // Gestos Touch (Mobile / Tablet Android: Pinch to Zoom, Pan e Double-tap)
+      viewport.addEventListener('touchstart', (e) => {
+        if (!currentImage || !currentImage.src || currentImage.style.display === 'none') return;
+        if (e.touches.length === 2) {
+          // Pinch-to-zoom com 2 dedos
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          initialPinchDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+          initialPinchZoom = zoomLevel;
+          initialPinchMidX = (t1.clientX + t2.clientX) / 2;
+          initialPinchMidY = (t1.clientY + t2.clientY) / 2;
+          startPinchPanX = panX;
+          startPinchPanY = panY;
+        } else if (e.touches.length === 1) {
+          const touch = e.touches[0];
+          startX = touch.clientX - panX;
+          startY = touch.clientY - panY;
+
+          // Duplo toque para alternar zoom 2x / reset
+          const now = Date.now();
+          if (now - lastTapTime < 300) {
+            if (zoomLevel > 1.0) {
+              resetZoom();
+            } else {
+              zoomLevel = 2.0;
+              const rect = viewport.getBoundingClientRect();
+              panX = (rect.width / 2 - (touch.clientX - rect.left)) * 0.6;
+              panY = (rect.height / 2 - (touch.clientY - rect.top)) * 0.6;
+              updateImageTransform();
+            }
+            lastTapTime = 0;
+          } else {
+            lastTapTime = now;
+          }
+        }
+      }, { passive: true });
+
+      viewport.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+          // Gesto de Pinça (Pinch-to-zoom)
+          e.preventDefault();
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+          if (initialPinchDistance > 0) {
+            const factor = currentDist / initialPinchDistance;
+            zoomLevel = Math.min(Math.max(initialPinchZoom * factor, 1.0), 5.0);
+            if (zoomLevel > 1.0) {
+              const currentMidX = (t1.clientX + t2.clientX) / 2;
+              const currentMidY = (t1.clientY + t2.clientY) / 2;
+              panX = startPinchPanX + (currentMidX - initialPinchMidX);
+              panY = startPinchPanY + (currentMidY - initialPinchMidY);
+            } else {
+              panX = 0;
+              panY = 0;
+            }
+            updateImageTransform();
+          }
+        } else if (e.touches.length === 1 && zoomLevel > 1.0) {
+          // Pan com 1 dedo quando ampliado
+          e.preventDefault();
+          const touch = e.touches[0];
+          panX = touch.clientX - startX;
+          panY = touch.clientY - startY;
+          updateImageTransform();
+        }
+        // Quando zoomLevel === 1.0 e 1 dedo: NÃO chama preventDefault -> permite o scroll natural da página!
+      }, { passive: false });
+
+      viewport.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+          if (zoomLevel <= 1.05) {
+            resetZoom();
+          }
+        } else if (e.touches.length === 1) {
+          const touch = e.touches[0];
+          startX = touch.clientX - panX;
+          startY = touch.clientY - panY;
+        }
+      });
+    }
+
+    return {
+      resetZoom,
+      zoomIn,
+      zoomOut,
+      getZoomLevel: () => zoomLevel,
+      setImage: (newImg) => {
+        currentImage = newImg;
+        resetZoom();
+      },
+    };
+  }
+
+  global.createPlotZoomController = createPlotZoomController;
   global.LGRNavigation = Object.freeze({ initialize: initializeNavigation });
 }(window));

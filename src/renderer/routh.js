@@ -54,6 +54,14 @@
     const btnCopyImg = optionalElement('btn-routh-copy-img');
     const btnDownloadSvg = optionalElement('btn-routh-download-svg');
     const btnDownloadPng = optionalElement('btn-routh-download-png');
+    const createPlotZoom = global.createPlotZoomController || (typeof window !== 'undefined' && window.createPlotZoomController);
+    const routhZoomCtrl = createPlotZoom && plotCard && plotImage ? createPlotZoom({
+      viewport: plotCard,
+      image: plotImage,
+      btnZoomIn: optionalElement('btn-routh-zoom-in'),
+      btnZoomOut: optionalElement('btn-routh-zoom-out'),
+      btnReset: optionalElement('btn-routh-zoom-reset'),
+    }) : null;
 
     // Tabela e Detalhes
     const tableContainer = optionalElement('routh-table-container');
@@ -278,11 +286,13 @@
           plotImage.src = data.plot_image;
           lastPlotImage = data.plot_image;
           lastPlotSvg = data.plot_svg || null;
+          routhZoomCtrl?.resetZoom();
         } else {
           plotCard.style.display = 'none';
           plotImage.style.display = 'none';
           lastPlotImage = null;
           lastPlotSvg = null;
+          routhZoomCtrl?.resetZoom();
         }
       }
 
@@ -576,6 +586,7 @@
         plotImage.style.display = 'none';
         plotImage.src = '';
       }
+      routhZoomCtrl?.resetZoom();
       lastPlotImage = null;
       lastPlotSvg = null;
       const consoleLine = optionalElement('routh-console-line');
