@@ -1207,9 +1207,15 @@
       zoomIn,
       zoomOut,
       getZoomLevel: () => zoomLevel,
+      getViewport: () => viewport,
       setImage: (newImg) => {
         currentImage = newImg;
         resetZoom();
+      },
+      bindButtons: ({ btnZoomIn: bIn, btnZoomOut: bOut, btnReset: bReset } = {}) => {
+        if (bIn) bIn.addEventListener('click', zoomIn);
+        if (bOut) bOut.addEventListener('click', zoomOut);
+        if (bReset) bReset.addEventListener('click', resetZoom);
       },
     };
   }
