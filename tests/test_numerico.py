@@ -1,4 +1,4 @@
-"""Suíte de testes numéricos e de isolamento de estado do ControLAB v4.0.3.
+"""Suíte de testes numéricos e de isolamento de estado do ControLAB v4.0.4.
 
 Cobre com tolerância relativa de 1e-2 todos os módulos do sistema:
 - TEMPO: G(s) = 4 / (s^2 + 2s + 4)
