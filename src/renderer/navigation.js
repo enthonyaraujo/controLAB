@@ -54,6 +54,11 @@
         el.classList.toggle('active', matches);
       });
 
+      // Garante que o item ativo da barra de navegação com scroll horizontal fique visível
+      document.querySelectorAll('.sci-bottom-nav .sci-bottom-nav-item.active').forEach((activeItem) => {
+        activeItem.scrollIntoView?.({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      });
+
       const sciAppBarTitle = optionalElement('sci-app-bar-title');
       const sciAppBarIcon = document.querySelector('.sci-app-bar-icon use');
       const navTitles = {

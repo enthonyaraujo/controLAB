@@ -3,6 +3,19 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.1.1] - 2026-10-12
+
+### Aprimorado
+- **Design Responsivo Tablet vs. Celular:**
+  - **Tablet (600px a 1024px)**: Exibição exclusiva do trilho lateral unificado (`.sci-rail` / `#home-sci-rail`) à esquerda tanto no *Início* quanto nos módulos de cálculo, contendo os 7 módulos (`Início`, `Tempo`, `Estab.`, `LGR`, `Freq.`, `Control.`, `Estados`), e ocultação estrita da barra inferior.
+  - **Celular (< 600px)**: Barra de navegação inferior com rolagem horizontal suave sincronizada e ocultação do trilho lateral.
+  - Harmonização de breakpoints em todo o CSS para eliminar duplicidade de barras em tablets e garantir integridade visual.
+- **Atualização de Versão e Artefatos da Release 4.1.1:**
+  - `versionCode 19` e `versionName "4.1.1"` no projeto Android.
+  - Bump de versão em manifests, PWA Service Worker, páginas e scripts de suporte.
+
+---
+
 ## [4.1.0] - 2026-10-12
 
 ### Adicionado

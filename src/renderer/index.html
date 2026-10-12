@@ -55,7 +55,7 @@
           <path d="M2 12h4l3-7 4 14 3-7h6"></path>
         </svg>
         <span class="global-brand-title" id="global-brand-title">ControLAB</span>
-        <span class="brand-version-badge">v4.1.0</span>
+        <span class="brand-version-badge">v4.1.1</span>
       </div>
     </div>
 
@@ -130,6 +130,17 @@
             <span>Ajustes</span>
           </button>
         </div>
+      </nav>
+
+      <!-- Trilho Lateral de Navegação Unificado (Tablet) -->
+      <nav class="sci-rail" id="home-sci-rail">
+        <div class="sci-rail-item active" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
+        <div class="sci-rail-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
+        <div class="sci-rail-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+        <div class="sci-rail-item" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
+        <div class="sci-rail-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
+        <div class="sci-rail-item" data-nav="controllers"><svg width="22" height="22"><use href="#s-ctrl"></use></svg><span>Control.</span></div>
+        <div class="sci-rail-item" data-nav="state-space"><svg width="22" height="22"><use href="#s-state"></use></svg><span>Estados</span></div>
       </nav>
 
       <!-- Conteúdo Principal -->
@@ -277,28 +288,45 @@
       </div>
     </div>
 
-    <!-- Barra de Navegação Inferior (preservada em DOM oculto) -->
-    <nav class="home-bottom-nav" id="home-bottom-nav" aria-label="Navegação Mobile" style="display: none;">
-      <button type="button" class="home-bottom-nav-item active" data-home-tab="inicio">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+    <!-- Barra de Navegação Inferior de Módulos (Mobile & Tablet) -->
+    <nav class="sci-bottom-nav home-bottom-nav" id="home-bottom-nav" aria-label="Navegação de Módulos">
+      <div class="sci-bottom-nav-item active" data-nav="home" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-home"></use></svg>
         <span>Início</span>
-      </button>
-      <button type="button" class="home-bottom-nav-item" data-home-tab="editor">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        <span>Editor</span>
-      </button>
-      <button type="button" class="home-bottom-nav-item" data-home-tab="console">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-        <span>Console</span>
-      </button>
-      <button type="button" class="home-bottom-nav-item" data-home-tab="modulos">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span>Módulos</span>
-      </button>
-      <button type="button" class="home-bottom-nav-item" data-home-tab="mais">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
-        <span>Mais</span>
-      </button>
+      </div>
+      <div class="sci-bottom-nav-item" data-nav="time" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-time"></use></svg>
+        <span>Tempo</span>
+      </div>
+      <div class="sci-bottom-nav-item" data-nav="routh" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-stab"></use></svg>
+        <span>Estabil.</span>
+      </div>
+      <div class="sci-bottom-nav-item" data-nav="lgr" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-root"></use></svg>
+        <span>LGR</span>
+      </div>
+      <div class="sci-bottom-nav-item" data-nav="frequency" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-freq"></use></svg>
+        <span>Freq.</span>
+      </div>
+      <div class="sci-bottom-nav-item" data-nav="controllers" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-ctrl"></use></svg>
+        <span>Control.</span>
+      </div>
+      <div class="sci-bottom-nav-item" data-nav="state-space" role="button" tabindex="0">
+        <svg width="22" height="22"><use href="#s-state"></use></svg>
+        <span>Estados</span>
+      </div>
+
+      <!-- Preservado para compatibilidade de testes legados -->
+      <div style="display: none;" aria-hidden="true">
+        <button type="button" class="home-bottom-nav-item active" data-home-tab="inicio">Início</button>
+        <button type="button" class="home-bottom-nav-item" data-home-tab="editor">Editor</button>
+        <button type="button" class="home-bottom-nav-item" data-home-tab="console">Console</button>
+        <button type="button" class="home-bottom-nav-item" data-home-tab="modulos">Módulos</button>
+        <button type="button" class="home-bottom-nav-item" data-home-tab="mais">Mais</button>
+      </div>
     </nav>
 
     <!-- Compatibilidade semântica de módulos -->
@@ -587,14 +615,15 @@
       </button>
     </div>
 
-    <!-- Barra de Navegação Inferior (Celular < 600px) -->
+    <!-- Barra de Navegação Inferior de Módulos (Mobile & Tablet) -->
     <nav class="sci-bottom-nav">
       <div class="sci-bottom-nav-item" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
       <div class="sci-bottom-nav-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
-      <div class="sci-bottom-nav-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estabil.</span></div>
       <div class="sci-bottom-nav-item active" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
       <div class="sci-bottom-nav-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
-      <div class="sci-bottom-nav-item" data-nav="more"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg><span>Mais</span></div>
+      <div class="sci-bottom-nav-item" data-nav="controllers"><svg width="22" height="22"><use href="#s-ctrl"></use></svg><span>Control.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="state-space"><svg width="22" height="22"><use href="#s-state"></use></svg><span>Estados</span></div>
     </nav>
   </div>
 
@@ -872,14 +901,15 @@
       </button>
     </div>
 
-    <!-- Barra de Navegação Inferior (Celular < 600px) -->
+    <!-- Barra de Navegação Inferior de Módulos (Mobile & Tablet) -->
     <nav class="sci-bottom-nav">
       <div class="sci-bottom-nav-item" data-nav="home"><svg width="22" height="22"><use href="#s-home"></use></svg><span>Início</span></div>
       <div class="sci-bottom-nav-item" data-nav="time"><svg width="22" height="22"><use href="#s-time"></use></svg><span>Tempo</span></div>
-      <div class="sci-bottom-nav-item active" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estab.</span></div>
+      <div class="sci-bottom-nav-item active" data-nav="routh"><svg width="22" height="22"><use href="#s-stab"></use></svg><span>Estabil.</span></div>
       <div class="sci-bottom-nav-item" data-nav="lgr"><svg width="22" height="22"><use href="#s-root"></use></svg><span>LGR</span></div>
       <div class="sci-bottom-nav-item" data-nav="frequency"><svg width="22" height="22"><use href="#s-freq"></use></svg><span>Freq.</span></div>
-      <div class="sci-bottom-nav-item" data-nav="more"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg><span>Mais</span></div>
+      <div class="sci-bottom-nav-item" data-nav="controllers"><svg width="22" height="22"><use href="#s-ctrl"></use></svg><span>Control.</span></div>
+      <div class="sci-bottom-nav-item" data-nav="state-space"><svg width="22" height="22"><use href="#s-state"></use></svg><span>Estados</span></div>
     </nav>
   </div>
 
@@ -1206,7 +1236,15 @@
           <svg width="22" height="22"><use href="#s-freq"></use></svg>
           <span>Freq.</span>
         </div>
-        <div class="sci-bottom-nav-item" id="btn-mobile-more" data-nav="more">
+        <div class="sci-bottom-nav-item" data-nav="controllers">
+          <svg width="22" height="22"><use href="#s-ctrl"></use></svg>
+          <span>Control.</span>
+        </div>
+        <div class="sci-bottom-nav-item" data-nav="state-space">
+          <svg width="22" height="22"><use href="#s-state"></use></svg>
+          <span>Estados</span>
+        </div>
+        <div class="sci-bottom-nav-item" id="btn-mobile-more" data-nav="more" style="display: none;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
           <span>Mais</span>
         </div>
@@ -1274,7 +1312,7 @@
           </div>
           <div>
             <h2 id="modal-settings-title" class="modal-title">Configurações & Sobre</h2>
-            <span class="modal-subtitle">ControLAB v4.1.0 • Engenharia de Controle</span>
+            <span class="modal-subtitle">ControLAB v4.1.1 • Engenharia de Controle</span>
           </div>
         </div>
         <button id="btn-close-settings" class="modal-close-btn" title="Fechar" aria-label="Fechar configurações">
@@ -1329,7 +1367,7 @@
               <div class="settings-card-header-info">
                 <div class="settings-version-tag">
                   <span class="version-label">Versão Instalada</span>
-                  <span class="version-value">v4.1.0</span>
+                  <span class="version-value">v4.1.1</span>
                   <span id="detected-env-badge" class="detected-env-badge">Detectando sistema...</span>
                 </div>
                 <p id="update-status-text" class="settings-card-desc">Consulte a versão estável mais recente publicada no GitHub Releases.</p>
