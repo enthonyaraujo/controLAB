@@ -245,6 +245,118 @@
     let previewRequestId = 0;
     let lastPreviewExpr = null;
 
+    // Controlador Unificado de Zoom (Desktop e Touch Android)
+    const createPlotZoom = global.createPlotZoomController || (typeof window !== 'undefined' && window.createPlotZoomController);
+    let singleZoomCtrl = null;
+    const stackedZoomCtrls = new Map();
+
+    function getActiveZoomController() {
+      if (stackedZoomCtrls.size > 0) {
+        return stackedZoomCtrls.get(currentResponseType) || stackedZoomCtrls.values().next().value;
+      }
+      return singleZoomCtrl;
+    }
+
+    function setupSinglePlotCard(imageSrc = '') {
+      const resultsContainer = element('scientific-results');
+      if (!resultsContainer) return null;
+
+      resultsContainer.classList.remove('multi-plots-scroll');
+      stackedZoomCtrls.clear();
+
+      let card = element('scientific-plot-card');
+      let img = element('scientific-plot');
+      let floatZoom = card?.querySelector('#sci-floating-zoom') || element('sci-floating-zoom');
+
+      if (!card || !img || !resultsContainer.contains(card)) {
+        resultsContainer.replaceChildren();
+
+        card = document.createElement('section');
+        card.id = 'scientific-plot-card';
+        card.className = 'scientific-plot-card plot-viewport';
+        card.style.cssText = 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;';
+
+        img = document.createElement('img');
+        img.id = 'scientific-plot';
+        img.className = 'plot-img';
+        img.alt = 'Gráfico da resposta';
+        img.style.cssText = 'max-width: 100%; max-height: 100%; object-fit: contain; display: block;';
+        if (imageSrc) img.src = imageSrc;
+        card.appendChild(img);
+
+        floatZoom = document.createElement('div');
+        floatZoom.className = 'plot-floating-zoom';
+        floatZoom.id = 'sci-floating-zoom';
+        floatZoom.innerHTML = `
+          <button type="button" id="btn-sci-float-zoom-in" title="Aumentar zoom (+)" aria-label="Aumentar zoom">+</button>
+          <button type="button" id="btn-sci-float-zoom-out" title="Diminuir zoom (−)" aria-label="Diminuir zoom">−</button>
+          <button type="button" id="btn-sci-float-zoom-reset" title="Ajustar figura (100%)" aria-label="Ajustar figura">⟲</button>
+        `;
+        ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(evt => {
+          floatZoom.addEventListener(evt, e => e.stopPropagation(), { passive: evt === 'wheel' ? false : true });
+        });
+        card.appendChild(floatZoom);
+        resultsContainer.appendChild(card);
+
+        if (createPlotZoom) {
+          singleZoomCtrl = createPlotZoom({
+            viewport: card,
+            image: img,
+            btnZoomIn: card.querySelector('#btn-sci-float-zoom-in'),
+            btnZoomOut: card.querySelector('#btn-sci-float-zoom-out'),
+            btnReset: card.querySelector('#btn-sci-float-zoom-reset'),
+          });
+        }
+      } else {
+        card.className = 'scientific-plot-card plot-viewport';
+        card.style.cssText = 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;';
+        img.className = 'plot-img';
+        img.style.cssText = 'max-width: 100%; max-height: 100%; object-fit: contain; display: block;';
+        if (imageSrc) img.src = imageSrc;
+
+        if (!floatZoom || !card.contains(floatZoom)) {
+          floatZoom = document.createElement('div');
+          floatZoom.className = 'plot-floating-zoom';
+          floatZoom.id = 'sci-floating-zoom';
+          floatZoom.innerHTML = `
+            <button type="button" id="btn-sci-float-zoom-in" title="Aumentar zoom (+)" aria-label="Aumentar zoom">+</button>
+            <button type="button" id="btn-sci-float-zoom-out" title="Diminuir zoom (−)" aria-label="Diminuir zoom">−</button>
+            <button type="button" id="btn-sci-float-zoom-reset" title="Ajustar figura (100%)" aria-label="Ajustar figura">⟲</button>
+          `;
+          ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(evt => {
+            floatZoom.addEventListener(evt, e => e.stopPropagation(), { passive: evt === 'wheel' ? false : true });
+          });
+          card.appendChild(floatZoom);
+        }
+
+        if (!singleZoomCtrl || (typeof singleZoomCtrl.getViewport === 'function' && singleZoomCtrl.getViewport() !== card)) {
+          if (createPlotZoom) {
+            singleZoomCtrl = createPlotZoom({
+              viewport: card,
+              image: img,
+              btnZoomIn: card.querySelector('#btn-sci-float-zoom-in'),
+              btnZoomOut: card.querySelector('#btn-sci-float-zoom-out'),
+              btnReset: card.querySelector('#btn-sci-float-zoom-reset'),
+            });
+          }
+        } else {
+          singleZoomCtrl.setImage(img);
+          singleZoomCtrl.bindButtons?.({
+            btnZoomIn: card.querySelector('#btn-sci-float-zoom-in'),
+            btnZoomOut: card.querySelector('#btn-sci-float-zoom-out'),
+            btnReset: card.querySelector('#btn-sci-float-zoom-reset'),
+          });
+        }
+      }
+
+      if (floatZoom) {
+        floatZoom.style.display = imageSrc ? 'flex' : 'none';
+      }
+
+      singleZoomCtrl?.resetZoom();
+      return { card, img };
+    }
+
     const moduleStates = {
       time: { result: null, formData: null, responseType: 'step', consoleText: '>> step(G, 10)' },
       frequency: { result: null, formData: null, responseType: 'step', consoleText: '>> bode(G)' },
@@ -681,25 +793,7 @@
         const statusChip = element('scientific-status-chip');
         if (statusChip) statusChip.style.display = 'none';
 
-        const resultsContainer = element('scientific-results');
-        if (resultsContainer) {
-          resultsContainer.classList.remove('multi-plots-scroll');
-          resultsContainer.replaceChildren();
-          const singleCard = document.createElement('section');
-          singleCard.id = 'scientific-plot-card';
-          singleCard.className = 'scientific-plot-card';
-          const singleImg = document.createElement('img');
-          singleImg.id = 'scientific-plot';
-          singleImg.className = 'plot-img';
-          singleImg.alt = 'Gráfico da resposta';
-          singleImg.src = '';
-          singleCard.appendChild(singleImg);
-          resultsContainer.appendChild(singleCard);
-        }
-
-        const plot = element('scientific-plot');
-        if (plot) plot.src = '';
-
+        setupSinglePlotCard('');
         showState('empty');
         resetResults(moduleKey);
       }
@@ -807,12 +901,26 @@
               img.id = 'scientific-plot';
             }
             body.appendChild(img);
+            const floatZoom = document.createElement('div');
+            floatZoom.className = 'plot-floating-zoom';
+            floatZoom.innerHTML = `
+              <button type="button" class="btn-stacked-zoom-in" title="Aumentar zoom (+)" aria-label="Aumentar zoom">+</button>
+              <button type="button" class="btn-stacked-zoom-out" title="Diminuir zoom (−)" aria-label="Diminuir zoom">−</button>
+              <button type="button" class="btn-stacked-zoom-reset" title="Ajustar figura (100%)" aria-label="Ajustar figura">⟲</button>
+            `;
+            ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel'].forEach(evt => {
+              floatZoom.addEventListener(evt, e => e.stopPropagation(), { passive: evt === 'wheel' ? false : true });
+            });
+            body.appendChild(floatZoom);
             card.appendChild(body);
 
             if (createPlotZoom) {
               const ctrl = createPlotZoom({
                 viewport: body,
                 image: img,
+                btnZoomIn: floatZoom.querySelector('.btn-stacked-zoom-in'),
+                btnZoomOut: floatZoom.querySelector('.btn-stacked-zoom-out'),
+                btnReset: floatZoom.querySelector('.btn-stacked-zoom-reset'),
               });
               stackedZoomCtrls.set(key, ctrl);
             }
@@ -849,35 +957,7 @@
         }
       } else {
         if (resultsContainer) {
-          resultsContainer.classList.remove('multi-plots-scroll');
-          stackedZoomCtrls.clear();
-          if (!element('scientific-plot-card')) {
-            resultsContainer.replaceChildren();
-            const singleCard = document.createElement('section');
-            singleCard.id = 'scientific-plot-card';
-            singleCard.className = 'scientific-plot-card plot-viewport';
-            singleCard.style.cssText = 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;';
-            const singleImg = document.createElement('img');
-            singleImg.id = 'scientific-plot';
-            singleImg.className = 'plot-img';
-            singleImg.alt = 'Gráfico da resposta';
-            singleImg.src = result.image;
-            singleCard.appendChild(singleImg);
-            resultsContainer.appendChild(singleCard);
-            if (createPlotZoom) {
-              singleZoomCtrl = createPlotZoom({
-                viewport: singleCard,
-                image: singleImg,
-              });
-            }
-          } else {
-            const pImg = element('scientific-plot');
-            if (pImg && result.image) {
-              pImg.src = result.image;
-              singleZoomCtrl?.setImage(pImg);
-            }
-          }
-          singleZoomCtrl?.resetZoom();
+          setupSinglePlotCard(result.image);
         }
         if (plotTabs) plotTabs.style.display = 'none';
         const figTitleEl = element('sci-figure-title');
@@ -1246,34 +1326,7 @@
       });
     });
 
-    // Ações do Ribbon e Zoom Interativo
-    const createPlotZoom = global.createPlotZoomController || (typeof window !== 'undefined' && window.createPlotZoomController);
-    let singleZoomCtrl = null;
-    const stackedZoomCtrls = new Map();
-
-    function initSinglePlotZoom() {
-      const plotCard = element('scientific-plot-card');
-      const plotImg = element('scientific-plot');
-      if (createPlotZoom && plotCard && plotImg) {
-        if (!singleZoomCtrl) {
-          singleZoomCtrl = createPlotZoom({
-            viewport: plotCard,
-            image: plotImg,
-          });
-        } else {
-          singleZoomCtrl.setImage(plotImg);
-        }
-      }
-    }
-    initSinglePlotZoom();
-
-    function getActiveZoomController() {
-      if (stackedZoomCtrls.size > 0) {
-        return stackedZoomCtrls.get(currentResponseType) || stackedZoomCtrls.values().next().value;
-      }
-      return singleZoomCtrl;
-    }
-
+    // Ações do Ribbon
     element('ribbon-btn-calc')?.addEventListener('click', run);
     element('ribbon-btn-clear')?.addEventListener('click', () => {
       const exprInput = getExpressionInput();
