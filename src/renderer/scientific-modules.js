@@ -636,6 +636,8 @@
       currentResult = modState.result;
       currentResponseType = modState.responseType || 'step';
       lastPreviewExpr = null;
+      singleZoomCtrl?.resetZoom();
+      stackedZoomCtrls.forEach(c => c.resetZoom());
 
       const kickerEl = element('scientific-kicker');
       if (kickerEl) kickerEl.textContent = config.kicker;
@@ -772,6 +774,7 @@
         if (resultsContainer) {
           resultsContainer.replaceChildren();
           resultsContainer.classList.add('multi-plots-scroll');
+          stackedZoomCtrls.clear();
 
           plotKeys.forEach((key, idx) => {
             const p = result.plots[key];
@@ -795,7 +798,7 @@
             card.appendChild(header);
 
             const body = document.createElement('div');
-            body.className = 'stacked-plot-body';
+            body.className = 'stacked-plot-body plot-viewport';
             const img = document.createElement('img');
             img.className = 'plot-img';
             img.src = p.image;
@@ -805,6 +808,14 @@
             }
             body.appendChild(img);
             card.appendChild(body);
+
+            if (createPlotZoom) {
+              const ctrl = createPlotZoom({
+                viewport: body,
+                image: img,
+              });
+              stackedZoomCtrls.set(key, ctrl);
+            }
 
             resultsContainer.appendChild(card);
           });
@@ -839,20 +850,34 @@
       } else {
         if (resultsContainer) {
           resultsContainer.classList.remove('multi-plots-scroll');
+          stackedZoomCtrls.clear();
           if (!element('scientific-plot-card')) {
             resultsContainer.replaceChildren();
             const singleCard = document.createElement('section');
             singleCard.id = 'scientific-plot-card';
-            singleCard.className = 'scientific-plot-card';
+            singleCard.className = 'scientific-plot-card plot-viewport';
+            singleCard.style.cssText = 'width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;';
             const singleImg = document.createElement('img');
             singleImg.id = 'scientific-plot';
             singleImg.className = 'plot-img';
             singleImg.alt = 'Gráfico da resposta';
+            singleImg.src = result.image;
             singleCard.appendChild(singleImg);
             resultsContainer.appendChild(singleCard);
+            if (createPlotZoom) {
+              singleZoomCtrl = createPlotZoom({
+                viewport: singleCard,
+                image: singleImg,
+              });
+            }
+          } else {
+            const pImg = element('scientific-plot');
+            if (pImg && result.image) {
+              pImg.src = result.image;
+              singleZoomCtrl?.setImage(pImg);
+            }
           }
-          const pImg = element('scientific-plot');
-          if (pImg && result.image) pImg.src = result.image;
+          singleZoomCtrl?.resetZoom();
         }
         if (plotTabs) plotTabs.style.display = 'none';
         const figTitleEl = element('sci-figure-title');
@@ -1221,17 +1246,34 @@
       });
     });
 
-    // Ações do Ribbon
-    let currentZoom = 1.0;
-    const plotImgEl = element('scientific-plot');
-    function applyZoom(z) {
-      currentZoom = Math.max(0.6, Math.min(2.5, z));
-      if (plotImgEl) {
-        plotImgEl.style.transform = `scale(${currentZoom})`;
-        plotImgEl.style.transformOrigin = 'center center';
-        plotImgEl.style.transition = 'transform 120ms ease';
+    // Ações do Ribbon e Zoom Interativo
+    const createPlotZoom = global.createPlotZoomController || (typeof window !== 'undefined' && window.createPlotZoomController);
+    let singleZoomCtrl = null;
+    const stackedZoomCtrls = new Map();
+
+    function initSinglePlotZoom() {
+      const plotCard = element('scientific-plot-card');
+      const plotImg = element('scientific-plot');
+      if (createPlotZoom && plotCard && plotImg) {
+        if (!singleZoomCtrl) {
+          singleZoomCtrl = createPlotZoom({
+            viewport: plotCard,
+            image: plotImg,
+          });
+        } else {
+          singleZoomCtrl.setImage(plotImg);
+        }
       }
     }
+    initSinglePlotZoom();
+
+    function getActiveZoomController() {
+      if (stackedZoomCtrls.size > 0) {
+        return stackedZoomCtrls.get(currentResponseType) || stackedZoomCtrls.values().next().value;
+      }
+      return singleZoomCtrl;
+    }
+
     element('ribbon-btn-calc')?.addEventListener('click', run);
     element('ribbon-btn-clear')?.addEventListener('click', () => {
       const exprInput = getExpressionInput();
@@ -1240,10 +1282,19 @@
         exprInput.focus();
         exprInput.dispatchEvent(new Event('input', { bubbles: true }));
       }
+      singleZoomCtrl?.resetZoom();
+      stackedZoomCtrls.forEach(c => c.resetZoom());
     });
-    element('ribbon-btn-zoom-in')?.addEventListener('click', () => applyZoom(currentZoom + 0.2));
-    element('ribbon-btn-zoom-out')?.addEventListener('click', () => applyZoom(currentZoom - 0.2));
-    element('ribbon-btn-fit')?.addEventListener('click', () => applyZoom(1.0));
+    element('ribbon-btn-zoom-in')?.addEventListener('click', () => {
+      getActiveZoomController()?.zoomIn();
+    });
+    element('ribbon-btn-zoom-out')?.addEventListener('click', () => {
+      getActiveZoomController()?.zoomOut();
+    });
+    element('ribbon-btn-fit')?.addEventListener('click', () => {
+      singleZoomCtrl?.resetZoom();
+      stackedZoomCtrls.forEach(c => c.resetZoom());
+    });
     element('ribbon-btn-grid')?.addEventListener('click', () => {
       showToast('Grade ativada na figura.', 'info', 2000);
     });

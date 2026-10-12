@@ -3170,12 +3170,14 @@ textarea::placeholder {
   -webkit-user-select: none;
 }
 
-.plot-viewport.zoomed {
+.plot-viewport.zoomed,
+.stacked-plot-body.zoomed {
   cursor: grab;
   touch-action: none;
 }
 
-.plot-viewport.zoomed:active {
+.plot-viewport.zoomed:active,
+.stacked-plot-body.zoomed:active {
   cursor: grabbing;
 }
 
@@ -7568,6 +7570,11 @@ body.in-scientific .global-navbar {
   align-items: center;
   justify-content: center;
   background: var(--surface);
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .stacked-plot-body img.plot-img {
