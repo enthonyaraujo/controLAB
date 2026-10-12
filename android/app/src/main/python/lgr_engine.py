@@ -970,9 +970,13 @@ def lgr_completo(num, den=None, titulo="Lugar Geométrico das Raízes", show_plo
     ax.set_ylabel(r'Eixo Imaginário ($j\omega$)', fontsize=10, labelpad=8)
     
     # Posiciona a legenda limpa abaixo dos ramos
-    leg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3,
-              fontsize=8, frameon=False)
+    leg = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.10), ncol=3,
+              fontsize=8, title="Componentes do LGR", title_fontsize=8.5, frameon=False)
     if leg:
+        t_obj = leg.get_title()
+        if t_obj:
+            t_obj.set_color(tokens["text"])
+            t_obj.set_fontweight("bold")
         for text in leg.get_texts():
             text.set_color(tokens["text"])
     

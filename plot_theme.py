@@ -201,12 +201,13 @@ def apply_plot_theme(fig, axes: Any = None, theme: str = "dark") -> None:
                 legend_title.set_fontsize(10.0)
                 legend_title.set_fontweight("bold")
 
-            frame = legend.get_frame()
-            if frame is not None:
-                frame.set_facecolor(tokens["bg_card"])
-                frame.set_edgecolor(tokens["spine"])
-                frame.set_linewidth(0.8)
-                frame.set_alpha(0.95)
+            if legend.get_frame_on():
+                frame = legend.get_frame()
+                if frame is not None:
+                    frame.set_facecolor(tokens["bg_card"])
+                    frame.set_edgecolor(tokens["spine"])
+                    frame.set_linewidth(0.8)
+                    frame.set_alpha(0.95)
 
             for text in legend.get_texts():
                 text.set_color(tokens["text"])

@@ -567,15 +567,18 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
     from plot_theme import get_theme_tokens, apply_plot_theme
     tokens = get_theme_tokens(theme)
 
-    fig, ax = plt.subplots(figsize=(11, 7.2), dpi=110)
-    fig.patch.set_facecolor("#FFFFFF")
-    ax.set_facecolor("#FFFFFF")
+    fig, ax = plt.subplots(figsize=(8.2, 7.2), dpi=140)
+    fig.patch.set_facecolor(tokens["bg_fig"])
+    ax.set_facecolor(tokens["bg_fig"])
 
     ax.grid(True, linestyle="--", alpha=tokens["grid_alpha"], color=tokens["grid"])
-    ax.axhline(0, color=tokens["spine"], linewidth=1.0)  # Eixo Real
-    ax.axvline(0, color=tokens["spine"], linewidth=1.0)  # Eixo jw
+    ax.axhline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)  # Eixo Real
+    ax.axvline(0, color=tokens["spine"], linewidth=0.8, alpha=0.7)  # Eixo jw
 
     has_k = k_info.get("has_k", False)
+    bg_badge = tokens.get("bg_card", "#FFFFFF")
+    edge_badge = tokens.get("grid", "#CBD5E1")
+    text_badge = tokens.get("text", "#000000")
 
     if has_k:
         # Separação analítica D(s) + K * N(s) = 0 para criação da TransferFunction via python-control
@@ -636,11 +639,6 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         re_max = max(x_max + pad_x, 1.5)
         im_max = y_max + pad_y
 
-        # Regiões de Estabilidade (SPE verde suave, SPD vermelho suave)
-        ax.axvspan(re_min * 2.5, 0, color="#10b981", alpha=0.08, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2.5, color="#ef4444", alpha=0.08, label="Regime Instável (SPD, Re > 0)")
-        ax.axvline(0, color="#f59e0b", linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
-
         # Traçado contínuo dos ramos do LGR
         branch_color = tokens.get("lgr_branch", "#000000")
         for i in range(ramos):
@@ -648,18 +646,19 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                 np.real(rlist[:, i]),
                 np.imag(rlist[:, i]),
                 color=branch_color,
-                linewidth=2.2,
+                linewidth=2.0,
                 label="Ramos do LGR" if i == 0 else "_nolegend_",
                 zorder=4,
             )
 
         # Marcação de polos em K = 0 (usando 'kx' padrão LGR)
+        pole_color = tokens.get("lgr_pole", "#000000")
         ax.plot(
             np.real(polos),
             np.imag(polos),
             "x",
-            color=tokens["text"],
-            markersize=9,
+            color=pole_color,
+            markersize=8.5,
             markeredgewidth=2.2,
             label="Polos (Início)",
             zorder=5,
@@ -679,8 +678,8 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                     va="bottom",
                     fontsize=8.5,
                     fontweight="bold",
-                    color=tokens["text"],
-                    bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
+                    color=text_badge,
+                    bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7),
                 )
             else:
                 sgn = "+" if im_p >= 0 else "-"
@@ -694,20 +693,21 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                     ha="right" if re_p < 0 else "left",
                     va="center",
                     fontsize=8.5,
-                    color=tokens["text"],
-                    bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
+                    color=text_badge,
+                    bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7),
                 )
 
         # Marcação de zeros finitos (usando 'ko' padrão LGR)
+        zero_color = tokens.get("lgr_zero", "#000000")
         if Z > 0:
             ax.plot(
                 np.real(zeros),
                 np.imag(zeros),
                 "o",
-                color=tokens["text"],
-                markerfacecolor="none",
-                markersize=8.5,
-                markeredgewidth=2.2,
+                color=zero_color,
+                markerfacecolor=tokens["bg_fig"],
+                markersize=7.5,
+                markeredgewidth=2.0,
                 label="Zeros (Término)",
                 zorder=5,
             )
@@ -724,11 +724,12 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                         va="top",
                         fontsize=8.5,
                         fontweight="bold",
-                        color=tokens["text"],
-                        bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
+                        color=text_badge,
+                        bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7),
                     )
 
         # Cruzamentos com o eixo imaginário (Ganhos Críticos de Routh com anotações callout idênticas ao LGR)
+        jw_legend_set = False
         for ck in k_info.get("critical_k", []):
             kv = float(ck.get("k_val", 0))
             if kv > 0:
@@ -738,7 +739,8 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                     jw_crit = [cp for cp in crit_poles if abs(np.real(cp)) < 1e-2 and abs(np.imag(cp)) > 1e-4]
                     for idx_cp, cp in enumerate(jw_crit):
                         w_val = float(np.imag(cp))
-                        lbl = rf"Cruz. j$\omega$ ($\omega=\pm${abs(w_val):.2f}, K={kv:.1f})" if idx_cp == 0 else "_nolegend_"
+                        lbl = rf"Cruz. j$\omega$ ($\omega=\pm${abs(w_val):.2f}, K={kv:.1f})" if not jw_legend_set else "_nolegend_"
+                        jw_legend_set = True
                         ax.plot(
                             0,
                             w_val,
@@ -746,26 +748,29 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                             color=tokens["danger"],
                             markerfacecolor=tokens["bg_card"],
                             markeredgewidth=2,
-                            markersize=7.5,
+                            markersize=7.0,
                             label=lbl,
                             zorder=6,
                         )
                         ax.annotate(
                             rf"$j\omega={w_val:+.2f}$" + "\n" + rf"K={kv:.1f}",
                             xy=(0, w_val),
-                            xytext=(16, 0),
+                            xytext=(14, 0),
                             textcoords="offset points",
                             ha="left",
                             va="center",
-                            fontsize=8.5,
+                            fontsize=8.0,
                             color=tokens["danger"],
                             fontweight="bold",
-                            bbox=dict(boxstyle="round,pad=0.25", facecolor=tokens["bg_card"], edgecolor=tokens["danger"], alpha=0.96, lw=0.8),
+                            bbox=dict(boxstyle="round,pad=0.25", facecolor=bg_badge, edgecolor=tokens["danger"], alpha=0.96, lw=0.8),
                             arrowprops=dict(arrowstyle="->", color=tokens["danger"], lw=0.8),
                         )
                 except Exception:
                     pass
 
+        ax.set_xlim(re_min, re_max)
+        ax.set_ylim(-im_max, im_max)
+        ax.set_aspect("equal", adjustable="box")
         ax.set_title("")
 
     else:
@@ -774,15 +779,24 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
         sys = ct.tf([1.0], den_coeffs)
         polos = ct.poles(sys)
 
-        re_vals = [float(np.real(p)) for p in polos]
-        im_vals = [float(np.imag(p)) for p in polos]
-        re_min = min(-4.0, min(re_vals) - 1.5)
-        re_max = max(3.0, max(re_vals) + 1.5)
-        im_max = max(3.5, max(np.abs(im_vals)) + 1.5)
+        re_vals = [float(np.real(p)) for p in polos] + [0.0]
+        im_vals = [float(np.imag(p)) for p in polos] + [0.0]
+        x_min, x_max = min(re_vals), max(re_vals)
+        y_max = max(np.abs(im_vals)) if len(im_vals) else 2.0
+        y_max = max(y_max, 2.0)
 
-        ax.axvspan(re_min * 2.5, 0, color=tokens.get("success", "#10b981"), alpha=0.08, label="Regime Estável (SPE, Re < 0)")
-        ax.axvspan(0, re_max * 2.5, color=tokens.get("danger", "#ef4444"), alpha=0.08, label="Regime Instável (SPD, Re > 0)")
-        ax.axvline(0, color=tokens.get("warning", "#f59e0b"), linestyle="--", linewidth=1.5, label=r"Fronteira Marginal ($j\omega$)", zorder=3)
+        span_x = max(x_max - x_min, 4.0)
+        span_y = max(2 * y_max, 4.0)
+        pad_x = span_x * 0.18
+        pad_y = span_y * 0.15
+
+        re_min = min(x_min - pad_x, -1.0)
+        re_max = max(x_max + pad_x, 1.5)
+        im_max = y_max + pad_y
+
+        spe_added = False
+        spd_added = False
+        jw_added = False
 
         for p in polos:
             re_p = float(np.real(p))
@@ -790,8 +804,20 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
             is_spe = re_p < -1e-4
             is_spd = re_p > 1e-4
             color = tokens.get("success", "#10b981") if is_spe else (tokens.get("danger", "#ef4444") if is_spd else tokens.get("warning", "#f59e0b"))
-            lbl_tag = "SPE" if is_spe else ("SPD" if is_spd else "jω")
-            ax.plot(re_p, im_p, "x", color=tokens["text"], markersize=10, markeredgewidth=2.2, zorder=6)
+            lbl_tag = "SPE" if is_spe else ("SPD" if is_spd else r"j\omega")
+
+            lbl = "_nolegend_"
+            if is_spe and not spe_added:
+                lbl = "Polos no SPE"
+                spe_added = True
+            elif is_spd and not spd_added:
+                lbl = "Polos no SPD"
+                spd_added = True
+            elif not is_spe and not is_spd and not jw_added:
+                lbl = r"Polos em $j\omega$"
+                jw_added = True
+
+            ax.plot(re_p, im_p, "x", color=tokens["text"], markersize=8.5, markeredgewidth=2.2, label=lbl, zorder=6)
             sgn = "+" if im_p >= 0 else "-"
             txt = f"p={re_p:.2g}{sgn}j{abs(im_p):.2g} [{lbl_tag}]" if abs(im_p) > 1e-5 else f"p={re_p:.2g} [{lbl_tag}]"
             ax.annotate(
@@ -802,47 +828,41 @@ def generate_stability_plot(poly_s, k_info, degree, is_fraction=False, numer=Non
                 fontsize=8.5,
                 color=color,
                 fontweight="bold",
-                bbox=dict(boxstyle="round,pad=0.22", facecolor=tokens["bg_card"], edgecolor=tokens["spine"], alpha=0.96, lw=0.7),
+                bbox=dict(boxstyle="round,pad=0.22", facecolor=bg_badge, edgecolor=edge_badge, alpha=0.96, lw=0.7),
             )
 
+        ax.set_xlim(re_min, re_max)
+        ax.set_ylim(-im_max, im_max)
+        ax.set_aspect("equal", adjustable="box")
         ax.set_title("")
 
-    ax.set_xlim(re_min, re_max)
-    ax.set_ylim(-im_max, im_max)
     ax.set_xlabel(r"Eixo Real ($\sigma$)", fontsize=10, labelpad=8)
     ax.set_ylabel(r"Eixo Imaginário ($j\omega$)", fontsize=10, labelpad=8)
 
     legend_title = "Componentes do LGR" if has_k else "Polos e Regiões de Estabilidade"
     leg = ax.legend(
-        loc="lower left",
-        bbox_to_anchor=(1.01, 0.35),
-        borderaxespad=0,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.10),
+        ncol=3,
+        fontsize=8,
         title=legend_title,
-        title_fontsize=7.5,
-        fontsize=7.0,
-        borderpad=0.25,
-        labelspacing=0.2,
-        handlelength=1.0,
-        handletextpad=0.3,
-        framealpha=0.90,
-        facecolor=tokens["bg_card"],
-        edgecolor=tokens["spine"],
+        title_fontsize=8.5,
+        frameon=False,
     )
     if leg:
-        title_obj = leg.get_title()
-        if title_obj is not None:
-            title_obj.set_color(tokens["text"])
-            title_obj.set_fontsize(7.5)
-            title_obj.set_fontweight("bold")
+        t_obj = leg.get_title()
+        if t_obj:
+            t_obj.set_color(tokens["text"])
+            t_obj.set_fontweight("bold")
         for t in leg.get_texts():
             t.set_color(tokens["text"])
-            t.set_fontsize(7.0)
 
     apply_plot_theme(fig, ax, theme=theme)
+    ax.set_title("")
     plt.tight_layout()
 
     from control_utils import figure_payload
-    return figure_payload(fig, dpi=110, theme=theme)
+    return figure_payload(fig, dpi=140, theme=theme)
 
 
 
