@@ -553,8 +553,8 @@
 
         <div class="sci-plot-viewport" style="display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; position: relative;">
           <!-- View 1: Gráfico -->
-          <div id="view-plot" class="view-panel active" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
-            <div id="plot-loading" class="loading-overlay" style="display: none;">
+          <div id="view-plot" class="view-panel active" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+            <div id="plot-loading" class="routh-loading-overlay sci-loading-card" style="display: none;">
               <div class="spinner"></div>
               <span>Calculando Lugar Geométrico das Raízes...</span>
             </div>
@@ -776,7 +776,7 @@
 
         <div class="sci-plot-viewport" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
           <!-- Loading -->
-          <div id="routh-loading" class="routh-loading-overlay" style="display: none;">
+          <div id="routh-loading" class="routh-loading-overlay sci-loading-card" style="display: none;">
             <div class="spinner"></div>
             <span>Calculando Critério de Routh-Hurwitz...</span>
           </div>
@@ -1129,11 +1129,10 @@
           </div>
 
           <!-- Área de visualização do gráfico -->
-          <div class="sci-plot-viewport" id="scientific-plot-viewport">
-            <div id="scientific-loading" class="scientific-state" hidden>
-              <div class="skeleton-layout" aria-busy="true" aria-label="Calculando resposta do sistema">
-                <div class="skeleton skeleton-plot"></div>
-              </div>
+          <div class="sci-plot-viewport" id="scientific-plot-viewport" style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+            <div id="scientific-loading" class="routh-loading-overlay sci-loading-card" style="display: none;" hidden>
+              <div class="spinner"></div>
+              <span id="scientific-loading-text">Calculando resposta do sistema...</span>
             </div>
 
             <div id="scientific-empty" class="scientific-empty-discrete" style="display: flex;">
