@@ -153,10 +153,6 @@ def generate_all():
     html_lgr = html_lgr.replace('id="page-lgr" class="app-page"', 'id="page-lgr" class="app-page active"')
     html_lgr = html_lgr.replace('<div id="plot-loading" class="loading-overlay">', '<div id="plot-loading" class="loading-overlay" style="display:none;">')
     html_lgr = html_lgr.replace('<img id="plot-image" src=""', f'<img id="plot-image" src="{res_lgr["image"]}"')
-    html_lgr = html_lgr.replace('id="badge-poles">Polos: <b>0</b>', 'id="badge-poles">Polos: <b>3</b>')
-    html_lgr = html_lgr.replace('id="badge-zeros">Zeros: <b>0</b>', 'id="badge-zeros">Zeros: <b>1</b>')
-    html_lgr = html_lgr.replace('id="badge-branches">Ramos: <b>0</b>', 'id="badge-branches">Ramos: <b>3</b>')
-    html_lgr = html_lgr.replace('id="badge-centroid">Centroide: <b>-</b>', 'id="badge-centroid">Centroide: <b>-1.50</b>')
     render_html_to_webp(html_lgr, 1918, 997, "lugar-das-raizes.webp")
 
     # 5. RESPOSTA EM FREQUÊNCIA (BODE E NYQUIST) (1918 x 997)

@@ -239,19 +239,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // 2. Renderizar Fórmulas LaTeX via KaTeX
-      renderMath(latexExpanded, res.latex_exp);
-      renderMath(latexFactored, res.latex_fac);
+      // 2. Renderizar Fórmulas LaTeX via KaTeX (se containers presentes)
+      if (latexExpanded) renderMath(latexExpanded, res.latex_exp);
+      if (latexFactored) renderMath(latexFactored, res.latex_fac);
 
-      // 3. Atualizar Badges de Resumo
+      // 3. Atualizar Badges de Resumo (se presentes)
       const det = res.detalhes;
-      badgePoles.innerHTML = `Polos: <b>${det.P}</b>`;
-      badgeZeros.innerHTML = `Zeros: <b>${det.Z}</b>`;
-      badgeBranches.innerHTML = `Ramos: <b>${det.ramos}</b>`;
-      badgeCentroid.innerHTML = det.centroide !== null 
-        ? `Centroide $\\sigma_a$: <b>${det.centroide.toFixed(2)}</b>` 
-        : `Centroide: <b>N/A</b>`;
-      renderMathInContainer(badgeCentroid);
+      if (badgePoles) badgePoles.innerHTML = `Polos: <b>${det.P}</b>`;
+      if (badgeZeros) badgeZeros.innerHTML = `Zeros: <b>${det.Z}</b>`;
+      if (badgeBranches) badgeBranches.innerHTML = `Ramos: <b>${det.ramos}</b>`;
+      if (badgeCentroid) {
+        badgeCentroid.innerHTML = det.centroide !== null 
+          ? `Centroide $\\sigma_a$: <b>${det.centroide.toFixed(2)}</b>` 
+          : `Centroide: <b>N/A</b>`;
+        renderMathInContainer(badgeCentroid);
+      }
 
       // 4. Preencher o Memorial de Cálculo dos 7 Passos e Deduções
       pendingMemorial = det;
