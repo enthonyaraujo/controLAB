@@ -7506,7 +7506,11 @@ body.in-scientific .global-navbar {
 }
 
 /* Gráficos múltiplos empilhados com rolagem vertical */
-.scientific-results.multi-plots-scroll {
+.scientific-results.multi-plots-scroll[hidden] {
+  display: none !important;
+}
+
+.scientific-results.multi-plots-scroll:not([hidden]) {
   display: flex !important;
   flex-direction: column !important;
   gap: 12px !important;
