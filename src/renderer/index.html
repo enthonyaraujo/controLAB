@@ -55,7 +55,7 @@
           <path d="M2 12h4l3-7 4 14 3-7h6"></path>
         </svg>
         <span class="global-brand-title" id="global-brand-title">ControLAB</span>
-        <span class="brand-version-badge">v4.0.4</span>
+        <span class="brand-version-badge">v4.1.0</span>
       </div>
     </div>
 
@@ -83,16 +83,17 @@
     <header class="home-top-bar">
       <div class="home-brand">
         <span class="home-brand-title">ControLAB</span>
-        <span class="home-brand-sep" aria-hidden="true">|</span>
-        <span class="home-brand-page">Início</span>
+        <span class="home-brand-sep" aria-hidden="true" style="display: none;">|</span>
+        <span class="home-brand-page" style="display: none;">Início</span>
       </div>
       <nav class="home-top-tabs">
-        <button type="button" class="home-tab active" data-home-tab="inicio">INÍCIO</button>
-        <button type="button" class="home-tab" data-home-tab="editor">EDITOR</button>
-        <button type="button" class="home-tab" data-home-tab="console">CONSOLE</button>
-        <button type="button" class="home-tab" data-home-tab="pacotes">PACOTES</button>
-        <button type="button" class="home-tab" data-home-tab="blocos">BLOCOS</button>
-        <button type="button" class="home-tab" data-home-tab="ajuda">AJUDA</button>
+        <button type="button" class="home-tab active" data-nav="home" data-home-tab="inicio">INÍCIO</button>
+        <button type="button" class="home-tab" data-nav="time">RESPOSTA NO TEMPO</button>
+        <button type="button" class="home-tab" data-nav="routh">ESTABILIDADE</button>
+        <button type="button" class="home-tab" data-nav="lgr">LUGAR GEOMÉTRICO DAS RAÍZES</button>
+        <button type="button" class="home-tab" data-nav="frequency">RESPOSTA EM FREQUÊNCIA</button>
+        <button type="button" class="home-tab" data-nav="controllers">CONTROLADORES</button>
+        <button type="button" class="home-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
       </nav>
       <div class="home-top-actions">
         <button type="button" class="btn-top-settings" data-action="settings" title="Configurações" aria-label="Configurações">
@@ -101,10 +102,10 @@
       </div>
     </header>
 
-    <!-- Contêiner Principal com Trilho Lateral (Tablet) e Conteúdo -->
+    <!-- Contêiner Principal e Conteúdo -->
     <div class="home-main-layout">
-      <!-- Navigation Rail para Tablet (84px) -->
-      <nav class="home-nav-rail" id="home-nav-rail" aria-label="Navegação Tablet">
+      <!-- Navigation Rail (preservado em DOM oculto para integridade de scripts) -->
+      <nav class="home-nav-rail" id="home-nav-rail" aria-label="Navegação Tablet" style="display: none;">
         <div class="home-rail-group home-rail-top">
           <button type="button" class="home-rail-item active" data-home-tab="inicio" title="Início">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
@@ -151,17 +152,23 @@
             </section>
           </aside>
 
-          <!-- Divisor Vertical Esquerdo (Desktop >= 1024px) -->
+          <!-- Divisor Vertical Esquerdo -->
           <div class="home-splitter home-splitter-v" id="home-splitter-left" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar a pasta (clique duplo para redefinir)"></div>
 
-          <!-- Coluna Central: Começar e Módulos -->
+          <!-- Coluna Central: Começar (Área reservada para futura execução .m e .mat) -->
           <section class="home-center-col">
             <!-- Painel: Começar -->
-            <div class="home-section-panel">
+            <div class="home-section-panel home-center-panel">
               <div class="home-panel-header">
                 <span class="home-panel-title">Começar</span>
-                <span class="home-panel-hint">Ctrl+N &nbsp;·&nbsp; Ctrl+O</span>
               </div>
+              <div class="home-workspace-central" id="home-workspace-central">
+                <!-- Espaço central reservado para execução de arquivos .m e .mat -->
+              </div>
+            </div>
+
+            <!-- Compatibilidade semântica de módulos e testes (em contêiner oculto) -->
+            <div style="display: none;" aria-hidden="true">
               <div class="home-start-body">
                 <p class="home-start-desc">
                   <span class="desc-full">Execute scripts .m, analise sistemas e gere gráficos, no editor ou pela interface gráfica de cada módulo.</span>
@@ -175,86 +182,40 @@
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Painel: Módulos -->
-            <div class="home-section-panel home-modules-panel">
-              <div class="home-panel-header">
-                <span class="home-panel-title">Módulos</span>
-                <span class="home-panel-hint">Cada módulo gera o código equivalente</span>
+              <div class="home-modules-panel">
                 <button type="button" class="home-see-all-link" id="btn-see-all-modules">Ver todos</button>
-              </div>
-              <div class="home-modules-grid" id="home-modules-grid">
-                <!-- 1. Sistemas de controle -->
-                <div class="home-module-card" id="card-mod-control" data-nav="time" role="button" tabindex="0">
-                  <div class="mod-card-header">
-                    <h3 class="mod-card-title">
-                      <span class="title-full">Sistemas de controle</span>
-                      <span class="title-mobile">Controle</span>
-                    </h3>
+                <div class="home-modules-grid" id="home-modules-grid">
+                  <div class="home-module-card" id="card-mod-control" data-nav="time" role="button" tabindex="0">
+                    <div class="mod-card-header"><h3 class="mod-card-title"><span class="title-full">Sistemas de controle</span></h3></div>
+                    <p class="mod-card-desc"><span class="desc-full">Resposta no tempo, LGR, Bode, PID e espaço de estados.</span></p>
                   </div>
-                  <p class="mod-card-desc">
-                    <span class="desc-full">Resposta no tempo, LGR, Bode, PID e espaço de estados.</span>
-                    <span class="desc-mobile">Tempo, LGR, Bode e PID.</span>
-                  </p>
-                </div>
-
-                <!-- 2. Sinais e filtros -->
-                <div class="home-module-card" id="card-mod-signals" data-module="Sinais e filtros" role="button" tabindex="0">
-                  <div class="mod-card-header">
-                    <h3 class="mod-card-title">
-                      <span class="title-full">Sinais e filtros</span>
-                      <span class="title-mobile">Sinais</span>
-                    </h3>
+                  <div class="home-module-card" id="card-mod-signals" data-module="Sinais e filtros" role="button" tabindex="0">
+                    <div class="mod-card-header"><h3 class="mod-card-title"><span class="title-full">Sinais e filtros</span></h3></div>
+                    <p class="mod-card-desc"><span class="desc-full">FFT, espectros e projeto de filtros.</span></p>
                   </div>
-                  <p class="mod-card-desc">
-                    <span class="desc-full">FFT, espectros e projeto de filtros.</span>
-                    <span class="desc-mobile">FFT e filtros.</span>
-                  </p>
-                </div>
-
-                <!-- 3. Otimização -->
-                <div class="home-module-card" id="card-mod-optim" data-module="Otimização" role="button" tabindex="0">
-                  <div class="mod-card-header">
-                    <h3 class="mod-card-title">Otimização</h3>
+                  <div class="home-module-card" id="card-mod-optim" data-module="Otimização" role="button" tabindex="0">
+                    <div class="mod-card-header"><h3 class="mod-card-title">Otimização</h3></div>
+                    <p class="mod-card-desc"><span class="desc-full">Mínimos quadrados, raízes e programação linear.</span></p>
                   </div>
-                  <p class="mod-card-desc">
-                    <span class="desc-full">Mínimos quadrados, raízes e programação linear.</span>
-                    <span class="desc-mobile">Raízes e mínimos quadrados.</span>
-                  </p>
-                </div>
-
-                <!-- 4. Álgebra linear -->
-                <div class="home-module-card" id="card-mod-linalg" data-module="Álgebra linear" role="button" tabindex="0">
-                  <div class="mod-card-header">
-                    <h3 class="mod-card-title">Álgebra linear</h3>
+                  <div class="home-module-card" id="card-mod-linalg" data-module="Álgebra linear" role="button" tabindex="0">
+                    <div class="mod-card-header"><h3 class="mod-card-title">Álgebra linear</h3></div>
+                    <p class="mod-card-desc"><span class="desc-full">Matrizes, autovalores, decomposições e sistemas lineares.</span></p>
                   </div>
-                  <p class="mod-card-desc">
-                    <span class="desc-full">Matrizes, autovalores, decomposições e sistemas lineares.</span>
-                    <span class="desc-mobile">Matrizes e autovalores.</span>
-                  </p>
-                </div>
-
-                <!-- 5. Equações diferenciais (oculto por padrão em mobile) -->
-                <div class="home-module-card is-extra-mobile" id="card-mod-diffeq" data-module="Equações diferenciais" role="button" tabindex="0">
-                  <div class="mod-card-header">
-                    <h3 class="mod-card-title">Equações diferenciais</h3>
+                  <div class="home-module-card is-extra-mobile" id="card-mod-diffeq" data-module="Equações diferenciais" role="button" tabindex="0">
+                    <div class="mod-card-header"><h3 class="mod-card-title">Equações diferenciais</h3></div>
+                    <p class="mod-card-desc">Integradores para sistemas rígidos e não rígidos.</p>
                   </div>
-                  <p class="mod-card-desc">Integradores para sistemas rígidos e não rígidos.</p>
-                </div>
-
-                <!-- 6. Diagrama de blocos (oculto por padrão em mobile) -->
-                <div class="home-module-card mod-card-dev is-extra-mobile" id="card-mod-blocks" data-module="Diagrama de blocos" role="button" tabindex="0">
-                  <div class="mod-card-header">
-                    <h3 class="mod-card-title">Diagrama de blocos</h3>
+                  <div class="home-module-card mod-card-dev is-extra-mobile" id="card-mod-blocks" data-module="Diagrama de blocos" role="button" tabindex="0">
+                    <div class="mod-card-header"><h3 class="mod-card-title">Diagrama de blocos</h3></div>
+                    <p class="mod-card-desc">Modelagem e simulação por blocos.</p>
                   </div>
-                  <p class="mod-card-desc">Modelagem e simulação por blocos. Em desenvolvimento.</p>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- Divisor Vertical Direito (Desktop >= 1024px) -->
+          <!-- Divisor Vertical Direito -->
           <div class="home-splitter home-splitter-v" id="home-splitter-right" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar o painel direito (clique duplo para redefinir)"></div>
 
           <!-- Coluna Direita: Recentes e Workspace -->
@@ -286,11 +247,11 @@
           </aside>
         </div>
 
-        <!-- Divisor Horizontal Console (Desktop >= 1024px) -->
-        <div class="home-splitter home-splitter-h" id="home-splitter-console" role="separator" aria-orientation="horizontal" tabindex="0" title="Arraste para redimensionar o console (clique duplo para redefinir)"></div>
+        <!-- Divisor Horizontal Console (preservado em DOM oculto para testes e scripts) -->
+        <div class="home-splitter home-splitter-h" id="home-splitter-console" role="separator" aria-orientation="horizontal" tabindex="0" style="display: none;" title="Arraste para redimensionar o console (clique duplo para redefinir)"></div>
 
-        <!-- Área Inferior: Console e Rodapé -->
-        <section class="home-console-area" id="home-console-area">
+        <!-- Área Inferior: Console e Rodapé (preservado em DOM oculto para testes e scripts) -->
+        <section class="home-console-area" id="home-console-area" style="display: none;">
           <div class="home-panel-header">
             <span class="home-panel-title">Console</span>
             <span class="home-panel-hint">Histórico: ↑ ↓ &nbsp;·&nbsp; Tab completa</span>
@@ -316,8 +277,8 @@
       </div>
     </div>
 
-    <!-- Barra de Navegação Inferior para Mobile -->
-    <nav class="home-bottom-nav" id="home-bottom-nav" aria-label="Navegação Mobile">
+    <!-- Barra de Navegação Inferior (preservada em DOM oculto) -->
+    <nav class="home-bottom-nav" id="home-bottom-nav" aria-label="Navegação Mobile" style="display: none;">
       <button type="button" class="home-bottom-nav-item active" data-home-tab="inicio">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/></svg>
         <span>Início</span>
@@ -357,6 +318,9 @@
   <div id="page-lgr" class="app-page sci-shell" data-active-tab="params">
     <!-- Barra Superior de Abas (Desktop >= 1024px) -->
     <header class="sci-top-bar">
+      <div class="home-brand">
+        <span class="home-brand-title">ControLAB</span>
+      </div>
       <nav class="sci-top-tabs">
         <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
         <button type="button" class="sci-tab" data-nav="time">RESPOSTA NO TEMPO</button>
@@ -366,6 +330,11 @@
         <button type="button" class="sci-tab" data-nav="controllers">CONTROLADORES</button>
         <button type="button" class="sci-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
       </nav>
+      <div class="home-top-actions">
+        <button type="button" class="btn-top-settings" data-action="settings" title="Configurações" aria-label="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
     </header>
 
     <!-- App Bar (Tablet & Celular < 1024px) -->
@@ -635,6 +604,9 @@
   <div id="page-routh" class="app-page sci-shell" data-active-tab="params">
     <!-- Barra Superior de Abas (Desktop >= 1024px) -->
     <header class="sci-top-bar">
+      <div class="home-brand">
+        <span class="home-brand-title">ControLAB</span>
+      </div>
       <nav class="sci-top-tabs">
         <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
         <button type="button" class="sci-tab" data-nav="time">RESPOSTA NO TEMPO</button>
@@ -644,6 +616,11 @@
         <button type="button" class="sci-tab" data-nav="controllers">CONTROLADORES</button>
         <button type="button" class="sci-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
       </nav>
+      <div class="home-top-actions">
+        <button type="button" class="btn-top-settings" data-action="settings" title="Configurações" aria-label="Configurações">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
     </header>
 
     <!-- App Bar (Tablet & Celular < 1024px) -->
@@ -951,6 +928,9 @@
     <div class="sci-shell">
       <!-- Barra Superior de Abas (Desktop >= 1024px) -->
       <header class="sci-top-bar" id="sci-top-bar">
+        <div class="home-brand">
+          <span class="home-brand-title">ControLAB</span>
+        </div>
         <nav class="sci-top-tabs">
           <button type="button" class="sci-tab" data-nav="home">INÍCIO</button>
           <button type="button" class="sci-tab active" data-nav="time">RESPOSTA NO TEMPO</button>
@@ -960,6 +940,11 @@
           <button type="button" class="sci-tab" data-nav="controllers">CONTROLADORES</button>
           <button type="button" class="sci-tab" data-nav="state-space">ESPAÇO DE ESTADOS</button>
         </nav>
+        <div class="home-top-actions">
+          <button type="button" class="btn-top-settings" data-action="settings" title="Configurações" aria-label="Configurações">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
       </header>
 
       <!-- Barra Superior App Bar (Tablet & Mobile < 1024px) -->
@@ -1289,7 +1274,7 @@
           </div>
           <div>
             <h2 id="modal-settings-title" class="modal-title">Configurações & Sobre</h2>
-            <span class="modal-subtitle">ControLAB v4.0.4 • Engenharia de Controle</span>
+            <span class="modal-subtitle">ControLAB v4.1.0 • Engenharia de Controle</span>
           </div>
         </div>
         <button id="btn-close-settings" class="modal-close-btn" title="Fechar" aria-label="Fechar configurações">
@@ -1344,7 +1329,7 @@
               <div class="settings-card-header-info">
                 <div class="settings-version-tag">
                   <span class="version-label">Versão Instalada</span>
-                  <span class="version-value">v4.0.4</span>
+                  <span class="version-value">v4.1.0</span>
                   <span id="detected-env-badge" class="detected-env-badge">Detectando sistema...</span>
                 </div>
                 <p id="update-status-text" class="settings-card-desc">Consulte a versão estável mais recente publicada no GitHub Releases.</p>
