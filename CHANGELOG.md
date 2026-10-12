@@ -3,6 +3,20 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.1.2] - 2026-10-12
+
+### Corrigido
+- **Visualização de Gráficos de Resposta no Tempo no Android:**
+  - Corrigida a renderização dos gráficos de resposta no tempo (`Degrau unitário`, `Rampa unitária` e `Impulso unitário`), restaurando a inserção correta dos elementos `<img>` no container DOM (`.stacked-plot-body`).
+  - Ajustadas as regras de estilo de layout flexível (`flex-basis`, `min-height: 0`, `object-fit: contain`) para evitar colapso de viewport e áreas transparentes no WebView Android e navegadores móveis.
+
+### Aprimorado
+- **Atualização de Versão e Artefatos da Release 4.1.2:**
+  - `versionCode 20` e `versionName "4.1.2"` no projeto Android.
+  - Bump de versão em manifests, PWA Service Worker, páginas e scripts de suporte.
+
+---
+
 ## [4.1.1] - 2026-10-12
 
 ### Aprimorado
