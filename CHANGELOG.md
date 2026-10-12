@@ -3,6 +3,27 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.1.0] - 2026-10-12
+
+### Adicionado
+- **Novo Layout da Interface Inicial (3 Colunas para Tablets e Desktop):**
+  - Coluna esquerda com *Pasta atual*, caminho do diretório e listagem de arquivos locais.
+  - Painel centralizado *Começar* (`#home-workspace-central`), com área limpa dedicada à futura integração do motor de scripts `.m` e `.mat`.
+  - Coluna lateral direita particionada verticalmente entre *Recentes* e *Workspace*, com botões dedicados de limpeza e rolagem independente.
+  - Divisores verticais interativos com pegadores visuais ergonômicos e suporte completo a redimensionamento em tablets (a partir de 768px) e desktop.
+  - Ocultação do console inferior acoplado na tela inicial para foco visual e organização do espaço de trabalho.
+
+### Aprimorado e Unificado
+- **Unificação Completa do Painel Superior de Navegação:**
+  - Padronização idêntica da barra superior entre o menu *Início* e todos os módulos científicos (*Resposta no Tempo*, *Estabilidade*, *LGR*, *Resposta em Frequência*, *Controladores* e *Espaço de Estados*).
+  - Composição idêntica com marca **ControLAB** à esquerda, abas centrais de navegação com altura (`2.75rem`), tipografia e espaçamentos sincronizados, e botão de configurações à direita em todas as telas.
+  - Eliminação de qualquer salto de layout, mudança de altura ou deslocamento das abas durante a alternância entre módulos.
+- **Atualização de Versão e Artefatos da Release 4.1.0:**
+  - Bump de versão em todos os manifests, PWA Service Worker, scripts de exportação e landing page.
+  - `versionCode 18` e `versionName "4.1.0"` no projeto Android (Capacitor/Chaquopy).
+
+---
+
 ## [4.0.4] - 2026-10-12
 
 ### Adicionado
