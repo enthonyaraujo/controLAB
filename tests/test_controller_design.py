@@ -73,6 +73,63 @@ class ControllerDesignTests(unittest.TestCase):
         self.assertEqual(result["module"], "controller_design")
         self.assertIn("avanço", result["details"]["design_label"])
 
+    def test_ziegler_nichols_critical_pd_auto(self):
+        result = design_controller(
+            "1 / (s * (s + 1) * (s + 5))",
+            method="zn_critical",
+            controller_type="PD",
+            final_time=12,
+            points=300,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["kcr"], 30.0, places=3)
+        self.assertAlmostEqual(params["wcr"], 5**0.5, places=3)
+        self.assertAlmostEqual(params["kp"], 24.0, places=3)
+        self.assertIsNone(params["ti"])
+        self.assertEqual(params["ki"], 0.0)
+        self.assertAlmostEqual(params["td"], 0.351, places=2)
+        self.assertAlmostEqual(params["kd"], 24.0 * params["td"], places=3)
+        self.assertTrue(result["details"]["stable"])
+        self.assertIn("PD por", result["details"]["design_label"])
+        json.dumps(result, allow_nan=False)
+
+    def test_pd_all_tuning_methods(self):
+        for method in ("zn_reaction", "zn_critical_manual", "cohen_coon", "chr"):
+            result = design_controller(
+                "1 / (4*s + 1)",
+                method=method,
+                controller_type="PD",
+                process_gain=1,
+                delay=0.5,
+                time_constant=4,
+                critical_gain=6,
+                critical_period=2,
+                final_time=20,
+                points=220,
+            )
+            self.assertTrue(result["success"])
+            params = result["details"]["controller_parameters"]
+            self.assertGreater(params["kp"], 0.0)
+            self.assertIsNone(params["ti"])
+            self.assertEqual(params["ki"], 0.0)
+            self.assertGreater(params["td"], 0.0)
+            self.assertGreater(params["kd"], 0.0)
+            self.assertIn("PD por", result["details"]["design_label"])
+            json.dumps(result, allow_nan=False)
+
+    def test_pd_dispatch_via_python_bridge(self):
+        result = dispatch({
+            "action": "controller_design",
+            "plant_expr": "1 / (s * (s + 1) * (s + 5))",
+            "design_type": "pid",
+            "method": "zn_critical",
+            "controller_type": "PD",
+            "points": 200,
+        })
+        self.assertTrue(result["success"])
+        self.assertEqual(result["module"], "controller_design")
+        self.assertIn("PD por", result["details"]["design_label"])
+
 
 if __name__ == "__main__":
     unittest.main()
