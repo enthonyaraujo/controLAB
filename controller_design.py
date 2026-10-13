@@ -48,8 +48,8 @@ def _calculate_critical_params(plant):
 def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, delay=1.0, time_constant=4.0, critical_gain=6.0, critical_period=2.0, chr_response="0"):
     method = str(method).lower()
     controller_type = str(controller_type).upper()
-    if controller_type not in {"P", "PI", "PID"}:
-        raise ValueError("O controlador deve ser P, PI ou PID.")
+    if controller_type not in {"P", "PI", "PD", "PID"}:
+        raise ValueError("O controlador deve ser P, PI, PD ou PID.")
 
     ti = None
     td = 0.0
@@ -65,6 +65,8 @@ def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, de
             kp = tau / (gain * lag)
         elif controller_type == "PI":
             kp, ti = 0.9 * tau / (gain * lag), 3.33 * lag
+        elif controller_type == "PD":
+            kp, td = 1.2 * tau / (gain * lag), 0.5 * lag
         else:
             kp, ti, td = 1.2 * tau / (gain * lag), 2.0 * lag, 0.5 * lag
         method_label = "Ziegler-Nichols — curva de reação"
@@ -79,6 +81,8 @@ def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, de
             kp = 0.5 * ku
         elif controller_type == "PI":
             kp, ti = 0.45 * ku, pu / 1.2
+        elif controller_type == "PD":
+            kp, td = 0.8 * ku, pu / 8.0
         else:
             kp, ti, td = 0.6 * ku, pu / 2.0, pu / 8.0
         method_label = "Ziegler-Nichols — oscilação crítica (automático)"
@@ -90,6 +94,8 @@ def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, de
             kp = 0.5 * ku
         elif controller_type == "PI":
             kp, ti = 0.45 * ku, pu / 1.2
+        elif controller_type == "PD":
+            kp, td = 0.8 * ku, pu / 8.0
         else:
             kp, ti, td = 0.6 * ku, pu / 2.0, pu / 8.0
         method_label = "Ziegler-Nichols — oscilação crítica (manual)"
@@ -103,6 +109,9 @@ def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, de
         elif controller_type == "PI":
             kp = (tau / (gain * lag)) * (0.9 + ratio / 12.0)
             ti = lag * (30.0 + 3.0 * ratio) / (9.0 + 20.0 * ratio)
+        elif controller_type == "PD":
+            kp = (tau / (gain * lag)) * (1.25 + ratio / 6.0)
+            td = lag * (6.0 - 2.0 * ratio) / (22.0 + 3.0 * ratio)
         else:
             kp = (tau / (gain * lag)) * (4.0 / 3.0 + ratio / 4.0)
             ti = lag * (32.0 + 6.0 * ratio) / (13.0 + 8.0 * ratio)
@@ -117,12 +126,14 @@ def _pid_parameters(method, controller_type, *, plant=None, process_gain=1.0, de
             table = {
                 "P": (0.7, None, 0.0),
                 "PI": (0.6, tau, 0.0),
+                "PD": (0.7, None, 0.45 * lag),
                 "PID": (0.95, 1.4 * tau, 0.47 * lag),
             }
         else:
             table = {
                 "P": (0.3, None, 0.0),
                 "PI": (0.35, 1.2 * tau, 0.0),
+                "PD": (0.3, None, 0.5 * lag),
                 "PID": (0.6, tau, 0.5 * lag),
             }
         factor, ti, td = table[controller_type]
@@ -153,6 +164,15 @@ def _pid_transfer(parameters, controller_type):
         return ct.tf([kp], [1])
     if controller_type == "PI":
         return ct.tf([kp, ki], [1, 0])
+    if controller_type == "PD":
+        # PD com derivada filtrada (N=10) para tornar a função de transferência própria
+        N = 10.0
+        if td is not None and td > 0:
+            tau_d = td / N
+            num = [kp * (tau_d + td), kp]
+            den = [tau_d, 1.0]
+            return ct.tf(num, den)
+        return ct.tf([kp], [1])
     # PID com derivada filtrada (N=10) para tornar a função de transferência própria
     N = 10.0
     if td is not None and td > 0:

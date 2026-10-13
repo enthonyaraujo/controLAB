@@ -3,7 +3,19 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [4.1.2] - 2026-10-12
+## [4.1.2] - 2026-10-13
+
+### Adicionado
+- **Projeto e Sintonia de Controladores PD:**
+  - Suporte completo ao controlador Proporcional-Derivativo (PD) no módulo de *Projeto de Controladores*.
+  - Sintonia analítica e heurística via métodos clássicos:
+    - Ziegler-Nichols por Oscilação Crítica (automático e manual): $K_p = 0{,}8 K_{cr}$, $T_d = P_{cr}/8$, $K_d = K_p T_d$.
+    - Ziegler-Nichols por Curva de Reação: $K_p = 1{,}2 \frac{T}{K L}$, $T_d = 0{,}5 L$.
+    - Cohen-Coon: $K_p = \frac{T}{K L}(1{,}25 + \frac{L}{6T})$, $T_d = L \frac{6 - 2(L/T)}{22 + 3(L/T)}$.
+    - Chien-Hrones-Reswick (CHR): sintonia com 0% e 20% de sobressinal.
+  - Implementação com dinâmica de derivada filtrada ($N=10$) para realizabilidade física e estabilidade de malha fechada.
+  - Atualização da interface web/desktop e mobile com opção dedicada `PD` no seletor de estrutura de controlador.
+  - Cobertura de testes unitários dedicada para cálculo analítico e despacho IPC.
 
 ### Corrigido
 - **Visualização de Gráficos de Resposta no Tempo no Android:**
@@ -12,7 +24,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ### Aprimorado
 - **Atualização de Versão e Artefatos da Release 4.1.2:**
-  - `versionCode 20` e `versionName "4.1.2"` no projeto Android.
+  - `versionCode 20` e `versionName "4.1.2"` no projeto Android (Capacitor/Chaquopy).
   - Bump de versão em manifests, PWA Service Worker, páginas e scripts de suporte.
 
 ---

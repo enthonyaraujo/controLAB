@@ -87,7 +87,7 @@
           label: 'Tipo de projeto',
           type: 'select',
           value: 'pid',
-          options: [['pid', 'Sintonia P / PI / PID'], ['lead_lag', 'Compensador avanço / atraso']],
+          options: [['pid', 'Sintonia P / PI / PD / PID'], ['lead_lag', 'Compensador avanço / atraso']],
         },
         {
           name: 'method',
@@ -108,7 +108,7 @@
           label: 'Estrutura do controlador',
           type: 'select',
           value: 'PID',
-          options: [['P', 'P'], ['PI', 'PI'], ['PID', 'PID']],
+          options: [['P', 'P'], ['PI', 'PI'], ['PD', 'PD'], ['PID', 'PID']],
           when: { design_type: ['pid'] },
         },
         {

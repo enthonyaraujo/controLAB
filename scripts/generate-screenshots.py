@@ -189,7 +189,7 @@ def generate_all():
       </div>
       <div class="preview-math">$$G(s) = \\frac{1}{s (s + 1) (s + 5)}$$</div>
     </div>
-    <div class="field-group"><label class="field-label">Tipo de projeto</label><select class="form-select"><option selected>Sintonia P / PI / PID</option></select></div>
+    <div class="field-group"><label class="field-label">Tipo de projeto</label><select class="form-select"><option selected>Sintonia P / PI / PD / PID</option></select></div>
     <div class="field-group"><label class="field-label">Método</label><select class="form-select"><option selected>Ziegler-Nichols — oscilação crítica</option></select></div>
     <div class="field-group"><label class="field-label">Estrutura</label><select class="form-select"><option selected>PID</option></select></div>
     '''
