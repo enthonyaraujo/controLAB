@@ -1184,7 +1184,7 @@
           <div class="sci-panel-header">
             <span>Resultados</span>
           </div>
-          <div class="sci-panel-body">
+          <div class="sci-panel-body" style="overflow-y: auto; overflow-x: hidden;">
             <table class="results-table tb" id="time-results-table">
               <tbody>
                 <tr><td>Sobressinal</td><td id="res-val-mp">—</td></tr>
@@ -1197,14 +1197,20 @@
                 <tr><td>Estabilidade</td><td id="res-val-stab">—</td></tr>
               </tbody>
             </table>
+            <div id="scientific-latex" class="scientific-latex-grid" style="display: none;"></div>
             <table class="results-table tb" id="scientific-general-results-table" style="display: none;">
               <tbody></tbody>
             </table>
+            <details id="scientific-steps-panel" class="ctrl-steps-panel" style="display: none; overflow: visible;" open>
+              <summary class="ctrl-steps-summary">
+                <span>Memória de Cálculo Passo a Passo (LGR)</span>
+              </summary>
+              <div id="scientific-steps-body" class="ctrl-steps-body"></div>
+            </details>
 
             <!-- Elementos preservados para compatibilidade com testes e outros módulos -->
             <div id="scientific-primary-metrics" class="scientific-primary-grid" style="display: none;"></div>
             <div id="scientific-metrics" class="submetrics-list" style="display: none;"></div>
-            <div id="scientific-latex" class="scientific-latex-grid" style="display: none;"></div>
             <div id="scientific-details-card" class="scientific-accordion" style="display: none;"><pre id="scientific-details"></pre></div>
             <div style="display: none;">
               <button id="btn-scientific-copy" type="button"></button>

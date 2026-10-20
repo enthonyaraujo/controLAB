@@ -1,4 +1,114 @@
 (function registerScientificModules(global) {
+  const CONTROLLER_PRESETS = {
+    lead_1: {
+      plant_expr: '5 / (s * (s + 1))',
+      controller_type: 'lead',
+      input_type: 'step',
+      settling_criterion: '2',
+      ts: '2',
+      mp: '16',
+      xi: '0.5',
+      wn: '4',
+      lead_zero: '',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+    lag_1: {
+      plant_expr: '1 / ((s + 1) * (s + 2))',
+      controller_type: 'lag',
+      input_type: 'step',
+      settling_criterion: '2',
+      error_reduction_factor: '10',
+      target_steady_state_error: '',
+      lag_pole: '0.01',
+      lag_gain: '1',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+    p_1: {
+      plant_expr: '1 / (s * (s + 1) * (s + 2))',
+      controller_type: 'P',
+      input_type: 'step',
+      settling_criterion: '2',
+      ts: '10',
+      mp: '10',
+      xi: '0.591',
+      wn: '0.6768',
+      lgr_branch_re: '',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+    p_2: {
+      plant_expr: '1 / ((s + 1) * (s + 5))',
+      controller_type: 'P',
+      input_type: 'step',
+      settling_criterion: '2',
+      ts: '2',
+      mp: '10',
+      xi: '0.591',
+      wn: '3.3841',
+      lgr_branch_re: '3',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+    pd_1: {
+      plant_expr: '40 / (s * (s + 2))',
+      controller_type: 'PD',
+      input_type: 'step',
+      settling_criterion: '2',
+      ts: '1',
+      mp: '25',
+      xi: '0.4',
+      wn: '10',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+    pd_2: {
+      plant_expr: '1 / (s * (s + 4) * (s + 6))',
+      controller_type: 'PD',
+      input_type: 'step',
+      settling_criterion: '2',
+      ts: '1.7544',
+      mp: '20',
+      xi: '0.456',
+      wn: '5',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'wn',
+    },
+    pi_1: {
+      plant_expr: '10 / ((s + 2) * (s + 5))',
+      controller_type: 'PI',
+      input_type: 'step',
+      settling_criterion: '5',
+      ts: '1.5',
+      mp: '0.63',
+      xi: '0.857',
+      wn: '2.3337',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+    pi_2: {
+      plant_expr: '1 / (s * (s + 4))',
+      controller_type: 'PI',
+      input_type: 'ramp',
+      settling_criterion: '5',
+      ts: '4',
+      mp: '20',
+      xi: '0.456',
+      wn: '1.6447',
+      primary_damping_spec: 'xi',
+      primary_freq_spec: 'ts',
+    },
+  };
+
+  const CONTROLLER_FORMULAS = {
+    lead: 'G_c(s) = \\frac{K(s+z)}{s+p}, \\quad z < p',
+    lag: 'G_c(s) = \\frac{K(s+z)}{s+p}, \\quad p < z',
+    P: 'G_c(s) = K_p, \\quad u(t) = K_p e(t)',
+    PD: 'G_c(s) = K_p(1 + \\tau_d s), \\quad z = \\frac{1}{\\tau_d}',
+    PI: 'G_c(s) = K_p\\frac{s + 1/\\tau_i}{s} = \\frac{K_p(s+z)}{s}, \\quad z = \\frac{1}{\\tau_i}',
+  };
+
   const MODULES = {
     time: {
       action: 'time_response',
@@ -70,11 +180,173 @@
     controllers: {
       action: 'controller_design',
       title: 'Projeto de Controladores',
-      kicker: 'Módulo em Desenvolvimento',
-      description: 'Esta funcionalidade está em processo de reformulação analítica e será recriada em breve.',
+      kicker: 'Síntese em Série via LGR — Gma(s) = Gc(s)G(s)',
+      description: 'Projete controladores por Avanço de Fase, Atraso de Fase, P, PD e PI no plano complexo s atendendo a especificações transitórias e de erro estacionário.',
       filename: 'projeto-de-controlador',
-      underDevelopment: true,
-      fields: [],
+      primaryKeys: ['Polo dominante s', 'Ganho', 'Zero do controlador (z)', 'Polo do controlador (p)', 'Erro e(∞) compensado', 'Estabilidade'],
+      fields: [
+        {
+          name: 'plant_expr',
+          label: 'Planta G(s)',
+          type: 'text',
+          value: '5 / (s * (s + 1))',
+          placeholder: 'Ex.: 5 / (s * (s + 1))',
+          help: 'Digite qualquer função de transferência G(s) genérica.',
+        },
+        {
+          name: 'controller_type',
+          label: 'Tipo de Controlador Gc(s)',
+          type: 'select',
+          value: 'lead',
+          help: 'Selecione entre Avanço de Fase, Atraso de Fase, P, PD ou PI em série com G(s).',
+          options: [
+            ['lead', '1. Avanço de Fase — Gc(s) = K(s+z)/(s+p), z < p'],
+            ['lag', '2. Atraso de Fase — Gc(s) = K(s+z)/(s+p), p < z'],
+            ['P', '3. Proporcional (P) — Gc(s) = Kp'],
+            ['PD', '4. Proporcional e Derivativo (PD) — Gc(s) = Kp(1 + τd·s)'],
+            ['PI', '5. Proporcional-Integral (PI) — Gc(s) = Kp(s+z)/s'],
+          ],
+          showControllerFormula: true,
+        },
+        {
+          name: 'input_type',
+          label: 'Entrada R(s)',
+          type: 'select',
+          value: 'step',
+          help: 'Entrada de referência R(s): degrau unitário 1/s, rampa unitária 1/s² ou parábola unitária 1/s³.',
+          options: [
+            ['step', 'Degrau 1/s'],
+            ['ramp', 'Rampa 1/s²'],
+            ['parabola', 'Parábola 1/s³'],
+          ],
+        },
+        {
+          name: 'settling_criterion',
+          label: 'Critério de ts',
+          type: 'select',
+          value: '2',
+          help: 'Critério de 2% (ts = 4/(ξωn)) ou de 5% (ts = 3/(ξωn)).',
+          options: [
+            ['2', 'Critério 2%'],
+            ['5', 'Critério 5%'],
+          ],
+        },
+        {
+          name: 'ts',
+          label: 'Tempo de acomodação ts (s)',
+          type: 'number',
+          value: '2',
+          min: '0.0001',
+          placeholder: 'Ex.: 2',
+          help: 'Calcula ωn automaticamente a partir de ts e ξ.',
+          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+        },
+        {
+          name: 'mp',
+          label: 'Sobressinal máximo Mp (%)',
+          type: 'number',
+          value: '16',
+          min: '0',
+          max: '99.99',
+          placeholder: 'Ex.: 16',
+          help: 'Converte automaticamente entre Mp(%) e ξ pela fórmula exponencial.',
+          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+        },
+        {
+          name: 'xi',
+          label: 'Coeficiente de amortecimento (ξ)',
+          type: 'number',
+          value: '0.5',
+          min: '0.0001',
+          max: '0.9999',
+          placeholder: 'Ex.: 0.5',
+          help: 'Calcula Mp(%) e ωn (ou ts) automaticamente ao editar.',
+          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+        },
+        {
+          name: 'wn',
+          label: 'Frequência natural ωn (rad/s)',
+          type: 'number',
+          value: '4',
+          min: '0.0001',
+          placeholder: 'Ex.: 4',
+          help: 'Calcula ts automaticamente a partir de ωn e ξ.',
+          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+          showDominantPolePreview: true,
+        },
+        {
+          name: 'lead_zero',
+          label: 'Zero do controlador z (opcional)',
+          type: 'number',
+          value: '',
+          min: '0.0001',
+          placeholder: 'Vazio = alocar em z = Re (θz = 90°)',
+          help: 'Por padrão aloca o zero em z = Re (θz = 90°). Preencha para customizar z.',
+          when: { controller_type: ['lead'] },
+        },
+        {
+          name: 'error_reduction_factor',
+          label: 'Fator de redução de e(∞)',
+          type: 'number',
+          value: '10',
+          min: '1.0001',
+          placeholder: 'Ex.: 10 (reduzir erro em 10 vezes)',
+          help: 'Divide o erro em regime permanente atual por este fator.',
+          when: { controller_type: ['lag'] },
+        },
+        {
+          name: 'target_steady_state_error',
+          label: 'Meta direta para e_novo(∞) (opcional)',
+          type: 'number',
+          value: '',
+          min: '0.000001',
+          placeholder: 'Ex.: 0.0667 (sobrepõe o fator acima se preenchido)',
+          help: 'Se preenchido, define diretamente o valor desejado para o novo erro estacionário.',
+          when: { controller_type: ['lag'] },
+        },
+        {
+          name: 'lag_pole',
+          label: 'Polo do controlador p (próximo da origem)',
+          type: 'number',
+          value: '0.01',
+          min: '0.000001',
+          placeholder: 'Padrão: 0.01',
+          help: 'Polo adotado próximo da origem (p < z) para não afetar significativamente o LGR.',
+          when: { controller_type: ['lag'] },
+        },
+        {
+          name: 'lag_gain',
+          label: 'Ganho K do Atraso de Fase',
+          type: 'number',
+          value: '1',
+          min: '0.0001',
+          placeholder: 'Padrão: 1',
+          help: 'Considera K = 1 por padrão para preservar a resposta transitória.',
+          when: { controller_type: ['lag'] },
+        },
+        {
+          name: 'lgr_branch_re',
+          label: 'Abscissa Re_LGR do ramo vertical (opcional)',
+          type: 'number',
+          value: '',
+          min: '0.0001',
+          placeholder: 'Auto (ou informe Re_LGR, ex.: 3 para s = -3 ± ωd·j)',
+          help: 'Se a planta possuir ramo vertical no LGR em -Re_LGR ≠ -Re, ajusta ωd = Re_LGR · tan(θ).',
+          when: { controller_type: ['P'] },
+        },
+        {
+          name: 'primary_damping_spec',
+          label: '',
+          type: 'hidden',
+          value: 'xi',
+        },
+        {
+          name: 'primary_freq_spec',
+          label: '',
+          type: 'hidden',
+          value: 'ts',
+        },
+      ],
     },
     'state-space': {
       action: 'state_space',
@@ -230,7 +502,7 @@
     const moduleStates = {
       time: { result: null, formData: null, responseType: 'step', consoleText: '>> step(G, 10)' },
       frequency: { result: null, formData: null, responseType: 'step', consoleText: '>> bode(G)' },
-      controllers: { result: null, formData: null, responseType: 'step', consoleText: '>> % Projeto de Controladores em desenvolvimento' },
+      controllers: { result: null, formData: null, responseType: 'step', consoleText: '>> controller_design(G, Gc)' },
       'state-space': { result: null, formData: null, responseType: 'step', consoleText: '>> ss(A, B, C, D)' },
     };
 
@@ -350,6 +622,144 @@
       }, 300);
     }
 
+    function getSystemTransferFunctionExpression() {
+      const lgrInput = element('input-expr');
+      if (lgrInput && lgrInput.value && lgrInput.value.trim()) {
+        return lgrInput.value.trim();
+      }
+      const timeExpr = moduleStates.time?.formData?.expr;
+      if (timeExpr && String(timeExpr).trim()) {
+        return String(timeExpr).trim();
+      }
+      const freqExpr = moduleStates.frequency?.formData?.expr;
+      if (freqExpr && String(freqExpr).trim()) {
+        return String(freqExpr).trim();
+      }
+      const routhInput = element('routh-input-expr');
+      if (routhInput && routhInput.value && routhInput.value.trim()) {
+        return routhInput.value.trim();
+      }
+      return '5 / (s * (s + 1))';
+    }
+
+    function updateControllerFormulaPreview() {
+      const box = element('ctrl-formula-preview-math');
+      const ctrlInput = form.elements.namedItem('controller_type');
+      if (!box || !ctrlInput) return;
+      const tex = CONTROLLER_FORMULAS[ctrlInput.value] || CONTROLLER_FORMULAS.lead;
+      renderMath(box, tex, true);
+    }
+
+    function updateDominantPolePreview() {
+      const box = element('ctrl-dominant-pole-math');
+      if (!box) return;
+      const xiInput = form.elements.namedItem('xi');
+      const wnInput = form.elements.namedItem('wn');
+      const xiVal = parseFloat(String(xiInput?.value || '').replace(',', '.'));
+      const wnVal = parseFloat(String(wnInput?.value || '').replace(',', '.'));
+      if (xiVal > 0 && xiVal < 1 && wnVal > 0) {
+        const re = xiVal * wnVal;
+        const im = wnVal * Math.sqrt(Math.max(0, 1 - xiVal * xiVal));
+        const fmt = (v) => Number(v.toFixed(4)).toString().replace('.', '{,}');
+        renderMath(box, `s = -\\text{Re} \\pm \\text{Im}j = -${fmt(re)} \\pm ${fmt(im)}j`, false);
+      } else {
+        box.textContent = 's = -Re ± Im·j (preencha ξ, Mp, ts ou ωn)';
+      }
+    }
+
+    function recomputeControllerTransients(changedField) {
+      if (currentKey !== 'controllers') return;
+      const tsInput = form.elements.namedItem('ts');
+      const mpInput = form.elements.namedItem('mp');
+      const xiInput = form.elements.namedItem('xi');
+      const wnInput = form.elements.namedItem('wn');
+      const critInput = form.elements.namedItem('settling_criterion');
+      const primaryDamp = form.elements.namedItem('primary_damping_spec');
+      const primaryFreq = form.elements.namedItem('primary_freq_spec');
+      if (!tsInput || !mpInput || !xiInput || !wnInput) return;
+
+      const parseNum = (inp) => {
+        const raw = String(inp?.value ?? '').trim().replace(',', '.');
+        if (!raw) return NaN;
+        return Number(raw);
+      };
+
+      const critConst = String(critInput?.value || '2') === '5' ? 3 : 4;
+
+      if (changedField === 'mp') {
+        if (primaryDamp) primaryDamp.value = 'mp';
+        const mpVal = parseNum(mpInput);
+        if (mpVal > 0 && mpVal < 100) {
+          const lnMp = Math.log(mpVal / 100);
+          const xiCalc = -lnMp / Math.sqrt(Math.PI * Math.PI + lnMp * lnMp);
+          xiInput.value = String(Number(xiCalc.toFixed(4)));
+        } else if (mpVal === 0) {
+          xiInput.value = '1';
+        }
+      } else if (changedField === 'xi') {
+        if (primaryDamp) primaryDamp.value = 'xi';
+        const xiVal = parseNum(xiInput);
+        if (xiVal > 0 && xiVal < 1) {
+          const mpCalc = Math.exp((-xiVal * Math.PI) / Math.sqrt(1 - xiVal * xiVal)) * 100;
+          mpInput.value = String(Number(mpCalc.toFixed(3)));
+        } else if (xiVal >= 1) {
+          mpInput.value = '0';
+        }
+      }
+
+      const xiNow = parseNum(xiInput);
+      if (changedField === 'ts') {
+        if (primaryFreq) primaryFreq.value = 'ts';
+        const tsVal = parseNum(tsInput);
+        if (tsVal > 0 && xiNow > 0) {
+          const wnCalc = critConst / (xiNow * tsVal);
+          wnInput.value = String(Number(wnCalc.toFixed(4)));
+        }
+      } else if (changedField === 'wn') {
+        if (primaryFreq) primaryFreq.value = 'wn';
+        const wnVal = parseNum(wnInput);
+        if (wnVal > 0 && xiNow > 0) {
+          const tsCalc = critConst / (xiNow * wnVal);
+          tsInput.value = String(Number(tsCalc.toFixed(4)));
+        }
+      } else if (changedField === 'mp' || changedField === 'xi' || changedField === 'settling_criterion') {
+        const freqMode = primaryFreq?.value || 'ts';
+        if (freqMode === 'wn') {
+          const wnVal = parseNum(wnInput);
+          if (wnVal > 0 && xiNow > 0) {
+            tsInput.value = String(Number((critConst / (xiNow * wnVal)).toFixed(4)));
+          }
+        } else {
+          const tsVal = parseNum(tsInput);
+          if (tsVal > 0 && xiNow > 0) {
+            wnInput.value = String(Number((critConst / (xiNow * tsVal)).toFixed(4)));
+          }
+        }
+      }
+
+      updateDominantPolePreview();
+    }
+
+    function applyControllerPreset(presetKey) {
+      const preset = CONTROLLER_PRESETS[presetKey];
+      if (!preset) return;
+      Object.entries(preset).forEach(([key, val]) => {
+        const control = form.elements.namedItem(key);
+        if (!control) return;
+        control.value = val;
+        const segContainer = control.parentElement?.querySelector('.form-segmented');
+        if (segContainer) {
+          segContainer.querySelectorAll('.tab-seg').forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.val === String(val));
+          });
+        }
+      });
+      updateConditionalFields();
+      updateControllerFormulaPreview();
+      updateDominantPolePreview();
+      scheduleScientificPreview();
+    }
+
     function renderFields(config, savedData = null) {
       if (previewContainer && form.parentElement) {
         previewContainer.style.display = 'none';
@@ -369,6 +779,17 @@
         return;
       }
       config.fields.forEach((field) => {
+        const initialVal = (savedData && savedData[field.name] !== undefined) ? savedData[field.name] : field.value;
+
+        if (field.type === 'hidden') {
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = field.name;
+          hiddenInput.value = initialVal !== undefined && initialVal !== null ? initialVal : '';
+          form.appendChild(hiddenInput);
+          return;
+        }
+
         const group = document.createElement('div');
         group.className = 'form-group scientific-field';
         if (field.when) group.dataset.when = JSON.stringify(field.when);
@@ -385,8 +806,6 @@
         }
         group.appendChild(labelRow);
 
-        const initialVal = (savedData && savedData[field.name] !== undefined) ? savedData[field.name] : field.value;
-
         let input;
         if (field.type === 'select') {
           // Se tiver 2 ou 3 opções curtas, renderiza como segmented pill buttons
@@ -402,13 +821,17 @@
             field.options.forEach(([val, label]) => {
               const pill = document.createElement('button');
               pill.type = 'button';
-              pill.className = `tab-seg ${val === hiddenInput.value ? 'active' : ''}`;
+              pill.dataset.val = String(val);
+              pill.className = `tab-seg ${String(val) === String(hiddenInput.value) ? 'active' : ''}`;
               pill.textContent = label;
               pill.addEventListener('click', () => {
                 hiddenInput.value = val;
                 segContainer.querySelectorAll('.tab-seg').forEach(p => p.classList.remove('active'));
                 pill.classList.add('active');
                 updateConditionalFields();
+                if (field.name === 'settling_criterion') {
+                  recomputeControllerTransients('settling_criterion');
+                }
               });
               segContainer.appendChild(pill);
             });
@@ -432,7 +855,12 @@
             if (opt) input.title = opt.textContent;
           };
           updateTooltip();
-          input.addEventListener('change', updateTooltip);
+          input.addEventListener('change', () => {
+            updateTooltip();
+            if (field.name === 'controller_type') {
+              updateControllerFormulaPreview();
+            }
+          });
         } else if (field.type === 'textarea') {
           input = document.createElement('textarea');
           input.rows = field.rows || 2;
@@ -453,6 +881,35 @@
         input.className = 'form-input code-font';
         input.autocomplete = 'off';
         group.appendChild(input);
+
+        if (field.showControllerFormula) {
+          const formulaBox = document.createElement('div');
+          formulaBox.className = 'ctrl-formula-preview-card';
+          const formulaLabel = document.createElement('span');
+          formulaLabel.className = 'ctrl-formula-preview-label';
+          formulaLabel.textContent = 'Lei do controlador em série:';
+          const formulaMath = document.createElement('div');
+          formulaMath.id = 'ctrl-formula-preview-math';
+          formulaMath.className = 'ctrl-formula-preview-math';
+          formulaBox.appendChild(formulaLabel);
+          formulaBox.appendChild(formulaMath);
+          group.appendChild(formulaBox);
+        }
+
+        if (field.showDominantPolePreview) {
+          const domBox = document.createElement('div');
+          domBox.className = 'ctrl-dominant-pole-badge';
+          const domLabel = document.createElement('span');
+          domLabel.className = 'ctrl-dominant-pole-label';
+          domLabel.textContent = 'Polos dominantes desejados:';
+          const domMath = document.createElement('div');
+          domMath.id = 'ctrl-dominant-pole-math';
+          domMath.className = 'ctrl-dominant-pole-math';
+          domBox.appendChild(domLabel);
+          domBox.appendChild(domMath);
+          group.appendChild(domBox);
+        }
+
         form.appendChild(group);
 
         if (field.name === 'expr' || field.name === 'plant_expr') {
@@ -483,6 +940,8 @@
         form.appendChild(examples);
       }
       updateConditionalFields();
+      updateControllerFormulaPreview();
+      updateDominantPolePreview();
     }
 
     function updateConditionalFields() {
@@ -522,12 +981,12 @@
         loadingText: 'Calculando Resposta em Frequência (Bode)...',
       },
       controllers: {
-        figureTitle: 'Figura 1 — Projeto de Controladores (Em desenvolvimento)',
+        figureTitle: 'Figura 1 — Lugar Geométrico das Raízes (LGR) e Resposta Compensada',
         hasResponseTabs: false,
-        defaultConsole: '>> % Projeto de Controladores em desenvolvimento',
-        solverMeta: 'Módulo: Projeto de Controladores • Em desenvolvimento',
-        cmd: 'pid',
-        loadingText: 'Em desenvolvimento...',
+        defaultConsole: '>> controller_design(G, Gc)',
+        solverMeta: 'Módulo: Projeto de Controladores • Solver: LGR / sympy / python-control',
+        cmd: 'controller_design',
+        loadingText: 'Projetando controlador em série via LGR...',
       },
       'state-space': {
         figureTitle: 'Figura 1 — Plano complexo e polos de estados',
@@ -607,6 +1066,10 @@
         latexGrid.replaceChildren();
         latexGrid.style.display = 'none';
       }
+      const stepsPanel = element('scientific-steps-panel');
+      const stepsBody = element('scientific-steps-body');
+      if (stepsBody) stepsBody.replaceChildren();
+      if (stepsPanel) stepsPanel.style.display = 'none';
       const detailsCard = element('scientific-details-card');
       if (detailsCard) detailsCard.hidden = true;
       element('scientific-results')?.classList.remove('multi-plots-scroll');
@@ -1065,9 +1528,9 @@
         const latexItems = result.latex || [];
         if (latexItems.length > 0) {
           latexGrid.style.display = 'grid';
-          latexItems.forEach((item) => {
+          latexItems.forEach((item, idx) => {
             const card = document.createElement('article');
-            card.className = 'scientific-latex-card';
+            card.className = `scientific-latex-card ${currentKey === 'controllers' && idx < 2 ? 'ctrl-highlight-latex-card' : ''}`;
             appendTextNode(card, 'span', 'scientific-card-label', item.label || 'Equação');
             const math = document.createElement('div');
             math.className = 'scientific-math';
@@ -1080,10 +1543,67 @@
             const latexClone = latexGrid.cloneNode(true);
             latexClone.removeAttribute('id');
             latexClone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
-            tabletRes.appendChild(latexClone);
+            tabletRes.insertBefore(latexClone, tabletRes.firstChild);
           }
         } else {
           latexGrid.style.display = 'none';
+        }
+      }
+
+      // 4b. PAINEL EXPANSÍVEL DE MEMÓRIA DE CÁLCULO PASSO A PASSO (Controladores)
+      const stepsPanel = element('scientific-steps-panel');
+      const stepsBody = element('scientific-steps-body');
+      if (stepsPanel && stepsBody) {
+        stepsBody.replaceChildren();
+        const stepsList = result.details?.steps || [];
+        if (Array.isArray(stepsList) && stepsList.length > 0) {
+          stepsPanel.style.display = 'block';
+          stepsPanel.style.overflow = 'visible';
+          stepsPanel.open = true;
+          stepsList.forEach((step) => {
+            const stepCard = document.createElement('article');
+            stepCard.className = 'ctrl-step-card';
+
+            const stepHeader = document.createElement('div');
+            stepHeader.className = 'ctrl-step-header';
+            appendTextNode(stepHeader, 'span', 'ctrl-step-badge', `Passo ${step.number}`);
+            appendTextNode(stepHeader, 'h4', 'ctrl-step-title', step.title || '');
+            stepCard.appendChild(stepHeader);
+
+            const stepContent = document.createElement('div');
+            stepContent.className = 'ctrl-step-content';
+
+            if (Array.isArray(step.equations) && step.equations.length > 0) {
+              step.equations.forEach((eqLatex) => {
+                const eqBox = document.createElement('div');
+                eqBox.className = 'ctrl-step-eq';
+                renderMath(eqBox, eqLatex, true);
+                stepContent.appendChild(eqBox);
+              });
+            }
+
+            if (Array.isArray(step.notes) && step.notes.length > 0) {
+              const notesList = document.createElement('ul');
+              notesList.className = 'ctrl-step-notes';
+              step.notes.forEach((noteText) => {
+                appendTextNode(notesList, 'li', 'ctrl-step-note-item', noteText);
+              });
+              stepContent.appendChild(notesList);
+            }
+
+            stepCard.appendChild(stepContent);
+            stepsBody.appendChild(stepCard);
+          });
+
+          const tabletRes = element('sci-tablet-results-container');
+          if (tabletRes) {
+            const stepsClone = stepsPanel.cloneNode(true);
+            stepsClone.removeAttribute('id');
+            stepsClone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+            tabletRes.appendChild(stepsClone);
+          }
+        } else {
+          stepsPanel.style.display = 'none';
         }
       }
 
@@ -1177,8 +1697,11 @@
     });
     form.addEventListener('change', updateConditionalFields);
     form.addEventListener('input', (event) => {
-      if (event.target.name === 'expr' || event.target.name === 'plant_expr') {
+      const targetName = event.target.name;
+      if (targetName === 'expr' || targetName === 'plant_expr') {
         scheduleScientificPreview();
+      } else if (currentKey === 'controllers' && ['ts', 'mp', 'xi', 'wn'].includes(targetName)) {
+        recomputeControllerTransients(targetName);
       }
     });
     global.addEventListener('keydown', (event) => {
