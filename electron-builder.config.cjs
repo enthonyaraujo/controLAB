@@ -19,6 +19,12 @@ module.exports = {
     'package.json',
   ],
   extraResources: [
+    { from: path.join('vendor', 'openmat', 'LICENSE'), to: path.join('licenses', 'openmat.txt') },
+    { from: path.join('vendor', 'openmat', 'THIRD_PARTY_NOTICES.txt'), to: path.join('licenses', 'rust-runtime-notices.txt') },
+    {
+      from: path.join('build', 'runtime', process.platform === 'win32' ? 'controlab-runtime.exe' : 'controlab-runtime'),
+      to: path.join('python', process.platform === 'win32' ? 'controlab-runtime.exe' : 'controlab-runtime'),
+    },
     {
       from: path.join('build', 'python', pythonExecutable),
       to: path.join('python', pythonExecutable),
