@@ -48,8 +48,8 @@
      ========================================================================= */
   --bg: #11161C;
   --surface: #161C24;
-  --surface-header: #1C232D;
-  --surface-title: #1C232D;
+  --surface-header: #222831;
+  --surface-title: #222831;
   --surface-inset: #0F141B;
 
   /* Aliases de compatibilidade */
@@ -180,8 +180,8 @@
   /* Cores: Superfícies e Fundos (Light) */
   --bg: #F4F6F8;
   --surface: #FFFFFF;
-  --surface-header: #ECEFF2;
-  --surface-title: #ECEFF2;
+  --surface-header: #EBEEF2;
+  --surface-title: #EBEEF2;
   --surface-inset: #F8FAFC;
 
   /* Aliases de compatibilidade */

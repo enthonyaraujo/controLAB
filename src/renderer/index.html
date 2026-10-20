@@ -19,6 +19,7 @@
 
   <!-- App Styles -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/studio.css">
   <script src="appearance.js"></script>
 </head>
 <body class="in-scientific">
@@ -78,7 +79,7 @@
   <!-- ========================================================= -->
   <!-- PÁGINA INICIAL: HUB CENTRAL DE SISTEMAS DE CONTROLE       -->
   <!-- ========================================================= -->
-  <main id="page-home" class="app-page sci-shell active">
+  <main id="page-home" class="app-page sci-shell active studio-home">
     <!-- Barra Superior de Abas (Header) -->
     <header class="home-top-bar">
       <div class="home-brand">
@@ -101,6 +102,55 @@
         </button>
       </div>
     </header>
+
+
+    <div class="studio-ribbon" role="toolbar" aria-label="Ferramentas de scripts">
+      <div class="studio-tool-group">
+        <button type="button" id="studio-new" title="Novo script (Ctrl+N)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7M9 16h7"/></svg><span>Novo script</span></button>
+        <button type="button" id="studio-open" title="Abrir script .m (Ctrl+O)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7l2 3h9l-2 10H3zM3 7V4h7l2 3h8v3"/></svg><span>Abrir</span></button>
+        <button type="button" id="studio-save" title="Salvar script (Ctrl+S)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h14l3 3v15H3V3zM7 3v6h10V3M7 21v-8h10v8"/></svg><span>Salvar</span></button>
+        <small>Arquivos</small>
+      </div>
+      <div class="studio-tool-group">
+        <button type="button" id="studio-variables" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span>Variáveis</span></button>
+        <button type="button" id="studio-clear"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>Limpar</span></button>
+        <small>Workspace</small>
+      </div>
+      <div class="studio-tool-group">
+        <button type="button" id="studio-run" class="studio-run" title="Executar script (F5)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 3 15 9-15 9z"/></svg><span>Executar</span></button>
+        <button type="button" id="studio-clear-output"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>Limpar saída</span></button>
+        <small>Script</small>
+      </div>
+      <div class="studio-tool-group">
+        <button type="button" id="studio-layout" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zM8 3v18M16 3v18M8 16h8"/></svg><span>Layout</span></button>
+        <button type="button" id="studio-help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 0 1 6 1c0 2-3 2-3 4M12 16v1"/></svg><span>Ajuda</span></button>
+        <small>Painéis</small>
+      </div>
+      <span id="studio-status" class="studio-status" role="status">Pronto</span>
+    </div>
+    <div class="studio-folder-bar">
+      <div class="studio-folder-tools" role="group" aria-label="Navegação de pastas">
+        <button type="button" id="studio-back" title="Voltar (Alt+←)" aria-label="Voltar à pasta anterior" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5 5 12l9 7v-5h6v-4h-6z"/></svg></button>
+        <button type="button" id="studio-forward" title="Avançar (Alt+→)" aria-label="Avançar à próxima pasta" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 9 7-9 7v-5H4v-4h6z"/></svg></button>
+        <button type="button" id="studio-up" title="Subir um nível (Alt+↑)" aria-label="Subir um nível" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path class="folder-shape" d="M3 7h7l2 3h9l-2 10H3zM3 7V4h7l2 3h8v3"/><path d="M12 18v-6m-3 3 3-3 3 3"/></svg></button>
+        <button type="button" id="studio-select-folder" title="Selecionar pasta" aria-label="Selecionar pasta"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="folder-shape" d="M3 7h7l2 3h9l-2 10H3zM3 7V4h7l2 3h8v3"/><path class="folder-select-mark" d="m10 15 2 2 5-5"/></svg></button>
+      </div>
+      <button type="button" id="studio-refresh">Atualizar</button>
+      <label for="studio-folder-input">Pasta atual:</label>
+      <form id="studio-folder-form"><input id="studio-folder-input" aria-label="Caminho da pasta atual" spellcheck="false" autocomplete="off"><button type="submit">Ir</button></form>
+      <button type="button" id="studio-files" aria-pressed="false">Arquivos</button>
+    </div>
+    <dialog id="studio-folder-dialog" class="studio-dialog studio-folder-dialog">
+      <h2>Selecionar pasta</h2>
+      <form id="studio-picker-form"><button type="button" id="studio-picker-up" title="Subir um nível" aria-label="Subir um nível no seletor">↑</button><input id="studio-picker-path" aria-label="Pasta no seletor" autocomplete="off" spellcheck="false"><button type="submit">Ir</button></form>
+      <p id="studio-picker-error" role="status"></p>
+      <ul id="studio-picker-list" aria-label="Subpastas"></ul>
+      <div class="studio-picker-actions"><button type="button" id="studio-picker-cancel">Cancelar</button><button type="button" id="studio-picker-confirm">Selecionar esta pasta</button></div>
+    </dialog>
+    <input type="file" id="studio-file-input" accept=".m" hidden>
+    <dialog id="studio-save-dialog" class="studio-dialog">
+      <form method="dialog"><h2>Salvar script</h2><label for="studio-save-name">Nome do arquivo</label><input id="studio-save-name" required pattern="[^/\\]+\.[mM]" value="script.m" autocomplete="off"><p>O arquivo será salvo na pasta atual.</p><div><button value="cancel" formnovalidate>Cancelar</button><button value="save">Salvar</button></div></form>
+    </dialog>
 
     <!-- Contêiner Principal e Conteúdo -->
     <div class="home-main-layout">
@@ -152,11 +202,12 @@
             <!-- Seção: Pasta atual -->
             <section class="home-section-panel">
               <div class="home-panel-header">
-                <span class="home-panel-title">Pasta atual</span>
+                <span class="home-panel-title">Arquivos</span>
               </div>
               <div class="home-folder-path" id="home-folder-path" role="button" tabindex="0" title="Clique para selecionar outra pasta de trabalho">
                 <span id="home-folder-path-text">~/Documentos/ControLAB</span>
               </div>
+              <input type="search" id="studio-file-search" class="studio-file-search" placeholder="Buscar nesta pasta" aria-label="Buscar arquivos nesta pasta">
               <ul class="home-file-list" id="home-file-list">
                 <li class="home-empty-hint">Nenhum arquivo na pasta</li>
               </ul>
@@ -166,17 +217,54 @@
           <!-- Divisor Vertical Esquerdo -->
           <div class="home-splitter home-splitter-v" id="home-splitter-left" role="separator" aria-orientation="vertical" tabindex="0" title="Arraste para redimensionar a pasta (clique duplo para redefinir)"></div>
 
-          <!-- Coluna Central: Começar (Área reservada para futura execução .m e .mat) -->
+          <!-- Editor e console .m -->
           <section class="home-center-col">
             <!-- Painel: Começar -->
             <div class="home-section-panel home-center-panel">
               <div class="home-panel-header">
-                <span class="home-panel-title">Começar</span>
+                <span class="home-panel-title" id="studio-editor-title">Editor</span><div class="studio-views"><button type="button" id="studio-editor-view" aria-pressed="true">Editor</button><button type="button" id="studio-figures-view" title="Abrir figuras em novas janelas">Figuras <span id="studio-figure-count">0</span></button></div>
               </div>
               <div class="home-workspace-central" id="home-workspace-central">
-                <!-- Espaço central reservado para execução de arquivos .m e .mat -->
+                <div id="studio-tabs" class="studio-tabs" role="tablist" aria-label="Scripts abertos"></div>
+                <div id="studio-editor-pane" class="studio-editor-pane">
+                  <pre id="studio-line-numbers" class="studio-line-numbers" aria-hidden="true">1</pre>
+                  <div class="studio-code-area">
+                    <pre id="studio-highlight" class="studio-highlight" aria-hidden="true"></pre>
+                    <textarea id="studio-source" class="studio-source" aria-label="Código do script MATLAB" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off"></textarea>
+                  </div>
+                </div>
+                <div id="studio-figures" class="studio-figures" hidden><p>Execute um script com plot(x,y) ou step(G) para visualizar uma figura.</p></div>
+                <div class="studio-editor-status"><span id="studio-document-status">Sem título 1.m</span><span id="studio-cursor">Ln 1, Col 1</span></div>
               </div>
             </div>
+
+        <!-- Divisor entre editor e console -->
+        <div class="home-splitter home-splitter-h" id="home-splitter-console" role="separator" aria-orientation="horizontal" tabindex="0" title="Arraste para redimensionar o console (clique duplo para redefinir)"></div>
+
+        <!-- Console persistente de scripts -->
+        <section class="home-console-area" id="home-console-area">
+          <div class="home-panel-header">
+            <span class="home-panel-title">Console</span>
+            <span class="home-panel-hint">Histórico: ↑ ↓ &nbsp;·&nbsp; Enter executa</span>
+          </div>
+          <div class="home-console-body" id="home-console-body">
+            <div class="home-console-logs" id="home-console-logs" role="log" aria-label="Saída do console"></div>
+            <div class="home-console-input-row">
+              <span class="console-prompt">&gt;&gt;</span>
+              <input type="text" id="home-console-input" class="home-console-input" placeholder="digite um comando" autocomplete="off" spellcheck="false" aria-label="Comando do Console" />
+            </div>
+          </div>
+          <footer class="home-footer">
+            <div class="home-footer-status">
+              <span class="status-dot-ok" aria-hidden="true"></span>
+              <span class="status-label">Pronto</span>
+            </div>
+            <span class="home-footer-text">
+              <span class="footer-tablet-text">Código aberto · MIT</span>
+              <span class="footer-desktop-text">open source</span>
+            </span>
+          </footer>
+        </section>
 
             <!-- Compatibilidade semântica de módulos e testes (em contêiner oculto) -->
             <div style="display: none;" aria-hidden="true">
@@ -245,9 +333,9 @@
             <!-- Seção: Workspace -->
             <section class="home-section-panel">
               <div class="home-panel-header">
-                <span class="home-panel-title">Workspace</span>
+                <span class="home-panel-title">Variáveis</span>
                 <div class="home-panel-header-right">
-                  <span class="home-panel-hint">Nome · Tipo</span>
+                  <span class="home-panel-hint">Nome · Valor</span>
                   <button type="button" class="home-btn-clear" id="btn-clear-workspace" title="Limpar variáveis do workspace">Limpar</button>
                 </div>
               </div>
@@ -258,33 +346,7 @@
           </aside>
         </div>
 
-        <!-- Divisor Horizontal Console (preservado em DOM oculto para testes e scripts) -->
-        <div class="home-splitter home-splitter-h" id="home-splitter-console" role="separator" aria-orientation="horizontal" tabindex="0" style="display: none;" title="Arraste para redimensionar o console (clique duplo para redefinir)"></div>
 
-        <!-- Área Inferior: Console e Rodapé (preservado em DOM oculto para testes e scripts) -->
-        <section class="home-console-area" id="home-console-area" style="display: none;">
-          <div class="home-panel-header">
-            <span class="home-panel-title">Console</span>
-            <span class="home-panel-hint">Histórico: ↑ ↓ &nbsp;·&nbsp; Tab completa</span>
-          </div>
-          <div class="home-console-body" id="home-console-body">
-            <div class="home-console-logs" id="home-console-logs"></div>
-            <div class="home-console-input-row">
-              <span class="console-prompt">&gt;&gt;</span>
-              <input type="text" id="home-console-input" class="home-console-input" placeholder="digite um comando" autocomplete="off" spellcheck="false" aria-label="Comando do Console" />
-            </div>
-          </div>
-          <footer class="home-footer">
-            <div class="home-footer-status">
-              <span class="status-dot-ok" aria-hidden="true"></span>
-              <span class="status-label">Pronto</span>
-            </div>
-            <span class="home-footer-text">
-              <span class="footer-tablet-text">Código aberto · MIT</span>
-              <span class="footer-desktop-text">open source</span>
-            </span>
-          </footer>
-        </section>
       </div>
     </div>
 
@@ -1476,6 +1538,7 @@
   <script src="vendor/katex/contrib/auto-render.min.js"></script>
   <script src="web-api.js"></script>
   <script src="settings.js"></script>
+  <script src="studio.js"></script>
   <script src="navigation.js"></script>
   <script src="routh.js"></script>
   <script src="scientific-modules.js"></script>
