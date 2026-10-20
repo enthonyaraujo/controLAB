@@ -54,7 +54,8 @@ const result = spawnSync(python, [
   '--hidden-import', 'matplotlib.backends.backend_pdf',
   '--collect-all', 'matplotlib',
   '--collect-all', 'control',
-  'python_bridge.py',
+  '--paths', path.join('src', 'python'),
+  path.join('src', 'python', 'python_bridge.py'),
 ], { cwd: projectRoot, stdio: 'inherit' });
 
 process.exit(result.status ?? 1);

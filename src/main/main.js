@@ -38,7 +38,7 @@ function runPythonBridge(payload) {
     const command = app.isPackaged ? getPackagedBridgePath() : getPythonPath();
     const args = app.isPackaged
       ? []
-      : [path.join(__dirname, '..', '..', 'python_bridge.py')];
+      : [path.join(__dirname, '..', 'python', 'python_bridge.py')];
 
     const pyProcess = spawn(command, args);
 

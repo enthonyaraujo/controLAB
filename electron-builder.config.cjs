@@ -14,6 +14,7 @@ module.exports = {
   },
   files: [
     'src/**/*',
+    '!src/python/**/*',
     'scripts/start-electron.js',
     'package.json',
   ],

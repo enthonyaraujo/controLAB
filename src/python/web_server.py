@@ -10,7 +10,7 @@ from pathlib import Path
 from python_bridge import dispatch
 
 
-RENDERER_DIR = Path(__file__).resolve().parent / "src" / "renderer"
+RENDERER_DIR = Path(__file__).resolve().parents[1] / "renderer"
 MAX_REQUEST_BYTES = 1_000_000
 
 mimetypes.add_type("application/manifest+json", ".webmanifest")
