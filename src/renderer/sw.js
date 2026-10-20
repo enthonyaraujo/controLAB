@@ -1,4 +1,4 @@
-const CACHE_NAME = 'controlab-shell-v4.1.2-1';
+const CACHE_NAME = 'controlab-shell-v4.1.2-figure-windows-1';
 const SHELL_FILES = [
   '/',
   '/index.html',
@@ -8,6 +8,11 @@ const SHELL_FILES = [
   '/settings.js',
   '/appearance.js',
   '/navigation.js',
+  '/studio.js',
+  '/figure.html',
+  '/figures.js',
+  '/figure-window.js',
+  '/styles/studio.css',
   '/routh.js',
   '/scientific-modules.js',
   '/web-api.js',

@@ -218,6 +218,7 @@
     });
 
     function setupHomeScreen() {
+      const studio = window.ControLABStudio?.initialize({ showToast });
       // Helper para sincronizar estado ativo entre top tabs, tablet rail e bottom nav
       function setActiveHomeTab(tabKey) {
         document.querySelectorAll('.home-tab, .home-rail-item, .home-bottom-nav-item').forEach((el) => {
@@ -232,6 +233,8 @@
           setActiveHomeTab('inicio');
           const homePage = optionalElement('page-home');
           if (homePage) homePage.scrollTop = 0;
+        } else if (tabKey === 'editor') {
+          studio?.focus();
         } else if (tabKey === 'console') {
           setActiveHomeTab('console');
           const input = optionalElement('home-console-input');
@@ -274,17 +277,9 @@
         });
       }
 
-      // Botões de ação em "Começar"
-      optionalElement('btn-home-new-script')?.addEventListener('click', () => {
-        showToast('Novo script iniciado no workspace.', 'info', 2500);
-        optionalElement('home-console-input')?.focus();
-      });
-      optionalElement('btn-home-open-file')?.addEventListener('click', () => {
-        showToast('Selecione um arquivo .m ou modelo do ControLAB.', 'info', 2500);
-      });
-      optionalElement('btn-home-import')?.addEventListener('click', () => {
-        showToast('Importador de arquivos .m / .mat pronto.', 'info', 2500);
-      });
+      optionalElement('btn-home-new-script')?.addEventListener('click', () => studio?.newDocument());
+      optionalElement('btn-home-open-file')?.addEventListener('click', () => studio?.openFile());
+      optionalElement('btn-home-import')?.addEventListener('click', () => studio?.openFile());
 
       // Cards de módulos
       document.querySelectorAll('.home-module-card').forEach((card) => {
@@ -514,6 +509,7 @@
 
       // Atualiza estado da pasta
       async function refreshHomeState(folder) {
+        if (studio) return studio.refreshFolder(folder);
         if (!window.api?.getHomeState) return;
         try {
           const state = await window.api.getHomeState(folder);
@@ -533,6 +529,7 @@
 
       // Clique na pasta atual abre o diálogo de seleção
       optionalElement('home-folder-path')?.addEventListener('click', async () => {
+        if (studio) return studio.selectFolder();
         if (window.api?.selectWorkspaceFolder) {
           const res = await window.api.selectWorkspaceFolder();
           if (res?.success && res.folder) {
@@ -586,6 +583,7 @@
       }
 
       async function executeConsoleCommand(rawCmd) {
+        if (studio) return studio.executeCommand(rawCmd);
         const cmd = (rawCmd || '').trim();
         if (!cmd) return;
         appendLog(`>> ${cmd}`, 'cmd');
@@ -637,6 +635,7 @@
       const btnClearWorkspace = optionalElement('btn-clear-workspace');
       if (btnClearWorkspace) {
         btnClearWorkspace.addEventListener('click', async () => {
+          if (studio) { await studio.clear(); return; }
           updateWorkspaceUI([]);
           if (window.api?.consoleExec) {
             try {
