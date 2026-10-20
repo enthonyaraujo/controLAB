@@ -14,6 +14,7 @@ const sources = [
   'state_space.py',
   'python_bridge.py',
   'android_bridge.py',
+  'script_service.py',
 ];
 
 fs.mkdirSync(pythonTarget, { recursive: true });

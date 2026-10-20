@@ -2,16 +2,18 @@
 
 import argparse
 import json
+import ipaddress
 import mimetypes
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlsplit
 from pathlib import Path
 
 from python_bridge import dispatch
 
 
 RENDERER_DIR = Path(__file__).resolve().parents[1] / "renderer"
-MAX_REQUEST_BYTES = 1_000_000
+MAX_REQUEST_BYTES = 8 * 1024 * 1024
 
 mimetypes.add_type("application/manifest+json", ".webmanifest")
 mimetypes.add_type("image/svg+xml", ".svg")
@@ -40,6 +42,20 @@ class LGRRequestHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         if self.path != "/api":
             self.send_error(HTTPStatus.NOT_FOUND)
+            return
+
+        # File editing is local application functionality. Reject cross-origin
+        # browser writes and DNS-rebinding hosts before dispatching a request.
+        host = self.headers.get("Host", "")
+        try:
+            hostname = urlsplit("http://" + host).hostname
+            if hostname != "localhost":
+                ipaddress.ip_address(hostname or "")
+            origin = self.headers.get("Origin")
+            if origin and origin != "http://" + host:
+                raise ValueError("Origem não permitida.")
+        except ValueError:
+            self._send_json(HTTPStatus.FORBIDDEN, {"success": False, "error": "Origem não permitida."})
             return
 
         try:

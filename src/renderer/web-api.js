@@ -76,6 +76,11 @@
     getRouthPresets: () => request('routh_presets'),
     evaluateRouthK: (payload) => request('routh_evaluate_k', payload),
     runScientificAnalysis: (action, payload) => request(action, payload),
+    releaseScriptSession: (session) => {
+      if (nativeLgr) return request('script_request', { operation: 'close', session });
+      navigator.sendBeacon?.('/api', new Blob([JSON.stringify({ action: 'script_request', operation: 'close', session })], { type: 'application/json' }));
+    },
+    scriptRequest: (payload) => request('script_request', payload),
     consoleExec: (command) => request('console_exec', { command }),
     getHomeState: (folder) => request('home_get_state', { folder }),
     selectWorkspaceFolder: async () => ({ success: false, canceled: true }),
