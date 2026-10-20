@@ -17,6 +17,7 @@ const javascriptFiles = [
   'src/preload/preload.js',
   'src/renderer/app.js',
   'src/renderer/navigation.js',
+  'scripts/build-openmat.js',
   'src/renderer/routh.js',
   'src/renderer/scientific-modules.js',
   'src/renderer/web-api.js',

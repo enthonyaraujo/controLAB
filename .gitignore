@@ -35,3 +35,8 @@ android/capacitor-cordova-android-plugins/
 .DS_Store
 Thumbs.db
 .agents/
+
+# Motor .m compilado (fontes em vendor/openmat)
+build/openmat/
+build/runtime/
+vendor/openmat/target/
