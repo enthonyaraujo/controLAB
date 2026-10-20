@@ -70,97 +70,11 @@
     controllers: {
       action: 'controller_design',
       title: 'Projeto de Controladores',
-      kicker: 'PID & Compensadores Lead-Lag',
-      description: 'Sintonize controladores clássicos ou aplique compensação de fase e compare a dinâmica antes e depois.',
+      kicker: 'Módulo em Desenvolvimento',
+      description: 'Esta funcionalidade está em processo de reformulação analítica e será recriada em breve.',
       filename: 'projeto-de-controlador',
-      primaryKeys: ['Tipo de projeto', 'Método', 'Estrutura', 'Estabilidade'],
-      fields: [
-        {
-          name: 'plant_expr',
-          label: 'Planta G(s)',
-          type: 'text',
-          value: '1 / (s * (s + 1) * (s + 5))',
-          placeholder: 'Ex.: 1 / (s * (s + 1) * (s + 5))',
-        },
-        {
-          name: 'design_type',
-          label: 'Tipo de projeto',
-          type: 'select',
-          value: 'pid',
-          options: [['pid', 'Sintonia P / PI / PD / PID'], ['lead_lag', 'Compensador avanço / atraso']],
-        },
-        {
-          name: 'method',
-          label: 'Método de sintonia',
-          type: 'select',
-          value: 'zn_critical',
-          options: [
-            ['zn_critical', 'Ziegler-Nichols — oscilação crítica (automático)'],
-            ['zn_critical_manual', 'Ziegler-Nichols — oscilação crítica (manual)'],
-            ['zn_reaction', 'Ziegler-Nichols — curva de reação'],
-            ['cohen_coon', 'Cohen-Coon'],
-            ['chr', 'CHR'],
-          ],
-          when: { design_type: ['pid'] },
-        },
-        {
-          name: 'controller_type',
-          label: 'Estrutura do controlador',
-          type: 'select',
-          value: 'PID',
-          options: [['P', 'P'], ['PI', 'PI'], ['PD', 'PD'], ['PID', 'PID']],
-          when: { design_type: ['pid'] },
-        },
-        {
-          name: 'critical_gain', label: 'Ganho crítico Kcr', type: 'number', value: '30', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_critical_manual'] },
-        },
-        {
-          name: 'critical_period', label: 'Período crítico Pcr (s)', type: 'number', value: '2.81', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_critical_manual'] },
-        },
-        {
-          name: 'process_gain', label: 'Ganho do processo K', type: 'number', value: '1', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
-        },
-        {
-          name: 'delay', label: 'Atraso aparente L (s)', type: 'number', value: '0.5', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
-        },
-        {
-          name: 'time_constant', label: 'Constante de tempo T (s)', type: 'number', value: '4', min: '0.000001',
-          when: { design_type: ['pid'], method: ['zn_reaction', 'cohen_coon', 'chr'] },
-        },
-        {
-          name: 'chr_response', label: 'Configuração CHR', type: 'select', value: '0',
-          options: [['0', '0% de sobressinal'], ['20', '20% de sobressinal']],
-          when: { design_type: ['pid'], method: ['chr'] },
-        },
-        {
-          name: 'compensator_type', label: 'Tipo de compensador', type: 'select', value: 'lead',
-          options: [['lead', 'Avanço de fase (lead)'], ['lag', 'Atraso de fase (lag)']],
-          when: { design_type: ['lead_lag'] },
-        },
-        {
-          name: 'design_domain', label: 'Domínio de referência', type: 'select', value: 'frequency',
-          options: [['frequency', 'Frequência / Bode'], ['root_locus', 'Plano s / LGR']],
-          when: { design_type: ['lead_lag'] },
-        },
-        {
-          name: 'compensator_zero', label: 'Frequência do zero', type: 'number', value: '1', min: '0.000001',
-          when: { design_type: ['lead_lag'] },
-        },
-        {
-          name: 'compensator_pole', label: 'Frequência do polo', type: 'number', value: '5', min: '0.000001',
-          help: 'No avanço, polo > zero. No atraso, polo < zero.',
-          when: { design_type: ['lead_lag'] },
-        },
-        {
-          name: 'compensator_gain', label: 'Ganho do compensador', type: 'number', value: '1', min: '0.000001',
-          when: { design_type: ['lead_lag'] },
-        },
-        { name: 'final_time', label: 'Tempo final (s)', type: 'number', value: '20', min: '0.05' },
-      ],
+      underDevelopment: true,
+      fields: [],
     },
     'state-space': {
       action: 'state_space',
@@ -316,7 +230,7 @@
     const moduleStates = {
       time: { result: null, formData: null, responseType: 'step', consoleText: '>> step(G, 10)' },
       frequency: { result: null, formData: null, responseType: 'step', consoleText: '>> bode(G)' },
-      controllers: { result: null, formData: null, responseType: 'step', consoleText: '>> pid(G)' },
+      controllers: { result: null, formData: null, responseType: 'step', consoleText: '>> % Projeto de Controladores em desenvolvimento' },
       'state-space': { result: null, formData: null, responseType: 'step', consoleText: '>> ss(A, B, C, D)' },
     };
 
@@ -442,6 +356,18 @@
         form.parentElement.appendChild(previewContainer);
       }
       form.replaceChildren();
+
+      if (config.underDevelopment) {
+        const devCard = document.createElement('div');
+        devCard.className = 'sci-dev-card';
+        devCard.innerHTML = `
+          <span class="sci-dev-card-badge">Em desenvolvimento</span>
+          <p class="sci-dev-card-desc">Parâmetros desativados. Toda esta aba de controladores está em processo de reformulação analítica e será recriada em breve.</p>
+        `;
+        form.appendChild(devCard);
+        if (previewContainer) previewContainer.style.display = 'none';
+        return;
+      }
       config.fields.forEach((field) => {
         const group = document.createElement('div');
         group.className = 'form-group scientific-field';
@@ -596,12 +522,12 @@
         loadingText: 'Calculando Resposta em Frequência (Bode)...',
       },
       controllers: {
-        figureTitle: 'Figura 1 — Desempenho e LGR do controlador',
+        figureTitle: 'Figura 1 — Projeto de Controladores (Em desenvolvimento)',
         hasResponseTabs: false,
-        defaultConsole: '>> pid(G)',
-        solverMeta: 'Módulo: Projeto de Controladores • Solver: python-control',
+        defaultConsole: '>> % Projeto de Controladores em desenvolvimento',
+        solverMeta: 'Módulo: Projeto de Controladores • Em desenvolvimento',
         cmd: 'pid',
-        loadingText: 'Calculando Projeto de Controladores...',
+        loadingText: 'Em desenvolvimento...',
       },
       'state-space': {
         figureTitle: 'Figura 1 — Plano complexo e polos de estados',
@@ -626,33 +552,50 @@
         document.querySelectorAll('#' + id).forEach(el => { el.textContent = '—'; });
       });
 
-      if (moduleKey === 'time') {
-        if (timeTable) timeTable.style.display = 'table';
-        if (generalTable) generalTable.style.display = 'none';
-      } else {
+      if (MODULES[moduleKey]?.underDevelopment) {
         if (timeTable) timeTable.style.display = 'none';
-        if (!generalTable) {
-          generalTable = document.createElement('table');
-          generalTable.id = 'scientific-general-results-table';
-          generalTable.className = 'results-table tb';
+        if (generalTable) generalTable.style.display = 'none';
+        let devResults = element('sci-dev-results-placeholder');
+        if (!devResults) {
+          devResults = document.createElement('div');
+          devResults.id = 'sci-dev-results-placeholder';
+          devResults.className = 'sci-dev-results-placeholder';
+          devResults.textContent = 'Resultados indisponíveis — módulo em desenvolvimento.';
           const parent = element('sci-panel-results')?.querySelector('.sci-panel-body');
-          if (parent) parent.insertBefore(generalTable, parent.firstChild);
+          if (parent) parent.insertBefore(devResults, parent.firstChild);
         }
-        generalTable.style.display = 'table';
-        generalTable.innerHTML = '';
-        const tbody = document.createElement('tbody');
-        const defaultMetrics = MODULES[moduleKey]?.primaryKeys || [];
-        defaultMetrics.forEach(key => {
-          const tr = document.createElement('tr');
-          const tdL = document.createElement('td');
-          tdL.textContent = key;
-          const tdV = document.createElement('td');
-          tdV.textContent = '—';
-          tr.appendChild(tdL);
-          tr.appendChild(tdV);
-          tbody.appendChild(tr);
-        });
-        generalTable.appendChild(tbody);
+        devResults.style.display = 'flex';
+      } else {
+        const devResults = element('sci-dev-results-placeholder');
+        if (devResults) devResults.style.display = 'none';
+        if (moduleKey === 'time') {
+          if (timeTable) timeTable.style.display = 'table';
+          if (generalTable) generalTable.style.display = 'none';
+        } else {
+          if (timeTable) timeTable.style.display = 'none';
+          if (!generalTable) {
+            generalTable = document.createElement('table');
+            generalTable.id = 'scientific-general-results-table';
+            generalTable.className = 'results-table tb';
+            const parent = element('sci-panel-results')?.querySelector('.sci-panel-body');
+            if (parent) parent.insertBefore(generalTable, parent.firstChild);
+          }
+          generalTable.style.display = 'table';
+          generalTable.innerHTML = '';
+          const tbody = document.createElement('tbody');
+          const defaultMetrics = MODULES[moduleKey]?.primaryKeys || [];
+          defaultMetrics.forEach(key => {
+            const tr = document.createElement('tr');
+            const tdL = document.createElement('td');
+            tdL.textContent = key;
+            const tdV = document.createElement('td');
+            tdV.textContent = '—';
+            tr.appendChild(tdL);
+            tr.appendChild(tdV);
+            tbody.appendChild(tr);
+          });
+          generalTable.appendChild(tbody);
+        }
       }
 
       const primaryContainer = element('scientific-primary-metrics');
@@ -671,12 +614,19 @@
       const tabletRes = element('sci-tablet-results-container');
       if (tabletRes) {
         tabletRes.innerHTML = '';
-        const activeTable = moduleKey === 'time' ? timeTable : generalTable;
-        if (activeTable) {
-          const clone = activeTable.cloneNode(true);
-          clone.removeAttribute('id');
-          clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-          tabletRes.appendChild(clone);
+        if (MODULES[moduleKey]?.underDevelopment) {
+          const cloneDev = document.createElement('div');
+          cloneDev.className = 'sci-dev-results-placeholder';
+          cloneDev.textContent = 'Resultados indisponíveis — módulo em desenvolvimento.';
+          tabletRes.appendChild(cloneDev);
+        } else {
+          const activeTable = moduleKey === 'time' ? timeTable : generalTable;
+          if (activeTable) {
+            const clone = activeTable.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            tabletRes.appendChild(clone);
+          }
         }
       }
     }
@@ -737,18 +687,31 @@
       const logEl = element('sci-console-text');
       if (logEl) logEl.textContent = modState.consoleText || meta.defaultConsole;
 
+      const isDev = Boolean(config.underDevelopment);
       const statusState = element('sci-status-state');
-      if (statusState) statusState.textContent = 'Pronto';
+      if (statusState) statusState.textContent = isDev ? 'Em desenvolvimento' : 'Pronto';
 
       const metaEl = element('sci-status-meta');
       if (metaEl) metaEl.textContent = meta.solverMeta;
 
-      if (modState.result) {
+      element('ribbon-btn-calc')?.classList.toggle('disabled', isDev);
+      element('ribbon-btn-clear')?.classList.toggle('disabled', isDev);
+      element('ribbon-btn-export')?.classList.toggle('disabled', isDev);
+      element('ribbon-btn-code')?.classList.toggle('disabled', isDev);
+
+      const mathKeyboard = element('sci-virtual-math');
+      if (mathKeyboard) mathKeyboard.style.display = isDev ? 'none' : '';
+
+      const statusChip = element('scientific-status-chip');
+      if (statusChip) statusChip.style.display = 'none';
+
+      if (isDev) {
+        setupSinglePlotCard('');
+        showState('dev');
+        resetResults(moduleKey);
+      } else if (modState.result) {
         renderResult(modState.result);
       } else {
-        const statusChip = element('scientific-status-chip');
-        if (statusChip) statusChip.style.display = 'none';
-
         setupSinglePlotCard('');
         showState('empty');
         resetResults(moduleKey);
@@ -765,6 +728,11 @@
       }
       const emptyEl = element('scientific-empty');
       if (emptyEl) emptyEl.style.display = state === 'empty' ? 'flex' : 'none';
+      const devEl = element('scientific-dev');
+      if (devEl) {
+        devEl.hidden = state !== 'dev';
+        devEl.style.display = state === 'dev' ? 'flex' : 'none';
+      }
       const errorEl = element('scientific-error');
       if (errorEl) errorEl.hidden = state !== 'error';
       const resultsEl = element('scientific-results');
@@ -772,7 +740,7 @@
         resultsEl.hidden = state !== 'results';
         resultsEl.style.display = state === 'results' ? '' : 'none';
       }
-      runButton.disabled = state === 'loading';
+      runButton.disabled = state === 'loading' || state === 'dev';
       const ribbonBtn = element('ribbon-btn-calc');
       if (ribbonBtn) ribbonBtn.classList.toggle('loading', state === 'loading');
     }
@@ -1132,6 +1100,10 @@
     async function run() {
       const config = MODULES[currentKey];
       if (!config) return;
+      if (config.underDevelopment) {
+        showToast(`O módulo "${config.title}" está em desenvolvimento.`, 'info', 2800);
+        return;
+      }
       const meta = MODULE_METAS[currentKey] || { cmd: 'run', solverMeta: 'Pronto' };
       const loadingTextEl = element('scientific-loading-text');
       if (loadingTextEl) {
