@@ -8,12 +8,11 @@ from pathlib import Path
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(PROJECT_ROOT / "src" / "python"))
 
 from python_bridge import dispatch
 
 DOCS_SCREENSHOTS = PROJECT_ROOT / "docs" / "screenshots"
-PUBLIC_SCREENSHOTS = PROJECT_ROOT / "public" / "screenshots"
 FF_PROFILE = Path("/tmp/ffprofile")
 
 def prepare_firefox_profile():
@@ -52,9 +51,7 @@ def render_html_to_webp(html_content: str, width: int, height: int, out_filename
         im = im.crop((0, 0, width, height))
 
     docs_out = DOCS_SCREENSHOTS / out_filename
-    public_out = PUBLIC_SCREENSHOTS / out_filename
     im.save(docs_out, format="WEBP", quality=95, method=6)
-    im.save(public_out, format="WEBP", quality=95, method=6)
     print(f"✓ {out_filename} gerado ({im.size}, {docs_out.stat().st_size:,} bytes)")
 
 
@@ -68,7 +65,6 @@ def generate_all():
         im_user = Image.open(user_img_path).convert("RGB")
         for fname in ["principal.webp", "hub-modulos.webp"]:
             im_user.save(DOCS_SCREENSHOTS / fname, format="WEBP", quality=95, method=6)
-            im_user.save(PUBLIC_SCREENSHOTS / fname, format="WEBP", quality=95, method=6)
         print(f"✓ principal.webp e hub-modulos.webp salvos a partir da captura oficial do usuário ({im_user.size})")
 
     # Helper para páginas do workspace científico em modo desktop

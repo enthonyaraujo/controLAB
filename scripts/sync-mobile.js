@@ -18,7 +18,7 @@ const sources = [
 
 fs.mkdirSync(pythonTarget, { recursive: true });
 for (const filename of sources) {
-  fs.copyFileSync(path.join(projectRoot, filename), path.join(pythonTarget, filename));
+  fs.copyFileSync(path.join(projectRoot, 'src', 'python', filename), path.join(pythonTarget, filename));
 }
 
 console.log('[ControLAB] Motor Python sincronizado com o projeto Android.');

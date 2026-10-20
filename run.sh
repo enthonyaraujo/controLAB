@@ -11,19 +11,14 @@ fi
 
 case "${1:-}" in
     --web)
-        python web_server.py
+        python src/python/web_server.py
         ;;
     --mobile)
-        python web_server.py --host 0.0.0.0
-        ;;
-    --streamlit)
-        streamlit run app.py
-        ;;
-    --gui)
-        python gui.py
+        python src/python/web_server.py --host 0.0.0.0
         ;;
     --cli)
-        python main.py
+        shift
+        python src/python/routh_hurwitz.py "$@"
         ;;
     *)
         npm start

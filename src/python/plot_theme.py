@@ -110,9 +110,8 @@ def register_local_fonts() -> bool:
         return True
 
     search_roots = [
-        Path(__file__).resolve().parent / "src" / "renderer" / "vendor" / "fonts",
+        Path(__file__).resolve().parents[1] / "renderer" / "vendor" / "fonts",
         Path(__file__).resolve().parent / "vendor" / "fonts",
-        Path(__file__).resolve().parent / "public" / "vendor" / "fonts",
     ]
 
     registered_any = False

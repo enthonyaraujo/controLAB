@@ -12,10 +12,8 @@
   "scripts": {
     "start": "node scripts/start-electron.js",
     "dev": "node scripts/start-electron.js",
-    "web": "node scripts/run-python.js web_server.py",
-    "web:mobile": "node scripts/run-python.js web_server.py --host 0.0.0.0",
-    "web:streamlit": "node scripts/run-python.js -m streamlit run app.py",
-    "gui": "node scripts/run-python.js gui.py",
+    "web": "node scripts/run-python.js src/python/web_server.py",
+    "web:mobile": "node scripts/run-python.js src/python/web_server.py --host 0.0.0.0",
     "mobile:sync": "node scripts/sync-mobile.js && cap sync android",
     "mobile:open": "npm run mobile:sync && cap open android",
     "mobile:apk": "npm run mobile:sync && node scripts/run-gradle.js assembleDebug",

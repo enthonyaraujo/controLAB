@@ -27,7 +27,13 @@ function tryCandidate(index) {
   }
 
   const args = executable === 'py' ? ['-3', ...commandArgs] : commandArgs;
-  const child = spawn(executable, args, { cwd: projectRoot, stdio: 'inherit' });
+  const pythonPath = [path.join(projectRoot, 'src', 'python'), process.env.PYTHONPATH]
+    .filter(Boolean).join(path.delimiter);
+  const child = spawn(executable, args, {
+    cwd: projectRoot,
+    stdio: 'inherit',
+    env: { ...process.env, PYTHONPATH: pythonPath },
+  });
 
   child.on('error', (error) => {
     if (error.code === 'ENOENT') {

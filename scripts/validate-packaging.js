@@ -41,7 +41,7 @@ for (const file of [
   'python_bridge.py',
   'android_bridge.py',
 ]) {
-  const canonical = fs.readFileSync(path.join(root, file));
+  const canonical = fs.readFileSync(path.join(root, 'src', 'python', file));
   const android = fs.readFileSync(path.join(root, 'android', 'app', 'src', 'main', 'python', file));
   if (!canonical.equals(android)) {
     throw new Error(`Motor Android dessincronizado: execute npm run mobile:sync (${file})`);
