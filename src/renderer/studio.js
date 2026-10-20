@@ -119,10 +119,11 @@
       source.scrollTop = source.scrollLeft = 0;
       renderTabs(); updateHighlight(); showView('editor'); source.focus();
     }
-    function newDocument(text = '', name = null, path = null, saved = '') {
+    function newDocument(text = '', name = null, path = null, saved = null) {
       syncDocument();
       const id = nextId++;
-      documents.push({ id, name: name || `Sem título ${id}.m`, source: text, path, saved });
+      const initialSaved = saved !== null && saved !== undefined ? saved : text;
+      documents.push({ id, name: name || `Sem título ${id}.m`, source: text, path, saved: initialSaved });
       activate(id);
     }
     function closeDocument(id) {

@@ -8,6 +8,7 @@ const execPromise = util.promisify(exec);
 Menu.setApplicationMenu(null);
 
 let mainWindow = null;
+let isQuitting = false;
 const scriptFigures = new Map();
 
 if (process.platform === 'linux') {
@@ -113,8 +114,34 @@ function createWindow() {
     }
   });
 
+  mainWindow.webContents.on('will-prevent-unload', (event) => {
+    if (isQuitting) {
+      event.preventDefault();
+      return;
+    }
+    const choice = dialog.showMessageBoxSync(mainWindow, {
+      type: 'question',
+      buttons: ['Sair sem salvar', 'Cancelar'],
+      defaultId: 0,
+      cancelId: 1,
+      noLink: true,
+      title: 'Alterações não salvas',
+      message: 'Existem alterações não salvas no editor de scripts.',
+      detail: 'Deseja realmente sair e descartar as alterações?',
+    });
+    if (choice === 0) {
+      event.preventDefault();
+    }
+  });
+
   mainWindow.on('closed', () => {
-    for (const { window } of scriptFigures.values()) window.destroy();
+    for (const { window } of scriptFigures.values()) {
+      try {
+        if (!window.isDestroyed()) window.destroy();
+      } catch {}
+    }
+    scriptFigures.clear();
+    terminateScriptWorker();
     mainWindow = null;
   });
 }
@@ -205,7 +232,32 @@ let scriptQueue = Promise.resolve();
 let scriptBuffer = '';
 let scriptPending = null;
 
+function terminateScriptWorker() {
+  if (scriptWorker) {
+    const worker = scriptWorker;
+    scriptWorker = null;
+    if (scriptPending) {
+      clearTimeout(scriptPending.timer);
+      scriptPending = null;
+    }
+    try {
+      if (worker.stdin && !worker.stdin.destroyed) {
+        worker.stdin.end();
+      }
+    } catch {}
+    try {
+      worker.kill('SIGTERM');
+    } catch {}
+    setTimeout(() => {
+      try {
+        worker.kill('SIGKILL');
+      } catch {}
+    }, 200).unref();
+  }
+}
+
 function startScriptWorker() {
+  if (isQuitting) return;
   const executable = app.isPackaged ? getPackagedBridgePath() : getPythonPath();
   const args = app.isPackaged ? ['--script-worker'] : [path.join(__dirname, '..', 'python', 'script_service.py')];
   const worker = spawn(executable, args, { stdio: ['pipe', 'pipe', 'pipe'] });
@@ -240,9 +292,24 @@ function startScriptWorker() {
 }
 
 ipcMain.handle('script-request', (event, payload) => {
+  if (isQuitting || !mainWindow || mainWindow.isDestroyed()) {
+    return { success: false, error: 'Aplicação encerrando.' };
+  }
+  if (payload?.operation === 'close' && !scriptWorker) {
+    return { success: true };
+  }
   const next = scriptQueue.then(() => new Promise((resolve, reject) => {
+    if (isQuitting || !mainWindow || mainWindow.isDestroyed()) {
+      return resolve({ success: false, error: 'Aplicação encerrando.' });
+    }
+    if (payload?.operation === 'close' && !scriptWorker) {
+      return resolve({ success: true });
+    }
     if (!scriptWorker) startScriptWorker();
     const worker = scriptWorker;
+    if (!worker) {
+      return resolve({ success: false, error: 'Motor de scripts indisponível.' });
+    }
     const timer = setTimeout(() => {
       if (scriptPending?.worker === worker) scriptPending = null;
       if (scriptWorker === worker) scriptWorker = null;
@@ -301,7 +368,6 @@ ipcMain.handle('save-script-dialog', async (event, name) => {
   });
   return { canceled: result.canceled, path: result.filePath };
 });
-app.on('before-quit', () => { scriptWorker?.kill(); });
 
 ipcMain.handle('console-exec', async (event, command) => {
   try {
@@ -391,7 +457,7 @@ ipcMain.handle('open-external', async (event, url) => {
 function getSystemInfo() {
   const platform = process.platform;
   const arch = process.arch;
-  const appVersion = app.getVersion() || '4.2.0';
+  const appVersion = app.getVersion() || '4.2.1';
 
   if (platform === 'win32') {
     return {
@@ -724,8 +790,28 @@ app.whenReady().then(() => {
   });
 });
 
+app.on('before-quit', () => {
+  isQuitting = true;
+  terminateScriptWorker();
+});
+
+app.on('will-quit', () => {
+  terminateScriptWorker();
+});
+
 app.on('window-all-closed', () => {
+  terminateScriptWorker();
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+process.on('SIGINT', () => {
+  terminateScriptWorker();
+  app.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  terminateScriptWorker();
+  app.exit(0);
 });

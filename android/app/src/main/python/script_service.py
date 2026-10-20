@@ -3,6 +3,7 @@ import atexit
 import json
 from pathlib import Path
 import queue
+import signal
 import subprocess
 import sys
 import threading
@@ -85,6 +86,22 @@ class ScriptService:
 
 _service = ScriptService()
 atexit.register(_service.close)
+
+
+def _handle_signal(signum, frame):
+    _service.close()
+    sys.exit(0)
+
+
+try:
+    signal.signal(signal.SIGTERM, _handle_signal)
+except (AttributeError, ValueError):
+    pass
+
+try:
+    signal.signal(signal.SIGINT, _handle_signal)
+except (AttributeError, ValueError):
+    pass
 
 
 def dispatch_script(data):
