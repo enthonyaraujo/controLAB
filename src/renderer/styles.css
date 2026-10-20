@@ -8720,9 +8720,9 @@ body.in-scientific .global-navbar {
   .scientific-workspace { display: flex; flex-direction: row; }
   .sci-panel-params {
     display: flex;
-    width: 13.75rem;
-    min-width: 11.25rem;
-    max-width: 17.5rem;
+    width: 16.5rem;
+    min-width: 13.5rem;
+    max-width: 18.5rem;
   }
   .sci-panel-plot { display: flex; flex: 1; }
   .sci-panel-results { display: none; } /* Integrado como aba na Figura */
@@ -9161,24 +9161,10 @@ body.in-scientific .global-navbar {
     overflow: hidden !important;
   }
 
-  #page-lgr.active .scientific-workspace,
-  #page-routh.active .scientific-workspace,
-  #page-scientific.active .scientific-workspace {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 0px !important;
-    min-height: 0 !important;
-    height: auto !important;
-    overflow: hidden !important;
-  }
-
-  /* Painel de Parâmetros e Resultados */
+  /* Painel de Parâmetros */
   #page-lgr.active .sci-panel-params,
-  #page-lgr.active .sci-panel-results,
   #page-routh.active .sci-panel-params,
-  #page-routh.active .sci-panel-results,
-  #page-scientific.active .sci-panel-params,
-  #page-scientific.active .sci-panel-results {
+  #page-scientific.active .sci-panel-params {
     display: flex;
     flex-direction: column !important;
     height: 100% !important;
@@ -9221,10 +9207,106 @@ body.in-scientific .global-navbar {
     min-height: 0 !important;
     height: auto !important;
     overflow: hidden !important;
-    display: flex !important;
+    display: flex;
     flex-direction: column !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
+  }
+
+  #page-lgr.active .sci-plot-viewport[style*="display: none"],
+  #page-routh.active .sci-plot-viewport[style*="display: none"],
+  #page-scientific.active .sci-plot-viewport[style*="display: none"],
+  #page-scientific.active #scientific-plot-viewport[style*="display: none"] {
+    display: none !important;
+  }
+
+  .sci-tablet-results-container[style*="display: none"] {
+    display: none !important;
+  }
+}
+
+/* Modo Smartphone (< 600px): Workspace em coluna vertical com alternância por abas */
+@media (max-width: 599.98px) {
+  #page-lgr.active .scientific-workspace,
+  #page-routh.active .scientific-workspace,
+  #page-scientific.active .scientific-workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  #page-lgr.active .sci-panel-results,
+  #page-routh.active .sci-panel-results,
+  #page-scientific.active .sci-panel-results {
+    display: flex;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Modo Tablet (600px a 1023.98px): Workspace horizontal [ Trilho | Parâmetros | Figura/Resultados ] */
+@media (min-width: 600px) and (max-width: 1023.98px) {
+  #page-lgr.active .scientific-workspace,
+  #page-routh.active .scientific-workspace,
+  #page-scientific.active .scientific-workspace {
+    display: flex !important;
+    flex-direction: row !important;
+    flex: 1 1 0px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  #page-lgr.active .sci-rail,
+  #page-routh.active .sci-rail,
+  #page-scientific.active .sci-rail {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 3.625rem !important;
+    min-width: 3.625rem !important;
+    flex-shrink: 0 !important;
+    border-right: 1px solid var(--border-strong) !important;
+  }
+
+  #page-lgr.active .sci-panel-params,
+  #page-routh.active .sci-panel-params,
+  #page-scientific.active .sci-panel-params {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 16.5rem !important;
+    min-width: 13.5rem !important;
+    max-width: 18.5rem !important;
+    flex-shrink: 0 !important;
+    height: 100% !important;
+    border-right: 1px solid var(--border-strong) !important;
+  }
+
+  #page-lgr.active .sci-panel-plot,
+  #page-routh.active .sci-panel-plot,
+  #page-scientific.active .sci-panel-plot {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0px !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  #page-lgr.active .sci-panel-results,
+  #page-routh.active .sci-panel-results,
+  #page-scientific.active .sci-panel-results {
+    display: none !important;
+  }
+
+  #page-lgr.active .sci-tablet-switcher,
+  #page-routh.active .sci-tablet-switcher,
+  #page-scientific.active .sci-tablet-switcher {
+    display: flex !important;
   }
 
   /* View 2: Memorial dos 7 Passos e View 3: Teoria Clássica */
