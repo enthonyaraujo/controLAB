@@ -40,6 +40,7 @@ for (const file of [
   'state_space.py',
   'python_bridge.py',
   'android_bridge.py',
+  'script_service.py',
 ]) {
   const canonical = fs.readFileSync(path.join(root, 'src', 'python', file));
   const android = fs.readFileSync(path.join(root, 'android', 'app', 'src', 'main', 'python', file));

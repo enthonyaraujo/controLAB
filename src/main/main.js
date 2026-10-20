@@ -8,6 +8,7 @@ const execPromise = util.promisify(exec);
 Menu.setApplicationMenu(null);
 
 let mainWindow = null;
+const scriptFigures = new Map();
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('no-sandbox');
@@ -113,6 +114,7 @@ function createWindow() {
   });
 
   mainWindow.on('closed', () => {
+    for (const { window } of scriptFigures.values()) window.destroy();
     mainWindow = null;
   });
 }
@@ -196,6 +198,110 @@ function getDefaultWorkspacePath() {
     return path.join(home, 'Documents', 'ControLAB');
   }
 }
+
+// One Python transport owns one persistent openMAT process for the home workspace.
+let scriptWorker = null;
+let scriptQueue = Promise.resolve();
+let scriptBuffer = '';
+let scriptPending = null;
+
+function startScriptWorker() {
+  const executable = app.isPackaged ? getPackagedBridgePath() : getPythonPath();
+  const args = app.isPackaged ? ['--script-worker'] : [path.join(__dirname, '..', 'python', 'script_service.py')];
+  const worker = spawn(executable, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+  scriptWorker = worker;
+  scriptBuffer = '';
+  worker.stdout.setEncoding('utf8');
+  worker.stdout.on('data', (chunk) => {
+    if (scriptWorker !== worker) return;
+    scriptBuffer += chunk;
+    if (scriptBuffer.length > 16 * 1024 * 1024) { worker.kill(); return; }
+    const end = scriptBuffer.indexOf('\n');
+    if (end < 0 || !scriptPending) return;
+    const pending = scriptPending;
+    scriptPending = null;
+    clearTimeout(pending.timer);
+    try { pending.resolve(JSON.parse(scriptBuffer.slice(0, end))); }
+    catch { pending.reject(new Error('Resposta inválida do motor .m.')); }
+    scriptBuffer = scriptBuffer.slice(end + 1);
+  });
+  worker.stderr.on('data', () => {});
+  const stop = () => {
+    if (scriptWorker === worker) scriptWorker = null;
+    if (scriptPending?.worker === worker) {
+      clearTimeout(scriptPending.timer);
+      scriptPending.reject(new Error('Motor .m encerrado. A sessão foi perdida.'));
+      scriptPending = null;
+    }
+  };
+  worker.stdin.on('error', stop);
+  worker.on('error', stop);
+  worker.on('exit', stop);
+}
+
+ipcMain.handle('script-request', (event, payload) => {
+  const next = scriptQueue.then(() => new Promise((resolve, reject) => {
+    if (!scriptWorker) startScriptWorker();
+    const worker = scriptWorker;
+    const timer = setTimeout(() => {
+      if (scriptPending?.worker === worker) scriptPending = null;
+      if (scriptWorker === worker) scriptWorker = null;
+      worker.kill();
+      reject(new Error('Tempo de execução excedido. A sessão foi encerrada.'));
+    }, 15000);
+    scriptPending = { resolve, reject, timer, worker };
+    worker.stdin.write(`${JSON.stringify(payload)}\n`);
+  })).catch((error) => ({ success: false, error: error.message }));
+  scriptQueue = next.then(() => {});
+  return next;
+});
+ipcMain.handle('get-script-figure', (event) => scriptFigures.get(event.sender.id)?.data || null);
+ipcMain.handle('open-script-figure', async (event, payload) => {
+  if (event.sender !== mainWindow?.webContents) return { success: false, error: 'Janela de origem inválida.' };
+  if (!payload?.plot?.series || !Array.isArray(payload.plot.series)) return { success: false, error: 'Figura inválida.' };
+  if (scriptFigures.size >= 16) return { success: false, error: 'Feche uma janela de figura antes de abrir outra.' };
+  const theme = payload.theme === 'light' ? 'light' : 'dark';
+  const figureWindow = new BrowserWindow({
+    width: 920, height: 680, minWidth: 420, minHeight: 320,
+    title: `${payload.plot.title || 'Figura'} — ControLAB`,
+    backgroundColor: theme === 'light' ? '#ffffff' : '#161c24',
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, '..', 'preload', 'figure-preload.js'),
+      contextIsolation: true, nodeIntegration: false, sandbox: true,
+    },
+  });
+  const id = figureWindow.webContents.id;
+  scriptFigures.set(id, { window: figureWindow, data: { plot: payload.plot, theme } });
+  figureWindow.setMenuBarVisibility(false);
+  figureWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  figureWindow.webContents.on('will-navigate', (event) => event.preventDefault());
+  figureWindow.on('closed', () => scriptFigures.delete(id));
+  try {
+    await figureWindow.loadFile(path.join(__dirname, '..', 'renderer', 'figure.html'));
+    figureWindow.show();
+    return { success: true };
+  } catch (error) {
+    figureWindow.destroy();
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('open-script-dialog', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'Abrir script', properties: ['openFile'], filters: [{ name: 'Script MATLAB', extensions: ['m'] }],
+    defaultPath: currentWorkspaceFolder || getDefaultWorkspacePath(),
+  });
+  return { canceled: result.canceled, path: result.filePaths[0] };
+});
+ipcMain.handle('save-script-dialog', async (event, name) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    title: 'Salvar script', defaultPath: path.join(currentWorkspaceFolder || getDefaultWorkspacePath(), path.basename(name || 'script.m')),
+    filters: [{ name: 'Script MATLAB', extensions: ['m'] }],
+  });
+  return { canceled: result.canceled, path: result.filePath };
+});
+app.on('before-quit', () => { scriptWorker?.kill(); });
 
 ipcMain.handle('console-exec', async (event, command) => {
   try {

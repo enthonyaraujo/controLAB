@@ -316,6 +316,9 @@ def handle_calculate(payload):
 def dispatch(data):
     action = data.get("action", "calculate")
     theme = data.get("theme", "dark")
+    if action == "script_request":
+        from script_service import dispatch_script
+        return dispatch_script(data)
     if action == "presets":
         return get_presets_response()
     if action == "preview":
@@ -519,6 +522,10 @@ def dispatch(data):
 
 
 def main():
+    if "--script-worker" in sys.argv:
+        from script_service import main as script_main
+        script_main()
+        return
     try:
         if len(sys.argv) > 1:
             raw_input = sys.argv[1]
