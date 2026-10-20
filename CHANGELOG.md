@@ -3,6 +3,33 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.2.0] - 2026-10-20
+
+### Adicionado
+- **ControLAB Studio — Editor e Execução de Scripts MATLAB (.m):**
+  - Integração do motor independente OpenMAT compilado em Rust com suporte nativo a operações matriciais, controle clássico e gráficos.
+  - Editor com suporte a abas, realce de sintaxe, histórico de navegação, barra de pastas e atalhos de teclado (F5 para execução, Ctrl+O, Ctrl+S, Ctrl+N).
+  - Console persistente com variáveis mantidas durante a sessão, inspeção de variáveis no workspace e diagnósticos claros de erro.
+  - Janelas dedicadas e isoladas para visualização e exportação de figuras vetoriais/gráficos gerados por scripts (`plot`, `step`).
+  - Serviço Python seguro (`script_service.py`) com timeouts, limites de memória lógica e mitigação de vulnerabilidades cross-origin e DNS rebinding.
+- **Suíte de Testes Automatizados E2E do Studio:**
+  - Testes de navegador no Chromium via Puppeteer para validação do fluxo do editor, navegação em pastas, execução de scripts e figuras.
+
+### Corrigido
+- **Layout e Proporções dos Módulos no Modo Tablet:**
+  - Corrigida a quebra de layout que empilhava verticalmente o trilho lateral e o formulário de parâmetros em telas de tablet (600px a 1023px).
+  - Restaurado o alinhamento horizontal [Trilho | Parâmetros | Figura], com o gráfico preenchendo adequadamente o restante da largura.
+  - Corrigido o funcionamento do switcher de tablet `[ Figura | Resultados ]`, permitindo alternar a visibilidade do viewport sem sobreposição.
+  - Ajustada a largura do painel de parâmetros para acomodar a prévia matemática KaTeX sem cortes ou barras de rolagem desnecessárias.
+
+### Aprimorado
+- **Reorganização Estrutural da Base de Código:**
+  - Fontes canônicas dos motores matemáticos, utilitários, servidores e ponte JSON consolidados em `src/python/`.
+  - Remoção de protótipos e interfaces legadas obsoletas (Streamlit, Tkinter e diretório `public/` legado).
+- **Atualização de Versão e Artefatos da Release 4.2.0:**
+  - `versionCode 21` e `versionName "4.2.0"` no projeto Android (Capacitor/Chaquopy).
+  - Bump de versão em manifests, PWA Service Worker, páginas, documentações e scripts de suporte.
+
 ## [4.1.2] - 2026-10-13
 
 ### Adicionado
