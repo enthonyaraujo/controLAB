@@ -168,6 +168,12 @@ assert(styles.includes('.home-top-bar {\n  height: 2.75rem;'), 'O header da tela
 assert(styles.includes('.home-panel-header {\n  height: 2rem;'), 'Os cabeçalhos de painel na tela de início precisam usar rem para responder ao tamanho de interface');
 assert(styles.includes('.btn-home-primary {\n  height: 2.25rem;'), 'Os botões de ação na tela de início precisam usar rem para responder ao tamanho de interface');
 
+// Validação do módulo de Projeto de Controladores em Série (LGR)
+assert(scientificModules.includes("CONTROLLER_FORMULAS"), 'As fórmulas dos tipos de controladores precisam existir');
+assert(scientificModules.includes("recomputeControllerTransients"), 'A conversão automática entre ts, Mp, xi e wn precisa existir na interface');
+assert(scientificModules.includes("['parabola', 'Parábola 1/s³']"), 'A entrada de parábola unitária precisa estar disponível no projeto de controladores');
+assert(html.includes('id="scientific-steps-panel"'), 'O painel expansível de memória de cálculo passo a passo precisa existir no HTML');
+
 console.log('Integração, responsividade e navegação do renderer válidas.');
 
 

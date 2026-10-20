@@ -111,9 +111,6 @@
         renderPageOnce(pageScientific);
         onOpenScientific?.(pageId);
         pageScientific?.scrollTo?.({ top: 0 });
-        if (pageId === 'controllers') {
-          showToast('O módulo "Projeto de Controladores" está em desenvolvimento.', 'info', 2500);
-        }
       } else {
         if (pageHome) pageHome.scrollTop = 0;
         renderPageOnce(pageHome);
