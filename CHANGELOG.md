@@ -3,6 +3,16 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.2.1] - 2026-10-20
+
+### Corrigido
+- **Fechamento e Encerramento Limpo da Aplicação Desktop (Electron):**
+  - Corrigido o bug que impedia o fechamento do aplicativo ao clicar no botão fechar (X) ou usar atalhos como Alt+F4.
+  - Implementado o tratador de evento `will-prevent-unload` no processo principal do Electron, exibindo diálogo nativo de confirmação quando houver alterações não salvas no Studio e permitindo o encerramento sem bloqueios silenciosos.
+  - Corrigida a inicialização de novos documentos no Studio (`newDocument`), garantindo que o exemplo inicial não seja incorretamente marcado como modificado logo na abertura do aplicativo.
+  - Eliminados processos zumbis em segundo plano (`scriptWorker` / Python e `controlab-runtime`) através do encerramento forçado de processos filhos no fechamento da janela e interceptação de sinais (`SIGTERM`, `SIGINT`, `will-quit`).
+  - Prevenida a reabertura indevida de instâncias de worker durante o descarregamento da página (`payload.operation === 'close'`).
+
 ## [4.2.0] - 2026-10-20
 
 ### Adicionado
