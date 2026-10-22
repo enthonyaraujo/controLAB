@@ -353,7 +353,9 @@
       }
 
       function handleRecentItemClick(item) {
-        if (item.nav) {
+        if (item.type === 'script' && item.file && studio) {
+          studio.openPath(item.file);
+        } else if (item.nav) {
           navigateTo(item.nav);
           if (item.expr) {
             window.setTimeout(() => {
@@ -375,14 +377,57 @@
         }
       }
 
+      const RECENT_ORIGINS = {
+        time: 'Resposta no tempo',
+        routh: 'Estabilidade',
+        lgr: 'Lugar das raízes',
+        frequency: 'Frequência',
+        controllers: 'Controladores',
+        'state-space': 'Espaço de estados',
+        console: 'Console',
+      };
+
+      // Lista da tela de boas-vindas: nome, origem e tempo relativo
+      function renderWelcomeRecents(items) {
+        const list = optionalElement('studio-welcome-recent');
+        if (!list) return;
+        list.replaceChildren();
+        if (!items || items.length === 0) {
+          const emptyLi = document.createElement('li');
+          emptyLi.className = 'studio-welcome-empty';
+          emptyLi.textContent = 'Scripts abertos e cálculos feitos nos módulos aparecem aqui.';
+          list.appendChild(emptyLi);
+          return;
+        }
+        items.slice(0, 6).forEach((item) => {
+          const li = document.createElement('li');
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'studio-welcome-item';
+          button.title = item.file || item.expr || item.name || '';
+          const name = document.createElement('span');
+          name.className = 'studio-welcome-item-name';
+          name.textContent = item.name || item.expr || item.file;
+          const meta = document.createElement('span');
+          meta.className = 'studio-welcome-item-meta';
+          const origin = item.type === 'script' ? 'Script .m' : (RECENT_ORIGINS[item.nav] || 'Arquivo');
+          meta.textContent = `${origin} · ${item.time || formatRelativeTime(item.timestamp)}`;
+          button.append(name, meta);
+          button.addEventListener('click', () => handleRecentItemClick(item));
+          li.appendChild(button);
+          list.appendChild(li);
+        });
+      }
+
       function renderRecentItems(items) {
+        renderWelcomeRecents(items);
         const list = optionalElement('home-recent-list');
         if (!list) return;
         list.innerHTML = '';
         if (!items || items.length === 0) {
           const emptyLi = document.createElement('li');
           emptyLi.className = 'home-empty-hint';
-          emptyLi.textContent = 'Nenhum cálculo recente';
+          emptyLi.textContent = 'Nenhum item recente';
           list.appendChild(emptyLi);
           return;
         }
@@ -412,12 +457,15 @@
       function addRecentItem(entry) {
         if (!entry || (!entry.name && !entry.expr && !entry.file)) return;
         const items = loadRecentItems();
+        // Scripts são identificados pelo caminho, para não confundir arquivos homônimos.
+        const isScript = entry.type === 'script' && entry.file;
+        const recentKey = (it) => (it.type === 'script' && it.file ? it.file : it.name || it.expr || it.file);
         const key = entry.name || entry.expr || entry.file;
-        const filtered = items.filter((it) => (it.name || it.expr || it.file) !== key);
+        const filtered = items.filter((it) => recentKey(it) !== recentKey(entry));
         const newItem = {
           name: key,
           expr: entry.expr || (entry.type === 'math' ? key : ''),
-          nav: entry.nav || 'time',
+          nav: entry.nav || (isScript ? '' : 'time'),
           file: entry.file,
           type: entry.type || 'math',
           timestamp: entry.timestamp || Date.now(),

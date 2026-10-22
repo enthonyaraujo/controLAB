@@ -3,7 +3,12 @@
   'use strict';
   let controller = null;
   const MAX_BYTES = 1024 * 1024;
-  const EXAMPLE = '% ControLAB · multiplicação matricial\nA = [1 2; 3 4];\nB = [5 6; 7 8];\nC = A * B;\ndisp(C);\n';
+  const EXAMPLES = {
+    matrix: { name: 'multiplicacao_matrizes.m', source: '% ControLAB · multiplicação matricial\nA = [1 2; 3 4];\nB = [5 6; 7 8];\nC = A * B;\ndisp(C);\n' },
+    linear: { name: 'sistema_linear.m', source: '% ControLAB · solução de A*x = b\nA = [4 -2; 1 1];\nb = [2; 3];\nx = A \\ b\n' },
+    plot: { name: 'grafico_seno.m', source: '% ControLAB · gráfico de uma função\nx = 0:0.1:6;\nplot(x, sin(x));\n' },
+    step: { name: 'degrau_segunda_ordem.m', source: '% ControLAB · resposta ao degrau de um sistema de 2ª ordem\nwn = 2;\nzeta = 0.3;\nG = tf([wn^2], [1 2*zeta*wn wn^2]);\nstep(G);\n' },
+  };
   const escape = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   function initialize({ showToast = () => {} } = {}) {
@@ -102,7 +107,10 @@
         tab.append(button, close); tabs.append(tab);
       });
       const doc = current();
-      element('studio-editor-title').textContent = `Editor — ${doc?.name || ''}`;
+      const empty = !documents.length;
+      element('studio-welcome').hidden = !empty;
+      element('home-workspace-central').classList.toggle('studio-welcome-active', empty);
+      element('studio-editor-title').textContent = empty ? 'Início' : `Editor — ${doc?.name || ''}`;
       element('studio-document-status').textContent = `${doc?.path || doc?.name || ''}${doc && dirty(doc) ? ' · Não salvo' : ''}`;
     }
     function showView(view) {
@@ -134,8 +142,25 @@
       // The source still belongs to the closed tab; don't sync it into another document.
       if (activeId === id) {
         activeId = null;
-        if (documents.length) activate(documents.at(-1).id); else newDocument();
+        if (documents.length) activate(documents.at(-1).id);
+        else { source.value = ''; renderTabs(); updateHighlight(); }
       } else renderTabs();
+    }
+    function openExample(key) {
+      const example = EXAMPLES[key];
+      if (!example) return;
+      const existing = documents.find((doc) => !doc.path && doc.name === example.name);
+      if (existing) activate(existing.id); else newDocument(example.source, example.name);
+      status(`Exemplo: ${example.name} · F5 executa`);
+    }
+    function runCurrent() {
+      syncDocument();
+      const doc = current();
+      if (!doc) { status('Abra ou crie um script para executar'); return; }
+      return execute(doc.source, doc.name);
+    }
+    function addRecentScript(result) {
+      global.ControLABRecents?.addRecent({ name: result.name, file: result.path, type: 'script' });
     }
     async function openPath(path) {
       try {
@@ -143,6 +168,7 @@
         if (existing) { activate(existing.id); return; }
         const result = await request('read', { path });
         newDocument(result.source, result.name, result.path, result.source);
+        addRecentScript(result);
         home.classList.remove('studio-show-files');
         status(`Aberto: ${result.name}`);
       } catch (error) { log(error.message, 'error'); showToast(error.message, 'error'); }
@@ -196,6 +222,7 @@
         }
         if (!result.success) throw new Error(result.error || 'Não foi possível salvar.');
         doc.path = result.path; doc.name = result.name; doc.saved = text;
+        addRecentScript(result);
         renderTabs(); status(`Salvo: ${result.name}`); await refreshFolder(folder);
       } catch (error) { log(error.message, 'error'); showToast(error.message, 'error'); }
     }
@@ -406,7 +433,11 @@
     element('studio-new').addEventListener('click', () => newDocument());
     element('studio-open').addEventListener('click', openFile);
     element('studio-save').addEventListener('click', save);
-    element('studio-run').addEventListener('click', () => { syncDocument(); return execute(current().source, current().name); });
+    element('studio-run').addEventListener('click', runCurrent);
+    element('studio-welcome-examples').addEventListener('click', (event) => {
+      const item = event.target.closest('[data-example]');
+      if (item) openExample(item.dataset.example);
+    });
     element('studio-clear').addEventListener('click', clear);
     element('studio-clear-output').addEventListener('click', () => logs.replaceChildren());
     element('studio-help').addEventListener('click', help);
@@ -451,7 +482,7 @@
         else navigateHistory(event.key === 'ArrowLeft' ? -1 : 1);
         return;
       }
-      if (event.key === 'F5') { event.preventDefault(); syncDocument(); execute(current().source, current().name); }
+      if (event.key === 'F5') { event.preventDefault(); runCurrent(); }
       if ((event.ctrlKey || event.metaKey) && ['s', 'o', 'n'].includes(event.key.toLowerCase())) {
         event.preventDefault(); ({ s: save, o: openFile, n: newDocument })[event.key.toLowerCase()]();
       }
@@ -460,10 +491,10 @@
     global.addEventListener('beforeunload', (event) => {
       syncDocument(); if (documents.some(dirty)) { event.preventDefault(); event.returnValue = ''; }
     });
-    newDocument(EXAMPLE);
-    log('Pronto. Execute o script com F5 ou digite um comando no console.');
+    renderTabs();
+    log('Pronto. Crie ou abra um script, ou digite um comando no console.');
     request('state').then((result) => { available = true; renderWorkspace(result.workspace); }).catch((error) => { log(error.message, 'error'); status('Motor .m indisponível'); });
-    controller = { newDocument, openFile, openPath, save, clear, executeCommand, refreshFolder, selectFolder, renderWorkspace, focus: () => { showView('editor'); source.focus(); } };
+    controller = { newDocument, openFile, openPath, openExample, save, clear, executeCommand, refreshFolder, selectFolder, renderWorkspace, focus: () => { if (!documents.length) newDocument(); showView('editor'); source.focus(); } };
     return controller;
   }
   global.ControLABStudio = { initialize, get controller() { return controller; } };

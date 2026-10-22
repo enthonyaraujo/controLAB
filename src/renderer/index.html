@@ -225,6 +225,75 @@
                 <span class="home-panel-title" id="studio-editor-title">Editor</span><div class="studio-views"><button type="button" id="studio-editor-view" aria-pressed="true">Editor</button><button type="button" id="studio-figures-view" title="Abrir figuras em novas janelas">Figuras <span id="studio-figure-count">0</span></button></div>
               </div>
               <div class="home-workspace-central" id="home-workspace-central">
+                <!-- Tela de boas-vindas: aparece quando nenhum script está aberto -->
+                <div id="studio-welcome" class="studio-welcome" hidden>
+                  <div class="studio-welcome-inner">
+                    <header class="studio-welcome-hero">
+                      <div>
+                        <h2 class="studio-welcome-title">Bem-vindo ao ControLAB</h2>
+                        <p class="studio-welcome-desc">Analise sistemas de controle nos módulos ou escreva scripts .m no editor.</p>
+                      </div>
+                      <div class="studio-welcome-actions">
+                        <button type="button" class="studio-welcome-primary" id="btn-home-new-script"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM14 3v5h5M12 11v6M9 14h6"/></svg>Novo script</button>
+                        <button type="button" class="studio-welcome-secondary" id="btn-home-open-file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7l2 3h9l-2 10H3zM3 7V4h7l2 3h8v3"/></svg>Abrir arquivo</button>
+                      </div>
+                    </header>
+
+                    <section class="studio-welcome-section" aria-labelledby="studio-welcome-modules-title">
+                      <h3 class="studio-welcome-heading" id="studio-welcome-modules-title">Módulos</h3>
+                      <div class="studio-welcome-modules" id="home-modules-grid">
+                        <button type="button" class="studio-welcome-module" data-nav="time">
+                          <svg aria-hidden="true"><use href="#s-time"></use></svg>
+                          <span class="studio-welcome-module-title">Resposta no tempo</span>
+                          <span class="studio-welcome-module-desc">Degrau, impulso e rampa com métricas transitórias e erro estacionário.</span>
+                        </button>
+                        <button type="button" class="studio-welcome-module" data-nav="routh">
+                          <svg aria-hidden="true"><use href="#s-stab"></use></svg>
+                          <span class="studio-welcome-module-title">Estabilidade</span>
+                          <span class="studio-welcome-module-desc">Critério de Routh-Hurwitz com a tabela montada passo a passo.</span>
+                        </button>
+                        <button type="button" class="studio-welcome-module" data-nav="lgr">
+                          <svg aria-hidden="true"><use href="#s-root"></use></svg>
+                          <span class="studio-welcome-module-title">Lugar das raízes</span>
+                          <span class="studio-welcome-module-desc">Gráfico do LGR com memorial de assíntotas, rupturas e cruzamentos.</span>
+                        </button>
+                        <button type="button" class="studio-welcome-module" data-nav="frequency">
+                          <svg aria-hidden="true"><use href="#s-freq"></use></svg>
+                          <span class="studio-welcome-module-title">Resposta em frequência</span>
+                          <span class="studio-welcome-module-desc">Bode com assíntotas, Nyquist, margens e frequências críticas.</span>
+                        </button>
+                        <button type="button" class="studio-welcome-module" data-nav="controllers">
+                          <svg aria-hidden="true"><use href="#s-ctrl"></use></svg>
+                          <span class="studio-welcome-module-title">Controladores</span>
+                          <span class="studio-welcome-module-desc">Projeto de P, PD, PI, avanço e atraso de fase a partir de especificações.</span>
+                        </button>
+                        <button type="button" class="studio-welcome-module" data-nav="state-space">
+                          <svg aria-hidden="true"><use href="#s-state"></use></svg>
+                          <span class="studio-welcome-module-title">Espaço de estados</span>
+                          <span class="studio-welcome-module-desc">Conversão de modelos, controlabilidade, observabilidade e observadores.</span>
+                        </button>
+                      </div>
+                    </section>
+
+                    <div class="studio-welcome-columns">
+                      <section class="studio-welcome-section" aria-labelledby="studio-welcome-examples-title">
+                        <h3 class="studio-welcome-heading" id="studio-welcome-examples-title">Exemplos de script</h3>
+                        <ul class="studio-welcome-list" id="studio-welcome-examples">
+                          <li><button type="button" class="studio-welcome-item" data-example="matrix"><span class="studio-welcome-item-name">Multiplicação de matrizes</span><code>C = A * B</code></button></li>
+                          <li><button type="button" class="studio-welcome-item" data-example="linear"><span class="studio-welcome-item-name">Sistema linear</span><code>x = A \ b</code></button></li>
+                          <li><button type="button" class="studio-welcome-item" data-example="plot"><span class="studio-welcome-item-name">Gráfico de uma função</span><code>plot(x, sin(x))</code></button></li>
+                          <li><button type="button" class="studio-welcome-item" data-example="step"><span class="studio-welcome-item-name">Degrau de 2ª ordem</span><code>step(G)</code></button></li>
+                        </ul>
+                      </section>
+                      <section class="studio-welcome-section" aria-labelledby="studio-welcome-recent-title">
+                        <h3 class="studio-welcome-heading" id="studio-welcome-recent-title">Recentes</h3>
+                        <ul class="studio-welcome-list" id="studio-welcome-recent">
+                          <li class="studio-welcome-empty">Scripts abertos e cálculos feitos nos módulos aparecem aqui.</li>
+                        </ul>
+                      </section>
+                    </div>
+                  </div>
+                </div>
                 <div id="studio-tabs" class="studio-tabs" role="tablist" aria-label="Scripts abertos"></div>
                 <div id="studio-editor-pane" class="studio-editor-pane">
                   <pre id="studio-line-numbers" class="studio-line-numbers" aria-hidden="true">1</pre>
@@ -266,52 +335,6 @@
           </footer>
         </section>
 
-            <!-- Compatibilidade semântica de módulos e testes (em contêiner oculto) -->
-            <div style="display: none;" aria-hidden="true">
-              <div class="home-start-body">
-                <p class="home-start-desc">
-                  <span class="desc-full">Execute scripts .m, analise sistemas e gere gráficos, no editor ou pela interface gráfica de cada módulo.</span>
-                  <span class="desc-mobile">Execute scripts .m e analise sistemas.</span>
-                </p>
-                <div class="home-action-buttons">
-                  <button type="button" class="btn-home-primary" id="btn-home-new-script">Novo script</button>
-                  <div class="home-action-subrow">
-                    <button type="button" class="btn-home-secondary" id="btn-home-open-file">Abrir arquivo</button>
-                    <button type="button" class="btn-home-secondary" id="btn-home-import">Importar<span class="btn-lbl-full"> .m / .mat</span></button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="home-modules-panel">
-                <button type="button" class="home-see-all-link" id="btn-see-all-modules">Ver todos</button>
-                <div class="home-modules-grid" id="home-modules-grid">
-                  <div class="home-module-card" id="card-mod-control" data-nav="time" role="button" tabindex="0">
-                    <div class="mod-card-header"><h3 class="mod-card-title"><span class="title-full">Sistemas de controle</span></h3></div>
-                    <p class="mod-card-desc"><span class="desc-full">Resposta no tempo, LGR, Bode, PID e espaço de estados.</span></p>
-                  </div>
-                  <div class="home-module-card" id="card-mod-signals" data-module="Sinais e filtros" role="button" tabindex="0">
-                    <div class="mod-card-header"><h3 class="mod-card-title"><span class="title-full">Sinais e filtros</span></h3></div>
-                    <p class="mod-card-desc"><span class="desc-full">FFT, espectros e projeto de filtros.</span></p>
-                  </div>
-                  <div class="home-module-card" id="card-mod-optim" data-module="Otimização" role="button" tabindex="0">
-                    <div class="mod-card-header"><h3 class="mod-card-title">Otimização</h3></div>
-                    <p class="mod-card-desc"><span class="desc-full">Mínimos quadrados, raízes e programação linear.</span></p>
-                  </div>
-                  <div class="home-module-card" id="card-mod-linalg" data-module="Álgebra linear" role="button" tabindex="0">
-                    <div class="mod-card-header"><h3 class="mod-card-title">Álgebra linear</h3></div>
-                    <p class="mod-card-desc"><span class="desc-full">Matrizes, autovalores, decomposições e sistemas lineares.</span></p>
-                  </div>
-                  <div class="home-module-card is-extra-mobile" id="card-mod-diffeq" data-module="Equações diferenciais" role="button" tabindex="0">
-                    <div class="mod-card-header"><h3 class="mod-card-title">Equações diferenciais</h3></div>
-                    <p class="mod-card-desc">Integradores para sistemas rígidos e não rígidos.</p>
-                  </div>
-                  <div class="home-module-card mod-card-dev is-extra-mobile" id="card-mod-blocks" data-module="Diagrama de blocos" role="button" tabindex="0">
-                    <div class="mod-card-header"><h3 class="mod-card-title">Diagrama de blocos</h3></div>
-                    <p class="mod-card-desc">Modelagem e simulação por blocos.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </section>
 
           <!-- Divisor Vertical Direito -->
@@ -326,7 +349,7 @@
                 <button type="button" class="home-btn-clear" id="btn-clear-recent" title="Limpar histórico recente">Limpar</button>
               </div>
               <ul class="home-recent-list" id="home-recent-list">
-                <li class="home-empty-hint">Nenhum cálculo recente</li>
+                <li class="home-empty-hint">Nenhum item recente</li>
               </ul>
             </section>
 
