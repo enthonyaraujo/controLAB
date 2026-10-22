@@ -3,6 +3,24 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [4.2.2] - 2026-10-22
+
+### Adicionado
+- **Tela de boas-vindas no Studio:**
+  - A tela inicial abre com atalhos para os 6 módulos (Resposta no tempo, Estabilidade, Lugar das raízes, Resposta em frequência, Controladores e Espaço de estados), no lugar do editor com script de exemplo.
+  - Exemplos de script prontos para executar: multiplicação de matrizes, sistema linear, gráfico de função e degrau de 2ª ordem.
+  - Lista de recentes unificada, com scripts .m abertos ou salvos e cálculos feitos nos módulos; clicar reabre o arquivo ou volta ao módulo.
+  - A tela volta ao fechar a última aba, e executar (F5) sem script aberto não gera mais erro.
+
+### Corrigido
+- **Motor .m (openMAT) no Android:**
+  - O runtime Rust passa a ser compilado com o Android NDK para `arm64-v8a` e `x86_64` e incluído no APK como `libcontrolab_runtime.so`; antes, todo script .m falhava no celular.
+  - O APK extrai a biblioteca nativa (`useLegacyPackaging`) e o Python a localiza em `nativeLibraryDir`.
+  - `npm run mobile:sync` compila o motor antes de montar o app, e o CI instala os alvos Rust do Android.
+
+### Removido
+- Marcação oculta de cards de módulos inexistentes na tela inicial.
+
 ## [4.2.1] - 2026-10-20
 
 ### Corrigido
