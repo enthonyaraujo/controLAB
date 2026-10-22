@@ -40,6 +40,15 @@ async function freePort() {
     await page.setViewport({ width: 1440, height: 900 });
     await page.goto(url, { waitUntil: 'networkidle0' });
     await page.waitForSelector('#studio-source');
+    // With no script open, the welcome screen replaces the editor.
+    assert.equal(await page.$eval('#studio-welcome', (node) => node.hidden), false);
+    assert.equal(await page.$$eval('.studio-welcome-module[data-nav]', (nodes) => nodes.length), 6);
+    await page.click('[data-example="linear"]');
+    await page.waitForFunction(() => document.querySelector('#studio-editor-title').textContent.includes('sistema_linear.m'));
+    await page.keyboard.press('F5');
+    await page.waitForFunction(() => document.querySelector('#home-console-logs').textContent.includes('1.6666'));
+    await page.click('.studio-tab[aria-selected="true"] .studio-close-tab');
+    assert.equal(await page.$eval('#studio-welcome', (node) => node.hidden), false);
     await page.locator('#studio-folder-input').fill(temp);
     await page.click('#studio-folder-form button');
     await page.waitForSelector(`button[title="${fixture}"]`);
