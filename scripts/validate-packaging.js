@@ -49,6 +49,15 @@ for (const file of [
   }
 }
 
+const gradle = fs.readFileSync(path.join(root, 'android', 'app', 'build.gradle'), 'utf8');
+if (!/useLegacyPackaging\s*=\s*true/.test(gradle)) {
+  throw new Error('O APK precisa extrair libcontrolab_runtime.so para executar o motor .m.');
+}
+const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+if (!packageJson.scripts['mobile:sync'].includes('build:openmat:android')) {
+  throw new Error('mobile:sync precisa compilar o motor .m do Android.');
+}
+
 const capacitor = JSON.parse(fs.readFileSync(path.join(root, 'capacitor.config.json'), 'utf8'));
 if (capacitor.appId !== 'br.com.enthony.lgrstudio' || capacitor.webDir !== 'src/renderer') {
   throw new Error('Configuração Capacitor inválida.');

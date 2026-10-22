@@ -81,3 +81,45 @@ class ScriptRuntimeTests(unittest.TestCase):
         replies = [json.loads(line) for line in process.stdout.splitlines()]
         self.assertEqual(len(replies), 2)
         self.assertIn('8', replies[1]['output'])
+
+
+class RuntimeLocationTests(unittest.TestCase):
+    """Android points the transport at the runtime shipped in nativeLibraryDir."""
+
+    def setUp(self):
+        import os
+        self.previous = os.environ.pop('CONTROLAB_RUNTIME', None)
+        self.addCleanup(self.restore)
+
+    def restore(self):
+        import os
+        os.environ.pop('CONTROLAB_RUNTIME', None)
+        if self.previous is not None:
+            os.environ['CONTROLAB_RUNTIME'] = self.previous
+
+    def test_environment_override_runs_the_given_runtime(self):
+        import os
+        runtime = ScriptService().runtime_path()
+        if not runtime.is_file():
+            self.skipTest('Compile o motor com npm run build:openmat antes destes testes.')
+        with tempfile.TemporaryDirectory() as temp:
+            # Same file name the APK uses, in a folder outside the build tree.
+            copy = Path(temp) / 'libcontrolab_runtime.so'
+            copy.write_bytes(runtime.read_bytes())
+            copy.chmod(0o755)
+            os.environ['CONTROLAB_RUNTIME'] = str(copy)
+            service = ScriptService()
+            self.addCleanup(service.close)
+            self.assertEqual(service.runtime_path(), copy)
+            result = service.request({'session': 'android', 'operation': 'execute', 'source': 'x = [4 -2; 1 1] \\ [2; 3]'})
+            self.assertTrue(result['success'], result)
+            self.assertIn('1.666', result['output'])
+
+    def test_missing_android_runtime_reports_the_apk(self):
+        import os
+        with tempfile.TemporaryDirectory() as temp:
+            os.environ['CONTROLAB_RUNTIME'] = str(Path(temp) / 'libcontrolab_runtime.so')
+            service = ScriptService()
+            result = service.request({'session': 'android', 'operation': 'state'})
+            self.assertFalse(result['success'])
+            self.assertIn('APK', result['error'])

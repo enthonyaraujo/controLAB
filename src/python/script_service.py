@@ -1,6 +1,7 @@
 """Persistent transport to the copied openMAT runtime (desktop and local Web)."""
 import atexit
 import json
+import os
 from pathlib import Path
 import queue
 import signal
@@ -19,6 +20,9 @@ class ScriptService:
     def runtime_path(self):
         if self.executable:
             return Path(self.executable)
+        # Android sets this to the copy shipped in nativeLibraryDir (see android_bridge.py).
+        if os.environ.get("CONTROLAB_RUNTIME"):
+            return Path(os.environ["CONTROLAB_RUNTIME"])
         name = "controlab-runtime.exe" if sys.platform == "win32" else "controlab-runtime"
         if getattr(sys, "frozen", False):
             return Path(sys.executable).parent / name
@@ -27,6 +31,8 @@ class ScriptService:
     def _start(self):
         executable = self.runtime_path()
         if not executable.is_file():
+            if os.environ.get("CONTROLAB_RUNTIME"):
+                raise RuntimeError("Motor .m não incluído neste APK. Gere o app com npm run mobile:apk e o Android NDK instalado.")
             raise RuntimeError("Motor .m indisponível nesta instalação. No desenvolvimento, execute npm run build:openmat.")
         self.process = subprocess.Popen(
             [str(executable)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,

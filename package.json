@@ -14,7 +14,7 @@
     "dev": "node scripts/start-electron.js",
     "web": "node scripts/run-python.js src/python/web_server.py",
     "web:mobile": "node scripts/run-python.js src/python/web_server.py --host 0.0.0.0",
-    "mobile:sync": "node scripts/sync-mobile.js && cap sync android",
+    "mobile:sync": "npm run build:openmat:android && node scripts/sync-mobile.js && cap sync android",
     "mobile:open": "npm run mobile:sync && cap open android",
     "mobile:apk": "npm run mobile:sync && node scripts/run-gradle.js assembleDebug",
     "mobile:install": "npm run mobile:apk && node scripts/install-apk.js",
@@ -25,6 +25,7 @@
     "test:js": "node scripts/check-javascript.js && node tests/renderer-smoke.js && node tests/renderer-requests.js",
     "test:python": "node scripts/run-python.js -m unittest discover -s tests",
     "build:openmat": "node scripts/build-openmat.js",
+    "build:openmat:android": "node scripts/build-openmat-android.js",
     "test:studio:browser": "node tests/studio-browser.cjs"
   },
   "keywords": [
