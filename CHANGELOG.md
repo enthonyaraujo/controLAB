@@ -17,6 +17,10 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
   - O runtime Rust passa a ser compilado com o Android NDK para `arm64-v8a` e `x86_64` e incluído no APK como `libcontrolab_runtime.so`; antes, todo script .m falhava no celular.
   - O APK extrai a biblioteca nativa (`useLegacyPackaging`) e o Python a localiza em `nativeLibraryDir`.
   - `npm run mobile:sync` compila o motor antes de montar o app, e o CI instala os alvos Rust do Android.
+- **Gráficos de scripts .m no Android:**
+  - Os gráficos passam a ser exibidos dentro do editor; antes, a janela de figura substituía a tela do app, não recebia os dados e mostrava "Não foi possível carregar a figura".
+  - O botão "Fechar janela" volta ao app quando a janela não pode ser fechada, em vez de deixar o usuário preso.
+  - Com pop-ups bloqueados no navegador, a figura abre no editor em vez de apenas exibir um aviso.
 
 ### Removido
 - Marcação oculta de cards de módulos inexistentes na tela inicial.

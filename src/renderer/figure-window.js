@@ -13,7 +13,15 @@
     document.getElementById('figure-title').textContent = title;
     window.ControLABFigures.render(document.getElementById('figure-content'), [data.plot]);
   }
-  document.getElementById('figure-close').addEventListener('click', () => window.close());
+  document.getElementById('figure-close').addEventListener('click', () => {
+    window.close();
+    // A page that was not opened as a pop-up (e.g. inside the Android WebView) cannot close itself.
+    setTimeout(() => {
+      if (!window.closed) {
+        if (history.length > 1) history.back(); else location.replace('index.html');
+      }
+    }, 200);
+  });
   if (window.figureApi) {
     window.figureApi.getData().then(show).catch(() => {});
   } else {

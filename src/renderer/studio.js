@@ -337,8 +337,14 @@
       plots = plots.slice(-16);
       element('studio-figure-count').textContent = plots.length;
     }
+    function showInlineFigures(figures) {
+      global.ControLABFigures.render(element('studio-figures'), figures);
+      showView('figures');
+    }
     async function openFigures(figures) {
       if (!figures.length) { showToast('Execute um script para gerar uma figura.', 'info'); return; }
+      // The Android WebView has no real pop-up windows: window.open replaces the app page.
+      if (global.Capacitor?.isNativePlatform?.() && !global.api?.openScriptFigure) { showInlineFigures(figures); return; }
       for (const plot of figures) {
         const theme = document.documentElement.dataset.theme || 'dark';
         if (global.api?.openScriptFigure) {
@@ -360,7 +366,9 @@
         popup = global.open(`figure.html?id=${encodeURIComponent(id)}`, `controlab-figure-${id}`, 'popup,width=900,height=640,resizable=yes,scrollbars=yes');
         if (!popup) {
           clearTimeout(timer); global.removeEventListener('message', listener);
-          showToast('Permita janelas pop-up e clique em Figuras para abrir o gráfico.', 'info');
+          showInlineFigures(figures);
+          showToast('Janelas pop-up bloqueadas: a figura foi aberta no editor.', 'info');
+          return;
         }
       }
     }
