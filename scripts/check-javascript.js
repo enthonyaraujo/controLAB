@@ -22,6 +22,7 @@ const javascriptFiles = [
   'src/renderer/figure-window.js',
   'src/preload/figure-preload.js',
   'scripts/build-openmat.js',
+  'scripts/build-openmat-android.js',
   'src/renderer/routh.js',
   'src/renderer/scientific-modules.js',
   'src/renderer/web-api.js',

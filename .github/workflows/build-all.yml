@@ -162,6 +162,9 @@ jobs:
       - name: Instalar dependências Node
         run: npm ci
 
+      - name: Configurar Rust para o motor .m do Android
+        run: rustup target add aarch64-linux-android x86_64-linux-android
+
       - name: Dar permissão e inicializar Gradle Wrapper com retentativas
         run: |
           chmod +x android/gradlew

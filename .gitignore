@@ -39,4 +39,6 @@ Thumbs.db
 # Motor .m compilado (fontes em vendor/openmat)
 build/openmat/
 build/runtime/
+build/openmat-android/
+android/app/src/main/jniLibs/
 vendor/openmat/target/
