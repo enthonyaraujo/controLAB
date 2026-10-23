@@ -21,6 +21,8 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
   - Os gráficos passam a ser exibidos dentro do editor; antes, a janela de figura substituía a tela do app, não recebia os dados e mostrava "Não foi possível carregar a figura".
   - O botão "Fechar janela" volta ao app quando a janela não pode ser fechada, em vez de deixar o usuário preso.
   - Com pop-ups bloqueados no navegador, a figura abre no editor em vez de apenas exibir um aviso.
+- **Janela de figura no desktop (Electron):**
+  - Corrigido o erro `ERR_FAILED (-2)` ao abrir gráficos de scripts .m: a trava de navegação da janela bloqueava o carregamento do próprio `figure.html`. A trava agora é aplicada depois que a página carrega.
 
 ### Removido
 - Marcação oculta de cards de módulos inexistentes na tela inicial.
