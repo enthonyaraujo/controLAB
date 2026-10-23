@@ -8,6 +8,7 @@ const app = fs.readFileSync(path.join(root, 'src', 'renderer', 'app.js'), 'utf8'
 const serviceWorker = fs.readFileSync(path.join(root, 'src', 'renderer', 'sw.js'), 'utf8').replace(/\r\n/g, '\n');
 const styles = fs.readFileSync(path.join(root, 'src', 'renderer', 'styles.css'), 'utf8').replace(/\r\n/g, '\n');
 const scientificModules = fs.readFileSync(path.join(root, 'src', 'renderer', 'scientific-modules.js'), 'utf8').replace(/\r\n/g, '\n');
+const mainProcess = fs.readFileSync(path.join(root, 'src', 'main', 'main.js'), 'utf8').replace(/\r\n/g, '\n');
 
 const settingsPosition = html.indexOf('<script src="settings.js"></script>');
 const navigationPosition = html.indexOf('<script src="navigation.js"></script>');
@@ -174,6 +175,7 @@ assert(scientificModules.includes("recomputeControllerTransients"), 'A conversã
 assert(scientificModules.includes("['parabola', 'Parábola 1/s³']"), 'A entrada de parábola unitária precisa estar disponível no projeto de controladores');
 assert(html.includes('id="scientific-steps-panel"'), 'O painel expansível de memória de cálculo passo a passo precisa existir no HTML');
 
+const figureLoad = mainProcess.indexOf("await figureWindow.loadFile(");
+const figureLock = mainProcess.indexOf("figureWindow.webContents.on('will-navigate'");
+assert(figureLoad >= 0 && figureLock > figureLoad, 'a trava de navegação da janela de figura precisa vir depois do loadFile, ou o Electron bloqueia o figure.html');
 console.log('Integração, responsividade e navegação do renderer válidas.');
-
-
