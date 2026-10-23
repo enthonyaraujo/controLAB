@@ -342,10 +342,11 @@ ipcMain.handle('open-script-figure', async (event, payload) => {
   scriptFigures.set(id, { window: figureWindow, data: { plot: payload.plot, theme } });
   figureWindow.setMenuBarVisibility(false);
   figureWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
-  figureWindow.webContents.on('will-navigate', (event) => event.preventDefault());
   figureWindow.on('closed', () => scriptFigures.delete(id));
   try {
     await figureWindow.loadFile(path.join(__dirname, '..', 'renderer', 'figure.html'));
+    // Electron also emits will-navigate for loadFile, so the lock is installed once the page has loaded.
+    figureWindow.webContents.on('will-navigate', (event) => event.preventDefault());
     figureWindow.show();
     return { success: true };
   } catch (error) {
