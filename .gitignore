@@ -42,3 +42,6 @@ build/runtime/
 build/openmat-android/
 android/app/src/main/jniLibs/
 vendor/openmat/target/
+
+# Configuração local do Claude Code
+.claude/
