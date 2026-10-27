@@ -10,6 +10,12 @@ Menu.setApplicationMenu(null);
 let mainWindow = null;
 let isQuitting = false;
 const scriptFigures = new Map();
+const english = require('../renderer/locales/en.json');
+let uiLanguage = 'pt-BR';
+const uiText = (text) => uiLanguage === 'en' ? (english[text] || text) : text;
+ipcMain.on('controlab-language', (event, value) => {
+  if (event.sender === mainWindow?.webContents && ['pt-BR', 'en'].includes(value)) uiLanguage = value;
+});
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('no-sandbox');
@@ -85,7 +91,7 @@ function createWindow() {
     minWidth: 360,
     minHeight: 640,
     autoHideMenuBar: true,
-    title: 'ControLAB - Sistemas de Controle',
+    title: uiText('ControLAB - Sistemas de Controle'),
     backgroundColor: '#F4F6F8',
     icon: iconPath,
     webPreferences: {
@@ -121,13 +127,13 @@ function createWindow() {
     }
     const choice = dialog.showMessageBoxSync(mainWindow, {
       type: 'question',
-      buttons: ['Sair sem salvar', 'Cancelar'],
+      buttons: [uiText('Sair sem salvar'), uiText('Cancelar')],
       defaultId: 0,
       cancelId: 1,
       noLink: true,
-      title: 'Alterações não salvas',
-      message: 'Existem alterações não salvas no editor de scripts.',
-      detail: 'Deseja realmente sair e descartar as alterações?',
+      title: uiText('Alterações não salvas'),
+      message: uiText('Existem alterações não salvas no editor de scripts.'),
+      detail: uiText('Deseja realmente sair e descartar as alterações?'),
     });
     if (choice === 0) {
       event.preventDefault();
@@ -357,14 +363,14 @@ ipcMain.handle('open-script-figure', async (event, payload) => {
 
 ipcMain.handle('open-script-dialog', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'Abrir script', properties: ['openFile'], filters: [{ name: 'Script MATLAB', extensions: ['m'] }],
+    title: uiText('Abrir script'), properties: ['openFile'], filters: [{ name: 'Script MATLAB', extensions: ['m'] }],
     defaultPath: currentWorkspaceFolder || getDefaultWorkspacePath(),
   });
   return { canceled: result.canceled, path: result.filePaths[0] };
 });
 ipcMain.handle('save-script-dialog', async (event, name) => {
   const result = await dialog.showSaveDialog(mainWindow, {
-    title: 'Salvar script', defaultPath: path.join(currentWorkspaceFolder || getDefaultWorkspacePath(), path.basename(name || 'script.m')),
+    title: uiText('Salvar script'), defaultPath: path.join(currentWorkspaceFolder || getDefaultWorkspacePath(), path.basename(name || 'script.m')),
     filters: [{ name: 'Script MATLAB', extensions: ['m'] }],
   });
   return { canceled: result.canceled, path: result.filePath };
@@ -389,7 +395,7 @@ ipcMain.handle('get-home-state', async (event, folder) => {
 
 ipcMain.handle('select-workspace-folder', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'Selecionar pasta de trabalho',
+    title: uiText('Selecionar pasta de trabalho'),
     defaultPath: currentWorkspaceFolder || getDefaultWorkspacePath(),
     properties: ['openDirectory', 'createDirectory'],
   });
@@ -410,9 +416,9 @@ ipcMain.handle('set-workspace-folder', async (event, folder) => {
 
 ipcMain.handle('save-image', async (event, { base64, defaultName }) => {
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
-    title: 'Salvar Gráfico do LGR',
+    title: uiText('Salvar Gráfico do LGR'),
     defaultPath: defaultName || 'lgr_grafico.png',
-    filters: [{ name: 'Imagens PNG', extensions: ['png'] }],
+    filters: [{ name: uiText('Imagens PNG'), extensions: ['png'] }],
   });
 
   if (filePath) {
@@ -425,9 +431,9 @@ ipcMain.handle('save-image', async (event, { base64, defaultName }) => {
 
 ipcMain.handle('save-svg', async (event, { svg, defaultName }) => {
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
-    title: 'Salvar Gráfico Vetorial SVG',
+    title: uiText('Salvar Gráfico Vetorial SVG'),
     defaultPath: defaultName || 'lgr_grafico.svg',
-    filters: [{ name: 'Vetorial SVG', extensions: ['svg'] }],
+    filters: [{ name: uiText('Vetorial SVG'), extensions: ['svg'] }],
   });
 
   if (filePath) {

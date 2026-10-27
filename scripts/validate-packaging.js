@@ -31,6 +31,7 @@ for (const file of requiredFiles) {
 
 for (const file of [
   'lgr_engine.py',
+  'localization.py',
   'control_utils.py',
   'plot_theme.py',
   'routh_hurwitz.py',
@@ -69,3 +70,5 @@ if (!desktop.linux?.target?.includes('AppImage') || !desktop.win?.target?.includ
 }
 
 console.log('Configurações Android, Linux e Windows válidas.');
+
+if (!fs.readFileSync(path.join(root, 'src/renderer/locales/en.json')).equals(fs.readFileSync(path.join(root, 'android/app/src/main/python/en.json')))) throw new Error('Catálogo Android dessincronizado.');

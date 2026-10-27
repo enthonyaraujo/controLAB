@@ -4,11 +4,14 @@
     container.replaceChildren();
       const NS = 'http://www.w3.org/2000/svg';
       const svgElement = (tag, attrs = {}, text = '') => {
-        const node = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value)); node.textContent = text; return node;
+        const node = document.createElementNS(NS, tag); Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value)); node.textContent = text; node.dataset.noI18n = ''; return node;
       };
       plots.forEach((plot, index) => {
         const figure = document.createElement('figure'); figure.className = 'studio-figure';
-        const caption = document.createElement('figcaption'); caption.textContent = `Figura ${index + 1} · ${plot.title || 'Gráfico'}`;
+        const caption = document.createElement('figcaption'); caption.append(document.createTextNode(`Figura ${index + 1} · `));
+        const plotTitle = document.createElement('span');
+        if (plot.title) plotTitle.dataset.noI18n = '';
+        plotTitle.textContent = plot.title || 'Gráfico'; caption.append(plotTitle);
         const svg = svgElement('svg', { viewBox: '0 0 680 340', role: 'img', 'aria-label': plot.title || 'Gráfico do script' });
         const all = plot.series.flatMap((series) => series.points).filter((point) => point.every(Number.isFinite));
         if (!all.length) return;

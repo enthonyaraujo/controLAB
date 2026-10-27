@@ -313,6 +313,10 @@ def handle_calculate(payload):
     }
 
 
+from localization import localized_request
+
+
+@localized_request
 def dispatch(data):
     action = data.get("action", "calculate")
     theme = data.get("theme", "dark")

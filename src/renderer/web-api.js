@@ -27,7 +27,7 @@
 
   async function request(action, payload = {}) {
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    const mergedPayload = { theme: currentTheme, ...payload };
+    const mergedPayload = { theme: currentTheme, language: window.ControLABI18n?.getLanguage() || 'pt-BR', ...payload };
     if (nativeLgr) {
       return nativeLgr.dispatch({ payload: { action, ...mergedPayload } });
     }

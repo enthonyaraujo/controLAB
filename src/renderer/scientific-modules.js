@@ -1250,6 +1250,7 @@
       const payload = {
         theme: document.documentElement.getAttribute('data-theme') || 'dark',
         response_type: currentResponseType,
+        language: global.ControLABI18n?.getLanguage() || 'pt-BR',
       };
       const plotViewport = element('scientific-plot-viewport');
       if (plotViewport) {
@@ -1837,7 +1838,7 @@
       const pyCode = `# ControLAB v4.2.3 - Script de Simulação\nimport control as ct\nimport matplotlib.pyplot as plt\n\ns = ct.tf('s')\nG = ${exprStr.replace(/\^/g, '**')}\nT = ct.feedback(G, 1)\nt, y = ct.step_response(T, T=10)\n\nplt.figure(figsize=(8, 4.5), dpi=120)\nplt.plot(t, y, label='Degrau unitário')\nplt.grid(True)\nplt.title('Resposta ao Degrau - ControLAB')\nplt.xlabel('Tempo (s)')\nplt.ylabel('Amplitude')\nplt.legend()\nplt.show()\n`;
       try {
         if (navigator.clipboard) {
-          await navigator.clipboard.writeText(pyCode);
+          await navigator.clipboard.writeText(global.ControLABI18n?.translate(pyCode) || pyCode);
           showToast('Código Python copiado para a Área de Transferência!', 'success');
         } else {
           showToast('Código gerado com sucesso.', 'info');

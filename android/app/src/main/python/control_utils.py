@@ -27,6 +27,8 @@ from plot_theme import apply_plot_theme, get_theme_tokens, register_local_fonts,
 def figure_payload(fig, *, dpi: int = 150, theme: str = "dark"):
     """Serializa uma figura Matplotlib em PNG base64 e SVG conforme os tokens do tema."""
     try:
+        from localization import localize_figure
+        localize_figure(fig)
         tokens = get_theme_tokens(theme)
         apply_plot_theme(fig, theme=theme)
         png_buffer = io.BytesIO()
