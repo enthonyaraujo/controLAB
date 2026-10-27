@@ -3,6 +3,22 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Adicionado
+- **Projeto de Controladores:**
+  - Controlador PID por LGR, tratado como PI·PD: o zero z_i fica próximo da origem (padrão Re/10, ajustável) e z_d sai da condição de fase.
+  - Campo opcional de realimentação H(s): o projeto usa a malha aberta G(s)H(s) e a simulação usa Gc·G/(1 + Gc·G·H).
+  - Campo opcional de polo dominante desejado (ex.: `-1+1j`, `-1+sqrt(3)j`), que substitui ξ, Mp, ts e ωn.
+  - Aviso quando o "avanço de fase" calculado tem p < z, ou seja, é na verdade um atraso.
+
+### Corrigido
+- **Projeto de Controladores:**
+  - Plantas com polos complexos (ex.: 1/(s²+1)) geravam o erro "Sign not allowed in string format specifier".
+  - Plantas com ganho negativo resultavam em controlador com sinal trocado e malha fechada instável; o ganho do controlador agora sai negativo.
+  - PD com polo desejado já sobre o LGR retornava τd ≈ 10⁻⁶ e z ≈ 10⁶; agora retorna Kd = 0.
+  - Quando o ponto desejado exige contribuição angular negativa, PD e PI explicam o motivo e sugerem PI ou Atraso de Fase, em vez de retornar um zero negativo.
+
 ## [4.2.2] - 2026-10-22
 
 ### Adicionado

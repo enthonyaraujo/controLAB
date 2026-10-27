@@ -107,6 +107,7 @@
     P: 'G_c(s) = K_p, \\quad u(t) = K_p e(t)',
     PD: 'G_c(s) = K_p(1 + \\tau_d s), \\quad z = \\frac{1}{\\tau_d}',
     PI: 'G_c(s) = K_p\\frac{s + 1/\\tau_i}{s} = \\frac{K_p(s+z)}{s}, \\quad z = \\frac{1}{\\tau_i}',
+    PID: 'G_c(s) = K_p + \\frac{K_i}{s} + K_d s = \\frac{K(s+z_i)(s+z_d)}{s}',
   };
 
   const MODULES = {
@@ -181,7 +182,7 @@
       action: 'controller_design',
       title: 'Projeto de Controladores',
       kicker: 'Síntese em Série via LGR — Gma(s) = Gc(s)G(s)',
-      description: 'Projete controladores por Avanço de Fase, Atraso de Fase, P, PD e PI no plano complexo s atendendo a especificações transitórias e de erro estacionário.',
+      description: 'Projete controladores por Avanço de Fase, Atraso de Fase, P, PD, PI e PID no plano complexo s atendendo a especificações transitórias e de erro estacionário, com realimentação unitária ou H(s).',
       filename: 'projeto-de-controlador',
       primaryKeys: ['Polo dominante s', 'Ganho', 'Zero do controlador (z)', 'Polo do controlador (p)', 'Erro e(∞) compensado', 'Estabilidade'],
       fields: [
@@ -191,20 +192,29 @@
           type: 'text',
           value: '5 / (s * (s + 1))',
           placeholder: 'Ex.: 5 / (s * (s + 1))',
-          help: 'Digite qualquer função de transferência G(s) genérica.',
+          help: 'Digite qualquer função de transferência G(s) genérica. Malhas internas podem ser reduzidas na própria expressão: G1/(1 + G1*H1).',
+        },
+        {
+          name: 'feedback_expr',
+          label: 'Realimentação H(s) (opcional)',
+          type: 'text',
+          value: '',
+          placeholder: 'Vazio = realimentação unitária (ex.: 0.05)',
+          help: 'Sensor no ramo de realimentação. O projeto no LGR usa a malha aberta G(s)H(s) e a simulação usa Gc·G/(1 + Gc·G·H).',
         },
         {
           name: 'controller_type',
           label: 'Tipo de Controlador Gc(s)',
           type: 'select',
           value: 'lead',
-          help: 'Selecione entre Avanço de Fase, Atraso de Fase, P, PD ou PI em série com G(s).',
+          help: 'Selecione entre Avanço de Fase, Atraso de Fase, P, PD, PI ou PID em série com G(s).',
           options: [
             ['lead', '1. Avanço de Fase — Gc(s) = K(s+z)/(s+p), z < p'],
             ['lag', '2. Atraso de Fase — Gc(s) = K(s+z)/(s+p), p < z'],
             ['P', '3. Proporcional (P) — Gc(s) = Kp'],
             ['PD', '4. Proporcional e Derivativo (PD) — Gc(s) = Kp(1 + τd·s)'],
             ['PI', '5. Proporcional-Integral (PI) — Gc(s) = Kp(s+z)/s'],
+            ['PID', '6. PID — Gc(s) = Kp + Ki/s + Kd·s'],
           ],
           showControllerFormula: true,
         },
@@ -239,7 +249,7 @@
           min: '0.0001',
           placeholder: 'Ex.: 2',
           help: 'Calcula ωn automaticamente a partir de ts e ξ.',
-          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+          when: { controller_type: ['lead', 'P', 'PD', 'PI', 'PID'] },
         },
         {
           name: 'mp',
@@ -250,7 +260,7 @@
           max: '99.99',
           placeholder: 'Ex.: 16',
           help: 'Converte automaticamente entre Mp(%) e ξ pela fórmula exponencial.',
-          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+          when: { controller_type: ['lead', 'P', 'PD', 'PI', 'PID'] },
         },
         {
           name: 'xi',
@@ -261,7 +271,7 @@
           max: '0.9999',
           placeholder: 'Ex.: 0.5',
           help: 'Calcula Mp(%) e ωn (ou ts) automaticamente ao editar.',
-          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+          when: { controller_type: ['lead', 'P', 'PD', 'PI', 'PID'] },
         },
         {
           name: 'wn',
@@ -271,8 +281,27 @@
           min: '0.0001',
           placeholder: 'Ex.: 4',
           help: 'Calcula ts automaticamente a partir de ωn e ξ.',
-          when: { controller_type: ['lead', 'P', 'PD', 'PI'] },
+          when: { controller_type: ['lead', 'P', 'PD', 'PI', 'PID'] },
           showDominantPolePreview: true,
+        },
+        {
+          name: 'desired_pole',
+          label: 'Polo dominante desejado s (opcional)',
+          type: 'text',
+          value: '',
+          placeholder: 'Ex.: -1+1j ou -1+sqrt(3)j',
+          help: 'Quando preenchido, substitui ξ, Mp, ts e ωn: o projeto usa diretamente s = -Re ± Im·j.',
+          when: { controller_type: ['lead', 'P', 'PD', 'PI', 'PID'] },
+        },
+        {
+          name: 'pid_pi_zero',
+          label: 'Zero da parte PI z_i (opcional)',
+          type: 'number',
+          value: '',
+          min: '0.0001',
+          placeholder: 'Vazio = z_i = Re/10 (próximo da origem)',
+          help: 'O PID é projetado como PI·PD: z_i fica próximo da origem e z_d é obtido pela condição de fase.',
+          when: { controller_type: ['PID'] },
         },
         {
           name: 'lead_zero',
@@ -653,6 +682,11 @@
     function updateDominantPolePreview() {
       const box = element('ctrl-dominant-pole-math');
       if (!box) return;
+      const desiredPole = String(form.elements.namedItem('desired_pole')?.value || '').trim();
+      if (desiredPole) {
+        box.textContent = `s = ${desiredPole} (polo informado diretamente)`;
+        return;
+      }
       const xiInput = form.elements.namedItem('xi');
       const wnInput = form.elements.namedItem('wn');
       const xiVal = parseFloat(String(xiInput?.value || '').replace(',', '.'));
@@ -743,6 +777,10 @@
     function applyControllerPreset(presetKey) {
       const preset = CONTROLLER_PRESETS[presetKey];
       if (!preset) return;
+      ['feedback_expr', 'desired_pole', 'pid_pi_zero'].forEach((name) => {
+        const control = form.elements.namedItem(name);
+        if (control) control.value = '';
+      });
       Object.entries(preset).forEach(([key, val]) => {
         const control = form.elements.namedItem(key);
         if (!control) return;
@@ -1702,6 +1740,8 @@
         scheduleScientificPreview();
       } else if (currentKey === 'controllers' && ['ts', 'mp', 'xi', 'wn'].includes(targetName)) {
         recomputeControllerTransients(targetName);
+      } else if (currentKey === 'controllers' && targetName === 'desired_pole') {
+        updateDominantPolePreview();
       }
     });
     global.addEventListener('keydown', (event) => {

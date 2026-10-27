@@ -12,6 +12,8 @@ from controller_design import (
     design_controller,
     evaluate_steady_state_error,
     mp_from_xi,
+    parse_desired_pole,
+    required_single_angle,
     resolve_transient_specifications,
     xi_from_mp,
 )
@@ -320,6 +322,173 @@ class ControllerDesignLegacyTests(unittest.TestCase):
         self.assertAlmostEqual(params["kd"], 0.9)
         self.assertFalse(result["details"]["stable"])
         self.assertEqual(result["details"]["warning"], "Malha fechada instável com estes parâmetros")
+
+
+def _closed_loop_poles(result):
+    return [complex(p["re"], p["im"]) for p in result["details"]["closed_loop_poles_after"]]
+
+
+class ControllerExerciseListTests(unittest.TestCase):
+    """Questões da lista de Projeto de Controladores (PEX0257 — Sistemas de Controle II)."""
+
+    def assertHasPole(self, result, pole, tol=1e-3):
+        poles = _closed_loop_poles(result)
+        self.assertTrue(
+            any(abs(p - pole) < tol for p in poles),
+            f"polo {pole} ausente em {poles}",
+        )
+
+    def test_parse_desired_pole_formats(self):
+        self.assertEqual(parse_desired_pole("-1+1j"), complex(-1, 1))
+        self.assertEqual(parse_desired_pole("-1 ± j"), complex(-1, 1))
+        self.assertEqual(parse_desired_pole("-1-1j"), complex(-1, 1))
+        self.assertAlmostEqual(parse_desired_pole("-1+sqrt(3)j").imag, math.sqrt(3.0))
+        self.assertAlmostEqual(parse_desired_pole("s = -1 ± √3 i").imag, math.sqrt(3.0))
+        self.assertEqual(parse_desired_pole("-2 + 3,5j"), complex(-2, 3.5))
+        self.assertIsNone(parse_desired_pole(""))
+        for invalid in ("1+1j", "-1", "9**9**9j", "__import__('os')"):
+            with self.assertRaises(ValueError):
+                parse_desired_pole(invalid)
+
+    def test_desired_pole_overrides_transient_specs(self):
+        specs = resolve_transient_specifications(ts=10, xi=0.9, desired_pole="-1+1j")
+        self.assertAlmostEqual(specs["xi"], 1 / math.sqrt(2.0), places=6)
+        self.assertAlmostEqual(specs["wn"], math.sqrt(2.0), places=6)
+        self.assertAlmostEqual(specs["ts"], 4.0, places=6)
+
+    def test_required_single_angle_rejects_unreachable_angle(self):
+        self.assertAlmostEqual(required_single_angle(464.8), 104.8, places=6)
+        with self.assertRaises(ValueError):
+            required_single_angle(343.84)
+
+    def test_q1_pi_cancels_slow_pole(self):
+        result = design_controller(
+            "1/((s+0.2)*(s+0.644))", controller_type="PI", xi=0.456, wn=0.706,
+            primary_freq_spec="wn", points=200,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["z"], 0.2, delta=1e-3)
+        self.assertAlmostEqual(params["kp"], 0.4984, delta=1e-3)
+        self.assertEqual(params["e_novo"], 0.0)
+        self.assertHasPole(result, complex(-0.322, 0.6283), tol=2e-3)
+
+    def test_q1_pd_reports_point_right_of_locus(self):
+        with self.assertRaisesRegex(ValueError, "PI ou Atraso"):
+            design_controller(
+                "1/((s+0.2)*(s+0.644))", controller_type="PD", xi=0.456, wn=0.706,
+                primary_freq_spec="wn", points=200,
+            )
+
+    def test_q1_lead_warns_when_result_is_lag(self):
+        result = design_controller(
+            "1/((s+0.2)*(s+0.644))", controller_type="lead", xi=0.456, wn=0.706,
+            primary_freq_spec="wn", points=200,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertLess(params["p"], params["z"])
+        self.assertIn("atraso", result["details"]["warning"])
+
+    def test_q2_pd_with_complex_plant_poles(self):
+        result = design_controller("1/(s^2+1)", controller_type="PD", xi=0.5, ts=4, points=200)
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["z"], 1.5, places=4)
+        self.assertAlmostEqual(params["kp"], 3.0, places=4)
+        self.assertHasPole(result, complex(-1, math.sqrt(3.0)))
+        json.dumps(result, allow_nan=False)
+
+    def test_q3_pd_with_inner_loop_and_desired_pole(self):
+        plant = "18/((2s+11)(2s+1)) / (1 + 0.5*18/((2s+11)(2s+1))) * 1/(30s)"
+        result = design_controller(plant, controller_type="PD", desired_pole="-1+1j", points=200)
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["z"], 1.6, places=4)
+        self.assertAlmostEqual(params["kp"], 53.33, delta=0.01)
+        self.assertEqual(params["e_novo"], 0.0)
+        self.assertHasPole(result, complex(-1, 1))
+
+    def test_q4_pi_with_non_unity_feedback(self):
+        result = dispatch({
+            "action": "controller_design",
+            "plant_expr": "5/(s+0.1)",
+            "feedback_expr": "0.05",
+            "controller_type": "PI",
+            "desired_pole": "-1 ± sqrt(3)j",
+            "points": 200,
+        })
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["kp"], 7.6, places=3)
+        self.assertAlmostEqual(params["z"], 2.1053, places=3)
+        self.assertEqual(params["e_novo"], 0.0)
+        self.assertHasPole(result, complex(-1, math.sqrt(3.0)))
+        labels = [item["label"] for item in result["latex"]]
+        self.assertIn("Realimentação H(s)", labels)
+        self.assertAlmostEqual(result["details"]["after"]["steady_state_value"], 20.0, delta=0.05)
+
+    def test_q5_pid_by_root_locus(self):
+        result = design_controller(
+            "1/(s^3+10s^2+17s+8)", controller_type="PID", xi=0.4, ts=1, points=200,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["zi"], 0.4, places=6)
+        self.assertAlmostEqual(params["z"], 1.578, delta=2e-3)
+        self.assertAlmostEqual(params["kp"], params["K"] * (params["zi"] + params["z"]), places=6)
+        self.assertAlmostEqual(params["ki"], params["K"] * params["zi"] * params["z"], places=6)
+        self.assertAlmostEqual(params["kd"], params["K"], places=6)
+        self.assertEqual(params["e_novo"], 0.0)
+        self.assertTrue(result["details"]["stable"])
+        self.assertHasPole(result, complex(-4, 4 / 0.4 * math.sqrt(1 - 0.16)), tol=2e-3)
+
+    def test_q5_pid_custom_pi_zero(self):
+        result = design_controller(
+            "1/(s^3+10s^2+17s+8)", controller_type="PID", xi=0.4, ts=1, pid_pi_zero=1, points=200,
+        )
+        self.assertAlmostEqual(result["details"]["controller_parameters"]["zi"], 1.0)
+        self.assertHasPole(result, complex(-4, 4 / 0.4 * math.sqrt(1 - 0.16)), tol=2e-3)
+
+    def test_q6_pd_when_point_already_on_locus(self):
+        result = design_controller(
+            "1/(s(s+2))", controller_type="PD", xi=0.5, wn=2, primary_freq_spec="wn", points=200,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["kp"], 4.0, places=4)
+        self.assertEqual(params["kd"], 0.0)
+        self.assertIsNone(params["z"])
+        self.assertIn("K_d = 0", result["latex"][0]["value"])
+        self.assertHasPole(result, complex(-1, math.sqrt(3.0)))
+        json.dumps(result, allow_nan=False)
+
+    def test_q7_pd_with_inner_velocity_loop(self):
+        result = design_controller("1/s / (1 + 2/s) * 5/(s(s+2))", controller_type="PD", xi=0.5, ts=4, points=200)
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["z"], 2.0, places=4)
+        self.assertAlmostEqual(params["kp"], 1.6, places=4)
+        self.assertHasPole(result, complex(-1, math.sqrt(3.0)))
+
+    def test_q8_pi_negative_plant_gain(self):
+        result = design_controller(
+            "-7.2/(5s+1)", controller_type="PI", mp=25, ts=4, primary_damping_spec="mp", points=200,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["kp"], -1.25, places=4)
+        self.assertAlmostEqual(params["z"], 3.409, delta=1e-3)
+        self.assertTrue(result["details"]["stable"])
+        self.assertEqual(params["e_novo"], 0.0)
+        self.assertTrue(all(p.real < 0 for p in _closed_loop_poles(result)))
+
+    def test_lag_negative_plant_gain(self):
+        result = design_controller(
+            "-1/((s+0.5)(s+2))", controller_type="lag", error_reduction_factor=10, points=200,
+        )
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["K"], -1.0)
+        self.assertAlmostEqual(params["z"], 0.19, places=4)
+        self.assertTrue(result["details"]["stable"])
+
+    def test_q9_pd_double_integrator(self):
+        result = design_controller("1/s^2", controller_type="PD", xi=0.5, ts=4, points=200)
+        params = result["details"]["controller_parameters"]
+        self.assertAlmostEqual(params["kp"], 4.0, places=4)
+        self.assertAlmostEqual(params["td"], 0.5, places=4)
+        self.assertHasPole(result, complex(-1, math.sqrt(3.0)))
 
 
 if __name__ == "__main__":
