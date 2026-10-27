@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from typing import Any, Iterable
 
 import control as ct
@@ -129,6 +130,58 @@ def _fmt_tex_num(val: float | None, digits: int = 4) -> str:
     return f"{v:.{digits}g}".replace(".", "{,}")
 
 
+def _fmt_tex_signed(val: float, digits: int = 4) -> str:
+    """Formata um termo com sinal explícito para LaTeX (ex.: '+ 2', '- 1{,}5')."""
+    sign = "-" if float(val) < 0 else "+"
+    return f"{sign} {_fmt_tex_num(abs(float(val)), digits)}"
+
+
+_POLE_ALLOWED = re.compile(r"[0-9.+\-*/()j]*")
+
+
+def parse_desired_pole(value: Any) -> complex | None:
+    """
+    Interpreta o polo dominante desejado escrito como texto, ex.: '-1+1j', '-1 ± j',
+    '-1+sqrt(3)j' ou '-1 + √3 i'. Retorna o polo do semiplano superior (Im > 0).
+    """
+    if value is None:
+        return None
+    if isinstance(value, complex):
+        pole = value
+    else:
+        text = str(value).strip()
+        if not text:
+            return None
+        text = (
+            text.replace("s =", "").replace("s=", "")
+            .replace("±", "+").replace("+-", "+").replace("−", "-")
+            .replace("√", "sqrt").replace("i", "j").replace(" ", "")
+        )
+        text = re.sub(r"(?<=\d),(?=\d)", ".", text)
+        if "**" in text or "^" in text:
+            raise ValueError("Polo desejado inválido: use sqrt(n) em vez de potências.")
+        roots = {}
+        def _sqrt(match):
+            roots[f"r{len(roots)}"] = math.sqrt(float(match.group(1)))
+            return f"(r{len(roots) - 1})"
+        text = re.sub(r"sqrt\(?(\d+(?:\.\d+)?)\)?", _sqrt, text)
+        for key, root_val in roots.items():
+            text = text.replace(f"({key})", f"({root_val!r})")
+        if not _POLE_ALLOWED.fullmatch(text) or "j" not in text:
+            raise ValueError("Polo desejado inválido. Use o formato -Re + Im·j, ex.: -1+1j ou -1+sqrt(3)j.")
+        # 'j' isolado ou após operador/parêntese vale 1j; após número ou ')' multiplica.
+        text = re.sub(r"(?<![0-9.)])j", "1j", text)
+        text = re.sub(r"(?<=\))j", "*1j", text)
+        try:
+            pole = complex(eval(text, {"__builtins__": {}}, {}))  # gramática restrita acima
+        except Exception as exc:
+            raise ValueError(f"Não foi possível interpretar o polo desejado '{value}'.") from exc
+    pole = complex(pole.real, abs(pole.imag))
+    if pole.real >= 0 or pole.imag <= 0:
+        raise ValueError("O polo dominante desejado deve ser complexo e estar no semiplano esquerdo (Re < 0, Im ≠ 0).")
+    return pole
+
+
 def _to_optional_float(value: Any) -> float | None:
     if value is None or value == "":
         return None
@@ -201,6 +254,7 @@ def resolve_transient_specifications(
     settling_criterion: str | int = "2",
     primary_damping_spec: str | None = None,
     primary_freq_spec: str | None = None,
+    desired_pole: Any = None,
 ) -> dict[str, Any]:
     """
     Resolve automaticamente os parâmetros transitórios (ts, Mp, xi, wn)
@@ -214,6 +268,27 @@ def resolve_transient_specifications(
     mp_in = _to_optional_float(mp)
     xi_in = _to_optional_float(xi)
     wn_in = _to_optional_float(wn)
+
+    # Polo dominante informado diretamente (s = -Re ± Im·j) tem prioridade sobre ξ, Mp, ts e ωn.
+    pole_in = parse_desired_pole(desired_pole)
+    if pole_in is not None:
+        wn_val = abs(pole_in)
+        xi_val = -pole_in.real / wn_val
+        re_val = -pole_in.real
+        return {
+            "criterion_pct": crit_pct,
+            "settling_factor": settling_factor,
+            "ts": float(settling_factor / re_val),
+            "mp": float(mp_from_xi(xi_val)),
+            "mp_calculated": float(mp_from_xi(xi_val)),
+            "xi": float(xi_val),
+            "wn": float(wn_val),
+            "re": float(re_val),
+            "im": float(pole_in.imag),
+            "dominant_pole": complex(-re_val, pole_in.imag),
+            "damping_source": "pole",
+            "freq_source": "pole",
+        }
 
     # 1. Determina xi e Mp(%)
     damping_source = "xi"
@@ -370,7 +445,7 @@ def calculate_complex_root_angle(root: complex, re_dom: float, im_dom: float) ->
         angle_deg += 360.0
     formula_latex = (
         rf"\theta = \angle\!\left((-{_fmt_tex_num(re_dom)} + {_fmt_tex_num(im_dom)}j) - "
-        rf"({_fmt_tex_num(root.real)} {_fmt_tex_num(root.imag):+}j)\right) = {_fmt_tex_num(angle_deg, 4)}^\circ"
+        rf"({_fmt_tex_num(root.real)} {_fmt_tex_signed(root.imag)}j)\right) = {_fmt_tex_num(angle_deg, 4)}^\circ"
     )
     return {
         "pos": float(-root.real),
@@ -392,6 +467,24 @@ def normalize_phase_angle(raw_angle_deg: float) -> float:
         # Mantém dentro do intervalo aberto quando próximo da fronteira
         angle = max(1e-4, min(179.9999, angle))
     return float(angle)
+
+
+def required_single_angle(raw_angle_deg: float, symbol: str = "z") -> float:
+    """
+    Reduz o ângulo exigido pela condição de fase a (0°, 180°]. Um único zero ou polo real
+    contribui com ângulo entre 0° e 180°; se a condição exigir um valor em (180°, 360°),
+    o ponto desejado não é alcançável com esse elemento.
+    """
+    angle = float(raw_angle_deg) % 360.0
+    if angle > 180.0 + 1e-6:
+        deficit = 360.0 - angle
+        element = "zero" if symbol == "z" else "polo"
+        raise ValueError(
+            f"A condição de fase exige que o {element} do controlador contribua com {-deficit:.4g}°, "
+            "o que um único elemento real no semiplano esquerdo não consegue. "
+            + ("O ponto desejado fica à direita do LGR: use PI ou Atraso de Fase." if symbol == "z" else "Escolha outra posição para o zero z ou outro tipo de controlador.")
+        )
+    return max(1e-4, min(180.0, angle))
 
 
 def calculate_position_from_angle(theta_deg: float, re_dom: float, im_dom: float, symbol: str = "z", tol: float = 1e-6) -> dict[str, Any]:
@@ -578,7 +671,7 @@ def _factor_magnitude_details(s_dom: complex, root: complex, multiplicity: int =
             if multiplicity > 1:
                 factor_tex += f"^{multiplicity}"
     else:
-        factor_tex = f"(s - ({_fmt_tex_num(root.real)}{_fmt_tex_num(root.imag):+}j))"
+        factor_tex = f"(s - ({_fmt_tex_num(root.real)} {_fmt_tex_signed(root.imag)}j))"
 
     formula = (
         rf"\left|{factor_tex}\right| = \sqrt{{({_fmt_tex_num(re_i, 4)})^2 + ({_fmt_tex_num(im_i, 4)})^2}}"
@@ -606,7 +699,7 @@ def _build_controller_latex(controller_kind: str, params: dict[str, Any]) -> str
         return rf"G_c(s) = \frac{{{k_s}(s + {z_s})}}{{s + {p_s}}}"
     if kind == "LAG":
         k_val = params["K"]
-        k_s = "" if abs(k_val - 1.0) < 1e-7 else _fmt_tex_num(k_val, 4)
+        k_s = "" if abs(k_val - 1.0) < 1e-7 else ("-" if abs(k_val + 1.0) < 1e-7 else _fmt_tex_num(k_val, 4))
         z_s = _fmt_tex_num(params["z"], 4)
         p_s = _fmt_tex_num(params["p"], 4)
         return rf"G_c(s) = \frac{{{k_s}(s + {z_s})}}{{s + {p_s}}}"
@@ -615,6 +708,8 @@ def _build_controller_latex(controller_kind: str, params: dict[str, Any]) -> str
         return rf"G_c(s) = K_p = {kp_s}"
     if kind == "PD":
         kp_s = _fmt_tex_num(params["kp"], 4)
+        if not params.get("td"):
+            return rf"G_c(s) = K_p + K_d s = {kp_s} \quad (K_d = 0)"
         td_s = _fmt_tex_num(params["td"], 4)
         z_s = _fmt_tex_num(params["z"], 4)
         return rf"G_c(s) = {kp_s}(1 + {td_s}s) = {kp_s}\cdot {td_s}(s + {z_s})"
@@ -622,6 +717,12 @@ def _build_controller_latex(controller_kind: str, params: dict[str, Any]) -> str
         kp_s = _fmt_tex_num(params["kp"], 4)
         z_s = _fmt_tex_num(params["z"], 4)
         return rf"G_c(s) = \frac{{{kp_s}(s + {z_s})}}{{s}}"
+    if kind == "PID":
+        k_s = _fmt_tex_num(params["K"], 4)
+        return (
+            rf"G_c(s) = {_fmt_tex_num(params['kp'], 4)} + \frac{{{_fmt_tex_num(params['ki'], 4)}}}{{s}} + {_fmt_tex_num(params['kd'], 4)}s"
+            rf" = \frac{{{k_s}(s + {_fmt_tex_num(params['zi'], 4)})(s + {_fmt_tex_num(params['z'], 4)})}}{{s}}"
+        )
     return "G_c(s) = 1"
 
 
@@ -643,15 +744,38 @@ def _design_lgr_series_controller(
     lag_pole: Any = None,
     lag_gain: Any = None,
     lgr_branch_re: Any = None,
+    desired_pole: Any = None,
+    feedback_expr: Any = None,
+    pid_pi_zero: Any = None,
     final_time: Any = None,
     points: int = 900,
     theme: str = "dark",
 ) -> dict[str, Any]:
     """
-    Executa o projeto analítico completo de controladores em série G_ma(s) = G_c(s)G(s)
-    para os 5 tipos: Avanço de Fase (lead), Atraso de Fase (lag), P, PD e PI.
+    Executa o projeto analítico completo de controladores em série G_ma(s) = G_c(s)G(s)H(s)
+    para os 6 tipos: Avanço de Fase (lead), Atraso de Fase (lag), P, PD, PI e PID.
     """
-    plant, num, den, plant_latex_expanded, plant_latex_factored = parse_siso_transfer_function(plant_expression)
+    forward_plant, num, den, plant_latex_expanded, plant_latex_factored = parse_siso_transfer_function(plant_expression)
+    plant = forward_plant
+    forward_latex_factored = plant_latex_factored
+
+    # Realimentação não unitária: o projeto no LGR usa a malha aberta G(s)H(s)
+    feedback_tf = None
+    feedback_dc = None
+    feedback_text = str(feedback_expr or "").strip()
+    if feedback_text and feedback_text not in {"1", "1.0"}:
+        feedback_tf, h_num, h_den, _, feedback_latex = parse_siso_transfer_function(feedback_text)
+        plant = ct.minreal(forward_plant * feedback_tf, verbose=False)
+        num = np.atleast_1d(np.asarray(ct.tfdata(plant)[0][0][0], dtype=float))
+        den = np.atleast_1d(np.asarray(ct.tfdata(plant)[1][0][0], dtype=float))
+        _, _, plant_latex_expanded, plant_latex_factored = format_transfer_function(num.tolist(), den.tolist())
+        plant_latex_expanded = plant_latex_expanded.replace("G(s) = ", "G(s)H(s) = ")
+        plant_latex_factored = plant_latex_factored.replace("G(s) = ", "G(s)H(s) = ")
+        feedback_latex = feedback_latex.replace("G(s) = ", "H(s) = ")
+        h_den_0 = float(np.polyval(h_den, 0.0))
+        feedback_dc = float(np.polyval(h_num, 0.0) / h_den_0) if abs(h_den_0) > 1e-12 else math.inf
+
+    design_warnings: list[str] = []
     kind = controller_kind.upper()
     if kind in {"AVANCO", "AVANÇO", "LEAD"}:
         kind = "LEAD"
@@ -668,6 +792,10 @@ def _design_lgr_series_controller(
 
     # Extração de ganho líder, polos e zeros da planta G(s)
     lead_gain = float(num[0] / den[0])
+    # Ganho negativo: projeta-se para -G(s) e inverte-se o sinal de Gc(s) ao final,
+    # pois o produto Gc(s)G(s) precisa ter ganho positivo para a condição de 180°.
+    gain_sign = -1.0 if lead_gain < 0 else 1.0
+    design_num = num * gain_sign
     plant_poles_raw = np.roots(den) if len(den) > 1 else np.array([])
     plant_zeros_raw = np.roots(num) if len(num) > 1 else np.array([])
     grouped_poles = _group_roots(plant_poles_raw)
@@ -701,15 +829,23 @@ def _design_lgr_series_controller(
         for g in grouped_zeros
     ) or "nenhum"
 
+    step1_notes = [
+        f"Polos de G(s): {poles_desc}",
+        f"Zeros de G(s): {zeros_desc}",
+    ]
+    if feedback_tf is not None:
+        step1_eqs[:1] = [forward_latex_factored, feedback_latex, plant_latex_factored]
+        step1_notes.append("Realimentação não unitária: o LGR, os ângulos e o ganho são calculados sobre a malha aberta G(s)H(s).")
+    if gain_sign < 0:
+        step1_notes.append("A planta tem ganho negativo: o projeto é feito para -G(s) e o ganho do controlador resulta negativo.")
     steps.append({
         "number": 1,
         "title": "Análise da Planta e Sistema Sem Controlador",
-        "description": f"Análise em malha fechada com realimentação unitária e entrada {input_label.lower()}.",
+        "description": (
+            f"Análise em malha fechada com realimentação {'H(s)' if feedback_tf is not None else 'unitária'} e entrada {input_label.lower()}."
+        ),
         "equations": step1_eqs,
-        "notes": [
-            f"Polos de G(s): {poles_desc}",
-            f"Zeros de G(s): {zeros_desc}",
-        ],
+        "notes": step1_notes,
     })
 
     angle_contributions: list[dict[str, Any]] = []
@@ -724,13 +860,13 @@ def _design_lgr_series_controller(
         k_val = _positive(lag_gain if lag_gain is not None and lag_gain != "" else 1.0, "O ganho K")
         p_val = _positive(lag_pole if lag_pole is not None and lag_pole != "" else 0.01, "O polo p do controlador")
 
-        e_atual = uncomp["steady_state_error_raw"]
+        e_atual = uncomp["steady_state_error_raw"] if gain_sign > 0 else evaluate_steady_state_error(design_num, den, input_type=input_mode)["value"]
         if not math.isfinite(e_atual) or e_atual <= 0:
             # Caso a planta tenha erro nulo para a entrada atual, testa rampa e parábola
             for fallback_mode in ("ramp", "parabola"):
                 if fallback_mode == input_mode:
                     continue
-                err_fb = evaluate_steady_state_error(num, den, input_type=fallback_mode)
+                err_fb = evaluate_steady_state_error(design_num, den, input_type=fallback_mode)
                 if math.isfinite(err_fb["value"]) and err_fb["value"] > 0:
                     e_atual = err_fb["value"]
                     input_mode = fallback_mode
@@ -754,7 +890,7 @@ def _design_lgr_series_controller(
         # Resolve simbolicamente lim_{s->0} s * (1 / (1 + K * (z/p) * G(s))) * R(s) = e_novo para achar r = z/p
         s_sym = sp.Symbol("s", positive=True)
         r_sym = sp.Symbol("r", positive=True)
-        n_expr = sum(sp.Float(c) * s_sym ** (len(num) - 1 - i) for i, c in enumerate(num))
+        n_expr = sum(sp.Float(c) * s_sym ** (len(design_num) - 1 - i) for i, c in enumerate(design_num))
         d_expr = sum(sp.Float(c) * s_sym ** (len(den) - 1 - i) for i, c in enumerate(den))
         g_expr = n_expr / d_expr
         if input_mode == "parabola":
@@ -775,7 +911,7 @@ def _design_lgr_series_controller(
             raise ValueError("No compensador por Atraso de Fase, o polo p deve ser menor que o zero z (p < z).")
 
         controller_tf = ct.tf([k_val, k_val * z_val], [1.0, p_val])
-        comp_loop_tf = controller_tf * plant
+        comp_loop_tf = controller_tf * plant * gain_sign
         comp_cl_tf = ct.feedback(comp_loop_tf, 1)
         comp_poles = ct.poles(comp_cl_tf)
         complex_cl = [cp for cp in comp_poles if abs(cp.imag) > 1e-5 and cp.real < 0]
@@ -849,6 +985,7 @@ def _design_lgr_series_controller(
             settling_criterion=settling_criterion,
             primary_damping_spec=primary_damping_spec,
             primary_freq_spec=primary_freq_spec,
+            desired_pole=desired_pole,
         )
         re_dom = specs["re"]
         im_dom = specs["im"]
@@ -865,6 +1002,12 @@ def _design_lgr_series_controller(
             rf"t_s({crit_pct}\%) = \frac{{{int(settling_factor)}}}{{\xi\omega_n}} = {_fmt_tex_num(ts_val, 4)}\text{{ s}} \implies \xi\omega_n = {_fmt_tex_num(re_dom, 4)} \implies \omega_n = \frac{{{_fmt_tex_num(re_dom, 4)}}}{{{_fmt_tex_num(xi_val, 4)}}} = {_fmt_tex_num(wn_val, 4)}\text{{ rad/s}}",
             rf"s = -\xi\omega_n \pm \omega_n\sqrt{{1 - \xi^2}}j = -{_fmt_tex_num(re_dom, 4)} \pm {_fmt_tex_num(im_dom, 4)}j",
         ]
+        if specs["damping_source"] == "pole":
+            step2_eqs = [
+                rf"s = -{_fmt_tex_num(re_dom, 4)} \pm {_fmt_tex_num(im_dom, 4)}j \text{{ (polo dominante informado)}}",
+                rf"\omega_n = |s| = \sqrt{{{_fmt_tex_num(re_dom, 4)}^2 + {_fmt_tex_num(im_dom, 4)}^2}} = {_fmt_tex_num(wn_val, 4)}\text{{ rad/s}}, \quad \xi = \frac{{\text{{Re}}}}{{\omega_n}} = {_fmt_tex_num(xi_val, 4)}",
+                rf"M_p = {_fmt_tex_num(mp_val, 4)}\%, \quad t_s({crit_pct}\%) = \frac{{{int(settling_factor)}}}{{\xi\omega_n}} = {_fmt_tex_num(ts_val, 4)}\text{{ s}}",
+            ]
         steps.append({
             "number": 2,
             "title": "Especificações Transitórias e Polos Dominantes Desejados",
@@ -931,12 +1074,17 @@ def _design_lgr_series_controller(
                 })
 
             raw_theta_p = theta_z + sum_zeros_g - sum_poles_g + 180.0
-            theta_p = normalize_phase_angle(raw_theta_p)
+            theta_p = required_single_angle(raw_theta_p, symbol="p")
             pos_p_info = calculate_position_from_angle(theta_p, re_dom, im_dom, symbol="p")
             p_val = pos_p_info["pos"]
 
             if p_val <= 0:
                 raise ValueError(f"A condição de fase resultou em um polo p = {p_val:.4g} fora do semiplano esquerdo. Ajuste as especificações ou a posição do zero z.")
+            if p_val < z_val:
+                design_warnings.append(
+                    f"O compensador resultante tem p = {_fmt_num(p_val)} < z = {_fmt_num(z_val)}, ou seja, é de atraso e não de avanço: "
+                    "o ponto desejado fica à direita do LGR. Considere um PI ou Atraso de Fase."
+                )
 
             angle_contributions.append({
                 "type": "controller_pole",
@@ -1140,37 +1288,52 @@ def _design_lgr_series_controller(
                 })
 
             raw_theta_z = sum_poles_g - sum_zeros_g + 180.0
-            theta_z = normalize_phase_angle(raw_theta_z)
-            pos_z_info = calculate_position_from_angle(theta_z, re_dom, im_dom, symbol="z")
-            z_val = pos_z_info["pos"]
-            if z_val <= 0:
-                raise ValueError(f"A condição de fase resultou em z = {z_val:.4g} <= 0. Verifique as especificações transitórias.")
-            td_val = 1.0 / z_val
+            # Se a soma dos ângulos já vale 180°, o ponto pertence ao LGR da planta: τd = 0 (basta Kp).
+            already_on_locus = abs(((raw_theta_z + 180.0) % 360.0) - 180.0) < 1e-3
+            if already_on_locus:
+                theta_z = 0.0
+                z_val = None
+                td_val = 0.0
+                angle_eqs.extend([
+                    rf"\sum \theta_{{\text{{polos de }} G}} - \sum \theta_{{\text{{zeros de }} G}} = {_fmt_tex_num(sum_poles_g - sum_zeros_g, 4)}^\circ = 180^\circ \implies \theta_z = 0^\circ",
+                    r"\tau_d = 0 \implies K_d = 0",
+                ])
+                step3_notes = [
+                    "O polo desejado já pertence ao LGR da planta: a ação derivativa não é necessária (Kd = 0) e o ganho Kp basta.",
+                ]
+            else:
+                theta_z = required_single_angle(raw_theta_z, symbol="z")
+                pos_z_info = calculate_position_from_angle(theta_z, re_dom, im_dom, symbol="z")
+                z_val = pos_z_info["pos"]
+                if z_val <= 0:
+                    raise ValueError(f"A condição de fase resultou em z = {z_val:.4g} <= 0. Verifique as especificações transitórias.")
+                td_val = 1.0 / z_val
 
-            angle_contributions.append({
-                "type": "controller_zero",
-                "label": f"Zero PD (s = -{_fmt_num(z_val)})",
-                "root": complex(-z_val, 0.0),
-                "multiplicity": 1,
-                "angle_deg": theta_z,
-                "total_angle_deg": theta_z,
-            })
+                angle_contributions.append({
+                    "type": "controller_zero",
+                    "label": f"Zero PD (s = -{_fmt_num(z_val)})",
+                    "root": complex(-z_val, 0.0),
+                    "multiplicity": 1,
+                    "angle_deg": theta_z,
+                    "total_angle_deg": theta_z,
+                })
 
-            angle_eqs.extend([
-                rf"\theta_z = \sum \theta_{{\text{{polos de }} G}} - \sum \theta_{{\text{{zeros de }} G}} + 180^\circ \pmod{{360^\circ}} = {_fmt_tex_num(sum_poles_g, 4)}^\circ - {_fmt_tex_num(sum_zeros_g, 4)}^\circ - 180^\circ = {_fmt_tex_num(theta_z, 4)}^\circ",
-                pos_z_info["formula_latex"],
-                rf"\tau_d = \frac{{1}}{{z}} = \frac{{1}}{{{_fmt_tex_num(z_val, 4)}}} = {_fmt_tex_num(td_val, 4)}\text{{ s}}",
-            ])
+                angle_eqs.extend([
+                    rf"\theta_z = \sum \theta_{{\text{{polos de }} G}} - \sum \theta_{{\text{{zeros de }} G}} + 180^\circ \pmod{{360^\circ}} = {_fmt_tex_num(sum_poles_g, 4)}^\circ - {_fmt_tex_num(sum_zeros_g, 4)}^\circ - 180^\circ = {_fmt_tex_num(theta_z, 4)}^\circ",
+                    pos_z_info["formula_latex"],
+                    rf"\tau_d = \frac{{1}}{{z}} = \frac{{1}}{{{_fmt_tex_num(z_val, 4)}}} = {_fmt_tex_num(td_val, 4)}\text{{ s}}",
+                ])
+                step3_notes = [
+                    f"Ângulo exigido do zero: θz = {_fmt_num(theta_z)}°",
+                    f"Zero do controlador: z = {_fmt_num(z_val)} → τd = {_fmt_num(td_val)} s",
+                ]
 
             steps.append({
                 "number": 3,
                 "title": "Condição de Fase no LGR, Zero z e Tempo Derivativo τd",
                 "description": "Cálculo de θz pela condição de fase e determinação de z e τd = 1/z.",
                 "equations": angle_eqs,
-                "notes": [
-                    f"Ângulo exigido do zero: θz = {_fmt_num(theta_z)}°",
-                    f"Zero do controlador: z = {_fmt_num(z_val)} → τd = {_fmt_num(td_val)} s",
-                ],
+                "notes": step3_notes,
             })
 
             # Condição de Módulo: |Kp * (1 + td * s) * G(s)| = 1
@@ -1209,7 +1372,7 @@ def _design_lgr_series_controller(
                 "kp": kp_val,
                 "kd": kd_val,
                 "td": float(td_val),
-                "z": float(z_val),
+                "z": float(z_val) if z_val is not None else None,
                 "theta_z": float(theta_z),
                 "re": float(re_dom),
                 "im": float(im_dom),
@@ -1268,7 +1431,7 @@ def _design_lgr_series_controller(
                 })
 
             raw_theta_z = sum_poles_total - sum_zeros_g + 180.0
-            theta_z = normalize_phase_angle(raw_theta_z)
+            theta_z = required_single_angle(raw_theta_z, symbol="z")
             pos_z_info = calculate_position_from_angle(theta_z, re_dom, im_dom, symbol="z")
             z_val = pos_z_info["pos"]
             if z_val <= 0:
@@ -1344,12 +1507,166 @@ def _design_lgr_series_controller(
                 "mp": float(mp_val),
                 "criterion_pct": crit_pct,
             })
+        # ----------------------------------------------------------------------
+        # CASO 6: PID — Gc(s) = Kp + Ki/s + Kd·s = K(s + z_i)(s + z_d)/s
+        # ----------------------------------------------------------------------
+        elif kind == "PID":
+            design_label = "Controlador PID — Gc(s) = Kp + Ki/s + Kd·s = K(s + zi)(s + zd)/s"
+            # Parte PI: zero próximo da origem (padrão zi = Re/10) para zerar o erro sem deslocar o LGR
+            zi_in = _to_optional_float(pid_pi_zero)
+            zi_val = zi_in if (zi_in is not None and zi_in > 0) else re_dom / 10.0
+            zi_angle = calculate_lgr_angle(zi_val, re_dom, im_dom)
+
+            pid_poles_raw = list(plant_poles_raw) + [0.0]
+            grouped_total_poles = _group_roots(pid_poles_raw)
+
+            angle_eqs = [
+                rf"\text{{Zero da parte PI alocado em }} z_i = {_fmt_tex_num(zi_val, 4)}: {zi_angle['formula_latex']}"
+            ]
+            angle_contributions.append({
+                "type": "controller_zero",
+                "label": f"Zero PI (s = -{_fmt_num(zi_val)})",
+                "root": complex(-zi_val, 0.0),
+                "multiplicity": 1,
+                "angle_deg": zi_angle["angle_deg"],
+                "total_angle_deg": zi_angle["angle_deg"],
+            })
+
+            sum_poles_total = 0.0
+            for idx, gp in enumerate(grouped_total_poles, start=1):
+                ang_info = calculate_complex_root_angle(gp["root"], re_dom, im_dom)
+                tot_ang = ang_info["angle_deg"] * gp["multiplicity"]
+                sum_poles_total += tot_ang
+                is_origin = abs(gp["root"]) < 1e-7
+                origin_note = " (inclui polo do PID em s = 0)" if is_origin else ""
+                mult_str = f"{gp['multiplicity']} \\times " if gp["multiplicity"] > 1 else ""
+                angle_eqs.append(
+                    rf"\text{{Polo }} p_{idx}{origin_note}: {ang_info['formula_latex']}"
+                    + (rf" \implies {mult_str}{_fmt_tex_num(ang_info['angle_deg'], 4)}^\circ = {_fmt_tex_num(tot_ang, 4)}^\circ" if gp["multiplicity"] > 1 else "")
+                )
+                angle_contributions.append({
+                    "type": "controller_pole" if (is_origin and gp["multiplicity"] == 1) else "plant_pole",
+                    "label": f"Polo s = {_fmt_num(gp['root'].real)}" + (f" (×{gp['multiplicity']})" if gp["multiplicity"] > 1 else ""),
+                    "root": gp["root"],
+                    "multiplicity": gp["multiplicity"],
+                    "angle_deg": ang_info["angle_deg"],
+                    "total_angle_deg": tot_ang,
+                })
+
+            sum_zeros_g = 0.0
+            for idx, gz in enumerate(grouped_zeros, start=1):
+                ang_info = calculate_complex_root_angle(gz["root"], re_dom, im_dom)
+                tot_ang = ang_info["angle_deg"] * gz["multiplicity"]
+                sum_zeros_g += tot_ang
+                angle_eqs.append(rf"\text{{Zero }} z_{idx}: {ang_info['formula_latex']}")
+                angle_contributions.append({
+                    "type": "plant_zero",
+                    "label": f"Zero G (s = {_fmt_num(gz['root'].real)})",
+                    "root": gz["root"],
+                    "multiplicity": gz["multiplicity"],
+                    "angle_deg": ang_info["angle_deg"],
+                    "total_angle_deg": tot_ang,
+                })
+
+            raw_theta_z = sum_poles_total - sum_zeros_g - zi_angle["angle_deg"] + 180.0
+            theta_z = required_single_angle(raw_theta_z, symbol="z")
+            pos_z_info = calculate_position_from_angle(theta_z, re_dom, im_dom, symbol="z_d")
+            zd_val = pos_z_info["pos"]
+            if zd_val <= 0:
+                raise ValueError(f"A condição de fase resultou em z_d = {zd_val:.4g} <= 0. Ajuste o zero z_i da parte PI ou as especificações.")
+
+            angle_contributions.append({
+                "type": "controller_zero",
+                "label": f"Zero PD (s = -{_fmt_num(zd_val)})",
+                "root": complex(-zd_val, 0.0),
+                "multiplicity": 1,
+                "angle_deg": theta_z,
+                "total_angle_deg": theta_z,
+            })
+            angle_eqs.extend([
+                rf"\theta_{{z_d}} = \sum \theta_{{\text{{polos}}}} - \sum \theta_{{\text{{zeros}}}} - \theta_{{z_i}} + 180^\circ \pmod{{360^\circ}} = {_fmt_tex_num(sum_poles_total, 4)}^\circ - {_fmt_tex_num(sum_zeros_g, 4)}^\circ - {_fmt_tex_num(zi_angle['angle_deg'], 4)}^\circ - 180^\circ = {_fmt_tex_num(theta_z, 4)}^\circ",
+                pos_z_info["formula_latex"],
+            ])
+            steps.append({
+                "number": 3,
+                "title": "Condição de Fase no LGR e Zeros z_i e z_d do PID",
+                "description": "O PID é tratado como PI·PD: o zero z_i fica próximo da origem e o zero z_d é posicionado pela condição de fase.",
+                "equations": angle_eqs,
+                "notes": [
+                    f"Zero da parte PI: z_i = {_fmt_num(zi_val)} (θ = {_fmt_num(zi_angle['angle_deg'])}°)",
+                    f"Zero da parte PD: z_d = {_fmt_num(zd_val)} (θ = {_fmt_num(theta_z)}°)",
+                ],
+            })
+
+            mag_num_factors = [
+                _factor_magnitude_details(s_dom, complex(-zi_val, 0.0), 1, f"(s + {_fmt_num(zi_val)})"),
+                _factor_magnitude_details(s_dom, complex(-zd_val, 0.0), 1, f"(s + {_fmt_num(zd_val)})"),
+            ]
+            for gz in grouped_zeros:
+                mag_num_factors.append(_factor_magnitude_details(s_dom, gz["root"], gz["multiplicity"]))
+            mag_den_factors = [_factor_magnitude_details(s_dom, gp["root"], gp["multiplicity"]) for gp in grouped_total_poles]
+
+            num_mag_prod = abs(lead_gain) * math.prod(f["magnitude"] for f in mag_num_factors)
+            den_mag_prod = math.prod(f["magnitude"] for f in mag_den_factors)
+            k_val = float(den_mag_prod / num_mag_prod)
+            kp_val = float(k_val * (zi_val + zd_val))
+            ki_val = float(k_val * zi_val * zd_val)
+            kd_val = k_val
+
+            mag_eqs = [f["formula_latex"] for f in mag_num_factors + mag_den_factors]
+            mag_eqs.extend([
+                rf"\left|\frac{{K(s + {_fmt_tex_num(zi_val, 4)})(s + {_fmt_tex_num(zd_val, 4)})}}{{s}}G(s)\right| = 1 \implies K = \frac{{{_fmt_tex_num(den_mag_prod, 4)}}}{{{_fmt_tex_num(num_mag_prod, 4)}}} = {_fmt_tex_num(k_val, 4)}",
+                rf"K_p = K(z_i + z_d) = {_fmt_tex_num(kp_val, 4)}, \quad K_i = K z_i z_d = {_fmt_tex_num(ki_val, 4)}, \quad K_d = K = {_fmt_tex_num(kd_val, 4)}",
+            ])
+            steps.append({
+                "number": 4,
+                "title": "Condição de Módulo e Ganhos Kp, Ki e Kd",
+                "description": "Aplicação de |Gma(s)| = 1 no polo dominante e expansão K(s+zi)(s+zd)/s = Kp + Ki/s + Kd·s.",
+                "equations": mag_eqs,
+                "notes": [
+                    f"Kp = {_fmt_num(kp_val)}, Ki = {_fmt_num(ki_val)}, Kd = {_fmt_num(kd_val)}",
+                ],
+            })
+
+            controller_tf = ct.tf([k_val, k_val * (zi_val + zd_val), k_val * zi_val * zd_val], [1.0, 0.0])
+            controller_params.update({
+                "K": k_val,
+                "kp": kp_val,
+                "ki": ki_val,
+                "kd": kd_val,
+                "ti": float(kp_val / ki_val),
+                "td": float(kd_val / kp_val),
+                "z": float(zd_val),
+                "zi": float(zi_val),
+                "p": 0.0,
+                "theta_z": float(theta_z),
+                "re": float(re_dom),
+                "im": float(im_dom),
+                "xi": float(xi_val),
+                "wn": float(wn_val),
+                "ts": float(ts_val),
+                "mp": float(mp_val),
+                "criterion_pct": crit_pct,
+            })
         else:
             raise ValueError(f"Tipo de controlador não suportado: {controller_kind}")
 
     # ==========================================================================
     # MONTAGEM FINAL DE G_c(s), G_ma(s), T(s), ERRO EM REGIME E GRÁFICOS
     # ==========================================================================
+    if gain_sign < 0:
+        controller_tf = -controller_tf
+        for key in ("K", "kp", "ki", "kd"):
+            if controller_params.get(key) is not None:
+                controller_params[key] = -float(controller_params[key])
+        steps.append({
+            "number": len(steps) + 1,
+            "title": "Correção de Sinal para Planta com Ganho Negativo",
+            "description": "Como G(s) tem ganho negativo, o controlador recebe ganho negativo para que Gc(s)G(s) satisfaça a condição de 180°.",
+            "equations": [rf"K_{{G}} = {_fmt_tex_num(lead_gain, 4)} < 0 \implies K_c \to -K_c"],
+            "notes": ["Os ângulos e módulos foram calculados para -G(s); apenas o sinal do ganho do controlador muda."],
+        })
+
     compensated_loop = controller_tf * plant
     comp_num = np.asarray(ct.tfdata(compensated_loop)[0][0][0], dtype=float)
     comp_den = np.asarray(ct.tfdata(compensated_loop)[1][0][0], dtype=float)
@@ -1362,19 +1679,32 @@ def _design_lgr_series_controller(
     else:
         sim_loop = compensated_loop
 
-    uncompensated_cl = ct.feedback(plant, 1)
-    compensated_cl = ct.feedback(sim_loop, 1)
+    if feedback_tf is None:
+        uncompensated_cl = ct.feedback(plant, 1)
+        compensated_cl = ct.feedback(sim_loop, 1)
+    else:
+        # Malha fechada real Y/R = Gc·G / (1 + Gc·G·H); o projeto no LGR usou Gc·G·H.
+        sim_forward = controller_tf * forward_plant
+        fwd_num = np.trim_zeros(np.asarray(ct.tfdata(sim_forward)[0][0][0], dtype=float), "f")
+        fwd_den = np.trim_zeros(np.asarray(ct.tfdata(sim_forward)[1][0][0], dtype=float), "f")
+        if len(fwd_num) > len(fwd_den):
+            sim_forward = sim_forward * ct.tf([1.0], [1e-3, 1.0])
+        uncompensated_cl = ct.feedback(forward_plant, feedback_tf)
+        compensated_cl = ct.feedback(sim_forward, feedback_tf)
     compensated_poles = ct.poles(compensated_cl)
     compensated_stable = bool(np.all(np.real(compensated_poles) < -1e-7))
-    warning = "Malha fechada instável com estes parâmetros" if not compensated_stable else None
+    if not compensated_stable:
+        design_warnings.insert(0, "Malha fechada instável com estes parâmetros.")
+    warning = " ".join(design_warnings) if design_warnings else None
 
     err_after = evaluate_steady_state_error(comp_num, comp_den, input_type=input_mode)
     controller_params["e_atual"] = uncomp["steady_state_error_raw"]
     controller_params["e_novo"] = err_after["value"]
 
     gc_latex = _build_controller_latex(kind, controller_params)
-    plant_clean_latex = plant_latex_factored.replace("G(s) = ", "")
-    gma_factored_latex = rf"G_{{ma}}(s) = G_c(s)G(s) = {gc_latex.replace('G_c(s) = ', '')} \cdot \left({plant_clean_latex}\right)"
+    plant_clean_latex = plant_latex_factored.replace("G(s)H(s) = ", "").replace("G(s) = ", "")
+    loop_label = "G_c(s)G(s)H(s)" if feedback_tf is not None else "G_c(s)G(s)"
+    gma_factored_latex = rf"G_{{ma}}(s) = {loop_label} = {gc_latex.replace('G_c(s) = ', '')} \cdot \left({plant_clean_latex}\right)"
     _, _, gma_exp_raw, _ = format_transfer_function(
         [float(f"{c:.5g}") for c in np.trim_zeros(comp_num, "f")],
         [float(f"{c:.5g}") for c in np.trim_zeros(comp_den, "f")],
@@ -1402,7 +1732,9 @@ def _design_lgr_series_controller(
         "notes": [
             f"Estabilidade em malha fechada: {'Estável' if compensated_stable else 'Instável'}",
             f"Erro em regime permanente antes: {uncomp['steady_state_error_latex']} → depois: {err_after['latex_value']}",
-        ],
+        ] + ([
+            f"Com H(s) ≠ 1, e(∞) refere-se ao sinal atuante E(s) = R(s) - H(s)Y(s); para o degrau a saída tende a y(∞) = 1/H(0) = {_fmt_num(1.0 / feedback_dc) if feedback_dc else '∞'}.",
+        ] if feedback_tf is not None else []) + design_warnings,
     })
 
     # Simulação temporal (degrau, rampa ou parábola)
@@ -1599,8 +1931,18 @@ def _design_lgr_series_controller(
     elif kind == "PD":
         metric_rows.extend([
             {"label": "Ganho proporcional (Kp)", "value": f"{controller_params['kp']:.4g}"},
-            {"label": "Zero do controlador (z)", "value": f"{controller_params['z']:.4g}"},
+            {"label": "Ganho derivativo (Kd)", "value": f"{controller_params['kd']:.4g}"},
+            {"label": "Zero do controlador (z)", "value": f"{controller_params['z']:.4g}" if controller_params.get("z") is not None else "— (Kd = 0)"},
             {"label": "Tempo derivativo (τd)", "value": f"{controller_params['td']:.4g}", "unit": "s"},
+            {"label": "Ângulo do zero (θz)", "value": f"{controller_params['theta_z']:.4g}", "unit": "°"},
+        ])
+    elif kind == "PID":
+        metric_rows.extend([
+            {"label": "Ganho proporcional (Kp)", "value": f"{controller_params['kp']:.4g}"},
+            {"label": "Ganho integral (Ki)", "value": f"{controller_params['ki']:.4g}"},
+            {"label": "Ganho derivativo (Kd)", "value": f"{controller_params['kd']:.4g}"},
+            {"label": "Zero da parte PI (zi)", "value": f"{controller_params['zi']:.4g}"},
+            {"label": "Zero do controlador (z)", "value": f"{controller_params['z']:.4g}"},
             {"label": "Ângulo do zero (θz)", "value": f"{controller_params['theta_z']:.4g}", "unit": "°"},
         ])
     elif kind == "PI":
@@ -1652,6 +1994,9 @@ def _design_lgr_series_controller(
         "tc_latex": tc_latex,
         "plant_latex_factored": plant_latex_factored,
         "plant_latex_expanded": plant_latex_expanded,
+        "forward_latex_factored": forward_latex_factored,
+        "feedback_latex": feedback_latex if feedback_tf is not None else None,
+        "warnings": design_warnings,
         "before": metrics_before,
         "after": metrics_after,
         "closed_loop_poles_before": serialize_complex(ct.poles(uncompensated_cl)),
@@ -1667,11 +2012,14 @@ def _design_lgr_series_controller(
         "svg": svg,
         "latex": [
             {"label": "Controlador Gc(s)", "value": gc_latex},
-            {"label": "Malha Aberta Compensada Gma(s) = Gc(s)G(s)", "value": gma_factored_latex},
+            {"label": "Malha Aberta Compensada Gma(s) = " + ("Gc(s)G(s)H(s)" if feedback_tf is not None else "Gc(s)G(s)"), "value": gma_factored_latex},
             {"label": "Malha Aberta Expandida", "value": gma_expanded_latex},
             {"label": "Malha Fechada Compensada T(s)", "value": tc_latex},
-            {"label": "Planta Original G(s)", "value": plant_latex_factored},
-        ],
+            {"label": "Planta Original G(s)", "value": forward_latex_factored},
+        ] + ([
+            {"label": "Realimentação H(s)", "value": feedback_latex},
+            {"label": "Malha Aberta sem Controlador G(s)H(s)", "value": plant_latex_factored},
+        ] if feedback_tf is not None else []),
         "metrics": metric_rows,
         "details": details,
     }
@@ -2079,6 +2427,9 @@ def design_controller(
     lag_pole: Any = None,
     lag_gain: Any = None,
     lgr_branch_re: Any = None,
+    desired_pole: Any = None,
+    feedback_expr: Any = None,
+    pid_pi_zero: Any = None,
     process_gain: Any = 1.0,
     delay: Any = 1.0,
     time_constant: Any = 4.0,
@@ -2096,7 +2447,7 @@ def design_controller(
 ) -> dict[str, Any]:
     """
     Ponto de entrada unificado para projeto de controladores:
-    - Por padrão (ou quando controller_type in {'lead', 'lag', 'P', 'PD', 'PI'} sem method legado),
+    - Por padrão (ou quando controller_type in {'lead', 'lag', 'P', 'PD', 'PI', 'PID'} sem method legado),
       executa o motor analítico universal de controladores em série no LGR.
     - Quando method legado ('zn_critical', 'cohen_coon', 'chr', etc.) ou design_type='lead_lag'
       com parâmetros diretos é informado, mantém compatibilidade com os testes legados.
@@ -2145,6 +2496,9 @@ def design_controller(
         lag_pole=lag_pole,
         lag_gain=lag_gain,
         lgr_branch_re=lgr_branch_re,
+        desired_pole=desired_pole,
+        feedback_expr=feedback_expr,
+        pid_pi_zero=pid_pi_zero,
         final_time=final_time,
         points=points,
         theme=theme,
