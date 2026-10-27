@@ -22,6 +22,16 @@
       renderedPages.add(page);
     }
 
+    let currentPageId = null;
+
+    // Reinicia a animação de entrada do conteúdo; a barra superior fica parada
+    function playPageEnter(shell) {
+      if (!shell) return;
+      shell.classList.remove('page-enter');
+      void shell.offsetWidth;
+      shell.classList.add('page-enter');
+    }
+
     function navigateTo(pageId) {
       const isHome = pageId === 'home' || !pageId;
       const isLgr = pageId === 'lgr';
@@ -33,6 +43,13 @@
       pageLgr?.classList.toggle('active', isLgr);
       pageRouth?.classList.toggle('active', isRouth);
       pageScientific?.classList.toggle('active', isScientific);
+
+      const nextPageId = isHome ? 'home' : pageId;
+      if (currentPageId !== null && currentPageId !== nextPageId) {
+        const activePage = isHome ? pageHome : isLgr ? pageLgr : isRouth ? pageRouth : pageScientific;
+        playPageEnter(activePage?.classList.contains('sci-shell') ? activePage : activePage?.querySelector('.sci-shell'));
+      }
+      currentPageId = nextPageId;
 
       const hasBack = !isHome && !isSciShell;
       if (btnNavHome) btnNavHome.style.display = hasBack ? 'inline-flex' : 'none';

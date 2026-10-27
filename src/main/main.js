@@ -86,7 +86,7 @@ function createWindow() {
     minHeight: 640,
     autoHideMenuBar: true,
     title: 'ControLAB - Sistemas de Controle',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#F4F6F8',
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
