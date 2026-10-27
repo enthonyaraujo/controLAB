@@ -41,6 +41,7 @@
       if (!text) return;
       const line = document.createElement('div');
       line.className = `home-console-log-line ${type}`;
+      if (type === 'output' || type === 'cmd') line.dataset.noI18n = '';
       line.textContent = text;
       logs.appendChild(line);
       while (logs.children.length > 250) logs.firstElementChild.remove();
@@ -97,12 +98,14 @@
         button.setAttribute('role', 'tab');
         button.setAttribute('aria-selected', String(doc.id === activeId));
         button.setAttribute('aria-controls', 'studio-editor-pane');
+        button.dataset.noI18n = '';
         button.textContent = `${doc.name}${dirty(doc) ? ' •' : ''}`;
         button.title = doc.path || doc.name;
         button.addEventListener('click', () => activate(doc.id));
         const close = document.createElement('button');
         close.type = 'button'; close.className = 'studio-close-tab';
-        close.textContent = '×'; close.setAttribute('aria-label', `Fechar ${doc.name}`);
+        close.dataset.noI18n = '';
+        close.textContent = '×'; close.setAttribute('aria-label', `${global.ControLABI18n?.translate('Fechar') || 'Fechar'} ${doc.name}`);
         close.addEventListener('click', () => closeDocument(doc.id));
         tab.append(button, close); tabs.append(tab);
       });
@@ -110,8 +113,11 @@
       const empty = !documents.length;
       element('studio-welcome').hidden = !empty;
       element('home-workspace-central').classList.toggle('studio-welcome-active', empty);
-      element('studio-editor-title').textContent = empty ? 'Início' : `Editor — ${doc?.name || ''}`;
-      element('studio-document-status').textContent = `${doc?.path || doc?.name || ''}${doc && dirty(doc) ? ' · Não salvo' : ''}`;
+      const fileName = (text) => {
+        const span = document.createElement('span'); span.dataset.noI18n = ''; span.textContent = text; return span;
+      };
+      element('studio-editor-title').replaceChildren(document.createTextNode(empty ? 'Início' : 'Editor — '), fileName(empty ? '' : doc?.name || ''));
+      element('studio-document-status').replaceChildren(fileName(doc?.path || doc?.name || ''), document.createTextNode(doc && dirty(doc) ? ' · Não salvo' : ''));
     }
     function showView(view) {
       const figures = view === 'figures';
@@ -131,7 +137,7 @@
       syncDocument();
       const id = nextId++;
       const initialSaved = saved !== null && saved !== undefined ? saved : text;
-      documents.push({ id, name: name || `Sem título ${id}.m`, source: text, path, saved: initialSaved });
+      documents.push({ id, name: name || `${global.ControLABI18n?.translate('Sem título') || 'Sem título'} ${id}.m`, source: text, path, saved: initialSaved });
       activate(id);
     }
     function closeDocument(id) {
@@ -150,7 +156,7 @@
       const example = EXAMPLES[key];
       if (!example) return;
       const existing = documents.find((doc) => !doc.path && doc.name === example.name);
-      if (existing) activate(existing.id); else newDocument(example.source, example.name);
+      if (existing) activate(existing.id); else newDocument(global.ControLABI18n?.translate(example.source) || example.source, example.name);
       status(`Exemplo: ${example.name} · F5 executa`);
     }
     function runCurrent() {
@@ -294,7 +300,7 @@
           const li = document.createElement('li');
           const button = document.createElement('button'); button.type = 'button'; button.className = 'studio-file-button';
           const icon = document.createElement('span'); icon.className = 'studio-file-icon folder'; icon.setAttribute('aria-hidden', 'true');
-          const name = document.createElement('span'); name.textContent = entry.name;
+          const name = document.createElement('span'); name.dataset.noI18n = ''; name.textContent = entry.name;
           button.append(icon, name); button.addEventListener('click', () => browsePicker(entry.path));
           li.append(button); list.append(li);
         });
@@ -499,8 +505,9 @@
     global.addEventListener('beforeunload', (event) => {
       syncDocument(); if (documents.some(dirty)) { event.preventDefault(); event.returnValue = ''; }
     });
+    global.addEventListener('controlab:languagechange', renderTabs);
     renderTabs();
-    log('Pronto. Crie ou abra um script, ou digite um comando no console.');
+    log('Pronto. Crie ou abra um script, ou digite um comando no console.', 'info');
     request('state').then((result) => { available = true; renderWorkspace(result.workspace); }).catch((error) => { log(error.message, 'error'); status('Motor .m indisponível'); });
     controller = { newDocument, openFile, openPath, openExample, save, clear, executeCommand, refreshFolder, selectFolder, renderWorkspace, focus: () => { if (!documents.length) newDocument(); showView('editor'); source.focus(); } };
     return controller;

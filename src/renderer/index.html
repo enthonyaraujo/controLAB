@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="theme-color" content="#0f172a">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.github.com; font-src 'self' data:; worker-src 'self';">
+  <script src="locales/en.js"></script>
+  <script src="i18n.js"></script>
   <title>ControLAB - Sistemas de Controle</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
@@ -1436,6 +1438,14 @@
         <section class="modal-section">
           <div class="section-label"><span>Aparência</span></div>
           <div class="settings-card appearance-card">
+            <div class="appearance-row">
+              <label class="appearance-label" for="settings-language">Idioma do aplicativo</label>
+              <select id="settings-language" class="form-input" style="width:auto" aria-describedby="settings-language-help">
+                <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
+                <option value="en" lang="en">English</option>
+              </select>
+            </div>
+            <p id="settings-language-help">A escolha de idioma é salva neste dispositivo.</p>
             <div class="appearance-row">
               <span class="appearance-label" id="appearance-theme-label">Tema</span>
               <div class="appearance-seg" role="group" aria-labelledby="appearance-theme-label">

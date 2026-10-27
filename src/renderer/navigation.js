@@ -424,7 +424,7 @@
           button.title = item.file || item.expr || item.name || '';
           const name = document.createElement('span');
           name.className = 'studio-welcome-item-name';
-          name.textContent = item.name || item.expr || item.file;
+          name.dataset.noI18n = ''; name.textContent = item.name || item.expr || item.file;
           const meta = document.createElement('span');
           meta.className = 'studio-welcome-item-meta';
           const origin = item.type === 'script' ? 'Script .m' : (RECENT_ORIGINS[item.nav] || 'Arquivo');
@@ -458,7 +458,7 @@
 
           const spanName = document.createElement('span');
           spanName.className = 'recent-name';
-          spanName.textContent = item.name || item.expr || item.file;
+          spanName.dataset.noI18n = ''; spanName.textContent = item.name || item.expr || item.file;
 
           const spanTime = document.createElement('span');
           spanTime.className = 'recent-time';
@@ -538,7 +538,7 @@
 
           const spanName = document.createElement('span');
           spanName.className = 'file-name';
-          spanName.textContent = file.name;
+          spanName.dataset.noI18n = ''; spanName.textContent = file.name;
 
           const spanType = document.createElement('span');
           spanType.className = 'file-type';
@@ -636,7 +636,7 @@
           li.dataset.var = v.name;
           const spanName = document.createElement('span');
           spanName.className = 'var-name';
-          spanName.textContent = v.name;
+          spanName.dataset.noI18n = ''; spanName.textContent = v.name;
           const spanType = document.createElement('span');
           spanType.className = 'var-type';
           spanType.textContent = v.type;

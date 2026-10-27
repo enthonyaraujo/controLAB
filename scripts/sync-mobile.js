@@ -5,6 +5,7 @@ const projectRoot = path.join(__dirname, '..');
 const pythonTarget = path.join(projectRoot, 'android', 'app', 'src', 'main', 'python');
 const sources = [
   'lgr_engine.py',
+  'localization.py',
   'control_utils.py',
   'plot_theme.py',
   'routh_hurwitz.py',
@@ -21,5 +22,7 @@ fs.mkdirSync(pythonTarget, { recursive: true });
 for (const filename of sources) {
   fs.copyFileSync(path.join(projectRoot, 'src', 'python', filename), path.join(pythonTarget, filename));
 }
+
+fs.copyFileSync(path.join(projectRoot, 'src/renderer/locales/en.json'), path.join(pythonTarget, 'en.json'));
 
 console.log('[ControLAB] Motor Python sincronizado com o projeto Android.');

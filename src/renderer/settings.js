@@ -100,7 +100,7 @@
     if (!isoString) return '';
     try {
       const date = new Date(isoString);
-      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      return date.toLocaleDateString(global.ControLABI18n?.getLanguage() === 'en' ? 'en-US' : 'pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
     } catch {
       return '';
     }
@@ -447,7 +447,7 @@
             }
             if (progressStats) {
               const speedText = prog.bytesPerSecond > 0 ? ` • ${formatSpeed(prog.bytesPerSecond)}` : '';
-              progressStats.textContent = `${formatBytes(prog.transferred)} de ${formatBytes(prog.total || expectedSize)}${speedText}`;
+              progressStats.textContent = `${formatBytes(prog.transferred)} ${global.ControLABI18n?.getLanguage() === 'en' ? 'of' : 'de'} ${formatBytes(prog.total || expectedSize)}${speedText}`;
             }
           }) : null;
 

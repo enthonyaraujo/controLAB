@@ -1,13 +1,17 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+function localized(payload = {}) {
+  return { ...payload, language: document.documentElement.lang === 'en' ? 'en' : 'pt-BR' };
+}
 contextBridge.exposeInMainWorld('api', {
-  calculateLGR: (payload) => ipcRenderer.invoke('calculate-lgr', payload),
-  previewTransferFunction: (payload) => ipcRenderer.invoke('preview-transfer-function', payload),
+  setLanguage: (language) => ipcRenderer.send('controlab-language', language),
+  calculateLGR: (payload) => ipcRenderer.invoke('calculate-lgr', localized(payload)),
+  previewTransferFunction: (payload) => ipcRenderer.invoke('preview-transfer-function', localized(payload)),
   getPresets: () => ipcRenderer.invoke('get-presets'),
-  calculateRouth: (payload) => ipcRenderer.invoke('calculate-routh', payload),
+  calculateRouth: (payload) => ipcRenderer.invoke('calculate-routh', localized(payload)),
   getRouthPresets: () => ipcRenderer.invoke('get-routh-presets'),
-  evaluateRouthK: (payload) => ipcRenderer.invoke('evaluate-routh-k', payload),
-  runScientificAnalysis: (action, payload) => ipcRenderer.invoke('run-scientific-analysis', action, payload),
+  evaluateRouthK: (payload) => ipcRenderer.invoke('evaluate-routh-k', localized(payload)),
+  runScientificAnalysis: (action, payload) => ipcRenderer.invoke('run-scientific-analysis', action, localized(payload)),
   saveImage: (payload) => ipcRenderer.invoke('save-image', payload),
   saveSVG: (payload) => ipcRenderer.invoke('save-svg', payload),
   copyImageToClipboard: (base64) => ipcRenderer.invoke('copy-image', base64),

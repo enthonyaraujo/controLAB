@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('controlab:themechange', onThemeChanged);
+  window.addEventListener('controlab:languagechange', onThemeChanged);
 
   // =========================================================================
   // NAVEGAÇÃO POR ABAS (MODO DE ENTRADA & VIEWS)
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function calculate() {
     if (calculating) return;
     const payload = getPayload();
-    const calculationKey = JSON.stringify(payload);
+    const calculationKey = JSON.stringify({ ...payload, language: window.ControLABI18n?.getLanguage() });
     if (calculationKey === lastCalculationKey) return;
     calculating = true;
     window.clearTimeout(previewTimer);
@@ -356,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderMath(element, texString, displayMode = false) {
     if (!element || !texString) return;
+    texString = window.ControLABI18n?.translate(texString) || texString;
     try {
       if (window.katex) {
         window.katex.render(texString, element, {
@@ -381,6 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderMathInContainer(container) {
     if (!container || !window.renderMathInElement) return;
+    window.ControLABI18n?.apply();
     window.renderMathInElement(container, {
       delimiters: mathDelimiters,
       throwOnError: false,
