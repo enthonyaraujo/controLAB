@@ -1352,8 +1352,30 @@ body {
   }
 }
 
+/* O shell científico anima só o conteúdo: a barra superior e a navegação
+   inferior ficam paradas e não piscam ao trocar de página. */
+#page-scientific.active {
+  animation: none;
+}
+
+.sci-shell.page-enter > :is(.studio-ribbon, .studio-folder-bar, .home-main-layout, .sci-mobile-tabs, .sci-ribbon, .scientific-workspace) {
+  animation: pageContentIn 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes pageContentIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .app-page.active {
+  .app-page.active,
+  .sci-shell.page-enter > * {
     animation: none;
   }
 }
@@ -1394,7 +1416,8 @@ body {
 .home-brand {
   display: flex;
   align-items: center;
-  padding: 0 1.25rem 0 1rem;
+  flex-shrink: 0;
+  padding: 0 0.75rem 0 1rem;
 }
 
 .home-brand-title {
@@ -1421,8 +1444,12 @@ body {
   color: rgba(255, 255, 255, 0.95);
 }
 
+/* As abas ocupam o espaço livre alinhadas à esquerda, ao lado da marca */
 .home-top-tabs {
   display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start;
   align-items: stretch;
   height: 100%;
   gap: 0.125rem;
@@ -1483,6 +1510,17 @@ body {
 .home-top-actions {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Desktop estreito: abas mais compactas para caberem sem rolagem */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .home-top-tabs .home-tab,
+  .sci-top-tabs .sci-tab {
+    padding: 0 0.4375rem;
+    letter-spacing: 0.1px;
+  }
 }
 
 .btn-top-settings {
@@ -7235,6 +7273,8 @@ body.in-scientific .global-navbar {
 
 .sci-top-tabs {
   display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-start;
   height: 100%;
   align-items: stretch;
   gap: 0.125rem;

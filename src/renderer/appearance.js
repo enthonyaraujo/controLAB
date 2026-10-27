@@ -18,7 +18,7 @@
 
   function getTheme() {
     const saved = read(THEME_KEY);
-    return THEMES.includes(saved) ? saved : 'dark';
+    return THEMES.includes(saved) ? saved : 'light';
   }
 
   function getScale() {
