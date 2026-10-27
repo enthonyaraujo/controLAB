@@ -3,7 +3,7 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Não lançado]
+## [4.2.3] - 2026-10-27
 
 ### Adicionado
 - **Projeto de Controladores:**
@@ -11,6 +11,12 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
   - Campo opcional de realimentação H(s): o projeto usa a malha aberta G(s)H(s) e a simulação usa Gc·G/(1 + Gc·G·H).
   - Campo opcional de polo dominante desejado (ex.: `-1+1j`, `-1+sqrt(3)j`), que substitui ξ, Mp, ts e ωn.
   - Aviso quando o "avanço de fase" calculado tem p < z, ou seja, é na verdade um atraso.
+
+### Alterado
+- **Interface:**
+  - O programa passa a iniciar no tema claro na primeira instalação; a escolha feita nas configurações continua sendo respeitada.
+  - As abas da barra superior ficam alinhadas à esquerda, ao lado de "ControLAB", e ficam mais compactas entre 1024 e 1280 px para caberem sem rolagem.
+  - Ao trocar de página, só o conteúdo aparece com uma transição suave; a barra superior e a navegação inferior não piscam mais.
 
 ### Corrigido
 - **Projeto de Controladores:**
