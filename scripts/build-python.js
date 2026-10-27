@@ -54,7 +54,7 @@ const result = spawnSync(python, [
   '--hidden-import', 'matplotlib.backends.backend_pdf',
   '--collect-all', 'matplotlib',
   '--collect-all', 'control',
-  '--add-data', `src/renderer/locales/en.json${path.delimiter}.`,
+  '--add-data', `${path.join(projectRoot, 'src', 'renderer', 'locales', 'en.json')}${path.delimiter}.`,
   '--paths', path.join('src', 'python'),
   path.join('src', 'python', 'python_bridge.py'),
 ], { cwd: projectRoot, stdio: 'inherit' });
