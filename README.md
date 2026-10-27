@@ -1,5 +1,7 @@
 # <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>ControLAB — Control Systems Suite</strong>
 
+**English** | [Português (Brasil)](README.pt-BR.md)
+
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Electron](https://img.shields.io/badge/Electron-44.1.0-47848F.svg?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![KaTeX](https://img.shields.io/badge/KaTeX-Offline%20Math-00d1b2.svg)](https://katex.org/)
@@ -116,9 +118,9 @@ The browser test does not install additional browsers.
 
 ### Current Implementation and Limitations
 
-This development stage supports Electron and the Web version with a local backend.
+`.m` scripts run in Electron, in the Web version with a local backend, and on Android.
 
-Offline `.m` script execution on Android still requires porting and compiling the engine for Android and remains pending. The existing scientific Python modules continue to operate independently.
+On Android, the engine is compiled with the Android NDK for `arm64-v8a` and `x86_64` and bundled in the APK as `libcontrolab_runtime.so`, so scripts run fully offline. Figures are displayed inside the editor. The scientific Python modules continue to operate independently.
 
 The interpreter supports the MATLAB language subset documented in `vendor/openmat/README.md`.
 
