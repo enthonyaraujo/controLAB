@@ -45,3 +45,13 @@ vendor/openmat/target/
 
 # Configuração local do Claude Code
 .claude/
+
+# Interface nativa Rust
+native/target/
+native/android/.gradle/
+native/android/app/build/
+native/android/app/src/main/jniLibs/
+build/native-android/
+
+# Cargo workspace
+/target/

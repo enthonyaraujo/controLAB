@@ -1,0 +1,76 @@
+plugins {
+    id 'com.android.application'
+    id 'com.chaquo.python'
+}
+
+// Select only installed Rust targets, e.g. -PnativeAbis=arm64-v8a,x86_64.
+def nativeAbis = providers.gradleProperty('nativeAbis').getOrElse('arm64-v8a').split(',').toList()
+def canonicalRequirements = rootProject.file('../../android/app/requirements-android.txt')
+
+android {
+    namespace 'br.com.enthony.controlab'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'br.com.enthony.lgrstudio'
+        minSdk 24
+        targetSdk 36
+        versionCode 25
+        versionName '5.0.0'
+        ndk { abiFilters.addAll(nativeAbis) }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes {
+        release { minifyEnabled false }
+    }
+    sourceSets {
+        debug.jniLibs.srcDir layout.buildDirectory.dir('generated/native/debug')
+        release.jniLibs.srcDir layout.buildDirectory.dir('generated/native/release')
+    }
+    // Python's .m runtime is an executable packaged as a shared library: it must
+    // be extracted to nativeLibraryDir rather than mmap-loaded from the APK.
+    packaging { jniLibs { useLegacyPackaging = true } }
+}
+
+chaquopy {
+    defaultConfig {
+        version '3.10'
+        def buildPythonPath = System.getenv('LGR_ANDROID_PYTHON')
+        if (buildPythonPath) { buildPython buildPythonPath }
+        pip { install '-r', canonicalRequirements.absolutePath }
+    }
+    sourceSets {
+        main { srcDirs = [rootProject.file('../../src/python').absolutePath] }
+    }
+}
+
+['debug', 'release'].each { variant ->
+    def capitalized = variant.capitalize()
+    def compileTask = tasks.register("compileNative${capitalized}", Exec) {
+        group = 'build'
+        description = "Build Rust UI and .m runtime for ${variant}"
+        workingDir rootProject.projectDir
+        def output = layout.buildDirectory.dir("generated/native/${variant}")
+        inputs.files(fileTree('../../src') { include '**/*.rs' })
+        inputs.files(rootProject.file('../../Cargo.toml'), rootProject.file('../../Cargo.lock'), rootProject.file('../Cargo.toml'))
+        inputs.files(fileTree('../../../vendor/openmat') {
+            include '**/*.rs', '**/Cargo.toml', 'Cargo.lock'
+            exclude '**/target/**'
+        })
+        inputs.file rootProject.file('build_native.py')
+        inputs.property('abis', nativeAbis.join(','))
+        inputs.property('variant', variant)
+        outputs.dir output
+        commandLine providers.gradleProperty('nativeBuildPython').getOrElse('python3'),
+            rootProject.file('build_native.py'), '--abis', nativeAbis.join(','),
+            '--profile', variant, '--output', output.get().asFile.absolutePath
+        if (providers.gradleProperty('nativeOffline').getOrElse('false').toBoolean()) {
+            args '--offline'
+        }
+    }
+    tasks.configureEach {
+        if (name == "pre${capitalized}Build") { dependsOn compileTask }
+    }
+}

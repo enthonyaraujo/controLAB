@@ -1,0 +1,18 @@
+# Build the existing adapter and engine without modifying the vendored sources.
+[package]
+name = "controlab-runtime-native"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "controlab-runtime"
+path = "../../vendor/openmat/crates/controlab-runtime/src/main.rs"
+
+[dependencies]
+openmat-lang = { path = "../../vendor/openmat/crates/openmat-lang" }
+serde_json = "=1.0.154"
+
+[lints.rust]
+unsafe_code = "forbid"

@@ -1,3 +1,5 @@
+> **Native migration in progress:** this branch uses Rust + egui/eframe. Run `cargo build --offline` and `cargo run --offline` or `./run.sh`. See [native/README.md](native/README.md) and [native Android](native/ANDROID.md). The Electron documentation below describes the previous implementation.
+
 # <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>ControLAB — Control Systems Suite</strong>
 
 **English** | [Português (Brasil)](README.pt-BR.md)

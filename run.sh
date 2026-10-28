@@ -21,6 +21,7 @@ case "${1:-}" in
         python src/python/routh_hurwitz.py "$@"
         ;;
     *)
-        npm start
+        if [ "${1:-}" = "--native" ]; then shift; fi
+        cargo build "$@" && cargo run --bin controlab "$@"
         ;;
 esac

@@ -1,0 +1,5 @@
+[workspace]
+members = ["native", "native/runtime"]
+default-members = ["native", "native/runtime"]
+exclude = ["vendor/openmat"]
+resolver = "3"
