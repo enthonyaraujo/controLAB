@@ -2,9 +2,6 @@
 __pycache__/
 *.py[cod]
 
-node_modules/
-npm-debug.log*
-
 graphify-out/
 .pytest_cache/
 .coverage
@@ -24,13 +21,8 @@ release-apk/
 *.apk
 *.aab
 
-# Android & Gradle
+# Gradle da integração Android nativa
 .gradle/
-android/.gradle/
-android/build/
-android/app/build/
-android/app/src/main/assets/
-android/capacitor-cordova-android-plugins/
 
 .DS_Store
 Thumbs.db
@@ -40,7 +32,6 @@ Thumbs.db
 build/openmat/
 build/runtime/
 build/openmat-android/
-android/app/src/main/jniLibs/
 vendor/openmat/target/
 
 # Configuração local do Claude Code
@@ -55,3 +46,6 @@ build/native-android/
 
 # Cargo workspace
 /target/
+
+# Pacote Linux nativo
+build/native-package/

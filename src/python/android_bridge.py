@@ -1,4 +1,4 @@
-"""Ponte do Capacitor/Chaquopy para o mesmo motor Python das interfaces desktop."""
+"""Ponte nativa do Chaquopy para o mesmo motor Python das interfaces desktop."""
 
 import json
 import os

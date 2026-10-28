@@ -8,7 +8,7 @@ O APK inclui três componentes:
 
 - `libcontrolab_native.so`: a interface Rust e o ciclo de vida `android-activity`;
 - Python 3.10/Chaquopy 17.0.0 e os módulos canônicos de `src/python`, com as mesmas
-  versões científicas de `android/app/requirements-android.txt`;
+  versões científicas de `requirements-android.txt`;
 - `libcontrolab_runtime.so`: o executável Rust do motor `.m`, extraído para
   `nativeLibraryDir` e iniciado pelo `script_service.py` canônico.
 
@@ -88,3 +88,9 @@ Nenhum teste em aparelho/emulador ou APK instalado foi realizado nesta mudança.
 
 Referências: [Chaquopy: configuração e fontes Python](https://chaquo.com/chaquopy/doc/current/android.html)
 e a documentação local do crate `android-activity` usado no `Cargo.lock`.
+
+Os recursos compartilhados agora vêm de `assets/`, empacotados como
+`controlab_assets` pelo Gradle. O projeto Capacitor antigo foi removido.
+A validação Android foi suspensa nesta etapa por decisão do usuário; o foco
+atual é Linux. Não considerar as alterações recentes de empacotamento como
+APK validado.

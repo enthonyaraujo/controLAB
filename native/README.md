@@ -33,14 +33,13 @@ O Python da `.venv` é escolhido automaticamente. É possível selecionar outro 
 stdin/stdout de um processo persistente, sem abrir portas de rede. Cálculos são
 serializados em uma thread de trabalho; erro/timeout não bloqueia os frames da UI.
 
-A interface reproduz o renderer anterior (`src/renderer`): os tokens de
-`tokens.css`, IBM Plex Sans e JetBrains Mono em todos os pesos, os ícones SVG
+A interface mantém a identidade visual estabelecida: IBM Plex Sans e JetBrains Mono em todos os pesos, os ícones SVG
 originais (rasterizados com resvg), as abas superiores, os ribbons, os três
 painéis dos módulos (Parâmetros, Figura e Resultados), o Studio `.m`, os toasts
 e o modal de Configurações & Sobre. Os temas Claro, Escuro e Sistema e a escala
 da interface (90–150%) são salvos no diretório de configuração do usuário, com
-a pasta de trabalho e os itens recentes. Abaixo de 1024 px os módulos usam as
-abas Parâmetros/Gráfico/Resultados; abaixo de 768 px o Studio oculta as colunas
+a pasta de trabalho e os itens recentes. Abaixo de 600 px os módulos usam as
+abas Parâmetros/Gráfico/Resultados; tablets usam rail e Figura/Resultados; abaixo de 768 px o Studio oculta as colunas
 laterais, como no CSS anterior. F5 executa o documento; Ctrl/Cmd+S, +O e +N
 salvam, abrem e criam scripts; Ctrl/Cmd+Enter calcula o módulo atual. Abrir,
 salvar, selecionar pasta e exportar figuras usam os diálogos do sistema.
@@ -49,7 +48,7 @@ Os gráficos científicos são gerados pelo mesmo Matplotlib em Python, como
 imagens locais, com zoom (botões, roda do mouse e arraste) e exportação em PNG
 ou SVG; Copiar envia a figura para a área de transferência. As fórmulas, prévias
 e memoriais são compostos pelo MathText com as fontes do KaTeX vendorizadas
-(`src/renderer/vendor/katex/fonts`), em modo display, com matrizes e setas AMS
+(`assets/fonts/katex`), em modo display, com matrizes e setas AMS
 adaptadas; a imagem é branca e recebe a cor do contexto na interface. Fórmulas
 não suportadas continuam legíveis como texto. Não há navegador, KaTeX em
 JavaScript nem instalação externa de LaTeX.
@@ -74,12 +73,12 @@ cargo clippy -p controlab-native --offline --all-targets -- -D warnings
 PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
 ```
 
-A árvore Electron/Capacitor foi preservada como referência durante a migração.
-Os scripts npm existentes continuam exclusivos dessa implementação anterior;
-a entrada nativa é `cargo build` e `cargo run` / `run.sh`. Não há instalador desktop nativo
-publicado nesta branch. Para distribuir, a interface precisa ser acompanhada
-do Python e seus pacotes científicos, da ponte e do executável `.m`; apenas
-copiar o binário Rust não produz uma instalação independente.
+A implementação web e seus scripts foram removidos. O build usa Cargo e o
+pacote Linux é produzido por `scripts/package_native.py`, que inclui uma engine
+Python independente com recursos em `assets/`. O cliente detecta a engine ao
+lado do aplicativo em `engine/controlab-engine`; `CONTROLAB_ENGINE` permite
+selecionar outra engine empacotada. O transporte continua local por stdin/stdout.
+Veja a [separação e validação Linux](../docs/validation/native-linux-only.md).
 
 A interface nativa está em português; a migração do seletor de inglês ainda está
 pendente. Evidências e limites completos: [validação](../docs/validation/native-migration.md).

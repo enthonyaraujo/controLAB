@@ -2,7 +2,7 @@
 import base64
 import io
 import re
-from pathlib import Path
+from resource_paths import asset_path
 
 MAX_FORMULAS = 200
 MAX_FORMULA_CHARS = 4096
@@ -18,7 +18,7 @@ _MATHTEXT_SUBSTITUTES = (
 
 # Formulas are typeset at a 48 px em in white; the client scales and tints them.
 FORMULA_EM_PX = 48
-_KATEX_FONTS = Path(__file__).resolve().parents[1] / 'renderer' / 'vendor' / 'katex' / 'fonts'
+_KATEX_FONTS = asset_path('fonts', 'katex')
 _fontset = None
 
 

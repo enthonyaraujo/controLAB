@@ -1,5 +1,5 @@
 //! Native ControLAB UI. Scientific calculations remain in the canonical Python engine;
-//! the interface reproduces the previous web renderer (`src/renderer`) in egui.
+//! the interface preserves ControLAB’s visual identity using native egui widgets.
 #[cfg(target_os = "android")]
 pub mod android;
 mod backend;

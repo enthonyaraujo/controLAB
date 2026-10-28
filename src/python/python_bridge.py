@@ -1,4 +1,4 @@
-"""Bridge JSON compartilhada pelas interfaces Electron e Web do ControLAB."""
+"""Bridge JSON canônica dos motores científicos da aplicação nativa ControLAB."""
 
 import base64
 import io

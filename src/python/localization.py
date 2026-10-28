@@ -3,12 +3,11 @@ import json
 import re
 from contextvars import ContextVar
 from functools import wraps
-from pathlib import Path
 
 _language = ContextVar('controlab_language', default='pt-BR')
-_catalog_path = Path(__file__).with_name('en.json')
-if not _catalog_path.exists():
-    _catalog_path = Path(__file__).resolve().parents[1] / 'renderer' / 'locales' / 'en.json'
+from resource_paths import asset_path
+
+_catalog_path = asset_path('locales', 'en.json')
 _catalog = json.loads(_catalog_path.read_text(encoding='utf-8'))
 _keys = sorted((k for k, v in _catalog.items() if k != v), key=len, reverse=True)
 _pattern = re.compile(r'(?<![\w])(?:' + '|'.join(re.escape(k) for k in _keys) + r')(?![\w])')

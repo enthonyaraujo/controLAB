@@ -161,13 +161,38 @@ mod desktop {
         PathBuf::from(if cfg!(windows) { "python" } else { "python3" })
     }
 
+    fn packaged_engine(directory: &Path) -> Option<PathBuf> {
+        let name = if cfg!(windows) {
+            "controlab-engine.exe"
+        } else {
+            "controlab-engine"
+        };
+        let path = directory.join("engine").join(name);
+        path.is_file().then_some(path)
+    }
+
     impl PythonProcess {
         fn start() -> Result<Self, String> {
-            let bridge = bridge_path()?;
-            let mut command = Command::new(python_path(&bridge));
+            let engine = if let Some(path) = std::env::var_os("CONTROLAB_ENGINE") {
+                Some(
+                    PathBuf::from(path)
+                        .canonicalize()
+                        .map_err(|error| format!("Engine empacotada indisponível: {error}"))?,
+                )
+            } else {
+                std::env::current_exe()
+                    .ok()
+                    .and_then(|p| p.parent().and_then(packaged_engine))
+            };
+            let (mut command, bridge_directory) = if let Some(engine) = engine {
+                (Command::new(engine), None)
+            } else {
+                let bridge = bridge_path()?;
+                let mut command = Command::new(python_path(&bridge));
+                command.arg("-u").arg(&bridge);
+                (command, bridge.parent().map(Path::to_path_buf))
+            };
             command
-                .arg("-u")
-                .arg(&bridge)
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::inherit())
@@ -180,7 +205,10 @@ mod desktop {
                 } else {
                     "controlab-runtime"
                 };
-                let mut candidates = vec![bridge.parent().unwrap().join(name)];
+                let mut candidates = bridge_directory
+                    .iter()
+                    .map(|path| path.join(name))
+                    .collect::<Vec<_>>();
                 if let Ok(executable) = std::env::current_exe()
                     && let Some(directory) = executable.parent()
                 {
@@ -346,6 +374,27 @@ mod desktop {
             }
             let _ = self.child.kill();
             let _ = self.child.wait();
+        }
+    }
+    #[cfg(test)]
+    mod packaged_tests {
+        use super::*;
+        #[test]
+        fn engine_is_selected_only_from_its_dedicated_distribution_directory() {
+            let root = std::env::temp_dir()
+                .join(format!("controlab-engine-discovery-{}", std::process::id()));
+            std::fs::create_dir_all(root.join("engine")).unwrap();
+            let name = if cfg!(windows) {
+                "controlab-engine.exe"
+            } else {
+                "controlab-engine"
+            };
+            assert!(packaged_engine(&root).is_none());
+            std::fs::write(root.join("engine").join(name), []).unwrap();
+            assert_eq!(packaged_engine(&root), Some(root.join("engine").join(name)));
+            std::fs::remove_file(root.join("engine").join(name)).unwrap();
+            std::fs::remove_dir(root.join("engine")).unwrap();
+            std::fs::remove_dir(root).unwrap();
         }
     }
 }

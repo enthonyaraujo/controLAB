@@ -1,5 +1,5 @@
-//! Design tokens from `src/renderer/tokens.css` and the computed styles of the previous
-//! renderer. Sizes are CSS pixels, which egui treats as points.
+//! ControLAB palette and typography, preserved from the established design.
+//! Sizes are logical pixels, which egui treats as points.
 use eframe::egui::{self, Color32, FontFamily, FontId};
 
 const fn rgb(r: u8, g: u8, b: u8) -> Color32 {
@@ -223,10 +223,7 @@ pub fn mono(size: f32, weight: Weight) -> FontId {
 
 macro_rules! font_file {
     ($path:literal) => {
-        egui::FontData::from_static(include_bytes!(concat!(
-            "../../src/renderer/vendor/fonts/",
-            $path
-        )))
+        egui::FontData::from_static(include_bytes!(concat!("../../assets/fonts/", $path)))
     };
 }
 

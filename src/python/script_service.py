@@ -1,4 +1,4 @@
-"""Persistent transport to the copied openMAT runtime (desktop and local Web)."""
+"""Persistent transport to the independent openMAT runtime (native application)."""
 import atexit
 import json
 import os
@@ -25,15 +25,19 @@ class ScriptService:
             return Path(os.environ["CONTROLAB_RUNTIME"])
         name = "controlab-runtime.exe" if sys.platform == "win32" else "controlab-runtime"
         if getattr(sys, "frozen", False):
-            return Path(sys.executable).parent / name
-        return Path(__file__).resolve().parents[2] / "build" / "runtime" / name
+            folder = Path(sys.executable).parent
+            candidates = [folder / name, folder.parent / name]
+            return next((path for path in candidates if path.is_file()), candidates[0])
+        root = Path(__file__).resolve().parents[2]
+        candidates = [root / "target" / "debug" / name, root / "target" / "release" / name]
+        return next((path for path in candidates if path.is_file()), candidates[0])
 
     def _start(self):
         executable = self.runtime_path()
         if not executable.is_file():
             if os.environ.get("CONTROLAB_RUNTIME"):
-                raise RuntimeError("Motor .m não incluído neste APK. Gere o app com npm run mobile:apk e o Android NDK instalado.")
-            raise RuntimeError("Motor .m indisponível nesta instalação. No desenvolvimento, execute npm run build:openmat.")
+                raise RuntimeError("Motor .m não incluído neste APK. Gere o app com o Gradle em native/android e o Android NDK instalado.")
+            raise RuntimeError("Motor .m indisponível nesta instalação. No desenvolvimento, execute cargo build --workspace.")
         self.process = subprocess.Popen(
             [str(executable)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL, text=True, encoding="utf-8",

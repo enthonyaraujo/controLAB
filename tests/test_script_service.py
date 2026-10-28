@@ -12,7 +12,7 @@ class ScriptRuntimeTests(unittest.TestCase):
     def setUp(self):
         self.service = ScriptService()
         if not self.service.runtime_path().is_file():
-            self.skipTest('Compile o motor com npm run build:openmat antes destes testes.')
+            self.skipTest('Compile o motor com cargo build --workspace antes destes testes.')
         self.addCleanup(self.service.close)
 
     def request(self, operation, **data):
@@ -73,7 +73,7 @@ class ScriptRuntimeTests(unittest.TestCase):
         result = self.request('execute', source='x' * (1024 * 1024 + 1))
         self.assertFalse(result['success'])
 
-    def test_persistent_electron_worker_protocol(self):
+    def test_persistent_native_worker_protocol(self):
         import sys
         worker = Path(__file__).resolve().parents[1] / 'src/python/script_service.py'
         requests = [{'operation': 'execute', 'source': 'A=7;'}, {'operation': 'execute', 'source': 'A+1'}]
@@ -101,7 +101,7 @@ class RuntimeLocationTests(unittest.TestCase):
         import os
         runtime = ScriptService().runtime_path()
         if not runtime.is_file():
-            self.skipTest('Compile o motor com npm run build:openmat antes destes testes.')
+            self.skipTest('Compile o motor com cargo build --workspace antes destes testes.')
         with tempfile.TemporaryDirectory() as temp:
             # Same file name the APK uses, in a folder outside the build tree.
             copy = Path(temp) / 'libcontrolab_runtime.so'
@@ -123,3 +123,17 @@ class RuntimeLocationTests(unittest.TestCase):
             result = service.request({'session': 'android', 'operation': 'state'})
             self.assertFalse(result['success'])
             self.assertIn('APK', result['error'])
+
+class BundledRuntimeLocationTests(unittest.TestCase):
+    def test_frozen_engine_finds_the_runtime_next_to_the_native_ui(self):
+        from unittest.mock import patch
+        import os
+        import sys
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'engine').mkdir()
+            name = 'controlab-runtime.exe' if sys.platform == 'win32' else 'controlab-runtime'
+            runtime = root / name
+            runtime.write_bytes(b'fixture')
+            with patch.dict(os.environ, {}, clear=True), patch.object(sys, 'frozen', True, create=True), patch.object(sys, 'executable', str(root / 'engine/controlab-engine')):
+                self.assertEqual(ScriptService().runtime_path(), runtime)
