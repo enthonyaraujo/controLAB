@@ -10,10 +10,15 @@ fn main() -> eframe::Result {
         Err(_) if screenshot => [1920.0, 1048.0],
         Err(_) => [1360.0, 880.0],
     };
+    // The app id matches controlab.desktop (StartupWMClass) so launchers group the window.
+    let icon = eframe::icon_data::from_png_bytes(include_bytes!("../../assets/icons/app-icon.png"))
+        .expect("embedded application icon");
     eframe::run_native(
         "ControLAB - Sistemas de Controle",
         eframe::NativeOptions {
             viewport: eframe::egui::ViewportBuilder::default()
+                .with_app_id("controlab")
+                .with_icon(icon)
                 .with_inner_size(size)
                 .with_min_inner_size(if screenshot {
                     [100.0, 100.0]

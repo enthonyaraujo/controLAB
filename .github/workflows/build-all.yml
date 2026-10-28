@@ -1,8 +1,9 @@
-name: Native Linux Build and Validation
+name: Multiplatform Build & Release (Linux, Windows, Android)
 
 on:
   push:
     branches: [main, enthony/migrate-rust]
+    tags: ['v*']
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -10,45 +11,270 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
+  # =========================================================================
+  # 1. LINUX (.deb, .rpm, .AppImage)
+  # =========================================================================
   linux:
-    runs-on: ubuntu-latest
+    name: Linux (deb, rpm, AppImage)
+    # The packages require the glibc of this image (2.39) or newer.
+    runs-on: ubuntu-24.04
     env:
       PYTHONPATH: ${{ github.workspace }}/src/python
       CONTROLAB_PYTHON: python
       CONTROLAB_RUNTIME: ${{ github.workspace }}/target/release/controlab-runtime
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+
+      - name: Sincronizar versão com a Git Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 scripts/set_version.py "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Native graphics and headless display
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Bibliotecas gráficas, display headless e ferramentas de pacote
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libx11-dev libxi-dev libxrandr-dev libgl1-mesa-dev libxkbcommon-dev libwayland-dev xvfb xauth
-      - name: Rust and scientific Python build dependencies
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libxi-dev libxrandr-dev libgl1-mesa-dev libxkbcommon-dev libwayland-dev \
+            xvfb xauth rpm desktop-file-utils
+
+      - name: Rust stable
         run: |
           rustup update stable
           rustup default stable
-          python -m pip install -r requirements.txt -r requirements-build.txt
-      - name: Reject frontend and Node sources
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Dependências Python científicas e de build
+        run: python -m pip install -r requirements.txt -r requirements-build.txt
+
+      - name: Rejeitar fontes de frontend e Node
         run: python scripts/check_native_sources.py
-      - name: Compile the native workspace
+
+      - name: Compilar o workspace nativo
         run: cargo build --locked --release --workspace
-      - name: Rust and Python regression tests
+
+      - name: Testes de regressão Rust e Python
         run: |
           cargo test --locked --workspace
-          cargo clippy -p controlab-native --all-targets -- -D warnings
+          cargo clippy --locked -p controlab-native --all-targets -- -D warnings
           cargo fmt -p controlab-native --check
           python -m unittest discover -s tests
-      - name: Build the independent Linux bundle
+          desktop-file-validate packaging/linux/controlab.desktop
+
+      - name: Gerar o pacote nativo independente
         run: python scripts/package_native.py --release --skip-build
-      - name: Run the bundled engine and UI without source or Python fallbacks
+
+      - name: Executar engine e interface empacotadas sem fontes ou Python de desenvolvimento
         run: xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 WINIT_UNIX_BACKEND=x11 python scripts/validate_native_bundle.py dist/native/controlab --ui
-      - name: Archive the complete Linux application
-        run: tar -C dist/native -czf dist/controlab-linux-x86_64.tar.gz controlab
+
+      - name: Instalar appimagetool
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/appimagetool" \
+            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$RUNNER_TEMP/appimagetool"
+          echo "APPIMAGETOOL=$RUNNER_TEMP/appimagetool" >> "$GITHUB_ENV"
+
+      - name: Gerar pacotes Linux (deb, rpm, AppImage)
+        env:
+          # Runners have no FUSE: AppImages extract themselves instead of mounting.
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: python scripts/package_installers.py deb rpm appimage --output release
+
+      - name: Verificar pacotes instalados
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: |
+          sudo apt-get install -y ./release/ControLAB-*.deb
+          test "$(readlink -f /usr/bin/controlab)" = /opt/controlab/controlab
+          env -u PYTHONPATH python scripts/validate_native_bundle.py /opt/controlab
+          rpm -qpi release/ControLAB-*.rpm
+          rpm -qpR release/ControLAB-*.rpm
+          cd "$RUNNER_TEMP"
+          "$GITHUB_WORKSPACE"/release/ControLAB-*.AppImage --appimage-extract > /dev/null
+          python "$GITHUB_WORKSPACE/scripts/validate_native_bundle.py" squashfs-root/opt/controlab
+
       - uses: actions/upload-artifact@v4
         with:
-          name: controlab-linux-x86_64
-          path: dist/controlab-linux-x86_64.tar.gz
+          name: ControLAB-Linux
+          path: |
+            release/*.deb
+            release/*.rpm
+            release/*.AppImage
           if-no-files-found: error
+
+  # =========================================================================
+  # 2. WINDOWS (instalador .exe NSIS)
+  # =========================================================================
+  windows:
+    name: Windows (instalador NSIS)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Sincronizar versão com a Git Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python scripts/set_version.py "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Rust stable
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Dependências Python científicas e de build
+        run: python -m pip install -r requirements.txt -r requirements-build.txt
+
+      - name: Compilar o workspace nativo
+        run: cargo build --locked --release --workspace
+
+      - name: Gerar o pacote nativo independente
+        run: python scripts/package_native.py --release --skip-build
+
+      - name: Executar a engine empacotada sem fontes ou Python de desenvolvimento
+        run: python scripts/validate_native_bundle.py dist/native/controlab
+
+      - name: Instalar NSIS
+        run: |
+          if ! command -v makensis > /dev/null; then
+            choco install nsis -y --no-progress
+          fi
+          echo 'C:\Program Files (x86)\NSIS' >> "$GITHUB_PATH"
+
+      - name: Gerar instalador Windows (.exe)
+        run: python scripts/package_installers.py nsis --output release
+
+      - name: Verificar instalação silenciosa
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem release\ControLAB-*.exe | Select-Object -First 1
+          $target = Join-Path $env:RUNNER_TEMP 'ControLAB'
+          Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$target" -Wait
+          python scripts/validate_native_bundle.py $target
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Start-Process -FilePath (Join-Path $target 'uninstall.exe') -ArgumentList '/S' -Wait
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ControLAB-Windows
+          path: release/*.exe
+          if-no-files-found: error
+
+  # =========================================================================
+  # 3. ANDROID (.apk: interface Rust + Chaquopy)
+  # =========================================================================
+  android:
+    name: Android (APK)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Sincronizar versão com a Git Tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 scripts/set_version.py "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Python 3.10 (Chaquopy)
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Rust stable com alvo Android
+        run: |
+          rustup update stable
+          rustup default stable
+          rustup target add aarch64-linux-android
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          # build_native.py shares this target directory between both Cargo workspaces.
+          workspaces: . -> build/native-android
+
+      - name: Chave de assinatura (opcional)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "::warning::Secret ANDROID_KEYSTORE_BASE64 ausente: APK assinado com a chave debug do runner."
+            exit 0
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          {
+            echo "CONTROLAB_KEYSTORE=$RUNNER_TEMP/release.jks"
+            echo "CONTROLAB_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "CONTROLAB_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+            echo "CONTROLAB_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+      - name: Compilar APK Android
+        run: |
+          export LGR_ANDROID_PYTHON="$(command -v python)"
+          chmod +x native/android/gradlew
+          native/android/gradlew --project-dir native/android --no-daemon :app:assembleRelease \
+            -PnativeAbis=arm64-v8a -PnativeBuildPython="$LGR_ANDROID_PYTHON"
+
+      - name: Renomear APK para distribuição
+        run: |
+          VERSION="$(python3 scripts/set_version.py)"
+          mkdir -p release
+          cp native/android/app/build/outputs/apk/release/app-release.apk "release/ControLAB-v${VERSION}-android.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ControLAB-Android-APK
+          path: release/*.apk
+          if-no-files-found: error
+
+  # =========================================================================
+  # 4. RELEASE NO GITHUB (TAGS v*)
+  # =========================================================================
+  publish-release:
+    name: Publicar GitHub Release
+    needs: [linux, windows, android]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
+      - run: ls -lh release
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          files: release/*
+          generate_release_notes: true

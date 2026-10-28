@@ -37,9 +37,11 @@ def validate(bundle, ui=False):
         env['CONTROLAB_PYTHON'] = str(Path(temp) / 'no-python')
         env['CONTROLAB_NATIVE_BRIDGE'] = str(Path(temp) / 'no-source-bridge')
         env.pop('CONTROLAB_RUNTIME', None)
+        # Same protocol encoding the UI sets; Windows pipes otherwise use the ANSI code page.
+        env['PYTHONIOENCODING'] = 'utf-8'
         completed = subprocess.run([str(bundle / metadata['engine'])],
             input=''.join(json.dumps(request) + '\n' for request in requests),
-            text=True, capture_output=True, cwd=temp, env=env, timeout=90)
+            text=True, encoding='utf-8', capture_output=True, cwd=temp, env=env, timeout=90)
         assert completed.returncode == 0, completed.stderr
         replies = [json.loads(line) for line in completed.stdout.splitlines()]
         assert len(replies) == len(requests), completed.stderr
@@ -52,7 +54,7 @@ def validate(bundle, ui=False):
             env.update(CONTROLAB_SCREENSHOT=str(screenshot), CONTROLAB_SCREENSHOT_PAGE='time',
                 CONTROLAB_SCREENSHOT_SIZE='1024x768', CONTROLAB_SCREENSHOT_THEME='dark')
             completed = subprocess.run([str(bundle / metadata['ui'])], cwd=temp, env=env,
-                text=True, capture_output=True, timeout=60)
+                text=True, encoding='utf-8', errors='replace', capture_output=True, timeout=60)
             assert completed.returncode == 0, completed.stderr
             assert screenshot.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
     print('Bundle validated: independent resources, all six scientific engines, formulas and persistent .m session' +

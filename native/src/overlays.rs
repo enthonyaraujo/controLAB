@@ -313,7 +313,7 @@ impl Controlab {
                 icons::paint(ui, icon.shrink(9.0), icons::GEAR, p.accent);
                 let g = galley(ui, "Configurações & Sobre", sans(18.5, Weight::Bold), p.text, 0.0);
                 ui.painter().galley(pos2(icon.right() + 14.0, head.center().y - 20.0), g, p.text);
-                let g = kit::ellipsized(ui, "ControLAB v5.0.0 • Engenharia de Controle", sans(12.5, Weight::Regular), p.muted, 0.0, (width-140.0).max(80.0));
+                let g = kit::ellipsized(ui, concat!("ControLAB v", env!("CARGO_PKG_VERSION"), " • Engenharia de Controle"), sans(12.5, Weight::Regular), p.muted, 0.0, (width-140.0).max(80.0));
                 ui.painter().galley(pos2(icon.right() + 14.0, head.center().y + 5.0), g, p.muted);
                 let close = Rect::from_center_size(pos2(head.right() - 42.0, head.center().y), vec2(32.0, 32.0));
                 let r = ui.interact(close, ui.id().with("close-settings"), Sense::click()).on_hover_text("Fechar");
@@ -360,7 +360,7 @@ impl Controlab {
                                     ui.horizontal_wrapped(|ui| {
                                         ui.spacing_mut().item_spacing.x = 6.0;
                                         kit::text(ui, "Versão Instalada", sans(13.0, Weight::Regular), p.muted);
-                                        badge(ui, "v5.0.0", crate::theme::mono(13.6, Weight::Bold), p.text, p.header, p.border);
+                                        badge(ui, concat!("v", env!("CARGO_PKG_VERSION")), crate::theme::mono(13.6, Weight::Bold), p.text, p.header, p.border);
                                     });
                                     ui.add_space(6.0);
                                     badge(ui, &environment(), sans(11.5, Weight::SemiBold), p.accent, p.accent.gamma_multiply(0.1), p.accent.gamma_multiply(0.35));

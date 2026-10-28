@@ -66,7 +66,9 @@ python3 native/android/build_native.py --abis arm64-v8a --profile debug \
 `assembleRelease` usa os mesmos passos com otimização Rust. A configuração não
 inclui chave de assinatura de produção; distribuição e atualização de uma
 instalação existente exigem assinatura apropriada. O `applicationId` permanece
-`br.com.enthony.lgrstudio`; a versão declarada permanece 5.0.0/código 25.
+`br.com.enthony.lgrstudio`; versionName e versionCode (`X*10000 + Y*100 + Z`) vêm de `native/Cargo.toml`.
+Sem `CONTROLAB_KEYSTORE` (e `CONTROLAB_KEYSTORE_PASSWORD`, `CONTROLAB_KEY_ALIAS`,
+`CONTROLAB_KEY_PASSWORD`), `assembleRelease` assina com a chave debug.
 
 ## Verificação e limites
 

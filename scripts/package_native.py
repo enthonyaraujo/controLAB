@@ -13,6 +13,8 @@ import shutil
 import subprocess
 import sys
 
+from set_version import current_version
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -76,7 +78,7 @@ def main():
     (output/'licenses').mkdir(exist_ok=True)
     for name in ('LICENSE', 'THIRD_PARTY_NOTICES.txt'):
         shutil.copy2(ROOT/'vendor/openmat'/name,output/'licenses'/('openmat-'+name))
-    manifest = {'version': '5.0.0', 'platform': sys.platform, 'profile': profile.name,
+    manifest = {'version': current_version(), 'platform': sys.platform, 'profile': profile.name,
         'ui': binaries[0].name, 'runtime': binaries[1].name,
         'engine': 'engine/controlab-engine' + suffix,
         'resources': 'engine/_internal/assets'}

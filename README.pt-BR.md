@@ -48,8 +48,29 @@ não é uma distribuição completa. A máquina de destino precisa das bibliotec
 gráficas do Linux e de uma glibc compatível com o sistema usado no build.
 
 A saída deve estar vazia para preservar arquivos existentes; `--output` permite
-selecionar outra pasta. Não há publicação, instalador ou atualização automática
-nesses comandos.
+selecionar outra pasta.
+
+## Instaladores e releases
+
+O GitHub Actions (`.github/workflows/build-all.yml`) compila, testa e anexa como
+artefatos a cada push: `.deb`, `.rpm` e `.AppImage` (runner Ubuntu 24.04, glibc
+2.39+), instalador NSIS por usuário para Windows e APK Android (arm64-v8a). Uma
+tag `vX.Y.Z` aplica essa versão (`scripts/set_version.py`) e publica um GitHub
+Release com todos os arquivos. `native/Cargo.toml` é a fonte única da versão.
+
+A partir de um pacote já gerado, com `dpkg-deb`, `rpmbuild`, `appimagetool` ou
+`makensis` instalados:
+
+```bash
+python3 scripts/package_installers.py deb rpm appimage   # Linux
+python scripts/package_installers.py nsis                # Windows
+```
+
+Os instaladores ficam em `release/`. Os pacotes Linux instalam em `/opt/controlab`,
+com o comando `controlab`, entrada no menu e ícones. Sem os secrets
+`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e
+`ANDROID_KEY_PASSWORD`, o APK release é assinado com a chave debug do runner;
+instalar uma build nova sobre outra antiga exige desinstalar antes.
 
 ## Estrutura e validação
 
@@ -66,7 +87,7 @@ PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
 python3 scripts/check_native_sources.py
 ```
 
-O fluxo CI atual valida Linux. A integração Android nativa em `native/android`
-é mantida para continuidade, mas Android e Windows estão fora da validação
-desta etapa por decisão do usuário. Registros históricos em `CHANGELOG.md` e
+O CI executa todos os testes Rust/Python e a verificação da interface no Linux;
+o job Windows valida a engine empacotada e uma instalação silenciosa. O APK é
+gerado no CI, mas não é executado em aparelho. Registros históricos em `CHANGELOG.md` e
 `docs/validation` podem mencionar a interface antiga, cujo código foi removido.
