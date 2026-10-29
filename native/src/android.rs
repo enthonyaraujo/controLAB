@@ -9,7 +9,12 @@ use jni::{
     refs::Global,
 };
 
+pub mod insets;
+
 struct Bridge {
+    vm: JavaVM,
+    // Application survives Activity recreation, and does not retain an obsolete window.
+    application: Global<JObject<'static>>,
     files_dir: PathBuf,
 }
 
@@ -21,7 +26,7 @@ fn initialize(app: &AndroidApp) -> Result<(), String> {
     }
     // AndroidApp owns these JNI handles for the lifetime of this entry point.
     let vm = unsafe { JavaVM::from_raw(app.vm_as_ptr().cast()) };
-    let files_dir = vm
+    let (application, files_dir) = vm
         .attach_current_thread(|env| -> jni::errors::Result<_> {
             let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
             // Borrow android-activity's global reference; never delete its handle.
@@ -51,10 +56,14 @@ fn initialize(app: &AndroidApp) -> Result<(), String> {
                 )?
                 .l()?;
             let path = env.cast_local::<JString>(path)?.try_to_string(env)?;
-            Ok(PathBuf::from(path))
+            Ok((env.new_global_ref(application)?, PathBuf::from(path)))
         })
         .map_err(|error| format!("Inicialização JNI: {error}"))?;
-    let _ = BRIDGE.set(Bridge { files_dir });
+    let _ = BRIDGE.set(Bridge {
+        vm,
+        application,
+        files_dir,
+    });
     Ok(())
 }
 
@@ -77,6 +86,7 @@ fn android_main(app: AndroidApp) {
         eprintln!("{error}");
         return;
     }
+    insets::attach(&app);
     let options = eframe::NativeOptions {
         android_app: Some(app),
         ..Default::default()

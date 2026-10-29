@@ -777,6 +777,72 @@ fn android_safe_areas_are_respected_without_changing_css_breakpoints() {
 }
 
 #[test]
+fn only_backgrounds_extend_under_the_system_bars_and_the_keyboard() {
+    let ctx = touch_context();
+    let mut app = fixture(&ctx, true);
+    let p = theme::palette(true);
+    let (nav, _) = kit::bottom_nav_colors(&p);
+    // Phone portrait, then with the keyboard raising the bottom edge.
+    for (page, bottom) in [("home", 48.0), ("time", 48.0), ("time", 320.0)] {
+        app.page = page.into();
+        let mut shapes = vec![];
+        for _ in 0..4 {
+            let z = ctx.zoom_factor();
+            let mut output = ctx.run_ui(
+                egui::RawInput {
+                    screen_rect: Some(egui::Rect::from_min_size(
+                        egui::Pos2::ZERO,
+                        egui::vec2(390.0 / z, 844.0 / z),
+                    )),
+                    safe_area_insets: Some(egui::SafeAreaInsets(egui::epaint::MarginF32 {
+                        top: 32.0 / z,
+                        bottom: bottom / z,
+                        left: 0.0,
+                        right: 0.0,
+                    })),
+                    ..Default::default()
+                },
+                |ui| app.frame(ui),
+            );
+            shapes = std::mem::take(&mut output.shapes);
+            output.drop_without_applying_deltas();
+        }
+        let safe = ctx.content_rect();
+        let viewport = ctx.viewport_rect();
+        let filled = |color: egui::Color32, rect: egui::Rect| {
+            shapes.iter().any(|s| match &s.shape {
+                Shape::Rect(r) => r.fill == color && r.rect.contains_rect(rect.shrink(0.5)),
+                _ => false,
+            })
+        };
+        let top = egui::Rect::from_min_max(viewport.min, egui::pos2(viewport.right(), safe.top()));
+        let under =
+            egui::Rect::from_min_max(egui::pos2(viewport.left(), safe.bottom()), viewport.max);
+        assert!(filled(p.shell, top), "status bar background on {page}");
+        assert!(filled(nav, under), "navigation bar background on {page}");
+        for s in &shapes {
+            let outside =
+                s.clip_rect.top() < safe.top() - 0.5 || s.clip_rect.bottom() > safe.bottom() + 0.5;
+            if let Shape::Text(t) = &s.shape {
+                assert!(
+                    !outside,
+                    "text {:?} clipped under a system bar",
+                    t.galley.text()
+                );
+            }
+            if let Shape::Rect(r) = &s.shape
+                && outside
+            {
+                assert!(
+                    r.fill == p.shell || r.fill == nav,
+                    "{page}: {r:?} under a system bar"
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn landscape_top_navigation_leaves_room_for_settings_at_1024_pixels() {
     for scale in [80, 100, 125] {
         let ctx = touch_context();

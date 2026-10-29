@@ -836,6 +836,17 @@ impl Controlab {
                         .interactive(!pending)
                         .layouter(&mut layouter)
                         .show(ui);
+                    // The soft keyboard covers the lower lines: bring the cursor back into view.
+                    if output.response.has_focus()
+                        && kit::content_resized(ui, output.response.id)
+                        && let Some(range) = output.cursor_range
+                    {
+                        let rect = output.galley.pos_from_cursor(range.primary);
+                        ui.scroll_to_rect(
+                            rect.translate(output.galley_pos.to_vec2()),
+                            Some(egui::Align::Center),
+                        );
+                    }
                     if let Some(range) = output.cursor_range {
                         let index = range.primary.index.0;
                         let before: String = self.documents[i].source.chars().take(index).collect();

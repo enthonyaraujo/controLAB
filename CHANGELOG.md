@@ -18,6 +18,11 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 - Engine Python, Chaquopy, `requirements*.txt`, scripts Python e a suíte de testes Python (preservados no histórico Git).
 - Modo `run.sh --cli`.
 
+## [6.0.1] - 2026-10-29
+
+### Corrigido
+- **Android:** a interface deixa de ficar sob a barra de status, a barra de navegação (gestos ou 3 botões), o recorte da câmera e o teclado virtual. A janela continua edge-to-edge (targetSdk 36): só os fundos do cabeçalho, da navegação e das laterais se estendem até as bordas, e os ícones das barras do sistema acompanham o contraste dessas cores. O desktop não muda.
+
 ## [6.0.0] - 2026-10-28
 
 ### Alterado

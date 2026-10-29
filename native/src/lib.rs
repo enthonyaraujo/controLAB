@@ -9,6 +9,7 @@ mod model;
 mod overlays;
 mod page;
 mod results;
+mod safe_area;
 mod scripts;
 mod studio;
 mod texfmt;
@@ -245,6 +246,12 @@ pub struct Controlab {
     quit_confirm: bool,
     allow_close: bool,
     now: f64,
+    /// System bars, display cutout and soft keyboard, in egui points; zero on desktop.
+    safe_area: safe_area::SafeArea,
+    #[cfg_attr(not(target_os = "android"), allow(dead_code))]
+    insets: safe_area::Tracker,
+    /// Zoom factor of the next pass: `set_zoom_factor` only applies at its start.
+    zoom: f32,
 }
 
 pub fn app(cc: &eframe::CreationContext<'_>) -> Box<dyn eframe::App> {
@@ -385,6 +392,9 @@ impl Controlab {
             quit_confirm: false,
             allow_close: false,
             now: 0.0,
+            safe_area: Default::default(),
+            insets: Default::default(),
+            zoom: 1.0,
         }
     }
 
@@ -1063,9 +1073,53 @@ impl Controlab {
             child.set_clip_rect(safe);
             self.frame_contents(&mut child);
             ui.advance_cursor_after_rect(safe);
+            self.system_bars(ui, outer, safe);
         } else {
             self.frame_contents(ui);
         }
+    }
+
+    /// Backgrounds under the system bars, cutout and keyboard continue the panels at each edge;
+    /// everything else stays inside `safe`.
+    fn system_bars(&mut self, ui: &egui::Ui, outer: egui::Rect, safe: egui::Rect) {
+        let p = self.palette();
+        let home = self.page == "home";
+        let bottom = if self.layout.mode == Mode::Phone {
+            kit::bottom_nav_colors(&p).0
+        } else if home {
+            p.bg
+        } else {
+            p.surface
+        };
+        let side = if home { p.bg } else { p.surface };
+        // Tablet pages and the Studio start with the module rail.
+        let left = if self.layout.mode == Mode::Tablet {
+            p.surface
+        } else {
+            side
+        };
+        let pos = egui::pos2;
+        for (min, max, color) in [
+            (outer.min, pos(outer.max.x, safe.min.y), p.shell),
+            (pos(outer.min.x, safe.max.y), outer.max, bottom),
+            (
+                pos(outer.min.x, safe.min.y),
+                pos(safe.min.x, safe.max.y),
+                left,
+            ),
+            (
+                pos(safe.max.x, safe.min.y),
+                pos(outer.max.x, safe.max.y),
+                side,
+            ),
+        ] {
+            let strip = egui::Rect::from_min_max(min, max);
+            if strip.is_positive() {
+                ui.painter().rect_filled(strip, 0, color);
+            }
+        }
+        #[cfg(target_os = "android")]
+        self.insets.bar_icons(p.shell, bottom);
     }
 
     fn frame_contents(&mut self, ui: &mut egui::Ui) {
@@ -1080,7 +1134,7 @@ impl Controlab {
             || ctx.input(|i| i.has_touch_screen())
             || std::env::var_os("CONTROLAB_TOUCH").is_some();
         self.layout = Layout::new(css_width, self.prefs.scale as f32 / 100.0, touch);
-        self.layout.keyboard_open = touch && ctx.text_edit_focused();
+        self.layout.keyboard_open = touch && (ctx.text_edit_focused() || self.safe_area.ime > 0.0);
         kit::set_layout(&ctx, self.layout);
         // Module pages are sized in rem, the Studio (`studio.css`) in CSS px.
         let target = if self.page == "home" {
@@ -1088,6 +1142,7 @@ impl Controlab {
         } else {
             self.layout.rem
         };
+        self.zoom = target;
         if (zoom - target).abs() > 0.001 {
             ctx.set_zoom_factor(target);
             ctx.request_repaint();
@@ -1207,6 +1262,13 @@ impl eframe::App for Controlab {
                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                 }
             }
+        }
+    }
+    #[cfg_attr(not(target_os = "android"), allow(unused_variables))]
+    fn raw_input_hook(&mut self, ctx: &egui::Context, raw_input: &mut egui::RawInput) {
+        #[cfg(target_os = "android")]
+        {
+            self.safe_area = self.insets.hook(ctx, raw_input, self.zoom);
         }
     }
     fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
