@@ -2,6 +2,7 @@
 //! the interface preserves ControLAB’s visual identity using native egui widgets.
 #[cfg(target_os = "android")]
 pub mod android;
+mod apps;
 mod backend;
 mod icons;
 mod kit;
@@ -252,6 +253,8 @@ pub struct Controlab {
     insets: safe_area::Tracker,
     /// Zoom factor of the next pass: `set_zoom_factor` only applies at its start.
     zoom: f32,
+    /// Command Window banner with the script examples, until it is closed.
+    examples_banner: bool,
 }
 
 pub fn app(cc: &eframe::CreationContext<'_>) -> Box<dyn eframe::App> {
@@ -323,6 +326,9 @@ impl Controlab {
                 app.documents[i].source = source;
                 app.run_current();
             }
+            if std::env::var("CONTROLAB_SCREENSHOT_PAGE").as_deref() == Ok("apps") {
+                app.page = "apps".into();
+            }
             if let Ok(page) = std::env::var("CONTROLAB_SCREENSHOT_PAGE")
                 && app.schema.contains_key(&page)
             {
@@ -357,7 +363,7 @@ impl Controlab {
             documents: vec![],
             active: None,
             console: vec![(
-                "Pronto. Crie ou abra um script, ou digite um comando no console.".into(),
+                "Pronto. Digite um comando abaixo, ou crie e abra scripts .m pelo ribbon.".into(),
                 "info",
             )],
             command: String::new(),
@@ -395,6 +401,7 @@ impl Controlab {
             safe_area: Default::default(),
             insets: Default::default(),
             zoom: 1.0,
+            examples_banner: true,
         }
     }
 
@@ -405,6 +412,11 @@ impl Controlab {
             _ => ctx.system_theme().is_none_or(|t| t == egui::Theme::Light),
         };
         theme::apply(ctx, self.light);
+    }
+
+    /// An analysis app is open, rather than Início or the Apps gallery.
+    fn in_app(&self) -> bool {
+        self.schema.contains_key(&self.page)
     }
 
     fn palette(&self) -> theme::Palette {
@@ -1083,7 +1095,7 @@ impl Controlab {
     /// everything else stays inside `safe`.
     fn system_bars(&mut self, ui: &egui::Ui, outer: egui::Rect, safe: egui::Rect) {
         let p = self.palette();
-        let home = self.page == "home";
+        let home = !self.in_app();
         let bottom = if self.layout.mode == Mode::Phone {
             kit::bottom_nav_colors(&p).0
         } else if home {
@@ -1136,28 +1148,26 @@ impl Controlab {
         self.layout = Layout::new(css_width, self.prefs.scale as f32 / 100.0, touch);
         self.layout.keyboard_open = touch && (ctx.text_edit_focused() || self.safe_area.ime > 0.0);
         kit::set_layout(&ctx, self.layout);
-        // Module pages are sized in rem, the Studio (`studio.css`) in CSS px.
-        let target = if self.page == "home" {
-            1.0
-        } else {
-            self.layout.rem
-        };
+        // App pages are sized in rem, Início (`studio.css`) and the gallery in CSS px.
+        let target = if self.in_app() { self.layout.rem } else { 1.0 };
         self.zoom = target;
         if (zoom - target).abs() > 0.001 {
             ctx.set_zoom_factor(target);
             ctx.request_repaint();
         }
         let p = self.palette();
-        let k = if self.page == "home" {
-            self.layout.rem
-        } else {
-            1.0
+        let k = if self.in_app() { 1.0 } else { self.layout.rem };
+        let title = match self.page.as_str() {
+            "home" => "Início",
+            "apps" => "Apps",
+            id => apps::title(id).unwrap_or("Apps"),
         };
         egui::Panel::top("shell")
             .exact_size(46.0 * k)
             .frame(egui::Frame::NONE)
             .show(ui, |ui| {
-                match kit::top_bar(ui, &p, &self.page, k, self.layout.mode == Mode::Desktop) {
+                let desktop = self.layout.mode == Mode::Desktop;
+                match kit::top_bar(ui, &p, &self.page, title, k, desktop) {
                     Some(kit::ShellAction::Navigate(id)) => self.page = id.into(),
                     Some(kit::ShellAction::Settings) => self.settings = true,
                     None => {}
@@ -1175,10 +1185,10 @@ impl Controlab {
                     }
                 });
         }
-        if self.page == "home" {
-            self.studio(ui);
-        } else {
-            self.module_page(ui);
+        match self.page.as_str() {
+            "home" => self.studio(ui),
+            "apps" => self.apps_page(ui),
+            _ => self.module_page(ui),
         }
         self.overlays(&ctx);
     }
@@ -1197,9 +1207,7 @@ impl eframe::App for Controlab {
         self.apply_picked();
         self.now = ctx.input(|i| i.time);
         self.schedule_previews();
-        if self.page != "home"
-            && ctx.input(|i| i.modifiers.command && i.key_pressed(egui::Key::Enter))
-        {
+        if self.in_app() && ctx.input(|i| i.modifiers.command && i.key_pressed(egui::Key::Enter)) {
             let page = self.page.clone();
             self.calculate(&page, 1080.0);
         }
@@ -1281,7 +1289,7 @@ F5: executar · Ctrl+S: salvar · Ctrl+O: abrir · Ctrl+N: novo script\n\
 Exemplo: A=[1 2;3 4]; disp(A*A)\n\
 Gráficos: x=0:0.1:6; plot(x,sin(x))\n\
 Controle: G=tf([1],[1 2 1]); step(G)\n\
-Console: clear, clc, whos, pwd, ls, cd <pasta>, run('arquivo.m')\n\
+Command Window: clear, clc, whos, pwd, ls, cd <pasta>, run('arquivo.m')\n\
 O interpretador suporta um subconjunto de MATLAB; funções de usuário e controle de fluxo ainda não estão disponíveis.\n";
 
 /// `cd <pasta>`: the folder may be absolute or relative to the current one.

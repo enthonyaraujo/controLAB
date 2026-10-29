@@ -77,7 +77,7 @@ impl Controlab {
         });
         let height = (g.size().y + 22.0).max(46.0);
         let bottom = if phone && !self.layout.keyboard_open {
-            (3.5 + if self.page == "home" { 0.0 } else { 4.0 }) * crate::MEASURED_REM + 12.0
+            (3.5 + if self.in_app() { 4.0 } else { 0.0 }) * crate::MEASURED_REM + 12.0
         } else if phone {
             12.0
         } else {

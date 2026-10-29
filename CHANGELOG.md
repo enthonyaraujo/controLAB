@@ -6,6 +6,8 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 ## [Não lançado]
 
 ### Alterado
+- **Interface:** a barra superior deixa de exibir o nome ControLAB e passa a ter apenas **Início** e **Apps**. Os seis módulos viram apps, listados na galeria Apps (no tablet e no celular, a lateral e a barra inferior seguem as mesmas duas seções).
+- **Início:** a tela de boas-vindas dá lugar à **Command Window**, como no MATLAB. Ela ocupa o centro até um script `.m` ser aberto e então desce para o painel inferior, abaixo do editor. Os exemplos de script ficam num aviso que pode ser fechado no topo da Command Window; os recentes continuam na coluna direita.
 - **Engine científica em Rust:** os seis módulos (LGR, Routh-Hurwitz, tempo, frequência, controladores e espaço de estados), fórmulas TeX e localização rodam no crate `controlab-engine`, como processo local no desktop e dentro do aplicativo no Android. Resultados equivalentes aos do Python dentro de `atol=1e-9, rtol=1e-7`, com textos idênticos.
 - **Gráficos:** marcações de eixo arredondadas, potências de 10 sobrescritas e subscritos (σₐ, θ_d). O LGR dos controladores voltou a ter legenda, marcadores e cores dos polos, zeros e do polo dominante. O Routh voltou a ter título, legenda, rótulos e cores por região, além do LGR com escala igual nos eixos.
 - **Ferramentas:** empacotamento, instaladores, versão, validação de pacotes e compilação Android passam a ser `cargo xtask`. `cargo xtask parity` compara a engine com os resultados e gráficos Python congelados em `tests/reference/`.

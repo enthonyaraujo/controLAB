@@ -137,7 +137,17 @@ fn render_sized(app: &mut Controlab, ctx: &egui::Context, width: f32, height: f3
             }
         }
     }
-    assert!(labels.contains("ControLAB"), "Missing application label");
+    // Desktop shows the INÍCIO and APPS tabs; narrower layouts title the page instead.
+    let title = match app.page.as_str() {
+        "home" => "Início",
+        "apps" => "Apps",
+        id => apps::title(id).unwrap(),
+    };
+    assert!(
+        labels.contains("APPS") || labels.contains(title),
+        "Missing navigation on {} at {width}",
+        app.page
+    );
     labels
 }
 
@@ -150,29 +160,41 @@ fn studio_and_six_modules_render_at_phone_tablet_and_desktop_sizes() {
             render(&mut app, &ctx, width);
             let labels = render(&mut app, &ctx, width);
             assert!(
-                labels.contains("Bem-vindo ao ControLAB"),
-                "Welcome missing at {width}"
+                labels.contains("Command Window") && labels.contains("Novo por aqui?"),
+                "Command Window missing at {width}"
             );
             assert!(
-                labels.contains("Novo script")
-                    && labels.contains("Exemplos de script".to_uppercase().as_str())
+                !labels.lines().any(|l| l == "ControLAB") && !labels.contains("Bem-vindo"),
+                "The brand and the welcome page were replaced at {width}"
             );
+            assert!(labels.contains("Novo script"));
             if width >= 1024.0 {
                 for (_, label) in kit::TABS {
                     assert!(labels.contains(label), "Desktop tab missing: {label}");
                 }
             } else {
                 assert!(
-                    labels.contains("Início") && labels.contains("Tempo"),
+                    labels.contains("Início") && labels.contains("Apps"),
                     "Mobile navigation missing at {width}"
                 );
             }
+            app.page = "apps".into();
+            render(&mut app, &ctx, width);
+            let labels = render(&mut app, &ctx, width);
+            for (id, _, title, _) in apps::APPS {
+                assert!(labels.contains(title), "App {id} missing at {width}");
+            }
+            app.page = "home".into();
             app.open_example(0);
             render(&mut app, &ctx, width);
             let labels = render(&mut app, &ctx, width);
             assert!(
-                labels.contains("multiplicacao_matrizes.m"),
-                "Editor tab missing at {width}"
+                labels.contains("multiplicacao_matrizes.m") && labels.contains("Command Window"),
+                "Editor tab or docked Command Window missing at {width}"
+            );
+            assert!(
+                !labels.contains("Novo por aqui?"),
+                "Banner over the editor at {width}"
             );
             for id in ORDER {
                 app.page = id.into();
@@ -631,6 +653,60 @@ fn responsive_breakpoints_match_electron_at_all_supported_scales() {
 }
 
 #[test]
+fn desktop_apps_tab_opens_the_gallery_and_stays_active_inside_an_app() {
+    let ctx = egui::Context::default();
+    let mut app = fixture(&ctx, false);
+    click_label(&mut app, &ctx, 1440.0, 900.0, "APPS");
+    assert_eq!(app.page, "apps");
+    click_label(&mut app, &ctx, 1440.0, 900.0, "Controladores");
+    assert_eq!(app.page, "controllers");
+    assert_eq!(kit::section(&app.page), "apps");
+    click_label(&mut app, &ctx, 1440.0, 900.0, "APPS");
+    assert_eq!(app.page, "apps");
+    click_label(&mut app, &ctx, 1440.0, 900.0, "INÍCIO");
+    assert_eq!(app.page, "home");
+    // Closing the examples notice keeps the Command Window in the centre.
+    let labels = render_sized(&mut app, &ctx, 1440.0, 900.0);
+    assert!(labels.contains("Novo por aqui?"));
+    app.examples_banner = false;
+    let labels = render_sized(&mut app, &ctx, 1440.0, 900.0);
+    assert!(labels.contains("Command Window") && !labels.contains("Novo por aqui?"));
+}
+
+#[test]
+fn command_window_prompt_follows_the_last_output_line() {
+    fn top_of(shapes: &[egui::epaint::ClippedShape], label: &str) -> f32 {
+        fn find(shape: &Shape, label: &str) -> Option<f32> {
+            match shape {
+                Shape::Text(t) if t.galley.text() == label => Some(t.pos.y),
+                Shape::Vec(v) => v.iter().find_map(|s| find(s, label)),
+                _ => None,
+            }
+        }
+        shapes
+            .iter()
+            .find_map(|s| find(&s.shape, label))
+            .unwrap_or_else(|| panic!("{label} not painted"))
+    }
+    let ctx = egui::Context::default();
+    let mut app = fixture(&ctx, false);
+    app.console = vec![
+        ("Pronto.".into(), "output"),
+        (">> disp(1)".into(), "cmd"),
+        ("1".into(), "output"),
+    ];
+    for _ in 0..3 {
+        event_frame(&mut app, &ctx, 1440.0, 900.0, vec![]);
+    }
+    let shapes = event_frame(&mut app, &ctx, 1440.0, 900.0, vec![]);
+    let (last, prompt) = (top_of(&shapes, "1"), top_of(&shapes, ">>"));
+    assert!(
+        prompt > last && prompt - last < 40.0,
+        "prompt at {prompt}, last output at {last}"
+    );
+}
+
+#[test]
 fn phone_navigation_tabs_and_studio_drawers_are_operable() {
     let ctx = touch_context();
     let mut app = fixture(&ctx, false);
@@ -649,7 +725,9 @@ fn phone_navigation_tabs_and_studio_drawers_are_operable() {
     assert!(labels.contains("Variáveis"));
     click_label(&mut app, &ctx, 390.0, 844.0, "Fechar");
     assert!(!app.show_vars);
-    click_label(&mut app, &ctx, 390.0, 844.0, "Tempo");
+    click_label(&mut app, &ctx, 390.0, 844.0, "Apps");
+    assert_eq!(app.page, "apps");
+    click_label(&mut app, &ctx, 390.0, 844.0, "Resposta no tempo");
     assert_eq!(app.page, "time");
     click_label(&mut app, &ctx, 390.0, 844.0, "Gráfico");
     assert_eq!(app.analyses["time"].mobile_tab, 1);
@@ -857,7 +935,7 @@ fn landscape_top_navigation_leaves_room_for_settings_at_1024_pixels() {
             .iter()
             .find_map(|s| {
                 if let Shape::Text(t) = &s.shape {
-                    (t.galley.text() == "ESPAÇO DE ESTADOS").then_some(t)
+                    (t.galley.text() == "APPS").then_some(t)
                 } else {
                     None
                 }
@@ -865,7 +943,7 @@ fn landscape_top_navigation_leaves_room_for_settings_at_1024_pixels() {
             .expect("all navigation labels must remain visible");
         assert!(
             label.pos.x + label.galley.size().x <= ctx.content_rect().right() - 42.0,
-            "last module overlaps settings at scale {scale}"
+            "last tab overlaps settings at scale {scale}"
         );
     }
 }

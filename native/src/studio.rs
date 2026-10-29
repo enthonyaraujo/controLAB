@@ -1,50 +1,14 @@
 //! Início: the `.m` Studio of the previous renderer (`studio.js`, `styles/studio.css`).
-use crate::icons::{self, Icon};
+use crate::Controlab;
+use crate::icons;
 use crate::kit::{self, fill, galley, hline, vline};
 use crate::texfmt::list;
 use crate::theme::{Palette, Weight, mono, sans};
-use crate::{Controlab, Recent};
 use eframe::egui::{self, Color32, Rect, Sense, Stroke, Ui, pos2, vec2};
 use serde_json::{Value, json};
 
-const MODULE_CARDS: [(&str, Icon, &str, &str); 6] = [
-    (
-        "time",
-        icons::S_TIME,
-        "Resposta no tempo",
-        "Degrau, impulso e rampa com métricas transitórias e erro estacionário.",
-    ),
-    (
-        "routh",
-        icons::S_STAB,
-        "Estabilidade",
-        "Critério de Routh-Hurwitz com a tabela montada passo a passo.",
-    ),
-    (
-        "lgr",
-        icons::S_ROOT,
-        "Lugar das raízes",
-        "Gráfico do LGR com memorial de assíntotas, rupturas e cruzamentos.",
-    ),
-    (
-        "frequency",
-        icons::S_FREQ,
-        "Resposta em frequência",
-        "Bode com assíntotas, Nyquist, margens e frequências críticas.",
-    ),
-    (
-        "controllers",
-        icons::S_CTRL,
-        "Controladores",
-        "Projeto de P, PD, PI, avanço e atraso de fase a partir de especificações.",
-    ),
-    (
-        "state-space",
-        icons::S_STATE,
-        "Espaço de estados",
-        "Conversão de modelos, controlabilidade, observabilidade e observadores.",
-    ),
-];
+/// Command Window input; clicks on the window focus it.
+const COMMAND_INPUT: &str = "command-window-input";
 
 pub const EXAMPLES: [(&str, &str, &str, &str); 4] = [
     (
@@ -72,22 +36,6 @@ pub const EXAMPLES: [(&str, &str, &str, &str); 4] = [
         "% ControLAB · resposta ao degrau de um sistema de 2ª ordem\nwn = 2;\nzeta = 0.3;\nG = tf([wn^2], [1 2*zeta*wn wn^2]);\nstep(G);\n",
     ),
 ];
-
-fn origin(recent: &Recent) -> &'static str {
-    if recent.kind == "script" {
-        return "Script .m";
-    }
-    match recent.nav.as_str() {
-        "time" => "Resposta no tempo",
-        "routh" => "Estabilidade",
-        "lgr" => "Lugar das raízes",
-        "frequency" => "Frequência",
-        "controllers" => "Controladores",
-        "state-space" => "Espaço de estados",
-        "console" => "Console",
-        _ => "Arquivo",
-    }
-}
 
 /// `formatRelativeTime`.
 pub fn relative_time(timestamp: u64) -> String {
@@ -179,18 +127,26 @@ impl Controlab {
                     .frame(side_frame)
                     .show(ui, |ui| self.right_column(ui, &p));
                 }
-                egui::Panel::bottom("studio-console")
-                    .default_size(if narrow { 150.0 } else { 167.0 })
-                    .size_range(
-                        60.0..=(ui.available_height() * if narrow { 0.4 } else { 0.65 })
-                            .clamp(60.0, 480.0),
-                    )
-                    .resizable(true)
-                    .frame(side_frame)
-                    .show(ui, |ui| self.console_panel(ui, &p));
-                egui::CentralPanel::default()
-                    .frame(side_frame)
-                    .show(ui, |ui| self.center_panel(ui, &p));
+                // As in MATLAB, the Command Window fills the centre until a script is opened;
+                // the editor then takes the centre and the Command Window docks below it.
+                if self.documents.is_empty() {
+                    egui::CentralPanel::default()
+                        .frame(side_frame)
+                        .show(ui, |ui| self.console_panel(ui, &p));
+                } else {
+                    egui::Panel::bottom("studio-console")
+                        .default_size(if narrow { 150.0 } else { 167.0 })
+                        .size_range(
+                            60.0..=(ui.available_height() * if narrow { 0.4 } else { 0.65 })
+                                .clamp(60.0, 480.0),
+                        )
+                        .resizable(true)
+                        .frame(side_frame)
+                        .show(ui, |ui| self.console_panel(ui, &p));
+                    egui::CentralPanel::default()
+                        .frame(side_frame)
+                        .show(ui, |ui| self.center_panel(ui, &p));
+                }
                 if narrow && (self.show_files || self.show_vars) {
                     self.studio_drawer(ui, &p);
                 }
@@ -612,18 +568,14 @@ impl Controlab {
 
     fn center_panel(&mut self, ui: &mut Ui, p: &Palette) {
         ui.spacing_mut().item_spacing.y = 0.0;
-        let welcome = self.documents.is_empty();
         let title = match self.active.and_then(|i| self.documents.get(i)) {
-            Some(d) if !welcome => format!("Editor — {}", d.name),
-            _ => "Início".into(),
+            Some(d) => format!("Editor — {}", d.name),
+            None => "Editor".into(),
         };
         let mut view = None;
         let count = self.script_plots.len();
         let showing = self.show_figures;
         kit::panel_header(ui, p, &title, true, |ui| {
-            if welcome {
-                return;
-            }
             ui.spacing_mut().item_spacing.x = 3.0;
             if view_button(ui, p, &format!("Figuras {count}"), showing)
                 .on_hover_text("Abrir figuras em novas janelas")
@@ -637,12 +589,6 @@ impl Controlab {
         });
         if let Some(v) = view {
             self.show_figures = v;
-        }
-        if welcome {
-            egui::ScrollArea::vertical()
-                .id_salt("studio-welcome")
-                .show(ui, |ui| self.welcome(ui, p));
-            return;
         }
         self.tabs(ui, p);
         if self.active.is_none() {
@@ -898,198 +844,6 @@ impl Controlab {
         }
     }
 
-    fn welcome(&mut self, ui: &mut Ui, p: &Palette) {
-        let outer = ui.available_width();
-        let narrow = self.layout.css_width < 768.0;
-        let pad = if narrow { 14 } else { 26 };
-        let width = (outer.min(1040.0) - 2.0 * pad as f32).max(100.0);
-        egui::Frame::new()
-            .inner_margin(egui::Margin {
-                left: pad,
-                right: pad,
-                top: if narrow { 16 } else { 22 },
-                bottom: if narrow { 20 } else { 26 },
-            })
-            .show(ui, |ui| {
-                ui.set_width(width);
-                ui.spacing_mut().item_spacing.y = 0.0;
-                let description =
-                    "Analise sistemas de controle nos módulos ou escreva scripts .m no editor.";
-                if width >= 760.0 {
-                    ui.horizontal(|ui| {
-                        ui.vertical(|ui| {
-                            ui.set_width(width - 290.0);
-                            kit::paragraph(
-                                ui,
-                                "Bem-vindo ao ControLAB",
-                                sans(20.0, Weight::SemiBold),
-                                p.text,
-                            );
-                            ui.add_space(4.0);
-                            kit::paragraph(ui, description, sans(13.0, Weight::Regular), p.muted);
-                        });
-                        self.welcome_actions(ui, p, false);
-                    });
-                } else {
-                    kit::paragraph(
-                        ui,
-                        "Bem-vindo ao ControLAB",
-                        sans(if narrow { 18.0 } else { 20.0 }, Weight::SemiBold),
-                        p.text,
-                    );
-                    ui.add_space(4.0);
-                    kit::paragraph(ui, description, sans(13.0, Weight::Regular), p.muted);
-                    ui.add_space(14.0);
-                    ui.horizontal(|ui| self.welcome_actions(ui, p, narrow));
-                }
-                ui.add_space(18.0);
-                let (line, _) = ui.allocate_exact_size(vec2(width, 1.0), Sense::hover());
-                hline(ui, line.x_range(), line.top(), p.border);
-                ui.add_space(20.0);
-                welcome_heading(ui, p, "Módulos");
-                let cols = if narrow {
-                    1
-                } else {
-                    (((width + 8.0) / 238.0).floor() as usize).clamp(1, 6)
-                };
-                let card_w = (width - 8.0 * (cols - 1) as f32) / cols as f32;
-                for chunk in MODULE_CARDS.chunks(cols) {
-                    let desc_heights: Vec<f32> = chunk
-                        .iter()
-                        .map(|c| {
-                            kit::wrapped(
-                                ui,
-                                c.3,
-                                sans(12.0, Weight::Regular),
-                                p.muted,
-                                card_w - 62.0,
-                            )
-                            .size()
-                            .y
-                        })
-                        .collect();
-                    let height =
-                        22.0 + 19.0 + 2.0 + desc_heights.iter().copied().fold(0.0, f32::max) + 6.0;
-                    let (row, _) = ui.allocate_exact_size(vec2(width, height), Sense::hover());
-                    for (j, (id, icon, title, desc)) in chunk.iter().enumerate() {
-                        let rect = Rect::from_min_size(
-                            pos2(row.left() + j as f32 * (card_w + 8.0), row.top()),
-                            vec2(card_w, height),
-                        );
-                        let response =
-                            ui.interact(rect, ui.id().with(("module", id)), Sense::click());
-                        let hovered = response.hovered();
-                        fill(
-                            ui,
-                            rect,
-                            4,
-                            if hovered { p.header } else { p.inset },
-                            Stroke::new(1.0, if hovered { p.accent } else { p.border }),
-                        );
-                        icons::paint(
-                            ui,
-                            Rect::from_min_size(rect.min + vec2(13.0, 12.0), vec2(24.0, 24.0)),
-                            *icon,
-                            p.accent,
-                        );
-                        let tx = rect.left() + 12.0 + 28.0 + 10.0;
-                        let g = galley(ui, title, sans(13.0, Weight::SemiBold), p.text, 0.0);
-                        ui.painter().galley(pos2(tx, rect.top() + 11.0), g, p.text);
-                        let d = kit::wrapped(
-                            ui,
-                            desc,
-                            sans(12.0, Weight::Regular),
-                            p.muted,
-                            rect.right() - 12.0 - tx,
-                        );
-                        ui.painter()
-                            .galley(pos2(tx, rect.top() + 11.0 + 19.0), d, p.muted);
-                        if response
-                            .on_hover_cursor(egui::CursorIcon::PointingHand)
-                            .clicked()
-                        {
-                            self.page = (*id).into();
-                        }
-                    }
-                    ui.add_space(8.0);
-                }
-                ui.add_space(12.0);
-                let two = width >= 588.0;
-                let col_w = if two { (width - 28.0) / 2.0 } else { width };
-                let top = ui.cursor().top();
-                let mut example = None;
-                let mut recent = None;
-                let left = Rect::from_min_size(pos2(ui.cursor().left(), top), vec2(col_w, 400.0));
-                let mut lc = ui.new_child(egui::UiBuilder::new().max_rect(left));
-                lc.spacing_mut().item_spacing.y = 0.0;
-                welcome_heading(&mut lc, p, "Exemplos de script");
-                list_border(&mut lc, p);
-                for (i, (name, code, _, _)) in EXAMPLES.iter().enumerate() {
-                    if welcome_item(&mut lc, p, name, code, true).clicked() {
-                        example = Some(i);
-                    }
-                }
-                let left_bottom = lc.min_rect().bottom();
-                let right = if two {
-                    Rect::from_min_size(pos2(left.right() + 28.0, top), vec2(col_w, 400.0))
-                } else {
-                    Rect::from_min_size(pos2(left.left(), left_bottom + 20.0), vec2(col_w, 400.0))
-                };
-                let mut rc = ui.new_child(egui::UiBuilder::new().max_rect(right));
-                rc.spacing_mut().item_spacing.y = 0.0;
-                welcome_heading(&mut rc, p, "Recentes");
-                list_border(&mut rc, p);
-                if self.prefs.recents.is_empty() {
-                    egui::Frame::new()
-                        .inner_margin(egui::Margin::symmetric(4, 10))
-                        .show(&mut rc, |ui| {
-                            kit::italic(
-                                ui,
-                                "Scripts abertos e cálculos feitos nos módulos aparecem aqui.",
-                                sans(12.0, Weight::Regular),
-                                p.muted,
-                            );
-                        });
-                }
-                for (i, r) in self.prefs.recents.iter().take(6).enumerate() {
-                    let meta = format!("{} · {}", origin(r), relative_time(r.timestamp));
-                    if welcome_item(&mut rc, p, &r.name, &meta, false)
-                        .on_hover_text(if r.file.is_empty() { &r.name } else { &r.file })
-                        .clicked()
-                    {
-                        recent = Some(i);
-                    }
-                }
-                let bottom = lc.min_rect().bottom().max(rc.min_rect().bottom());
-                ui.allocate_space(vec2(width, (bottom - top).max(0.0)));
-                if let Some(i) = example {
-                    self.open_example(i);
-                }
-                if let Some(i) = recent {
-                    self.open_recent(i);
-                }
-            });
-    }
-
-    fn welcome_actions(&mut self, ui: &mut Ui, p: &Palette, stretch: bool) {
-        ui.spacing_mut().item_spacing.x = 8.0;
-        if stretch {
-            ui.data_mut(|d| {
-                d.insert_temp(
-                    egui::Id::new("welcome-button-width"),
-                    (ui.available_width() - 8.0) / 2.0,
-                )
-            });
-        }
-        if kit::welcome_button(ui, p, icons::WELCOME_NEW, "Novo script", true).clicked() {
-            self.new_document();
-        }
-        if kit::welcome_button(ui, p, icons::WELCOME_OPEN, "Abrir arquivo", false).clicked() {
-            self.pick(None, "open");
-        }
-        ui.data_mut(|d| d.remove_temp::<f32>(egui::Id::new("welcome-button-width")));
-    }
-
     fn studio_drawer(&mut self, ui: &mut Ui, p: &Palette) {
         let screen = ui.max_rect();
         let files = self.show_files;
@@ -1186,7 +940,7 @@ impl Controlab {
         // Panels shrink to their content; the console keeps the height it was given.
         ui.set_min_height(ui.available_height());
         ui.spacing_mut().item_spacing.y = 0.0;
-        kit::panel_header(ui, p, "Console", true, |ui| {
+        kit::panel_header(ui, p, "Command Window", true, |ui| {
             kit::text(
                 ui,
                 if self.layout.css_width < 400.0 {
@@ -1198,15 +952,18 @@ impl Controlab {
                 p.muted,
             );
         });
+        if self.documents.is_empty() && self.examples_banner {
+            self.examples_banner(ui, p);
+        }
+        // As in MATLAB, the `>>` prompt is the last line of the output and scrolls with it;
+        // a click on the empty part of the window puts the caret back in the prompt.
+        let area = ui.available_rect_before_wrap();
+        let background = ui.interact(area, ui.id().with("command-window"), Sense::click());
         egui::Frame::new()
             .inner_margin(egui::Margin::symmetric(8, 5))
             .show(ui, |ui| {
-                ui.spacing_mut().item_spacing.y = 0.0;
-                // Input row: 5 px margin, 1 px rule, 5 px padding and the 20 px field.
-                let logs_height = (ui.available_height() - 31.0).max(20.0);
                 egui::ScrollArea::vertical()
                     .id_salt("console-logs")
-                    .max_height(logs_height)
                     .auto_shrink([false, false])
                     .stick_to_bottom(true)
                     .show(ui, |ui| {
@@ -1229,54 +986,115 @@ impl Controlab {
                             );
                             ui.painter().galley(rect.min, g, color);
                         }
+                        self.command_prompt(ui, p);
                     });
-                ui.add_space(5.0);
-                let (line, _) =
-                    ui.allocate_exact_size(vec2(ui.available_width(), 1.0), Sense::hover());
-                hline(ui, line.x_range(), line.top(), p.border);
-                ui.add_space(5.0);
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 8.3;
-                    kit::text(ui, ">>", mono(13.6, Weight::Bold), p.accent);
-                    let edit = egui::TextEdit::singleline(&mut self.command)
-                        .font(mono(12.0, Weight::Regular))
-                        .text_color(p.text)
-                        .hint_text(
-                            egui::RichText::new("digite um comando")
-                                .color(p.faint)
-                                .font(mono(12.0, Weight::Regular)),
-                        )
-                        .frame(egui::Frame::NONE.inner_margin(egui::Margin::symmetric(0, 2)))
-                        .desired_width(f32::INFINITY);
-                    let response = ui.add_enabled(!self.script_pending, edit);
-                    if response.has_focus() {
-                        if ui.input(|i| i.key_pressed(egui::Key::ArrowUp)) && self.history_index > 0
-                        {
-                            self.history_index -= 1;
-                            self.command = self.command_history[self.history_index].clone();
-                        }
-                        if ui.input(|i| i.key_pressed(egui::Key::ArrowDown)) {
-                            if self.history_index + 1 < self.command_history.len() {
-                                self.history_index += 1;
-                                self.command = self.command_history[self.history_index].clone();
-                            } else {
-                                self.history_index = self.command_history.len();
-                                self.command.clear();
-                            }
-                        }
-                    }
-                    if response.lost_focus()
-                        && ui.input(|i| i.key_pressed(egui::Key::Enter))
-                        && !self.command.trim().is_empty()
-                    {
-                        let command = std::mem::take(&mut self.command);
-                        self.command_history.push(command.clone());
+            });
+        if background.on_hover_cursor(egui::CursorIcon::Text).clicked() {
+            ui.memory_mut(|m| m.request_focus(egui::Id::new(COMMAND_INPUT)));
+        }
+    }
+
+    /// `>>` and the command field, with the ↑ ↓ history.
+    fn command_prompt(&mut self, ui: &mut Ui, p: &Palette) {
+        ui.horizontal(|ui| {
+            ui.spacing_mut().item_spacing.x = 8.3;
+            kit::text(ui, ">>", mono(13.6, Weight::Bold), p.accent);
+            let edit = egui::TextEdit::singleline(&mut self.command)
+                .id(egui::Id::new(COMMAND_INPUT))
+                .font(mono(12.0, Weight::Regular))
+                .text_color(p.text)
+                .hint_text(
+                    egui::RichText::new("digite um comando")
+                        .color(p.faint)
+                        .font(mono(12.0, Weight::Regular)),
+                )
+                .frame(egui::Frame::NONE.inner_margin(egui::Margin::symmetric(0, 2)))
+                .desired_width(f32::INFINITY);
+            let response = ui.add_enabled(!self.script_pending, edit);
+            if response.has_focus() {
+                if ui.input(|i| i.key_pressed(egui::Key::ArrowUp)) && self.history_index > 0 {
+                    self.history_index -= 1;
+                    self.command = self.command_history[self.history_index].clone();
+                }
+                if ui.input(|i| i.key_pressed(egui::Key::ArrowDown)) {
+                    if self.history_index + 1 < self.command_history.len() {
+                        self.history_index += 1;
+                        self.command = self.command_history[self.history_index].clone();
+                    } else {
                         self.history_index = self.command_history.len();
-                        self.execute_command(&command);
-                        response.request_focus();
+                        self.command.clear();
+                    }
+                }
+            }
+            if response.lost_focus()
+                && ui.input(|i| i.key_pressed(egui::Key::Enter))
+                && !self.command.trim().is_empty()
+            {
+                let command = std::mem::take(&mut self.command);
+                self.command_history.push(command.clone());
+                self.history_index = self.command_history.len();
+                self.execute_command(&command);
+                response.request_focus();
+            }
+        });
+    }
+
+    /// Strip under the Command Window header, like MATLAB's "New to MATLAB?" notice: opens
+    /// the script examples until it is closed for the session.
+    fn examples_banner(&mut self, ui: &mut Ui, p: &Palette) {
+        let mut open = None;
+        let (top, _) = ui.allocate_exact_size(vec2(ui.available_width(), 0.0), Sense::hover());
+        let frame = egui::Frame::new()
+            .fill(p.header)
+            .inner_margin(egui::Margin {
+                left: 10,
+                right: 30,
+                top: 6,
+                bottom: 6,
+            })
+            .show(ui, |ui| {
+                ui.set_width(ui.available_width());
+                ui.horizontal_wrapped(|ui| {
+                    ui.spacing_mut().item_spacing = vec2(0.0, 4.0);
+                    let font = sans(12.0, Weight::Regular);
+                    kit::text(ui, "Novo por aqui? Abra um exemplo: ", font.clone(), p.text);
+                    for (i, (name, ..)) in EXAMPLES.iter().enumerate() {
+                        if i > 0 {
+                            kit::text(ui, "  ·  ", font.clone(), p.faint);
+                        }
+                        if example_link(ui, p, name).clicked() {
+                            open = Some(i);
+                        }
                     }
                 });
             });
+        let strip = frame.response.rect;
+        hline(ui, strip.x_range(), strip.bottom() - 1.0, p.border);
+        let close = Rect::from_min_size(
+            pos2(strip.right() - 26.0, top.top() + 3.0),
+            vec2(22.0, 22.0),
+        );
+        let response = ui
+            .interact(close, ui.id().with("examples-banner-close"), Sense::click())
+            .on_hover_text("Fechar");
+        if response.hovered() {
+            fill(ui, close, 3, p.inset, Stroke::NONE);
+        }
+        icons::paint(
+            ui,
+            Rect::from_center_size(close.center(), vec2(13.0, 13.0)),
+            icons::X_THIN,
+            if response.hovered() { p.text } else { p.muted },
+        );
+        if response
+            .on_hover_cursor(egui::CursorIcon::PointingHand)
+            .clicked()
+        {
+            self.examples_banner = false;
+        }
+        if let Some(i) = open {
+            self.open_example(i);
+        }
     }
 
     fn right_column(&mut self, ui: &mut Ui, p: &Palette) {
@@ -1468,59 +1286,18 @@ fn view_button(ui: &mut Ui, p: &Palette, label: &str, pressed: bool) -> egui::Re
     response
 }
 
-fn welcome_heading(ui: &mut Ui, p: &Palette, label: &str) {
-    kit::spaced(
-        ui,
-        &label.to_uppercase(),
-        sans(11.0, Weight::SemiBold),
-        p.muted,
-        0.66,
-    );
-    ui.add_space(10.0);
-}
-
-fn list_border(ui: &mut Ui, p: &Palette) {
-    let (line, _) = ui.allocate_exact_size(vec2(ui.available_width(), 1.0), Sense::hover());
-    hline(ui, line.x_range(), line.top(), p.border);
-}
-
-fn welcome_item(ui: &mut Ui, p: &Palette, name: &str, meta: &str, code: bool) -> egui::Response {
-    let (row, response) = ui.allocate_exact_size(vec2(ui.available_width(), 43.0), Sense::click());
-    let hovered = response.hovered();
-    if hovered {
-        fill(
-            ui,
-            Rect::from_min_max(row.min, pos2(row.right(), row.bottom() - 1.0)),
-            0,
-            p.header,
-            Stroke::NONE,
-        );
-    }
-    hline(ui, row.x_range(), row.bottom() - 1.0, p.border);
-    let meta_font = if code {
-        mono(11.0, Weight::Regular)
+/// Underlined accent link, as `Getting Started` in MATLAB's Command Window notice.
+fn example_link(ui: &mut Ui, p: &Palette, label: &str) -> egui::Response {
+    let g = galley(ui, label, sans(12.0, Weight::Regular), p.accent, 0.0);
+    let (rect, response) = ui.allocate_exact_size(g.size(), Sense::click());
+    let color = if response.hovered() {
+        p.accent_hover
     } else {
-        sans(11.0, Weight::Regular)
+        p.accent
     };
-    let mg = galley(ui, meta, meta_font, p.muted, 0.0);
-    let mx = row.right() - 4.0 - mg.size().x.min(row.width() / 2.0);
     ui.painter()
-        .with_clip_rect(Rect::from_min_max(pos2(mx, row.top()), row.max))
-        .galley(pos2(mx, row.center().y - mg.size().y / 2.0), mg, p.muted);
-    let ng = galley(
-        ui,
-        name,
-        sans(13.0, Weight::Regular),
-        if hovered { p.accent } else { p.text },
-        0.0,
-    );
-    ui.painter()
-        .with_clip_rect(Rect::from_min_max(row.min, pos2(mx - 12.0, row.bottom())))
-        .galley(
-            pos2(row.left() + 4.0, row.center().y - ng.size().y / 2.0),
-            ng,
-            if hovered { p.accent } else { p.text },
-        );
+        .galley_with_override_text_color(rect.min, g, color);
+    hline(ui, rect.x_range(), rect.bottom() - 1.0, color);
     response.on_hover_cursor(egui::CursorIcon::PointingHand)
 }
 
