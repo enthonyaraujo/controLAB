@@ -1165,6 +1165,8 @@ impl Controlab {
         egui::Panel::top("shell")
             .exact_size(46.0 * k)
             .frame(egui::Frame::NONE)
+            // The active tab continues into the page below without a dividing line.
+            .show_separator_line(false)
             .show(ui, |ui| {
                 let desktop = self.layout.mode == Mode::Desktop;
                 match kit::top_bar(ui, &p, &self.page, title, k, desktop) {

@@ -202,6 +202,9 @@ pub fn top_bar(
         );
     }
     let current = section(page);
+    // The active tab takes the colour of what lies under it: the ribbon of Início and of
+    // the apps, or the background of the Apps gallery.
+    let under = if page == "apps" { p.bg } else { p.header };
     let padding = 29.2 * k;
     let radius = CornerRadius {
         nw: 4,
@@ -227,7 +230,9 @@ pub fn top_bar(
         );
         let response = ui.interact(tab, ui.id().with(("tab", id)), Sense::click());
         if active {
-            fill(ui, tab, radius, p.header, Stroke::NONE);
+            // Overlap the page by a pixel so no seam shows at fractional scales.
+            let tab = Rect::from_min_max(tab.min, pos2(tab.right(), tab.bottom() + 1.0));
+            fill(ui, tab, radius, under, Stroke::NONE);
         } else if response.hovered() {
             fill(ui, tab, radius, p.shell_hover, Stroke::NONE);
         }
