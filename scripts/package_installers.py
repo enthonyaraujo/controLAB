@@ -71,8 +71,8 @@ def build_deb(bundle, output, version, arch, temp):
     (root / 'DEBIAN').mkdir()
     (root / 'DEBIAN/control').write_text(
         f'Package: {NAME}\nVersion: {version}\nArchitecture: {deb_arch}\nMaintainer: {MAINTAINER}\n'
-        f'Installed-Size: {size}\nDepends: libc6 (>= {required_glibc(root)}), libgcc-s1, libgl1, libegl1, libxkbcommon0\n'
-        'Recommends: libxkbcommon-x11-0, libwayland-client0, libwayland-egl1, xdg-desktop-portal\n'
+        f'Installed-Size: {size}\nDepends: libc6 (>= {required_glibc(root)}), libgcc-s1, libgl1, libegl1, libxkbcommon0, libxkbcommon-x11-0\n'
+        'Recommends: libwayland-client0, libwayland-egl1, xdg-desktop-portal\n'
         f'Section: science\nPriority: optional\nHomepage: {HOMEPAGE}\n'
         f'Description: {SUMMARY}\n {DESCRIPTION}\n', encoding='utf-8')
     package = output / f'ControLAB-v{version}-linux-{deb_arch}.deb'
@@ -99,7 +99,7 @@ License: MIT
 URL: {HOMEPAGE}
 AutoReqProv: no
 Requires: libc.so.6(GLIBC_{required_glibc(root)})(64bit), libgcc_s.so.1()(64bit)
-Requires: libGL.so.1()(64bit), libEGL.so.1()(64bit), libxkbcommon.so.0()(64bit)
+Requires: libGL.so.1()(64bit), libEGL.so.1()(64bit), libxkbcommon.so.0()(64bit), libxkbcommon-x11.so.0()(64bit)
 Recommends: xdg-desktop-portal
 
 %description
