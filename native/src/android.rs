@@ -10,6 +10,8 @@ use jni::{
 };
 use serde_json::Value;
 
+pub mod insets;
+
 struct Bridge {
     vm: JavaVM,
     // Application survives Activity recreation, and does not retain an obsolete window.
@@ -109,6 +111,7 @@ fn android_main(app: AndroidApp) {
         eprintln!("{error}");
         return;
     }
+    insets::attach(&app);
     let options = eframe::NativeOptions {
         android_app: Some(app),
         ..Default::default()

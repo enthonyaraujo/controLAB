@@ -760,13 +760,8 @@ pub fn input_id(
         edit = edit.id(id);
     }
     let response = ui.put(rect, edit);
-    if response.has_focus() {
-        let height = ui.ctx().content_rect().height();
-        let previous = ui.data_mut(|d| d.get_temp::<f32>(response.id.with("viewport-height")));
-        if response.gained_focus() || previous.is_some_and(|h| (height - h).abs() > 1.0) {
-            response.scroll_to_me(Some(egui::Align::Center));
-        }
-        ui.data_mut(|d| d.insert_temp(response.id.with("viewport-height"), height));
+    if response.has_focus() && (content_resized(ui, response.id) || response.gained_focus()) {
+        response.scroll_to_me(Some(egui::Align::Center));
     }
     let border = if response.has_focus() {
         p.accent
@@ -783,6 +778,16 @@ pub fn input_id(
     response
 }
 
+/// Whether the content area changed height since the last frame `id` had focus: the soft
+/// keyboard opened or closed, or the window rotated. Call it every frame the field has focus.
+pub fn content_resized(ui: &Ui, id: egui::Id) -> bool {
+    let height = ui.ctx().content_rect().height();
+    let key = id.with("viewport-height");
+    let previous = ui.data_mut(|d| d.get_temp::<f32>(key));
+    ui.data_mut(|d| d.insert_temp(key, height));
+    previous.is_some_and(|h| (height - h).abs() > 1.0)
+}
+
 pub fn textarea(ui: &mut Ui, p: &Palette, value: &mut String, rows: usize) -> Response {
     let height = 12.0 + rows as f32 * 19.0;
     let (rect, _) = ui.allocate_exact_size(vec2(ui.available_width(), height), Sense::hover());
@@ -794,6 +799,9 @@ pub fn textarea(ui: &mut Ui, p: &Palette, value: &mut String, rows: usize) -> Re
         .desired_rows(rows)
         .desired_width(rect.width());
     let response = ui.put(rect, edit);
+    if response.has_focus() && content_resized(ui, response.id) {
+        response.scroll_to_me(Some(egui::Align::Center));
+    }
     let border = if response.has_focus() {
         p.accent
     } else {
@@ -1235,14 +1243,19 @@ pub const NAV: [(&str, Icon, &str, &str); 7] = [
     ("state-space", icons::S_STATE, "Estados", "Estados"),
 ];
 
-/// `.sci-bottom-nav`: scrollable icon bar of the phone layout; keeps the active item visible.
-pub fn bottom_nav(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'static str> {
-    let rect = ui.max_rect();
-    let (bg, border) = if p.light {
+/// `.sci-bottom-nav` background and top border.
+pub fn bottom_nav_colors(p: &Palette) -> (Color32, Color32) {
+    if p.light {
         (Color32::WHITE, Color32::from_rgb(226, 232, 240))
     } else {
         (Color32::from_rgb(30, 36, 44), Color32::from_rgb(45, 55, 72))
-    };
+    }
+}
+
+/// `.sci-bottom-nav`: scrollable icon bar of the phone layout; keeps the active item visible.
+pub fn bottom_nav(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'static str> {
+    let rect = ui.max_rect();
+    let (bg, border) = bottom_nav_colors(p);
     fill(ui, rect, 0, bg, Stroke::NONE);
     hline(ui, rect.x_range(), rect.top(), border);
     let rem = crate::MEASURED_REM * k;

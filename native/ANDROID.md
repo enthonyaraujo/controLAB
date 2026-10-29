@@ -25,7 +25,32 @@ os dados privados. A exploração por caminhos fica limitada aos diretórios que
 o aplicativo pode acessar. Importação/exportação pelo seletor de documentos e
 compartilhamento pela galeria exigem integração Android específica posterior.
 
-## Compilar
+## Barras do sistema e teclado
+
+A janela é edge-to-edge (targetSdk 36) e a superfície nativa ocupa a tela toda.
+O egui 0.36 tem `RawInput::safe_area_insets` e tira essas margens de
+`Context::content_rect`, mas o egui-winit só as preenche no iOS, e o winit 0.30
+descarta `ContentRectChanged`/`InsetsChanged` no Android. Por isso:
+
+- `src/android/insets.rs` lê por JNI
+  `getWindow().getDecorView().getRootWindowInsets()`: `systemBars() | displayCutout()`
+  e `ime()` a partir da API 30; antes disso, `getSystemWindowInset*` (que já inclui o
+  teclado) e o recorte de `getDisplayCutout()` na API 28–29;
+- `src/safe_area.rs` converte pixels físicos em pontos do egui (escala nativa × zoom
+  da página) e entrega a `SafeArea` ao egui em `App::raw_input_hook`, antes de cada
+  passada. `Controlab::frame` desenha a interface inteira dentro de `content_rect`;
+  `Area`, popups, menus e tooltips já se limitam a esse retângulo. Só os fundos do
+  cabeçalho, da navegação inferior e das laterais vão até as bordas;
+- a leitura não acontece em todo quadro: só ao iniciar, quando o tamanho da janela ou
+  o foco mudam (rotação, retorno do segundo plano), no primeiro quadro após uma pausa
+  (rotação de 180°), durante 1 s após cada mudança (animações) e a cada 0,5 s enquanto
+  um campo de texto tem foco (teclado abrindo ou fechando);
+- `NativeApplication.setSystemBarIcons` define, na thread de UI, ícones claros ou
+  escuros conforme a luminância do fundo sob cada barra
+  (`WindowInsetsController.setSystemBarsAppearance`; flags `View` antes da API 30).
+  O cabeçalho é verde-azulado nos dois temas, então a barra de status usa ícones
+  claros; a barra de navegação acompanha o tema.
+
 
 Pré-requisitos já instalados: JDK 17, Android SDK API 36, NDK, Rust/Cargo,
 alvo `aarch64-linux-android` e Python 3.10 para o Chaquopy. O script de compilação
