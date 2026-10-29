@@ -29,6 +29,17 @@ class NativeBridgeTests(unittest.TestCase):
         self.assertTrue(all(not item['success'] for item in replies[:4]))
         self.assertEqual(replies[-1]['num'], [3.0])
 
+    def test_replies_are_utf8_whatever_the_console_encoding(self):
+        # Windows consoles default to cp1252, which cannot encode Greek letters.
+        import os
+        env = dict(os.environ, PYTHONIOENCODING='cp1252')
+        process = subprocess.run([sys.executable, str(BRIDGE)],
+            input=json.dumps({'action': 'δ'}).encode() + b'\n', capture_output=True, env=env, timeout=90)
+        self.assertEqual(process.returncode, 0, process.stderr.decode(errors='replace'))
+        reply = json.loads(process.stdout.decode('utf-8'))
+        self.assertFalse(reply['success'])
+        self.assertIn('δ', reply['error'])
+
     def test_oversized_request_is_drained_before_the_next_line(self):
         replies = self.exchange_raw(' ' * (8 * 1024 * 1024 + 1) + '\n'
                                     + '{"action":"presets"}\n')

@@ -45,7 +45,11 @@ def _reject_constant(value):
 
 
 def main():
-    protocol_stdout = sys.stdout
+    # The protocol is UTF-8 bytes whatever the console code page: frozen engines
+    # ignore PYTHONIOENCODING, and Windows would otherwise encode as cp1252.
+    protocol_stdout = sys.stdout.buffer
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
     sys.stdout = sys.stderr
     from python_bridge import dispatch
 
@@ -73,7 +77,7 @@ def main():
                 {"success": False, "error": f"{type(error).__name__}: {error}"},
                 ensure_ascii=False, allow_nan=False,
             )
-        protocol_stdout.write(response + "\n")
+        protocol_stdout.write(response.encode("utf-8") + b"\n")
         protocol_stdout.flush()
 
 
