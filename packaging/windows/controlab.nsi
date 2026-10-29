@@ -1,6 +1,6 @@
-; ControLAB per-user installer. Built by scripts/package_installers.py, which defines:
+; ControLAB per-user installer. Built by `cargo xtask installers nsis`, which defines:
 ;   VERSION     X.Y.Z
-;   SOURCE_DIR  native bundle produced by scripts/package_native.py
+;   SOURCE_DIR  native bundle produced by `cargo xtask package`
 ;   ICON        application .ico
 ;   LICENSE     license text shown by the installer
 ;   OUTFILE     installer path

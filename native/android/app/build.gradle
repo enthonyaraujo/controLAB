@@ -5,7 +5,7 @@ plugins {
 // Select only installed Rust targets, e.g. -PnativeAbis=arm64-v8a,x86_64.
 def nativeAbis = providers.gradleProperty('nativeAbis').getOrElse('arm64-v8a').split(',').toList()
 def repositoryRoot = rootProject.file('../..')
-// The workspace Cargo.toml is the single version source (scripts/set_version.py).
+// The workspace Cargo.toml is the single version source (cargo xtask version).
 def appVersion = (new File(repositoryRoot, 'Cargo.toml').text =~ /(?m)^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"/)[0]
 def releaseKeystore = System.getenv('CONTROLAB_KEYSTORE')
 android {

@@ -6,9 +6,9 @@ Capacitor, JavaScript, TypeScript, HTML or CSS.
 
 [Português (Brasil)](README.pt-BR.md) · [Native interface](native/README.md)
 
-The Python implementation is temporarily retained as a migration reference.
-Scientific parity and visual review remain separate migration gates; the Rust
-bundle does not require Python, PyInstaller or Chaquopy.
+The former Python engine was retired after the migration; it remains in the Git
+history. Its results and figures are frozen in `tests/reference/` and
+`cargo xtask parity` compares the Rust engine against them.
 
 ## Linux development
 
@@ -80,7 +80,7 @@ uninstalling first.
 - `assets/`: canonical fonts, licenses, icons and translation data with a SHA-256 manifest.
 - `crates/mscript/`: `.m` interpreter (numeric arrays, control models, plots, documents), run in-process by the UI.
 - `xtask/`: Rust packaging, installers, version synchronization, source checks, bundle validation and Android library builds.
-- `src/python/`, `scripts/` and the Python regression tests: temporary migration reference and comparison tooling; excluded from Rust bundles.
+- `tests/reference/`: frozen Python results, curves and figures used by `cargo xtask parity`.
 - `packaging/`: Linux desktop entry, Windows NSIS script and installer icons.
 
 ```bash
@@ -88,11 +88,13 @@ cargo test --locked --workspace
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all --check
 cargo xtask check-sources
+cargo xtask parity
 ```
 
 CI runs the Rust workspace checks and packaged UI check on Linux; the Windows
 job validates the six scientific modules, formula rendering and a silent
-install. The APK is built in CI but not exercised on a device. These checks do
-not by themselves establish complete scientific or visual migration parity.
+install. The APK is built in CI but not exercised on a device. Parity with the
+retired Python engine is checked by `cargo xtask parity`: numeric results within
+`atol=1e-9, rtol=1e-7`, exact texts, and every figure's labels and colors.
 Notes and screenshots of the removed Electron/Capacitor interface are kept in
 `docs/history`.

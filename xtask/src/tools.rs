@@ -465,36 +465,9 @@ fn version(root: &Path, args: &[String]) -> Result<()> {
             names.difference(&found).collect::<Vec<_>>()
         ));
     }
-    let python_path = root.join("src/python/app_version.py");
-    let python = if python_path.exists() {
-        let old = read(&python_path)?;
-        let mut count = 0;
-        let new = old
-            .lines()
-            .map(|line| {
-                if line.starts_with("VERSION = ") {
-                    count += 1;
-                    format!("VERSION = \"{version}\"")
-                } else {
-                    line.to_owned()
-                }
-            })
-            .collect::<Vec<_>>()
-            .join("\n")
-            + "\n";
-        if count != 1 {
-            return Err("VERSION ausente ou duplicada em app_version.py".into());
-        }
-        Some(new)
-    } else {
-        None
-    };
     // Parse and validate all files before the first write.
     write(&manifest_path, manifest.to_string())?;
     write(&lock_path, lock.to_string())?;
-    if let Some(python) = python {
-        write(&python_path, python)?;
-    }
     println!("{version}");
     Ok(())
 }

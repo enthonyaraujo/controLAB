@@ -13,12 +13,13 @@ removido depois da equivalência comprovada, ficando no histórico Git.
 ## Etapas e evidências
 
 - [x] 1. Catálogo e dados de referência reproduzíveis do Python.
-- [ ] 2. Entradas e fundamentos matemáticos Rust.
-- [ ] 3. Tempo, frequência, LGR, Routh, controladores e espaço de estados.
-- [ ] 4. Gráficos, composição TeX, localização e serviços auxiliares.
-- [ ] 5. Integração desktop/Android, mantendo contratos e isolamento.
-- [ ] 6. `cargo xtask`, instaladores e CI sem ferramentas Python próprias.
-- [ ] 7. Comparações finais, retirada do Python, documentação e memória.
+- [x] 2. Entradas e fundamentos matemáticos Rust.
+- [x] 3. Tempo, frequência, LGR, Routh, controladores e espaço de estados.
+- [x] 4. Gráficos, composição TeX, localização e serviços auxiliares.
+- [x] 5. Integração desktop/Android, mantendo contratos e isolamento (Android
+  compila o motor no processo; APK e aparelho seguem sem validação real).
+- [x] 6. `cargo xtask`, instaladores e CI sem ferramentas Python próprias.
+- [x] 7. Comparações finais, retirada do Python e documentação.
 
 Base: 106 testes Python aprovados; suíte Rust aprovada (três testes MATLAB
 ignorados por requererem instalação local). Nenhuma equivalência nova presumida.
@@ -61,3 +62,29 @@ ignorados por requererem instalação local). Nenhuma equivalência nova presumi
   O console `.m` atual, já Rust, e os seis módulos científicos permanecem.
 - Overshoot é expresso em porcentagem: sua tolerância absoluta deriva do fator
   100 da fórmula (`100 × atol` da saída), sem mudar ganhos ou classificações.
+
+### Conclusão em 2026-10-29
+
+- `cargo xtask parity`: 152 casos aprovados, 0 falhas, 6 arquivados (ponte de
+  console autorizada acima) e **260 imagens comparadas**; `complete_parity: true`.
+- Critério visual aprovado pelo usuário: conteúdo e legibilidade, aceitando
+  fontes, espessuras e dimensões diferentes do Matplotlib. Em cada SVG, todos os
+  textos não numéricos (títulos, eixos, legendas, anotações) e todas as cores
+  não neutras do Python devem aparecer no Rust, sem textos extras; cada PNG deve
+  ser válido na codificação do Python. Implementado em `xtask/src/visual.rs`.
+- A primeira comparação visual encontrou 42 figuras com conteúdo ausente
+  (legenda e marcadores do LGR dos controladores; título, legendas, rótulos e
+  cores por região dos polos do Routh) e marcações de eixo não arredondadas em
+  todas. Corrigido no `Chart` compartilhado: marcações 1/2/2,5/5 × 10ⁿ como o
+  MaxNLocator, potências 10ⁿ sobrescritas, subscritos `σ_a`/`θ_d`, marcadores
+  e legendas com símbolo; LGR do Routh com escala igual nos eixos.
+- Diferença intencional: polos sobre jω no Routh são rotulados `[jω]`; o Python
+  exibia o texto literal `[j\omega]`.
+- Entrada parabólica: amostrada e interpolada linearmente como o
+  `forced_response` do python-control 0.10.2 (valores conferidos no próprio
+  python-control antes da retirada).
+- Última suíte Python antes da retirada: 108 testes aprovados. Removidos
+  `src/python/`, testes Python, `scripts/`, `build_native.py`,
+  `requirements*.txt` e `assets/__init__.py`; ficam no histórico Git (`be79347`).
+  A integridade do corpus congelado passou para os testes `reference_*` do `xtask`.
+- `cargo test --workspace`, `clippy -D warnings` e `fmt --check` aprovados.

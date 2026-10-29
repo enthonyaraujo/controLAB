@@ -6,9 +6,9 @@ Electron, Capacitor, JavaScript, TypeScript, HTML ou CSS.
 
 [English](README.md) · [Interface e atalhos](native/README.md) · [Responsividade](docs/validation/native-responsive.md)
 
-A implementação Python permanece temporariamente como referência da migração.
-Paridade científica e revisão visual continuam sendo critérios separados da
-migração; o pacote Rust dispensa Python, PyInstaller e Chaquopy.
+A engine Python anterior foi retirada ao fim da migração e permanece no
+histórico Git. Seus resultados e gráficos estão congelados em `tests/reference/`
+e `cargo xtask parity` compara a engine Rust com eles.
 
 ## Executar no Linux
 
@@ -90,7 +90,7 @@ desinstalar antes.
 - `assets/`: fontes, licenças, ícones e catálogo compartilhados; `manifest.json` registra seus hashes.
 - `crates/mscript/`: interpretador `.m` (arrays, modelos de controle, gráficos e documentos), executado dentro da interface.
 - `xtask/`: empacotamento, instaladores, sincronização de versão, verificação de fontes, validação de pacotes e compilação Android em Rust.
-- `src/python/`, `scripts/` e testes de regressão Python: referência temporária da migração e ferramentas de comparação; excluídos dos pacotes Rust.
+- `tests/reference/`: resultados, curvas e gráficos Python congelados, usados por `cargo xtask parity`.
 - `packaging/`: entrada de menu Linux, script NSIS do Windows e ícones dos instaladores.
 
 ```bash
@@ -98,11 +98,13 @@ cargo test --locked --workspace
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all --check
 cargo xtask check-sources
+cargo xtask parity
 ```
 
 O CI executa as verificações do workspace Rust e da interface empacotada no
 Linux; o job Windows valida os seis módulos científicos, fórmulas e uma
 instalação silenciosa. O APK é gerado no CI, mas não é executado em aparelho.
-Essas verificações, sozinhas, não comprovam paridade científica ou visual
-completa da migração. Documentos e capturas da interface Electron/Capacitor
+A paridade com a engine Python retirada é verificada por `cargo xtask parity`:
+valores numéricos com `atol=1e-9, rtol=1e-7`, textos exatos e os rótulos e
+cores de cada gráfico. Documentos e capturas da interface Electron/Capacitor
 removida ficam em `docs/history`.

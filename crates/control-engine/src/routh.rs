@@ -536,124 +536,168 @@ fn stability_plot(
     roots: &[Complex64],
     curves: &[(String, Vec<f64>, Vec<f64>)],
 ) -> Result<(String, String)> {
-    use crate::time_response::Chart;
-    let mut chart = Chart::new(
-        1148.,
-        1008.,
-        (110., 45., 990., 865.),
-        "Eixo Real (σ)",
-        "Eixo Imaginário (jω)",
-        false,
-    );
+    use crate::lgr::badge;
+    use crate::time_response::{Chart, Key, Marker};
+    use crate::values::general as g2;
+    // Round-off residue of the root finder (e.g. -1e-15 for ±2j) prints as 0.
+    let g = |v: f64| g2(if v.abs() < 1e-9 { 0. } else { v }, 2);
     let mut xs = vec![0.];
     let mut ys = vec![0.];
     for (_, x, y) in curves {
         xs.extend(x);
         ys.extend(y);
     }
-    let min = xs.iter().copied().fold(0., f64::min);
-    let max = xs.iter().copied().fold(0., f64::max);
-    let im = ys.iter().map(|v| v.abs()).fold(2., f64::max);
-    let pad = (max - min).max(4.) * 0.18;
-    let (mut left, mut right, mut top) = ((min - pad).min(-1.), (max + pad).max(1.5), im * 1.3);
-    let aspect = 990. / 865.;
-    if (right - left) / (2. * top) < aspect {
-        let c = (left + right) / 2.;
-        let span = 2. * top * aspect;
-        left = c - span / 2.;
-        right = c + span / 2.;
-    } else {
-        top = (right - left) / aspect / 2.;
-    }
-    chart.bounds = (left, right, -top, top);
-    chart.axes();
-    chart.line(&[left, right], &[0., 0.], "black", 0.8, "");
-    chart.line(&[0., 0.], &[-top, top], "black", 0.8, "");
     let poles = if poly.has_k() {
         numerical_roots(poly, 0.)?
     } else {
         roots.to_vec()
     };
+    let zeros = if poly.has_k() {
+        polynomial::roots(&polynomial::add(&poly.numeric(1.), &poly.numeric(0.), -1.))?
+    } else {
+        vec![]
+    };
+    xs.extend(poles.iter().chain(&zeros).map(|z| z.re));
+    ys.extend(poles.iter().chain(&zeros).map(|z| z.im));
+    let min = xs.iter().copied().fold(0., f64::min);
+    let max = xs.iter().copied().fold(0., f64::max);
+    let im = ys.iter().map(|v| v.abs()).fold(2., f64::max);
+    let pad = (max - min).max(4.) * 0.18;
+    // Python: set_aspect("equal", adjustable="box") shrinks the axes box.
+    let limits = (
+        (min - pad).min(-1.),
+        (max + pad).max(1.5),
+        -im * 1.3,
+        im * 1.3,
+    );
+    let available = (110., 35., 990., 860.);
+    let scale = (available.2 / (limits.1 - limits.0)).min(available.3 / (limits.3 - limits.2));
+    let (pw, ph) = ((limits.1 - limits.0) * scale, (limits.3 - limits.2) * scale);
+    let rect = (
+        available.0 + (available.2 - pw) / 2.,
+        available.1 + (available.3 - ph) / 2.,
+        pw,
+        ph,
+    );
+    let mut chart = Chart::new(
+        1148.,
+        1100.,
+        rect,
+        "Eixo Real (σ)",
+        "Eixo Imaginário (jω)",
+        false,
+    );
+    chart.bounds = limits;
+    chart.axes();
+    chart.line(&[limits.0, limits.1], &[0., 0.], "black", 0.8, "");
+    chart.line(&[0., 0.], &[limits.2, limits.3], "black", 0.8, "");
+    let mut legend = vec![];
     if poly.has_k() {
         for (_, x, y) in curves {
             chart.line(x, y, "black", 2., "");
         }
-    }
-    for pole in &poles {
-        let (x, y) = chart.xy(pole.re, pole.im);
-        chart.svg += &format!(
-            r#"<path data-pole="original" d="M{} {}l12 12m-12 0l12 -12" stroke="black" stroke-width="2.2" fill="none"/>"#,
-            x - 6.,
-            y - 6.
-        );
-        let tag = if pole.re < -1e-4 {
-            "SPE"
-        } else if pole.re > 1e-4 {
-            "SPD"
-        } else {
-            "jω"
-        };
-        let label = if poly.has_k() {
-            format!("p={}", root_string(*pole))
-        } else {
-            format!("p={} [{tag}]", root_string(*pole))
-        };
-        chart.label(
-            pole.re,
-            pole.im,
-            &label,
-            0.,
-            if pole.im >= 0. { -18. } else { 24. },
-            true,
-        );
-    }
-    if poly.has_k() {
-        let n = polynomial::add(&poly.numeric(1.), &poly.numeric(0.), -1.);
-        for zero in polynomial::roots(&n)? {
-            let (x, y) = chart.xy(zero.re, zero.im);
-            chart.svg += &format!(
-                r#"<circle data-zero="finite" cx="{x}" cy="{y}" r="6" stroke="black" stroke-width="2" fill="white"/>"#
-            );
-            chart.label(
-                zero.re,
-                zero.im,
-                &format!("z={}", root_string(zero)),
-                0.,
-                24.,
-                true,
-            );
+        legend.push(("Ramos do LGR".to_string(), "black", Key::Line("")));
+        for pole in &poles {
+            chart.marker(pole.re, pole.im, Marker::Cross, "black", 6.);
+            if pole.im.abs() < 1e-5 {
+                let text = format!("p={}", g(pole.re));
+                badge(
+                    &mut chart, pole.re, 0., &text, 0., -25., "#000000", "middle", false,
+                );
+            } else {
+                let text = format!(
+                    "p={}{}j{}",
+                    g(pole.re),
+                    if pole.im >= 0. { "+" } else { "-" },
+                    g(pole.im.abs())
+                );
+                let anchor = if pole.re < 0. { "end" } else { "start" };
+                let dy = if pole.im > 0. { -25. } else { 35. };
+                badge(
+                    &mut chart, pole.re, pole.im, &text, -16., dy, "#000000", anchor, false,
+                );
+            }
         }
+        legend.push((
+            "Polos (Início)".to_string(),
+            "black",
+            Key::Marker(Marker::Cross),
+        ));
+        for zero in &zeros {
+            chart.marker(zero.re, zero.im, Marker::Ring, "black", 5.5);
+            if zero.im.abs() < 1e-5 {
+                let text = format!("z={}", g(zero.re));
+                badge(
+                    &mut chart, zero.re, 0., &text, 0., 36., "#000000", "middle", false,
+                );
+            }
+        }
+        if !zeros.is_empty() {
+            legend.push((
+                "Zeros (Término)".to_string(),
+                "black",
+                Key::Marker(Marker::Ring),
+            ));
+        }
+        let mut crossing_legend = false;
         for critical in k["critical_k"].as_array().into_iter().flatten() {
-            if let Some(gain) = critical["k_val"].as_f64() {
-                for p in numerical_roots(poly, gain)? {
-                    if p.re.abs() < 1e-2 && p.im.abs() > 1e-4 {
-                        let (x, y) = chart.xy(0., p.im);
-                        chart.svg += &format!(
-                            r##"<circle data-critical-k="{gain}" cx="{x}" cy="{y}" r="6" stroke="#B91C1C" stroke-width="2" fill="white"/>"##
-                        );
-                        chart.label(
-                            0.,
-                            p.im,
-                            &format!("jω={:+.2}; K={gain:.1}", p.im),
-                            14.,
-                            0.,
-                            true,
-                        );
+            let Some(gain) = critical["k_val"].as_f64().filter(|&v| v > 0.) else {
+                continue;
+            };
+            for p in numerical_roots(poly, gain)? {
+                if p.re.abs() < 1e-2 && p.im.abs() > 1e-4 {
+                    if !crossing_legend {
+                        legend.push((
+                            format!("Cruz. jω (ω=±{:.2}, K={gain:.1})", p.im.abs()),
+                            "#B91C1C",
+                            Key::Marker(Marker::Ring),
+                        ));
+                        crossing_legend = true;
                     }
+                    chart.marker(0., p.im, Marker::Ring, "#B91C1C", 5.5);
+                    let text = format!("jω={:+.2}\nK={gain:.1}", p.im);
+                    badge(
+                        &mut chart, 0., p.im, &text, 35., 0., "#B91C1C", "start", true,
+                    );
                 }
             }
         }
-        chart.legend(
-            &[
-                ("Ramos do LGR", "black", false),
-                ("Polos (Início)", "black", false),
-                ("Zeros (Término)", "black", false),
-            ],
-            true,
-        );
     } else {
-        chart.legend(&[("Polos no plano s", "black", false)], true);
+        let mut seen = [false; 3];
+        for pole in &poles {
+            let (region, tag, color, label) = if pole.re < -1e-4 {
+                (0, "SPE", "#0F766E", "Polos no SPE")
+            } else if pole.re > 1e-4 {
+                (1, "SPD", "#B91C1C", "Polos no SPD")
+            } else {
+                (2, "jω", "#B45309", "Polos em jω")
+            };
+            if !seen[region] {
+                seen[region] = true;
+                legend.push((label.to_string(), "black", Key::Marker(Marker::Cross)));
+            }
+            chart.marker(pole.re, pole.im, Marker::Cross, "black", 6.);
+            let text = if pole.im.abs() > 1e-5 {
+                format!(
+                    "p={}{}j{} [{tag}]",
+                    g(pole.re),
+                    if pole.im >= 0. { "+" } else { "-" },
+                    g(pole.im.abs())
+                )
+            } else {
+                format!("p={} [{tag}]", g(pole.re))
+            };
+            badge(
+                &mut chart, pole.re, pole.im, &text, 16., -16., color, "start", false,
+            );
+        }
     }
+    let title = if poly.has_k() {
+        "Componentes do LGR"
+    } else {
+        "Polos e Regiões de Estabilidade"
+    };
+    chart.legend_below(title, &legend, 985.);
     chart.finish()
 }
 

@@ -11,6 +11,94 @@ pub fn escape(s: &str) -> String {
         .replace('\'', "&apos;")
 }
 
+/// Escapes text and renders `x_a`, `x_{ab}`, `x^2` and `x^{-1}` as SVG
+/// sub/superscripts, like the Matplotlib mathtext labels of the Python plots.
+pub fn rich(s: &str) -> String {
+    let mut out = String::new();
+    let mut chars = s.chars().peekable();
+    while let Some(c) = chars.next() {
+        let shift = match c {
+            '_' => "sub",
+            '^' => "super",
+            _ => {
+                out.push_str(&escape(c.encode_utf8(&mut [0; 4])));
+                continue;
+            }
+        };
+        let mut script = String::new();
+        if chars.peek() == Some(&'{') {
+            chars.next();
+            for c in chars.by_ref() {
+                if c == '}' {
+                    break;
+                }
+                script.push(c);
+            }
+        } else if let Some(c) = chars.next() {
+            script.push(c);
+        }
+        let _ = write!(
+            out,
+            r#"<tspan baseline-shift="{shift}" font-size="75%">{}</tspan>"#,
+            escape(&script)
+        );
+    }
+    out
+}
+
+/// Tick positions inside `[lo, hi]` with steps 1, 2, 2.5 or 5 × 10ⁿ, as
+/// Matplotlib's MaxNLocator chooses for at most `bins` intervals.
+pub fn nice_ticks(lo: f64, hi: f64, bins: usize) -> (Vec<f64>, f64) {
+    let (lo, hi) = if lo <= hi { (lo, hi) } else { (hi, lo) };
+    let raw = (hi - lo) / bins.max(1) as f64;
+    if !raw.is_finite() || raw <= 0. {
+        return (vec![lo], 1.);
+    }
+    let scale = 10f64.powf(raw.log10().floor());
+    let mut step = 10. * scale;
+    for factor in [1., 2., 2.5, 5., 10.] {
+        let candidate = factor * scale;
+        let count = (hi / candidate + 1e-9).floor() - (lo / candidate - 1e-9).ceil();
+        if candidate >= raw * (1. - 1e-9) && count <= bins as f64 {
+            step = candidate;
+            break;
+        }
+    }
+    let first = (lo / step - 1e-9).ceil() as i64;
+    let last = (hi / step + 1e-9).floor() as i64;
+    let ticks = (first..=last)
+        .map(|i| {
+            let v = i as f64 * step;
+            if v.abs() < step * 1e-9 { 0. } else { v }
+        })
+        .collect();
+    (ticks, step)
+}
+
+/// Tick text with the decimals implied by the step and a typographic minus.
+pub fn tick_label(v: f64, step: f64) -> String {
+    let decimals = (0..=8)
+        .find(|&d| {
+            let scaled = step * 10f64.powi(d);
+            (scaled - scaled.round()).abs() < 1e-6 * scaled.max(1.)
+        })
+        .unwrap_or(8) as usize;
+    let text = format!("{v:.decimals$}");
+    match text.strip_prefix('-') {
+        Some(rest) if rest.chars().any(|c| c != '0' && c != '.') => format!("−{rest}"),
+        Some(rest) => rest.into(),
+        None => text,
+    }
+}
+
+/// Decade tick text, e.g. 10⁻² as `10<tspan …>−2</tspan>`.
+pub fn decade_label(exponent: i32) -> String {
+    format!(
+        r#"10<tspan baseline-shift="super" font-size="75%">{}</tspan>"#,
+        exponent.to_string().replace('-', "−")
+    )
+}
+
 pub fn rasterize(svg: &str) -> Result<String> {
     static OPTIONS: OnceLock<resvg::usvg::Options<'static>> = OnceLock::new();
     let options = OPTIONS.get_or_init(|| {

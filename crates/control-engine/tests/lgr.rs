@@ -45,7 +45,12 @@ fn conjugate_departure_arrival_and_deductions_are_retained() {
     let r = lgr::analyze(&json!({"mode":"coeffs","num":"1 6 12","den":"1 4 4 0"})).unwrap();
     let a = &r["detalhes"]["angulos_chegada"][0];
     assert!(a["angulo"].as_f64().unwrap().is_finite());
-    assert!(r["svg"].as_str().unwrap().contains("θ_a"));
+    assert!(
+        r["svg"]
+            .as_str()
+            .unwrap()
+            .contains(r#"θ<tspan baseline-shift="sub" font-size="75%">a</tspan>"#)
+    );
 }
 #[test]
 fn all_presets_and_input_modes_work() {

@@ -3,7 +3,7 @@ members = ["native", "crates/mscript", "crates/control-engine", "xtask"]
 default-members = ["native", "crates/mscript", "crates/control-engine", "xtask"]
 resolver = "3"
 
-# scripts/set_version.py updates this version, shared by every crate.
+# `cargo xtask version` updates this version, shared by every crate.
 [workspace.package]
 version = "6.0.0"
 license = "MIT"

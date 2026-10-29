@@ -1,6 +1,9 @@
 //! Classical seven-step root locus, including the original fixed gain grid.
 use crate::{
-    Result, input, polynomial as poly, time_response::Chart, transfer::TransferFunction, values,
+    Result, input, polynomial as poly,
+    time_response::{Chart, Key, Marker},
+    transfer::TransferFunction,
+    values,
 };
 use num_complex::Complex64 as C;
 use serde_json::{Value, json};
@@ -382,41 +385,8 @@ fn xy(chart: &Chart, x: f64, y: f64) -> (f64, f64) {
     let (l, t, w, h) = chart.rect;
     (l + (x - a) / (b - a) * w, t + h - (y - c) / (d - c) * h)
 }
-fn marker(chart: &mut Chart, x: f64, y: f64, kind: &str, color: &str, r: f64) {
-    let (px, py) = xy(chart, x, y);
-    chart.svg += &match kind {
-        "x" => format!(
-            r#"<path d="M {} {} l {} {} M {} {} l {} {}" stroke="{color}" stroke-width="2.2"/>"#,
-            px - r,
-            py - r,
-            2. * r,
-            2. * r,
-            px - r,
-            py + r,
-            2. * r,
-            -2. * r
-        ),
-        "+" => format!(
-            r#"<path d="M {} {py} h {} M {px} {} v {}" stroke="{color}" stroke-width="1.8"/>"#,
-            px - r,
-            2. * r,
-            py - r,
-            2. * r
-        ),
-        "square" => format!(
-            r#"<rect x="{}" y="{}" width="{}" height="{}" fill="{color}"/>"#,
-            px - r,
-            py - r,
-            2. * r,
-            2. * r
-        ),
-        _ => format!(
-            r#"<circle cx="{px}" cy="{py}" r="{r}" fill="white" stroke="{color}" stroke-width="2"/>"#
-        ),
-    };
-}
 #[allow(clippy::too_many_arguments)]
-fn badge(
+pub(crate) fn badge(
     chart: &mut Chart,
     x: f64,
     y: f64,
@@ -451,7 +421,7 @@ fn badge(
         chart.svg += &format!(
             r#"<tspan x="{bx}" dy="{}">{}</tspan>"#,
             if i == 0 { 0 } else { 18 },
-            crate::presentation::escape(line)
+            crate::presentation::rich(line)
         )
     }
     chart.svg.push_str("</text>");
@@ -625,7 +595,7 @@ fn graph(
     sorted_zeros.sort_by(f64::total_cmp);
     let collision = span_x * 0.09;
     for p in poles {
-        marker(&mut chart, p.re, p.im, "x", "black", 6.);
+        chart.marker(p.re, p.im, Marker::Cross, "black", 6.);
         let real = values::general(p.re, 2);
         if p.im.abs() < 1e-5 {
             let i = sorted_poles.iter().position(|&v| v == p.re).unwrap();
@@ -660,7 +630,7 @@ fn graph(
         }
     }
     for z in zeros {
-        marker(&mut chart, z.re, z.im, "o", "black", 5.5);
+        chart.marker(z.re, z.im, Marker::Ring, "black", 5.5);
         let real = values::general(z.re, 2);
         if z.im.abs() < 1e-5 {
             let i = sorted_zeros.iter().position(|&v| v == z.re).unwrap();
@@ -696,7 +666,7 @@ fn graph(
         }
     }
     if let Some(c) = centroid {
-        marker(&mut chart, c, 0., "+", "#64748B", 7.);
+        chart.marker(c, 0., Marker::Plus, "#64748B", 7.);
         let close = real_zeros.iter().any(|v| (v - c).abs() < collision * 1.3);
         badge(
             &mut chart,
@@ -728,7 +698,7 @@ fn graph(
     for b in breaks {
         let s = b["s"].as_f64().unwrap();
         let k = b["K"].as_f64().unwrap();
-        marker(&mut chart, s, 0., "square", "black", 5.);
+        chart.marker(s, 0., Marker::Square, "black", 5.);
         let near = real_poles.iter().any(|v| (v - s).abs() < collision * 1.4);
         badge(
             &mut chart,
@@ -745,7 +715,7 @@ fn graph(
     for c in crossings {
         let w = c["w"].as_f64().unwrap();
         let k = c["K"].as_f64().unwrap();
-        marker(&mut chart, 0., w, "o", "#B91C1C", 5.);
+        chart.marker(0., w, Marker::Ring, "#B91C1C", 5.);
         badge(
             &mut chart,
             0.,
@@ -778,8 +748,12 @@ fn graph(
         );
     }
     let mut legends = vec![
-        ("Ramos do LGR".to_string(), "black"),
-        ("Polos (Início)".to_string(), "black"),
+        ("Ramos do LGR".to_string(), "black", Key::Line("")),
+        (
+            "Polos (Início)".to_string(),
+            "black",
+            Key::Marker(Marker::Cross),
+        ),
         (
             if zeros.is_empty() {
                 "Zeros (Nenhum nesta FT)".to_string()
@@ -787,16 +761,22 @@ fn graph(
                 "Zeros (Término)".to_string()
             },
             "black",
+            Key::Marker(Marker::Ring),
         ),
     ];
     if let Some(c) = centroid {
-        legends.push((format!("Centroide (σ_a = {c:0.2})"), "#64748B"));
-        legends.push(("Assíntotas".into(), "#64748B"))
+        legends.push((
+            format!("Centroide (σ_a = {c:0.2})"),
+            "#64748B",
+            Key::Marker(Marker::Plus),
+        ));
+        legends.push(("Assíntotas".into(), "#64748B", Key::Line("6 4")))
     }
     if let Some(b) = breaks.first() {
         legends.push((
             format!("Break-in/out (K={:0.1})", b["K"].as_f64().unwrap()),
             "black",
+            Key::Marker(Marker::Square),
         ))
     }
     if let Some(c) = crossings.first() {
@@ -807,62 +787,10 @@ fn graph(
                 c["K"].as_f64().unwrap()
             ),
             "#B91C1C",
+            Key::Marker(Marker::Ring),
         ))
     }
-    chart.svg += r#"<text x="656" y="1010" text-anchor="middle" font-weight="bold">Componentes do LGR</text>"#;
-    let column_sizes = [
-        legends.len().div_ceil(3),
-        (legends.len() + 1) / 3,
-        legends.len() / 3,
-    ];
-    for (i, (label, color)) in legends.iter().enumerate() {
-        let (column, row) = if i < column_sizes[0] {
-            (0, i)
-        } else if i < column_sizes[0] + column_sizes[1] {
-            (1, i - column_sizes[0])
-        } else {
-            (2, i - column_sizes[0] - column_sizes[1])
-        };
-        let x = 145. + column as f64 * 385.;
-        let y = 1040. + row as f64 * 27.;
-        let cx = x + 12.;
-        let cy = y - 4.;
-        if label.starts_with("Polos") {
-            chart.svg += &format!(
-                r#"<path d="M {} {} l 10 10 M {} {} l 10 -10" stroke="{color}" stroke-width="2.2"/>"#,
-                cx - 5.,
-                cy - 5.,
-                cx - 5.,
-                cy + 5.
-            );
-        } else if label.starts_with("Zeros") || label.starts_with("Cruz.") {
-            chart.svg += &format!(
-                r#"<circle cx="{cx}" cy="{cy}" r="5" fill="white" stroke="{color}" stroke-width="2"/>"#
-            );
-        } else if label.starts_with("Centroide") {
-            chart.svg += &format!(
-                r#"<path d="M {} {cy} h 12 M {cx} {} v 12" stroke="{color}" stroke-width="1.8"/>"#,
-                cx - 6.,
-                cy - 6.
-            );
-        } else if label.starts_with("Break") {
-            chart.svg += &format!(
-                r#"<rect x="{}" y="{}" width="9" height="9" fill="{color}"/>"#,
-                cx - 4.5,
-                cy - 4.5
-            );
-        } else {
-            chart.svg += &format!(
-                r#"<path d="M {x} {cy} h 25" stroke="{color}" stroke-width="2" stroke-dasharray="{}"/>"#,
-                if label == "Assíntotas" { "6 4" } else { "" }
-            );
-        }
-        chart.svg += &format!(
-            r#"<text x="{}" y="{y}" font-size="13">{}</text>"#,
-            x + 33.,
-            crate::presentation::escape(label)
-        );
-    }
+    chart.legend_below("Componentes do LGR", &legends, 1010.);
     chart.finish()
 }
 pub fn analyze(payload: &Value) -> Result<Value> {

@@ -4,11 +4,19 @@ use controlab_engine::{
 };
 
 #[test]
-fn sampled_parabolic_input_preserves_python_controls_first_order_hold(){
-    let tf=TransferFunction::parse("1/(s+1)").unwrap();
-    let y=simulate(&tf,&[0.,0.5,1.,1.5],Input::Parabolic).unwrap();
-    let expected=[0.,0.026632664928158356,0.15803013970713942,0.4540816623840793];
-    for(a,b)in y.iter().zip(expected){assert!((a-b).abs()<1e-12,"{a} vs {b}");}
+fn sampled_parabolic_input_preserves_python_controls_first_order_hold() {
+    let tf = TransferFunction::parse("1/(s+1)").unwrap();
+    let y = simulate(&tf, &[0., 0.5, 1., 1.5], Input::Parabolic).unwrap();
+    // python-control 0.10.2: forced_response(tf([1], [1, 1]), T=t, U=t**2 / 2).
+    let expected = [
+        0.,
+        0.026632664928158356,
+        0.1452351901491773,
+        0.41798759047914535,
+    ];
+    for (a, b) in y.iter().zip(expected) {
+        assert!((a - b).abs() < 1e-12, "{a} vs {b}");
+    }
 }
 
 #[test]

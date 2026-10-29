@@ -59,11 +59,6 @@ fn version_updates_all_local_crates_and_preserves_registry_packages() {
         "Cargo.lock",
         "version=4\n[[package]]\nname=\"controlab-native\"\nversion=\"1.0.0\"\n[[package]]\nname=\"xtask\"\nversion=\"1.0.0\"\n[[package]]\nname=\"controlab-engine\"\nversion=\"1.0.0\"\n[[package]]\nname=\"other\"\nversion=\"1.0.0\"\nsource=\"registry+https://example.test\"\n",
     );
-    put(
-        &t.0,
-        "src/python/app_version.py",
-        "# compatibility\nVERSION = \"1.0.0\"\n",
-    );
     run(&t.0, &["version", "v2.3.4"]).unwrap();
     let lock = fs::read_to_string(t.0.join("Cargo.lock")).unwrap();
     assert_eq!(
@@ -80,11 +75,6 @@ fn version_updates_all_local_crates_and_preserves_registry_packages() {
         fs::read_to_string(t.0.join("Cargo.toml"))
             .unwrap()
             .contains("2.3.4")
-    );
-    assert!(
-        fs::read_to_string(t.0.join("src/python/app_version.py"))
-            .unwrap()
-            .contains("VERSION = \"2.3.4\"")
     );
     let before = fs::read(t.0.join("Cargo.toml")).unwrap();
     assert!(run(&t.0, &["version", "2.3.4-beta"]).is_err());

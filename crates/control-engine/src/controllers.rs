@@ -1452,13 +1452,13 @@ fn plot_universal(
     mode: &str,
     c: &Context,
 ) -> Result<(String, String)> {
-    use crate::time_response::{Chart, svg_document};
+    use crate::time_response::{Chart, Key, Marker, svg_document};
     let width = 1652.;
     let height = 756.;
     let mut left = Chart::new(
         width,
         height,
-        (80., 45., 650., 600.),
+        (110., 45., 620., 600.),
         "Eixo Real (σ)",
         "Eixo Imaginário (jω)",
         false,
@@ -1483,15 +1483,25 @@ fn plot_universal(
     left.axes();
     let mut gains = vec![0.];
     gains.extend(logspace(-3., 2.5, 280));
+    const REFERENCE: &str = "#64748B";
+    const DANGER: &str = "#B91C1C";
+    const DOMINANT: &str = "#F59E0B";
+    let mut legend = vec![];
     for (x, y) in locus(plant, &gains)? {
         left.line(&x, &y, "#64748B", 1.1, "2 3");
     }
+    legend.push((
+        "LGR sem controlador".to_string(),
+        REFERENCE,
+        Key::Line("2 3"),
+    ));
     let mut gains = vec![0.];
     gains.extend((0..80).map(|i| 0.01 + 0.99 * i as f64 / 79.));
     gains.extend(logspace(0.01, 2.2, 180));
     for (x, y) in locus(loop_tf, &gains)? {
         left.line(&x, &y, "black", 2., "");
     }
+    legend.push(("LGR compensado Gma(s)".to_string(), "black", Key::Line("")));
     left.line(
         &[left.bounds.0, left.bounds.1],
         &[0., 0.],
@@ -1500,25 +1510,12 @@ fn plot_universal(
         "",
     );
     left.line(&[0., 0.], &[-sy, sy], "#64748B", 0.8, "");
-    for r in &poles {
-        left.label(r.re, r.im, "×", -5., 5., true);
-    }
-    for r in &zeros {
-        left.label(r.re, r.im, "○", -5., 5., true);
-    }
-    for (key, label) in [("z", "○"), ("p", "✚")] {
-        if !p[key].is_null() {
-            left.label(-n(&p[key]), 0., label, -5., 5., true);
-        }
-    }
     if im > 0. {
-        left.label(-re, im, "★", -5., 5., true);
-        left.label(-re, -im, "★", -5., 5., true);
         for a in get(c, "angle_contributions").as_array().unwrap() {
             let root = &a["root"];
             let rr = n(&root["re"]);
             let ri = n(&root["im"]);
-            left.line(&[rr, -re], &[ri, im], "#64748B", 1., "5 4");
+            left.line(&[rr, -re], &[ri, im], DOMINANT, 1., "5 4");
             left.label(
                 0.55 * rr - 0.45 * re,
                 0.55 * ri + 0.45 * im,
@@ -1529,6 +1526,62 @@ fn plot_universal(
             );
         }
     }
+    for r in &poles {
+        left.marker(r.re, r.im, Marker::Cross, REFERENCE, 6.);
+    }
+    if !poles.is_empty() {
+        legend.push((
+            "Polos de G(s)".to_string(),
+            REFERENCE,
+            Key::Marker(Marker::Cross),
+        ));
+    }
+    for r in &zeros {
+        left.marker(r.re, r.im, Marker::Ring, REFERENCE, 5.5);
+    }
+    if !zeros.is_empty() {
+        legend.push((
+            "Zeros de G(s)".to_string(),
+            REFERENCE,
+            Key::Marker(Marker::Ring),
+        ));
+    }
+    if !p["z"].is_null() {
+        let z = -n(&p["z"]);
+        left.marker(z, 0., Marker::Disc, "black", 6.5);
+        legend.push((
+            format!("Zero Gc (-z = {})", fmt(&json!(z), 4, false)),
+            "black",
+            Key::Marker(Marker::Disc),
+        ));
+    }
+    if !p["p"].is_null() {
+        let pole = -n(&p["p"]);
+        left.marker(pole, 0., Marker::FilledPlus, DANGER, 8.);
+        legend.push((
+            format!("Polo Gc (-p = {})", fmt(&json!(pole), 4, false)),
+            DANGER,
+            Key::Marker(Marker::FilledPlus),
+        ));
+    }
+    if im > 0. {
+        left.marker(-re, im, Marker::Star, DOMINANT, 11.);
+        left.marker(-re, -im, Marker::Star, DOMINANT, 11.);
+        legend.push((
+            format!(
+                "Polo dom. (-{} ± {}j)",
+                fmt(&p["re"], 3, false),
+                fmt(&p["im"], 3, false)
+            ),
+            DOMINANT,
+            Key::Marker(Marker::Star),
+        ));
+    }
+    let legend: Vec<_> = legend
+        .iter()
+        .map(|(l, c, k)| (l.as_str(), *c, *k))
+        .collect();
+    left.legend_keys(&legend, true, false);
     let mut right = Chart::new(
         width,
         height,
@@ -1547,15 +1600,16 @@ fn plot_universal(
         .collect::<Vec<_>>();
     right.autobounds(t, &[before, after, &reference]);
     right.axes();
-    right.line(t, &reference, "#64748B", 1.2, "2 3");
+    right.line(t, &reference, "black", 1.2, "2 3");
     right.line(t, before, "#64748B", 1.6, "6 4");
     right.line(t, after, "black", 2.2, "");
-    right.legend(
+    right.legend_keys(
         &[
-            ("Referência r(t)", "#64748B", true),
-            ("Sem controlador", "#64748B", true),
-            ("Com controlador Gc(s)", "black", false),
+            ("Referência r(t)", "black", Key::Line("2 3")),
+            ("Sem controlador", "#64748B", Key::Line("6 4")),
+            ("Com controlador Gc(s)", "black", Key::Line("")),
         ],
+        true,
         true,
     );
     let title = match mode {
@@ -1564,7 +1618,7 @@ fn plot_universal(
         _ => "Resposta ao Degrau Unitário",
     };
     let body = format!(
-        "{}{}<text x=\"405\" y=\"24\" text-anchor=\"middle\">Lugar Geométrico das Raízes e Ângulos θ</text><text x=\"1225\" y=\"24\" text-anchor=\"middle\">{title}</text>",
+        "{}{}<text x=\"420\" y=\"24\" text-anchor=\"middle\">Lugar Geométrico das Raízes e Ângulos θ</text><text x=\"1225\" y=\"24\" text-anchor=\"middle\">{title}</text>",
         left.svg, right.svg
     );
     let svg = svg_document(width, height, &body);

@@ -1103,18 +1103,23 @@ fn pole_plot(
     let mut svg = String::from(
         r##"<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="780" viewBox="0 0 1260 780"><rect width="1260" height="780" fill="white"/><g font-family="IBM Plex Sans" font-size="18" fill="black">"##,
     );
-    for i in 0..=6 {
-        let fraction = i as f64 / 6.;
-        let xx = 100. + fraction * 1110.;
-        let yy = 700. - fraction * 660.;
-        let real = xmin + fraction * (xmax - xmin);
-        let imag = -ymax + fraction * 2. * ymax;
+    let (ticks, step) = presentation::nice_ticks(xmin, xmax, 9);
+    for real in ticks {
+        let xx = x(real);
         let _ = write!(
             svg,
-            r##"<path d="M{xx:.4} 40V700 M100 {yy:.4}H1210" stroke="#CBD5E1" stroke-opacity=".75" stroke-dasharray="4 4" fill="none"/><text x="{xx:.4}" y="732" text-anchor="middle">{}</text><text x="85" y="{:.4}" text-anchor="end">{}</text>"##,
-            presentation::escape(&values::general(real, 4)),
+            r##"<path d="M{xx:.4} 40V700" stroke="#CBD5E1" stroke-opacity=".75" stroke-dasharray="4 4" fill="none"/><text x="{xx:.4}" y="732" text-anchor="middle">{}</text>"##,
+            presentation::tick_label(real, step)
+        );
+    }
+    let (ticks, step) = presentation::nice_ticks(-ymax, ymax, 9);
+    for imag in ticks {
+        let yy = y(imag);
+        let _ = write!(
+            svg,
+            r##"<path d="M100 {yy:.4}H1210" stroke="#CBD5E1" stroke-opacity=".75" stroke-dasharray="4 4" fill="none"/><text x="85" y="{:.4}" text-anchor="end">{}</text>"##,
             yy + 6.,
-            presentation::escape(&values::general(imag, 4))
+            presentation::tick_label(imag, step)
         );
     }
     let _ = write!(

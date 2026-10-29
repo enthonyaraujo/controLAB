@@ -30,7 +30,7 @@ impl Scripts {
     }
 }
 
-/// Same folder the Python engine uses for the home page: Documentos/ControLAB.
+/// Same folder the home page has always used: Documentos/ControLAB.
 fn default_workspace() -> PathBuf {
     #[cfg(target_os = "android")]
     let folder =

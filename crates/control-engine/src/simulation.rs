@@ -47,8 +47,10 @@ pub fn simulate(model: &TransferFunction, times: &[f64], input: Input) -> Result
     }
     let (a, b, c, d) = realization(model)?;
     let n = a.nrows();
-    // Include u and its first two derivatives. Polynomial inputs are propagated
+    // Include u and its first two derivatives. Step and ramp are propagated
     // exactly; impulse is represented as x(0+)=B, without a Dirac sample at t=0.
+    // The parabola is sampled and held linearly between samples, like
+    // python-control's forced_response with U = t²/2.
     let dim = n + 3;
     let mut generator = DMatrix::zeros(dim, dim);
     generator.view_mut((0, 0), (n, n)).copy_from(&a);
@@ -66,7 +68,7 @@ pub fn simulate(model: &TransferFunction, times: &[f64], input: Input) -> Result
             }
         }
         Input::Ramp => x[n + 1] = 1.,
-        Input::Parabolic => x[n + 2] = 1.,
+        Input::Parabolic => {}
     }
     let mut out = Vec::with_capacity(times.len());
     let mut last_dt = f64::NAN;
@@ -74,10 +76,15 @@ pub fn simulate(model: &TransferFunction, times: &[f64], input: Input) -> Result
     for (i, &time) in times.iter().enumerate() {
         crate::execution::checkpoint()?;
         if i > 0 {
-            let dt = time - times[i - 1];
+            let previous = times[i - 1];
+            let dt = time - previous;
             if !last_dt.is_finite() || (dt - last_dt).abs() > 1e-12 * dt {
                 transition = (&generator * dt).exp();
                 last_dt = dt;
+            }
+            if matches!(input, Input::Parabolic) {
+                x[n] = 0.5 * previous * previous;
+                x[n + 1] = 0.5 * (previous + time);
             }
             x = &transition * x;
         }

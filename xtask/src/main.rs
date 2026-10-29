@@ -1,20 +1,29 @@
 //! Migration tools. Commands never report incomplete semantic/visual parity as a pass.
 use serde_json::{Value, json};
 mod tools;
-use std::{env, fs, path::PathBuf, process::ExitCode};
+mod visual;
+use std::{
+    env, fs,
+    path::{Path, PathBuf},
+    process::ExitCode,
+};
+
+/// Frozen reference directory and number of figures compared by `visual`.
+struct Assets<'a> {
+    root: &'a Path,
+    checked: usize,
+}
 
 fn compare(
     expected: &Value,
     actual: &Value,
     path: &str,
     diffs: &mut Vec<String>,
-    assets: &mut usize,
+    assets: &mut Assets,
 ) {
     if expected.get("$asset").is_some() {
-        *assets += 1;
-        if !actual.is_string() {
-            diffs.push(format!("{path}: imagem/SVG ausente"));
-        }
+        assets.checked += 1;
+        visual::check(assets.root, expected, actual, path, diffs);
         return;
     }
     match (expected, actual) {
@@ -71,18 +80,19 @@ fn short(v: &Value) -> String {
 }
 
 fn numeric_text_equivalent(a: &str, b: &str, path: &str) -> bool {
-    if path.contains(".metrics[") && path.ends_with(".value") {
-        if let (Ok(a), Ok(b)) = (a.parse::<f64>(), b.parse::<f64>()) {
-            return a.is_finite() && b.is_finite() && (a - b).abs() <= 1e-9 + 1e-7 * a.abs();
-        }
+    if path.contains(".metrics[")
+        && path.ends_with(".value")
+        && let (Ok(a), Ok(b)) = (a.parse::<f64>(), b.parse::<f64>())
+    {
+        return a.is_finite() && b.is_finite() && (a - b).abs() <= 1e-9 + 1e-7 * a.abs();
     }
-    if path.ends_with(".text") || path.ends_with(".str") {
-        if let (Ok(a), Ok(b)) = (
+    if (path.ends_with(".text") || path.ends_with(".str"))
+        && let (Ok(a), Ok(b)) = (
             controlab_engine::input::complex(&a.replace(' ', "")),
             controlab_engine::input::complex(&b.replace(' ', "")),
-        ) {
-            return (a - b).norm() <= 1e-9 + 1e-7 * a.norm();
-        }
+        )
+    {
+        return (a - b).norm() <= 1e-9 + 1e-7 * a.norm();
     }
     if path.contains("latex") {
         use std::sync::OnceLock;
@@ -283,7 +293,10 @@ fn parity(args: &[String]) -> Result<bool, String> {
             continue;
         }
         let mut diffs = vec![];
-        let mut pending_assets = 0;
+        let mut pending_assets = Assets {
+            root: &root,
+            checked: 0,
+        };
         if section.is_some() {
             compare(
                 &expected["success"],
@@ -339,25 +352,22 @@ fn parity(args: &[String]) -> Result<bool, String> {
                 }
             }
         }
-        assets += pending_assets;
+        assets += pending_assets.checked;
         if diffs.is_empty() {
             matched += 1;
         } else {
             failed += 1;
         }
-        reports.push(json!({"case":entry["id"],"module":entry["module"],"differences":diffs,"visual_assets_unverified":pending_assets,"accepted_plateaus":accepted_plateaus,"accepted_render_geometry":accepted_render_geometry}));
+        reports.push(json!({"case":entry["id"],"module":entry["module"],"differences":diffs,"visual_assets_checked":pending_assets.checked,"accepted_plateaus":accepted_plateaus,"accepted_render_geometry":accepted_render_geometry}));
     }
     if reports.is_empty() {
         return Err("Nenhum caso corresponde aos filtros.".into());
     }
-    let report = json!({"scope":section.map_or("response",String::as_str),"numeric_atol":1e-9,"numeric_rtol":1e-7,"percentage_atol":100e-9,"numeric_metric_text":"same numeric tolerance; type/label/unit remain exact","matched":matched,"failed":failed,"archived":archived,"visual_assets_unverified":assets,"complete_parity":section.is_none()&&failed==0&&assets==0,"cases":reports});
+    let report = json!({"scope":section.map_or("response",String::as_str),"numeric_atol":1e-9,"numeric_rtol":1e-7,"percentage_atol":100e-9,"numeric_metric_text":"same numeric tolerance; type/label/unit remain exact","matched":matched,"failed":failed,"archived":archived,"visual_assets_checked":assets,"visual_criterion":visual::CRITERION,"complete_parity":section.is_none()&&failed==0,"cases":reports});
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
-    // A partial details check can succeed for its stated scope; a full run with
-    // unchecked assets cannot be used as evidence of complete parity.
-    Ok(
-        failed == 0
-            && (section.is_some() || assets == 0 || args.iter().any(|s| s == "--data-only")),
-    )
+    // Figures are compared by `visual::check` inside each case, so any visual
+    // difference already counts as a failed case.
+    Ok(failed == 0)
 }
 
 fn main() -> ExitCode {
@@ -376,10 +386,97 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use sha2::{Digest, Sha256};
+
+    fn reference() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../tests/reference/python")
+    }
+    fn read_json(path: &Path) -> Value {
+        serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
+    }
+    fn sha256(path: &Path) -> String {
+        format!("{:x}", Sha256::digest(fs::read(path).unwrap()))
+    }
+
+    /// The frozen Python oracle must stay byte-identical: the generator was
+    /// retired with the Python engine and only survives in the Git history.
+    #[test]
+    fn reference_manifest_covers_all_modules_presets_and_case_hashes() {
+        let root = reference();
+        let manifest = read_json(&root.join("manifest.json"));
+        assert_eq!(manifest["schema_version"], 1);
+        assert!(
+            manifest["source_commit"]
+                .as_str()
+                .is_some_and(|s| !s.is_empty())
+        );
+        let modules = manifest["modules"].as_object().unwrap();
+        let mut names: Vec<_> = modules.keys().map(String::as_str).collect();
+        names.sort_unstable();
+        assert_eq!(
+            names,
+            [
+                "controller",
+                "frequency",
+                "lgr",
+                "routh",
+                "state_space",
+                "time"
+            ]
+        );
+        for module in modules.values() {
+            assert!(!module["preset_ids"].as_array().unwrap().is_empty());
+            assert_eq!(module["preset_ids"], module["covered_preset_ids"]);
+        }
+        let cases = manifest["cases"].as_array().unwrap();
+        assert!(cases.len() >= 80);
+        for case in cases {
+            let path = root.join(case["path"].as_str().unwrap());
+            assert_eq!(sha256(&path), case["sha256"], "{}", path.display());
+        }
+    }
+
+    #[test]
+    fn reference_assets_and_numerical_arrays_are_complete() {
+        fn visit(root: &Path, value: &Value) {
+            match value {
+                Value::Object(map) if map.contains_key("$asset") => {
+                    let path = root.join(map["$asset"].as_str().unwrap());
+                    assert_eq!(sha256(&path), map["sha256"], "{}", path.display());
+                    assert_eq!(fs::metadata(&path).unwrap().len(), map["bytes"]);
+                }
+                Value::Object(map) => map.values().for_each(|v| visit(root, v)),
+                Value::Array(items) => items.iter().for_each(|v| visit(root, v)),
+                _ => {}
+            }
+        }
+        let root = reference();
+        let manifest = read_json(&root.join("manifest.json"));
+        let (mut time, mut frequency) = (0, 0);
+        for entry in manifest["cases"].as_array().unwrap() {
+            let case = read_json(&root.join(entry["path"].as_str().unwrap()));
+            assert!(case.get("input").is_some() && case.get("output").is_some());
+            visit(&root, &case["output"]);
+            if let Some(numerical) = case.get("numerical") {
+                let key = if numerical["kind"] == "time" {
+                    time += 1;
+                    "time"
+                } else {
+                    frequency += 1;
+                    "omega"
+                };
+                assert!(numerical[key].as_array().unwrap().len() >= 200);
+            }
+        }
+        assert!(time >= 5 && frequency >= 4);
+    }
     #[test]
     fn tolerance_does_not_hide_types_or_missing_fields() {
         let mut d = vec![];
-        let mut a = 0;
+        let mut a = Assets {
+            root: Path::new("."),
+            checked: 0,
+        };
         compare(&json!({"v":1.}), &json!({"v":1.+1e-8}), "$", &mut d, &mut a);
         assert!(d.is_empty());
         compare(&json!({"v":1.}), &json!({"v":"1"}), "$", &mut d, &mut a);
@@ -388,18 +485,28 @@ mod tests {
         assert_eq!(d.len(), 2);
     }
     #[test]
-    fn visual_assets_are_explicitly_unverified() {
+    fn png_assets_must_decode_in_the_reference_encoding() {
         let mut d = vec![];
-        let mut a = 0;
+        let mut a = Assets {
+            root: Path::new("."),
+            checked: 0,
+        };
+        let png = controlab_engine::presentation::rasterize(
+            r#"<svg xmlns="http://www.w3.org/2000/svg" width="2" height="2"/>"#,
+        )
+        .unwrap();
+        let expected = json!({"$asset":"a.png","encoding":"data:image/png;base64"});
+        compare(&expected, &json!(png), "$", &mut d, &mut a);
+        assert_eq!(a.checked, 1);
+        assert!(d.is_empty(), "{d:?}");
         compare(
-            &json!({"$asset":"a.png"}),
+            &expected,
             &json!("data:image/png;base64,..."),
             "$",
             &mut d,
             &mut a,
         );
-        assert_eq!(a, 1);
-        assert!(d.is_empty());
+        assert_eq!(d.len(), 1);
     }
 
     #[test]

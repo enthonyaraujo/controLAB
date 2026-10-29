@@ -408,45 +408,51 @@ impl Chart {
         (l + w * xx, t + h - h * (y - c) / (d - c))
     }
     pub fn axes(&mut self) {
+        use crate::presentation::{decade_label, nice_ticks, rich, tick_label};
         let (l, t, w, h) = self.rect;
         let (a, b, c, d) = self.bounds;
+        // Matplotlib's tick density: one x tick per three 10 pt labels, one y
+        // tick per two, at the 140 dpi of the Python figures.
+        const LABEL: f64 = 10. * 140. / 72.;
+        let x_bins = ((w / (3. * LABEL)) as usize).clamp(1, 9);
+        let y_bins = ((h / (2. * LABEL)) as usize).clamp(1, 9);
         let mut x_ticks = vec![];
         if self.log {
-            for e in a.log10().ceil() as i32..=b.log10().floor() as i32 {
-                x_ticks.push((10_f64.powi(e), format!("10^{}", e)))
+            let first = (a.log10() - 1e-9).ceil() as i32;
+            let last = (b.log10() + 1e-9).floor() as i32;
+            let every = ((last - first) as usize).div_ceil(x_bins).max(1);
+            for e in (first..=last).step_by(every) {
+                x_ticks.push((10_f64.powi(e), decade_label(e)))
             }
         } else {
-            for i in 0..=5 {
-                let v = a + (b - a) * i as f64 / 5.;
-                x_ticks.push((v, display(Some(v), "")))
-            }
+            let (ticks, step) = nice_ticks(a, b, x_bins);
+            x_ticks.extend(ticks.into_iter().map(|v| (v, tick_label(v, step))));
         }
         for (x, label) in x_ticks {
             let (px, _) = self.xy(x, c);
             self.svg += &format!(
-                r##"<path d="M {px} {t} v {h}" stroke="#CBD5E1" stroke-opacity="0.75" stroke-dasharray="3 3"/><text x="{px}" y="{}" text-anchor="middle">{}</text>"##,
+                r##"<path d="M {px} {t} v {h}" stroke="#CBD5E1" stroke-opacity="0.75" stroke-dasharray="3 3"/><text x="{px}" y="{}" text-anchor="middle">{label}</text>"##,
                 t + h + 23.,
-                crate::presentation::escape(&label)
             );
         }
-        for i in 0..=5 {
-            let y = c + (d - c) * i as f64 / 5.;
+        let (ticks, step) = nice_ticks(c, d, y_bins);
+        for y in ticks {
             let (_, py) = self.xy(a, y);
             self.svg += &format!(
                 r##"<path d="M {l} {py} h {w}" stroke="#CBD5E1" stroke-opacity="0.75" stroke-dasharray="3 3"/><text x="{}" y="{}" text-anchor="end">{}</text>"##,
                 l - 9.,
                 py + 4.,
-                display(Some(y), "")
+                tick_label(y, step)
             );
         }
         self.svg += &format!(
             r##"<rect x="{l}" y="{t}" width="{w}" height="{h}" fill="none" stroke="#000000"/><text x="{}" y="{}" text-anchor="middle">{}</text><text transform="translate({} {}) rotate(-90)" text-anchor="middle">{}</text>"##,
             l + w / 2.,
             t + h + 52.,
-            crate::presentation::escape(&self.xlabel),
+            rich(&self.xlabel),
             l - 80.,
             t + h / 2.,
-            crate::presentation::escape(&self.ylabel)
+            rich(&self.ylabel)
         );
     }
     pub fn line(&mut self, x: &[f64], y: &[f64], color: &str, width: f64, dash: &str) {
@@ -478,34 +484,74 @@ impl Chart {
             px + dx,
             py + dy,
             if bold { "bold" } else { "normal" },
-            crate::presentation::escape(text)
+            crate::presentation::rich(text)
         );
     }
     pub fn dot(&mut self, x: f64, y: f64) {
         let (px, py) = self.xy(x, y);
         self.svg += &format!(r#"<circle cx="{px}" cy="{py}" r="4" fill="black" stroke="black"/>"#);
     }
+    /// Scatter marker at a scientific coordinate.
+    pub fn marker(&mut self, x: f64, y: f64, marker: Marker, color: &str, r: f64) {
+        let (px, py) = self.xy(x, y);
+        self.svg += &marker.svg(px, py, color, r);
+    }
     pub fn legend(&mut self, items: &[(&str, &str, bool)], upper: bool) {
         self.legend_at(items, upper, !upper);
     }
     pub fn legend_at(&mut self, items: &[(&str, &str, bool)], upper: bool, right: bool) {
+        let keys: Vec<_> = items
+            .iter()
+            .map(|&(label, color, dash)| (label, color, Key::Line(if dash { "6 4" } else { "" })))
+            .collect();
+        self.legend_keys(&keys, upper, right);
+    }
+    /// Framed legend inside the axes, with line or marker keys.
+    pub fn legend_keys(&mut self, items: &[(&str, &str, Key)], upper: bool, right: bool) {
         let (l, t, w, h) = self.rect;
         let width = items.iter().map(|v| v.0.chars().count()).max().unwrap_or(0) as f64 * 7.7 + 45.;
         let height = items.len() as f64 * 22. + 10.;
         let x = if right { l + w - width - 8. } else { l + 8. };
         let y = if upper { t + 8. } else { t + h - height - 8. };
         self.svg += &format!(
-            r#"<rect x="{x}" y="{y}" width="{width}" height="{height}" fill="white" fill-opacity="0.85"/>"#
+            r##"<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="3" fill="white" fill-opacity="0.85" stroke="#CBD5E1"/>"##
         );
-        for (i, (label, color, dash)) in items.iter().enumerate() {
+        for (i, (label, color, key)) in items.iter().enumerate() {
             let yy = y + 20. + 22. * i as f64;
+            self.svg += &key.svg(x + 7., yy - 4., 22., color);
             self.svg += &format!(
-                r#"<path d="M {} {} h 22" stroke="{color}" stroke-width="2" stroke-dasharray="{}"/><text x="{}" y="{yy}">{}</text>"#,
-                x + 7.,
-                yy - 4.,
-                if *dash { "6 4" } else { "" },
+                r#"<text x="{}" y="{yy}">{}</text>"#,
                 x + 36.,
-                crate::presentation::escape(label)
+                crate::presentation::rich(label)
+            );
+        }
+    }
+    /// Untitled-frame legend below the axes in columns filled top to bottom,
+    /// like Matplotlib's `legend(loc="upper center", ncol=3, frameon=False)`.
+    pub fn legend_below(&mut self, title: &str, items: &[(String, &str, Key)], top: f64) {
+        let center = self.width / 2.;
+        let columns = items.len().clamp(1, 3);
+        let longest = items.iter().map(|v| v.0.chars().count()).max().unwrap_or(0);
+        let column_width = (longest as f64 * 7.2 + 60.).min((self.width - 40.) / columns as f64);
+        let left = center - column_width * columns as f64 / 2.;
+        self.svg += &format!(
+            r#"<text x="{center}" y="{top}" text-anchor="middle" font-weight="bold">{}</text>"#,
+            crate::presentation::rich(title)
+        );
+        // Columns are filled top to bottom; the first ones take the remainder.
+        let mut cells = vec![];
+        for column in 0..columns {
+            let rows = items.len() / columns + usize::from(column < items.len() % columns);
+            cells.extend((0..rows).map(|row| (column, row)));
+        }
+        for ((label, color, key), (column, row)) in items.iter().zip(cells) {
+            let x = left + column as f64 * column_width;
+            let y = top + 30. + row as f64 * 27.;
+            self.svg += &key.svg(x, y - 4., 25., color);
+            self.svg += &format!(
+                r#"<text x="{}" y="{y}" font-size="13">{}</text>"#,
+                x + 33.,
+                crate::presentation::rich(label)
             );
         }
     }
@@ -515,6 +561,115 @@ impl Chart {
         Ok((image, svg))
     }
 }
+/// Matplotlib marker shapes used by the scientific plots.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub(crate) enum Marker {
+    /// `x`: pole.
+    Cross,
+    /// `o` with white face: zero, crossing.
+    Ring,
+    /// `o` filled with the edge color.
+    Disc,
+    /// `+`: centroid.
+    Plus,
+    /// `P`: filled plus.
+    FilledPlus,
+    /// `*`: star.
+    Star,
+    /// `s`: filled square.
+    Square,
+}
+impl Marker {
+    fn svg(self, px: f64, py: f64, color: &str, r: f64) -> String {
+        match self {
+            Self::Cross => format!(
+                r#"<path d="M {} {} l {} {} M {} {} l {} {}" stroke="{color}" stroke-width="2.2"/>"#,
+                px - r,
+                py - r,
+                2. * r,
+                2. * r,
+                px - r,
+                py + r,
+                2. * r,
+                -2. * r
+            ),
+            Self::Ring => format!(
+                r#"<circle cx="{px}" cy="{py}" r="{r}" fill="white" stroke="{color}" stroke-width="2"/>"#
+            ),
+            Self::Disc => format!(
+                r#"<circle cx="{px}" cy="{py}" r="{r}" fill="{color}" stroke="{color}" stroke-width="1.8"/>"#
+            ),
+            Self::Plus => format!(
+                r#"<path d="M {} {py} h {} M {px} {} v {}" stroke="{color}" stroke-width="1.8"/>"#,
+                px - r,
+                2. * r,
+                py - r,
+                2. * r
+            ),
+            Self::FilledPlus => {
+                let a = r / 3.;
+                let outline = [
+                    (-a, -r),
+                    (a, -r),
+                    (a, -a),
+                    (r, -a),
+                    (r, a),
+                    (a, a),
+                    (a, r),
+                    (-a, r),
+                    (-a, a),
+                    (-r, a),
+                    (-r, -a),
+                    (-a, -a),
+                ];
+                let points: Vec<String> = outline
+                    .iter()
+                    .map(|(dx, dy)| format!("{:.3},{:.3}", px + dx, py + dy))
+                    .collect();
+                format!(r#"<polygon points="{}" fill="{color}"/>"#, points.join(" "))
+            }
+            Self::Star => {
+                let points: Vec<String> = (0..10)
+                    .map(|i| {
+                        let radius = if i % 2 == 0 { r } else { r * 0.42 };
+                        let angle = (-90. + 36. * i as f64).to_radians();
+                        format!(
+                            "{:.3},{:.3}",
+                            px + radius * angle.cos(),
+                            py + radius * angle.sin()
+                        )
+                    })
+                    .collect();
+                format!(r#"<polygon points="{}" fill="{color}"/>"#, points.join(" "))
+            }
+            Self::Square => format!(
+                r#"<rect x="{}" y="{}" width="{}" height="{}" fill="{color}"/>"#,
+                px - r,
+                py - r,
+                2. * r,
+                2. * r
+            ),
+        }
+    }
+}
+
+/// Legend key: a line sample with an SVG dash pattern, or a marker.
+#[derive(Clone, Copy, Debug)]
+pub(crate) enum Key {
+    Line(&'static str),
+    Marker(Marker),
+}
+impl Key {
+    fn svg(self, x: f64, y: f64, length: f64, color: &str) -> String {
+        match self {
+            Self::Line(dash) => format!(
+                r#"<path d="M {x} {y} h {length}" stroke="{color}" stroke-width="2" stroke-dasharray="{dash}"/>"#
+            ),
+            Self::Marker(marker) => marker.svg(x + length / 2., y, color, 5.5),
+        }
+    }
+}
+
 pub(crate) fn svg_document(width: f64, height: f64, body: &str) -> String {
     format!(
         r#"<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}"><rect width="100%" height="100%" fill="white"/><g font-family="IBM Plex Sans" font-size="14" fill="black">{body}</g></svg>"#

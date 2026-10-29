@@ -3,6 +3,21 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Alterado
+- **Engine científica em Rust:** os seis módulos (LGR, Routh-Hurwitz, tempo, frequência, controladores e espaço de estados), fórmulas TeX e localização rodam no crate `controlab-engine`, como processo local no desktop e dentro do aplicativo no Android. Resultados equivalentes aos do Python dentro de `atol=1e-9, rtol=1e-7`, com textos idênticos.
+- **Gráficos:** marcações de eixo arredondadas, potências de 10 sobrescritas e subscritos (σₐ, θ_d). O LGR dos controladores voltou a ter legenda, marcadores e cores dos polos, zeros e do polo dominante. O Routh voltou a ter título, legenda, rótulos e cores por região, além do LGR com escala igual nos eixos.
+- **Ferramentas:** empacotamento, instaladores, versão, validação de pacotes e compilação Android passam a ser `cargo xtask`. `cargo xtask parity` compara a engine com os resultados e gráficos Python congelados em `tests/reference/`.
+
+### Corrigido
+- Resposta à parábola nos controladores amostrada como no python-control.
+- Polos sobre o eixo jω no Routh rotulados `[jω]`, e não `[j\omega]`.
+
+### Removido
+- Engine Python, Chaquopy, `requirements*.txt`, scripts Python e a suíte de testes Python (preservados no histórico Git).
+- Modo `run.sh --cli`.
+
 ## [6.0.0] - 2026-10-28
 
 ### Alterado

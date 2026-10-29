@@ -27,21 +27,22 @@ grade completa, módulo, fase desenrolada, dB, assíntotas, resposta complexa e 
 de malha fechada. Essas matrizes adicionais não existem na resposta pública e
 foram obtidas pelas mesmas funções de cálculo usadas pelo motor.
 
-Para regenerar, usando as dependências já instaladas e preservando a versão de
-origem para uma referência confiável:
+O gerador `scripts/export_rust_reference.py`, o motor Python e o teste de
+integridade `tests/migration` foram retirados com a engine Python; estão no
+histórico Git (último commit com Python: `be79347`). O corpus agora é imutável:
+os testes `reference_*` do `xtask` conferem os SHA-256 de cada caso e imagem e a
+cobertura dos presets, e a comparação com o Rust é feita por:
 
 ```sh
-.venv/bin/python scripts/export_rust_reference.py
-.venv/bin/python scripts/export_rust_reference.py --check
-.venv/bin/python scripts/export_rust_reference.py --check --case time_preset_00
-.venv/bin/python -m unittest discover -s tests/migration -v
+cargo xtask parity
+cargo xtask parity --module time --case time_preset_00
 ```
 
-`--check` gera uma cópia temporária e compara os casos completos, incluindo hashes
-de todas as imagens. O teste de integridade roda sem importar o motor Python e
-confere hashes, existência de arquivos e cobertura dos presets declarada.
+Regenerar exige restaurar esses arquivos de `be79347` e o ambiente científico
+registrado em `python/manifest.json`.
 
-Esta é a base de referência da fase 1. **Não comprova equivalência Rust**, cobertura
+Esta é a base de referência da fase 1. Por si só **não comprova equivalência Rust**
+(papel de `cargo xtask parity`), nem cobertura
 exaustiva de todas as combinações numéricas, UI, execução do interpretador `.m`,
 empacotamento, rede ou execução em Windows/Android. Não inclui operações do
 console que dependem do diretório pessoal (`pwd`, `cd`, `ls`, `dir`, home state),
@@ -51,7 +52,8 @@ usar tolerâncias justificadas, preservando verificações exatas de texto e for
 
 Captura inicial: **158 casos** (133 respostas de sucesso e 25 respostas de erro),
 **28 presets**, **215 arquivos PNG/SVG**, aproximadamente **21 MiB**. Integridade:
-2 testes aprovados; suíte Python existente e integração: 108 testes aprovados.
+2 testes aprovados; suíte Python existente e integração: 108 testes aprovados
+(última execução antes da retirada: 108 aprovados em 2026-10-29).
 A reprodução independente de oito casos (um por módulo, TeX e entrada Unicode)
 foi verificada byte a byte. A reprodução integral dos 158 casos ainda não foi
 executada como segunda passagem; a geração inicial executou todos eles.
