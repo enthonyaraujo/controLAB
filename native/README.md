@@ -40,15 +40,22 @@ scripts `.m` são executados na mesma thread de trabalho, sem processo separado
 interpretador. Cálculos são serializados nessa thread; erro/timeout não bloqueia
 os frames da UI.
 
+A navegação tem duas seções, como no MATLAB: **Início**, com o Studio `.m`, e
+**Apps**, a galeria dos seis apps de análise (resposta no tempo, estabilidade,
+lugar das raízes, resposta em frequência, controladores e espaço de estados).
+Sem script aberto, a Command Window (o console `.m`) ocupa o centro do Início;
+ao abrir um script, o editor ocupa o centro e a Command Window desce para o
+painel inferior.
+
 A interface mantém a identidade visual estabelecida: IBM Plex Sans e JetBrains Mono em todos os pesos, os ícones SVG
 originais (rasterizados com resvg), as abas superiores, os ribbons, os três
-painéis dos módulos (Parâmetros, Figura e Resultados), o Studio `.m`, os toasts
+painéis dos apps (Parâmetros, Figura e Resultados), o Studio `.m`, os toasts
 e o modal de Configurações & Sobre. Os temas Claro, Escuro e Sistema e a escala
 da interface (90–150%) são salvos no diretório de configuração do usuário, com
 a pasta de trabalho e os itens recentes. Abaixo de 600 px os módulos usam as
 abas Parâmetros/Gráfico/Resultados; tablets usam rail e Figura/Resultados; abaixo de 768 px o Studio oculta as colunas
 laterais, como no CSS anterior. F5 executa o documento; Ctrl/Cmd+S, +O e +N
-salvam, abrem e criam scripts; Ctrl/Cmd+Enter calcula o módulo atual. Abrir,
+salvam, abrem e criam scripts; Ctrl/Cmd+Enter calcula o app atual. Abrir,
 salvar, selecionar pasta e exportar figuras usam os diálogos do sistema.
 
 Os gráficos científicos são compostos em Rust e exibidos como imagens locais,

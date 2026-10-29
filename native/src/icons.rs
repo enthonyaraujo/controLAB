@@ -43,20 +43,14 @@ pub const HELP: Icon = stroke(
 /// `.studio-run svg` is filled with the success color.
 pub const RUN_FILLED: Icon = stroke("1.5", r#"<path d="m7 3 15 9-15 9z" fill="currentColor"/>"#);
 
-// Welcome actions (stroke 1.6).
-pub const WELCOME_NEW: Icon = stroke(
-    "1.6",
-    r#"<path d="M6 3h9l4 4v14H6zM14 3v5h5M12 11v6M9 14h6"/>"#,
-);
-pub const WELCOME_OPEN: Icon = stroke(
-    "1.6",
-    r#"<path d="M3 7h7l2 3h9l-2 10H3zM3 7V4h7l2 3h8v3"/>"#,
-);
-
 // Module symbols (`#s-*`, stroke 1.75).
 pub const S_HOME: Icon = stroke(
     "1.75",
     r#"<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z"/>"#,
+);
+pub const S_APPS: Icon = stroke(
+    "1.75",
+    r#"<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>"#,
 );
 pub const S_TIME: Icon = stroke(
     "1.75",
@@ -275,44 +269,10 @@ mod tests {
     fn every_icon_rasterizes_with_visible_pixels() {
         let p = crate::theme::LIGHT;
         let mut sources: Vec<String> = [
-            GEAR,
-            NEW_SCRIPT,
-            OPEN,
-            SAVE,
-            VARIABLES,
-            CLEAR,
-            LAYOUT,
-            HELP,
-            RUN_FILLED,
-            WELCOME_NEW,
-            WELCOME_OPEN,
-            S_TIME,
-            S_STAB,
-            S_ROOT,
-            S_FREQ,
-            S_CTRL,
-            S_STATE,
-            CALC,
-            ERASER,
-            ZOOM_IN,
-            ZOOM_OUT,
-            FIT,
-            GRID,
-            EXPORT,
-            CODE,
-            X_THIN,
-            RESET,
-            COPY,
-            INFO,
-            CHEVRON,
-            CHECK,
-            PIN,
-            BOLT,
-            ARROW_UP,
-            TARGET,
-            REFRESH,
-            EXTERNAL,
-            GITHUB,
+            GEAR, NEW_SCRIPT, OPEN, SAVE, VARIABLES, CLEAR, LAYOUT, HELP, RUN_FILLED, S_HOME,
+            S_APPS, S_TIME, S_STAB, S_ROOT, S_FREQ, S_CTRL, S_STATE, CALC, ERASER, ZOOM_IN,
+            ZOOM_OUT, FIT, GRID, EXPORT, CODE, X_THIN, RESET, COPY, INFO, CHEVRON, CHECK, PIN,
+            BOLT, ARROW_UP, TARGET, REFRESH, EXTERNAL, GITHUB,
         ]
         .into_iter()
         .map(svg)

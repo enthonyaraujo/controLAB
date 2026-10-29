@@ -161,100 +161,78 @@ pub fn frame(
 // ---------------------------------------------------------------------------
 // Shell
 
-pub const TABS: [(&str, &str); 7] = [
-    ("home", "INÍCIO"),
-    ("time", "RESPOSTA NO TEMPO"),
-    ("routh", "ESTABILIDADE"),
-    ("lgr", "LUGAR GEOMÉTRICO DAS RAÍZES"),
-    ("frequency", "RESPOSTA EM FREQUÊNCIA"),
-    ("controllers", "CONTROLADORES"),
-    ("state-space", "ESPAÇO DE ESTADOS"),
-];
+pub const TABS: [(&str, &str); 2] = [("home", "INÍCIO"), ("apps", "APPS")];
+
+/// Top-level section of a page: every analysis app belongs to Apps.
+pub fn section(page: &str) -> &'static str {
+    if page == "home" { "home" } else { "apps" }
+}
 
 pub enum ShellAction {
     Navigate(&'static str),
     Settings,
 }
 
-/// `.home-top-bar` / `.sci-top-bar`: 46 px teal bar. Below 1024 px only the brand and the
-/// settings button remain (`.sci-top-tabs { display: none }`). `k` scales rem sizes on pages
-/// that are not zoomed in rem (the Studio).
-pub fn top_bar(ui: &mut Ui, p: &Palette, page: &str, k: f32, tabs: bool) -> Option<ShellAction> {
-    let home = page == "home";
+/// `.home-top-bar` / `.sci-top-bar`: 46 px teal bar with the INÍCIO and APPS tabs. Below
+/// 1024 px the rail or the bottom navigation takes over and the bar shows the page `title`.
+/// `k` scales rem sizes on pages that are not zoomed in rem (Início and Apps).
+pub fn top_bar(
+    ui: &mut Ui,
+    p: &Palette,
+    page: &str,
+    title: &str,
+    k: f32,
+    tabs: bool,
+) -> Option<ShellAction> {
+    let home = page == "home" || page == "apps";
     let rect = ui.max_rect();
     fill(ui, rect, 0, p.shell, Stroke::NONE);
     let mut action = None;
-    let brand = galley(
-        ui,
-        "ControLAB",
-        sans(16.7 * k, Weight::Bold),
-        p.on_shell,
-        -0.2,
-    );
-    let left = if !home {
-        25.0
-    } else if tabs {
-        17.0
-    } else if layout(ui).mode == crate::Mode::Phone {
-        29.0
-    } else {
-        17.0
-    };
-    let mut x = rect.left() + left * k;
-    ui.painter().galley(
-        pos2(x, rect.center().y - brand.size().y / 2.0),
-        brand.clone(),
-        p.on_shell,
-    );
-    x += brand.size().x + if home { 12.0 } else { 20.0 } * k;
-    let room = (rect.right() - if home { 50.0 * k } else { 42.0 * k } - x - 8.0).max(1.0);
-    let labels_width: f32 = TABS
-        .iter()
-        .map(|(id, label)| {
-            galley(
-                ui,
-                label,
-                sans(
-                    if home { 12.5 } else { 12.0 } * k,
-                    if *id == page || home {
-                        Weight::Bold
-                    } else {
-                        Weight::SemiBold
-                    },
-                ),
-                p.on_shell,
-                0.6,
-            )
-            .size()
-            .x
-        })
-        .sum();
-    let padding = ((room - labels_width - 14.0) / 7.0).clamp(8.0 * k, 29.2 * k);
-    let tab_scale = (room / (labels_width + 7.0 * (padding + 2.0))).min(1.0);
+    if !tabs {
+        let left = if layout(ui).mode == crate::Mode::Phone {
+            29.0
+        } else {
+            17.0
+        };
+        let g = galley(ui, title, sans(15.0 * k, Weight::Bold), p.on_shell, -0.1);
+        ui.painter().galley(
+            pos2(rect.left() + left * k, rect.center().y - g.size().y / 2.0),
+            g,
+            p.on_shell,
+        );
+    }
+    let current = section(page);
+    // The active tab takes the colour of what lies under it: the ribbon of Início and of
+    // the apps, or the background of the Apps gallery.
+    let under = if page == "apps" { p.bg } else { p.header };
+    let padding = 29.2 * k;
     let radius = CornerRadius {
         nw: 4,
         ne: 4,
         sw: 0,
         se: 0,
     };
+    let mut x = rect.left() + 6.0 * k;
     for (id, label) in TABS.iter().copied().filter(|_| tabs) {
-        let active = page == id;
+        let active = current == id;
         let font = sans(
-            if home { 12.5 } else { 12.0 } * k * tab_scale,
+            if home { 12.5 } else { 12.0 } * k,
             if active || home {
                 Weight::Bold
             } else {
                 Weight::SemiBold
             },
         );
-        let g = galley(ui, label, font, p.on_shell, 0.6 * tab_scale);
+        let g = galley(ui, label, font, p.on_shell, 0.6);
         let tab = Rect::from_min_size(
             pos2(x, rect.top()),
-            vec2(g.size().x + padding * tab_scale, rect.height()),
+            vec2(g.size().x + padding, rect.height()),
         );
         let response = ui.interact(tab, ui.id().with(("tab", id)), Sense::click());
         if active {
-            fill(ui, tab, radius, p.header, Stroke::NONE);
+            // Overlap the page by a pixel so no seam shows at fractional scales.
+            let tab = Rect::from_min_max(tab.min, pos2(tab.right(), tab.bottom() + 1.0));
+            fill(ui, tab, radius, under, Stroke::NONE);
         } else if response.hovered() {
             fill(ui, tab, radius, p.shell_hover, Stroke::NONE);
         }
@@ -267,19 +245,21 @@ pub fn top_bar(ui: &mut Ui, p: &Palette, page: &str, k: f32, tabs: bool) -> Opti
         };
         ui.painter().galley_with_override_text_color(
             pos2(
-                tab.left() + padding * tab_scale / 2.0,
+                tab.left() + padding / 2.0,
                 tab.center().y - g.size().y / 2.0,
             ),
             g,
             color,
         );
+        // Apps is a link back to the gallery, also from inside an app.
         if response
             .on_hover_cursor(egui::CursorIcon::PointingHand)
             .clicked()
+            && page != id
         {
             action = Some(ShellAction::Navigate(id));
         }
-        x = tab.right() + 2.0 * tab_scale;
+        x = tab.right() + 2.0 * k;
     }
     let gear = Rect::from_min_size(
         pos2(
@@ -590,59 +570,6 @@ pub fn icon_button(
         tint,
     );
     response
-}
-
-/// `.studio-welcome-primary` / `-secondary`.
-pub fn welcome_button(
-    ui: &mut Ui,
-    p: &Palette,
-    icon: Icon,
-    label: &str,
-    primary: bool,
-) -> Response {
-    let font = sans(13.0, Weight::Medium);
-    let g = galley(ui, label, font, p.text, 0.0);
-    let (rect, response) = ui.allocate_exact_size(
-        vec2(
-            ui.data(|d| d.get_temp::<f32>(egui::Id::new("welcome-button-width")))
-                .unwrap_or(g.size().x + 51.0),
-            42.0,
-        ),
-        Sense::click(),
-    );
-    let hovered = response.hovered();
-    let (bg, border, fg) = if primary {
-        let c = if hovered { p.accent_hover } else { p.accent };
-        (c, c, p.accent_contrast)
-    } else {
-        (
-            p.header,
-            if hovered { p.accent } else { p.border_strong },
-            p.text,
-        )
-    };
-    fill(ui, rect, 4, bg, Stroke::new(1.0, border));
-    icons::paint(
-        ui,
-        Rect::from_min_size(
-            pos2(
-                rect.center().x - (g.size().x + 23.0) / 2.0,
-                rect.center().y - 8.0,
-            ),
-            vec2(16.0, 16.0),
-        ),
-        icon,
-        fg,
-    );
-    ui.painter().galley_with_override_text_color(
-        pos2(
-            rect.center().x - (g.size().x + 23.0) / 2.0 + 23.0,
-            rect.center().y - g.size().y / 2.0,
-        ),
-        g,
-        fg,
-    );
-    response.on_hover_cursor(egui::CursorIcon::PointingHand)
 }
 
 /// `.sci-btn-mini`: compact teal button.
@@ -1232,15 +1159,10 @@ pub fn layout(ui: &Ui) -> crate::Layout {
         .unwrap_or_default()
 }
 
-/// Module entries of the rail and of the bottom navigation, with the home symbol.
-pub const NAV: [(&str, Icon, &str, &str); 7] = [
+/// Sections of the rail and of the bottom navigation: Início and the Apps gallery.
+pub const NAV: [(&str, Icon, &str, &str); 2] = [
     ("home", icons::S_HOME, "Início", "Início"),
-    ("time", icons::S_TIME, "Tempo", "Tempo"),
-    ("routh", icons::S_STAB, "Estab.", "Estabil."),
-    ("lgr", icons::S_ROOT, "LGR", "LGR"),
-    ("frequency", icons::S_FREQ, "Freq.", "Freq."),
-    ("controllers", icons::S_CTRL, "Control.", "Control."),
-    ("state-space", icons::S_STATE, "Estados", "Estados"),
+    ("apps", icons::S_APPS, "Apps", "Apps"),
 ];
 
 /// `.sci-bottom-nav` background and top border.
@@ -1272,7 +1194,7 @@ pub fn bottom_nav(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'stat
             ui.horizontal(|ui| {
                 ui.spacing_mut().item_spacing.x = 0.0;
                 for (id, icon, _, label) in NAV {
-                    let active = page == id;
+                    let active = section(page) == id;
                     let font = sans(
                         0.72 * rem,
                         if active { Weight::Bold } else { Weight::Medium },
@@ -1325,7 +1247,7 @@ pub fn bottom_nav(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'stat
                         g,
                         color,
                     );
-                    if response.clicked() && !active {
+                    if response.clicked() && page != id {
                         chosen = Some(id);
                     }
                 }
@@ -1334,7 +1256,7 @@ pub fn bottom_nav(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'stat
     chosen
 }
 
-/// `.sci-rail`: vertical module rail of the tablet layout.
+/// `.sci-rail`: vertical section rail of the tablet layout.
 pub fn rail(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'static str> {
     let rect = ui.max_rect();
     fill(ui, rect, 0, p.surface, Stroke::NONE);
@@ -1352,7 +1274,7 @@ pub fn rail(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'static str
             for (id, icon, label, _) in NAV.iter() {
                 let (item, response) =
                     ui.allocate_exact_size(vec2(rect.width() - 1.0, item_h), Sense::click());
-                let active = page == *id;
+                let active = section(page) == *id;
                 if active {
                     fill(ui, item, 0, p.bg, Stroke::NONE);
                     fill(
@@ -1402,7 +1324,7 @@ pub fn rail(ui: &mut Ui, p: &Palette, page: &str, k: f32) -> Option<&'static str
                 if response
                     .on_hover_cursor(egui::CursorIcon::PointingHand)
                     .clicked()
-                    && !active
+                    && page != *id
                 {
                     chosen = Some(*id);
                 }
