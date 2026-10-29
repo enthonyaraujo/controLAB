@@ -42,9 +42,7 @@ def localized_request(function):
     def wrapped(data):
         token = _language.set('en' if data.get('language') == 'en' else 'pt-BR')
         try:
-            result = function(data)
-            # Script output and script figures belong to the author.
-            return result if data.get('action') == 'script_request' else translate_result(result)
+            return translate_result(function(data))
         except Exception as error:
             error.args = (translate(str(error)),)
             raise

@@ -58,15 +58,13 @@ def main():
         target = ROOT / target
     profile = target / ('release' if args.release else 'debug')
     suffix = '.exe' if sys.platform == 'win32' else ''
-    binaries = [profile / ('controlab' + suffix), profile / ('controlab-runtime' + suffix)]
-    for binary in binaries:
-        if not binary.is_file():
-            parser.error(f'Executável ausente: {binary}. Compile o workspace Cargo primeiro.')
+    ui = profile / ('controlab' + suffix)
+    if not ui.is_file():
+        parser.error(f'Executável ausente: {ui}. Compile o workspace Cargo primeiro.')
     work = ROOT / 'build/native-package'
     subprocess.run(pyinstaller_command(work, work / 'dist'), cwd=ROOT, check=True)
     output.mkdir(parents=True, exist_ok=True)
-    for binary in binaries:
-        shutil.copy2(binary, output / binary.name)
+    shutil.copy2(ui, output / ui.name)
     shutil.copytree(work / 'dist/controlab-engine', output / 'engine')
     # Matplotlib's scientific Agg/SVG/PDF backends need no WebAgg frontend.
     for payload in (output/'engine', work/'dist/controlab-engine'):
@@ -75,11 +73,8 @@ def main():
             if web_backend.exists():
                 shutil.rmtree(web_backend)
     shutil.copy2(ROOT / 'LICENSE', output / 'LICENSE')
-    (output/'licenses').mkdir(exist_ok=True)
-    for name in ('LICENSE', 'THIRD_PARTY_NOTICES.txt'):
-        shutil.copy2(ROOT/'vendor/openmat'/name,output/'licenses'/('openmat-'+name))
     manifest = {'version': current_version(), 'platform': sys.platform, 'profile': profile.name,
-        'ui': binaries[0].name, 'runtime': binaries[1].name,
+        'ui': ui.name,
         'engine': 'engine/controlab-engine' + suffix,
         'resources': 'engine/_internal/assets'}
     (output / 'bundle.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')

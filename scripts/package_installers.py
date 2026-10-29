@@ -57,7 +57,7 @@ def stage_linux(bundle, root):
     applications = root / 'usr/share/applications'
     applications.mkdir(parents=True)
     shutil.copy2(ROOT / 'packaging/linux/controlab.desktop', applications / f'{NAME}.desktop')
-    for icon in sorted((ROOT / 'build/icons').glob('*.png')):
+    for icon in sorted((ROOT / 'packaging/icons/linux').glob('*.png')):
         folder = root / 'usr/share/icons/hicolor' / icon.stem / 'apps'
         folder.mkdir(parents=True)
         shutil.copy2(icon, folder / f'{NAME}.png')
@@ -123,7 +123,7 @@ def build_appimage(bundle, output, version, arch, temp):
     appdir = temp / 'ControLAB.AppDir'
     copy_bundle(bundle, appdir / 'opt' / NAME)
     shutil.copy2(ROOT / 'packaging/linux/controlab.desktop', appdir / f'{NAME}.desktop')
-    shutil.copy2(ROOT / 'build/icons/256x256.png', appdir / f'{NAME}.png')
+    shutil.copy2(ROOT / 'packaging/icons/linux/256x256.png', appdir / f'{NAME}.png')
     (appdir / '.DirIcon').symlink_to(f'{NAME}.png')
     apprun = appdir / 'AppRun'
     apprun.write_text('#!/bin/sh\nHERE="$(dirname "$(readlink -f "$0")")"\n'
@@ -141,7 +141,7 @@ def build_nsis(bundle, output, version, arch, temp):
     copy_bundle(bundle, source)
     package = output / f'ControLAB-v{version}-win-{arch}.exe'
     subprocess.run(['makensis', '/V3', '/INPUTCHARSET', 'UTF8', f'/DVERSION={version}',
-        f'/DSOURCE_DIR={source}', f'/DICON={ROOT / "build/icon.ico"}', f'/DLICENSE={ROOT / "LICENSE"}',
+        f'/DSOURCE_DIR={source}', f'/DICON={ROOT / "packaging/icons/icon.ico"}', f'/DLICENSE={ROOT / "LICENSE"}',
         f'/DOUTFILE={package}', str(ROOT / 'packaging/windows/controlab.nsi')], check=True)
     return package
 

@@ -1,8 +1,8 @@
 # ControLAB nativo — Rust + egui/eframe
 
 A interface nativa executa em Linux, Windows e Android, sem navegador, WebView,
-HTML, CSS ou JavaScript. O motor científico continua em `src/python`; o motor
-`.m` continua sendo o núcleo openMAT independente em `vendor/openmat`.
+HTML, CSS ou JavaScript. O motor científico continua em `src/python`; scripts
+`.m` são executados pelo interpretador `crates/mscript`, dentro do aplicativo.
 
 ## Desktop
 
@@ -21,17 +21,17 @@ cargo run --offline --release
 ./run.sh
 ```
 
-O workspace Cargo compila a interface e o mesmo adaptador `.m` vendorizado,
-sem modificar as fontes do motor. `cargo run` executa a interface (`default-run`),
-mas compila apenas ela: rode `cargo build` antes, no mesmo perfil, para gerar
-também o runtime `.m`. Os executáveis ficam em `target/debug/`
-ou `target/release/`. O cliente localiza o runtime `.m` ao lado de seu próprio
-executável. O caminho padrão não depende de Node ou de um launcher Python.
-O Python da `.venv` é escolhido automaticamente. É possível selecionar outro com
-`CONTROLAB_PYTHON`. `CONTROLAB_RUNTIME` seleciona o executável `.m` e
-`CONTROLAB_NATIVE_BRIDGE` seleciona a ponte Python. A comunicação usa JSON por
-stdin/stdout de um processo persistente, sem abrir portas de rede. Cálculos são
-serializados em uma thread de trabalho; erro/timeout não bloqueia os frames da UI.
+O workspace Cargo compila a interface e o interpretador `.m` (`crates/mscript`),
+ligado à própria interface. `cargo run` executa a interface (`default-run`); o
+executável fica em `target/debug/` ou `target/release/`. O caminho padrão não
+depende de Node ou de um launcher Python. O Python da `.venv` é escolhido
+automaticamente. É possível selecionar outro com `CONTROLAB_PYTHON`, e
+`CONTROLAB_NATIVE_BRIDGE` seleciona a ponte Python. A comunicação com Python usa
+JSON por stdin/stdout de um processo persistente, sem abrir portas de rede. Os
+scripts `.m` são executados na mesma thread de trabalho, sem processo separado
+(`native/src/scripts.rs`), com limites de tempo, memória e eventos do
+interpretador. Cálculos são serializados nessa thread; erro/timeout não bloqueia
+os frames da UI.
 
 A interface mantém a identidade visual estabelecida: IBM Plex Sans e JetBrains Mono em todos os pesos, os ícones SVG
 originais (rasterizados com resvg), as abas superiores, os ribbons, os três
@@ -69,7 +69,7 @@ sincronizadas por JavaScript.
 
 ```bash
 cargo test --workspace --offline
-cargo clippy -p controlab-native --offline --all-targets -- -D warnings
+cargo clippy --workspace --offline --all-targets -- -D warnings
 PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
 ```
 

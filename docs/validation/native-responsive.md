@@ -6,7 +6,7 @@ Pedido: terminar a responsividade Android do trabalho em `enthony/migrate-rust`,
 preservando os fluxos e a organização da interface Electron. Foram consultados
 os estilos canônicos `src/renderer/styles.css`, `styles/studio.css`, os controles
 de `studio.js` e capturas do mesmo renderer em Chromium local com toque ativado.
-Não houve alteração nas engines Python/openMAT nem nas fontes da UI Electron.
+Não houve alteração nas engines Python e `.m` nem nas fontes da UI Electron.
 
 | Faixa | Comportamento preservado |
 |---|---|

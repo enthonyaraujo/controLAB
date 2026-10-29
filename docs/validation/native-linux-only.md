@@ -6,8 +6,8 @@ etapa de validação ao Linux.
 
 ## Estado implementado
 
-- Interface Rust/egui/eframe; cálculos científicos Python; sessão `.m` no mesmo
-  núcleo Rust/openMAT vendorizado, sem mudanças nas suas fontes.
+- Interface Rust/egui/eframe; cálculos científicos Python; sessão `.m` no
+  interpretador Rust do projeto (`crates/mscript`).
 - Removidos Electron, renderer, preload, servidor Web Python, projeto Android
   Capacitor, dependências Node e scripts/testes JS. Não existem fontes
   JS/JSX/TS/TSX/MJS/CJS, HTML ou CSS na árvore de aplicação.
@@ -72,8 +72,7 @@ Execute `dist/native/controlab/controlab` e distribua a pasta inteira.
   avisou sobre a futura troca de `root_locus`. PyInstaller avisou sobre
   `scipy.special._cdflib` e bibliotecas Windows opcionais `user32`/`msvcrt`.
   Os seis módulos e a execução gráfica Linux passaram apesar desses avisos.
-- `cargo fmt --all -- --check` encontra diferenças preexistentes nas fontes
-  vendorizadas. O vendor foi preservado; a formatação da interface passou.
+- `cargo fmt -p controlab-native -- --check` passou para a interface.
 - Android e Windows ficaram fora desta validação por decisão explícita do
   usuário. O bootstrap Android nativo e seus requisitos permanecem para
   continuidade; o pacote de recursos Gradle recente ainda não foi validado.

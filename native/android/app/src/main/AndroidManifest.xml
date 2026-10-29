@@ -4,8 +4,8 @@
     <application
         android:name=".NativeApplication"
         android:allowBackup="false"
-        android:extractNativeLibs="true"
         android:hasCode="true"
+        android:icon="@mipmap/ic_launcher"
         android:label="ControLAB"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity

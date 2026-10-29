@@ -1,7 +1,7 @@
 # ControLAB — Sistemas de Controle
 
 Interface nativa em **Rust + egui/eframe**, engine científica em **Python** e
-interpretador `.m` em **Rust/openMAT**. O aplicativo não usa navegador,
+interpretador `.m` em **Rust** (`mscript`). O aplicativo não usa navegador,
 Electron, Capacitor, JavaScript, TypeScript, HTML ou CSS.
 
 [English](README.md) · [Interface e atalhos](native/README.md) · [Responsividade](docs/validation/native-responsive.md)
@@ -17,13 +17,13 @@ cargo build --workspace
 cargo run --bin controlab
 ```
 
-O workspace gera `controlab` e `controlab-runtime` em `target/debug/`. Para uma
+O workspace gera `controlab`, que já inclui o interpretador `.m`, em `target/debug/`. Para uma
 compilação otimizada, use `cargo build --release --workspace` e
 `cargo run --release --bin controlab`. `--offline` pode ser acrescentado quando
 as dependências Cargo já estiverem no cache. `./run.sh` usa o mesmo fluxo.
 
 O Python da `.venv` é detectado automaticamente. `CONTROLAB_PYTHON` seleciona
-outro interpretador; `CONTROLAB_RUNTIME` seleciona o executável `.m`.
+outro interpretador.
 Nenhuma dependência é instalada automaticamente pelos scripts do aplicativo.
 
 ## Funcionalidades
@@ -74,20 +74,22 @@ instalar uma build nova sobre outra antiga exige desinstalar antes.
 
 ## Estrutura e validação
 
-- `native/`: interface Rust; `native/runtime/`: adaptação de build do motor `.m`.
+- `native/`: interface Rust, incluindo a ponte JSON dos scripts `.m` (`native/src/scripts.rs`).
 - `src/python/`: engine científica e transporte local por stdin/stdout, sem servidor HTTP.
 - `assets/`: fontes, licenças, ícones e catálogo compartilhados; `manifest.json` registra seus hashes.
-- `vendor/openmat/`: núcleo Rust independente, com licença e procedência próprias.
-- `scripts/`: empacotamento e verificações em Python; builds Rust pelo Cargo.
+- `crates/mscript/`: interpretador `.m` (arrays, modelos de controle, gráficos e documentos), executado dentro da interface.
+- `scripts/`: empacotamento, versão e verificações em Python; builds Rust pelo Cargo.
+- `packaging/`: entrada de menu Linux, script NSIS do Windows e ícones dos instaladores.
 
 ```bash
 cargo test --workspace
-cargo clippy -p controlab-native --all-targets -- -D warnings
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all --check
 PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
 python3 scripts/check_native_sources.py
 ```
 
 O CI executa todos os testes Rust/Python e a verificação da interface no Linux;
 o job Windows valida a engine empacotada e uma instalação silenciosa. O APK é
-gerado no CI, mas não é executado em aparelho. Registros históricos em `CHANGELOG.md` e
-`docs/validation` podem mencionar a interface antiga, cujo código foi removido.
+gerado no CI, mas não é executado em aparelho. Documentos e capturas da interface
+Electron/Capacitor removida ficam em `docs/history`.

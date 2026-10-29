@@ -3,6 +3,29 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Não lançado]
+
+### Alterado
+- **Interface nativa em Rust:** a interface Electron/Capacitor foi substituída por um aplicativo Rust (egui/eframe) para Linux, Windows e Android, sem navegador, WebView, HTML, CSS ou JavaScript. A identidade visual (IBM Plex Sans, JetBrains Mono, ícones, abas, ribbons, painéis, Studio `.m`, temas e escala) foi preservada.
+- **Engine científica:** os mesmos módulos Python, agora executados como processo local por stdin/stdout (desktop) ou pelo Chaquopy (Android), sem servidor HTTP.
+- **Scripts `.m`:** o interpretador passa a ser o crate `mscript` do próprio workspace e roda dentro do aplicativo, sem processo separado nem intermediação do Python. Os 79 testes do interpretador entram no CI; diagnósticos usam identificadores `mscript:*`.
+- **Android:** projeto Gradle próprio em `native/android`, com NativeActivity e ícone adaptativo. A versão (`versionName`/`versionCode`) vem do `Cargo.toml` do workspace. O APK não carrega mais um executável disfarçado de biblioteca.
+- **Builds e releases:** o GitHub Actions gera `.deb`, `.rpm`, `.AppImage`, instalador NSIS por usuário e APK, e publica tudo em tags `vX.Y.Z`. A versão da tag é aplicada por `scripts/set_version.py`.
+
+### Removido
+- Electron, Capacitor, servidor Web Python, dependências Node e os scripts e testes em JavaScript.
+- Executável `controlab-runtime`, `script_service.py` e a variável `CONTROLAB_RUNTIME`.
+- Seletor de idioma inglês: a interface nativa está somente em português até a migração do catálogo.
+
+## [5.0.0] - 2026-10-27
+
+### Adicionado
+- **Idiomas:** seletor Português (Brasil)/English em Configurações → Aparência, com troca imediata sem perder o editor. Gráficos Matplotlib e exportações PNG/SVG acompanham o idioma escolhido.
+- **Documentação:** README em inglês e português e novas capturas de tela.
+
+### Corrigido
+- **Build:** o catálogo de traduções passa a ser resolvido pela raiz do projeto nos pacotes gerados.
+
 ## [4.2.3] - 2026-10-27
 
 ### Adicionado
@@ -35,7 +58,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
   - A tela volta ao fechar a última aba, e executar (F5) sem script aberto não gera mais erro.
 
 ### Corrigido
-- **Motor .m (openMAT) no Android:**
+- **Motor .m no Android:**
   - O runtime Rust passa a ser compilado com o Android NDK para `arm64-v8a` e `x86_64` e incluído no APK como `libcontrolab_runtime.so`; antes, todo script .m falhava no celular.
   - O APK extrai a biblioteca nativa (`useLegacyPackaging`) e o Python a localiza em `nativeLibraryDir`.
   - `npm run mobile:sync` compila o motor antes de montar o app, e o CI instala os alvos Rust do Android.
@@ -63,7 +86,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ### Adicionado
 - **ControLAB Studio — Editor e Execução de Scripts MATLAB (.m):**
-  - Integração do motor independente OpenMAT compilado em Rust com suporte nativo a operações matriciais, controle clássico e gráficos.
+  - Motor `.m` compilado em Rust com suporte nativo a operações matriciais, controle clássico e gráficos.
   - Editor com suporte a abas, realce de sintaxe, histórico de navegação, barra de pastas e atalhos de teclado (F5 para execução, Ctrl+O, Ctrl+S, Ctrl+N).
   - Console persistente com variáveis mantidas durante a sessão, inspeção de variáveis no workspace e diagnósticos claros de erro.
   - Janelas dedicadas e isoladas para visualização e exportação de figuras vetoriais/gráficos gerados por scripts (`plot`, `step`).

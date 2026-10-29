@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Print or set the application version (native/Cargo.toml and its Cargo.lock entry).
+"""Print or set the application version.
 
-native/Cargo.toml is the single source: the Rust UI (CARGO_PKG_VERSION), the
-Gradle project and the packaging scripts all read the version from it.
+The workspace Cargo.toml ([workspace.package]) is the source: every crate,
+the Rust UI (CARGO_PKG_VERSION), the Gradle project and the packaging scripts
+read it. Setting a version also updates the workspace entries in Cargo.lock
+and the Python engine's copy in src/python/app_version.py.
 """
 import argparse
 from pathlib import Path
@@ -10,9 +12,10 @@ import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / 'native/Cargo.toml'
+MANIFEST = ROOT / 'Cargo.toml'
 LOCK = ROOT / 'Cargo.lock'
-PACKAGE = 'controlab-native'
+PYTHON = ROOT / 'src/python/app_version.py'
+PACKAGES = ('controlab-native', 'mscript')
 SEMVER = re.compile(r'^\d+\.\d+\.\d+$')
 
 
@@ -29,11 +32,16 @@ def set_version(version):
     if count != 1:
         raise RuntimeError(f'Versão ausente em {MANIFEST}')
     lock = LOCK.read_text(encoding='utf-8')
-    lock, count = re.subn(rf'(\[\[package\]\]\nname = "{PACKAGE}"\nversion = )"[^"]+"', rf'\g<1>"{version}"', lock)
+    for package in PACKAGES:
+        lock, count = re.subn(rf'(\[\[package\]\]\nname = "{package}"\nversion = )"[^"]+"', rf'\g<1>"{version}"', lock)
+        if count != 1:
+            raise RuntimeError(f'Pacote {package} ausente em {LOCK}')
+    python, count = re.subn(r'^VERSION = "[^"]+"', f'VERSION = "{version}"', PYTHON.read_text(encoding='utf-8'), flags=re.M)
     if count != 1:
-        raise RuntimeError(f'Pacote {PACKAGE} ausente em {LOCK}')
+        raise RuntimeError(f'VERSION ausente em {PYTHON}')
     MANIFEST.write_text(manifest, encoding='utf-8')
     LOCK.write_text(lock, encoding='utf-8')
+    PYTHON.write_text(python, encoding='utf-8')
 
 
 if __name__ == '__main__':

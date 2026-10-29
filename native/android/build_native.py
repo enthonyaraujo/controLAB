@@ -64,23 +64,16 @@ def build(args):
             common.append("--release")
         if args.offline:
             common.append("--offline")
-        for manifest, extra in (
-            (ROOT / "native" / "Cargo.toml", ["--lib"]),
-            (ROOT / "vendor" / "openmat" / "Cargo.toml", ["-p", "controlab-runtime"]),
-        ):
-            subprocess.run(["cargo", "build", "--manifest-path", str(manifest), *common, *extra], cwd=ROOT, env=env, check=True)
+        subprocess.run(["cargo", "build", *common, "-p", "controlab-native", "--lib"], cwd=ROOT, env=env, check=True)
         built = target_dir / triple / args.profile
         destination = output / abi
         destination.mkdir(parents=True, exist_ok=True)
         shutil.copy2(built / "libcontrolab_native.so", destination / "libcontrolab_native.so")
-        runtime = destination / "libcontrolab_runtime.so"
-        shutil.copy2(built / "controlab-runtime", runtime)
-        runtime.chmod(0o755)
         # Builds with older NDKs may require libc++_shared; include it when present.
         cxx = toolchain.parent / "sysroot" / "usr" / "lib" / triple / "libc++_shared.so"
         if cxx.exists():
             shutil.copy2(cxx, destination / cxx.name)
-        print(f"[ControLAB] {abi}: interface Rust + runtime .m em {destination}")
+        print(f"[ControLAB] {abi}: interface Rust e interpretador .m em {destination}")
 
 
 if __name__ == "__main__":

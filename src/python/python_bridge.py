@@ -15,6 +15,7 @@ os.environ["MPLBACKEND"] = "Agg"
 
 import numpy as np
 
+from app_version import VERSION
 from lgr_engine import (
     PRESETS,
     format_complex,
@@ -320,9 +321,6 @@ from localization import localized_request
 def dispatch(data):
     action = data.get("action", "calculate")
     theme = data.get("theme", "dark")
-    if action == "script_request":
-        from script_service import dispatch_script
-        return dispatch_script(data)
     if action == "presets":
         return get_presets_response()
     if action == "preview":
@@ -470,7 +468,7 @@ def dispatch(data):
 
         if cmd in ("help", "ajuda"):
             help_text = (
-                "ControLAB Console v5.0.0\n"
+                f"ControLAB Console v{VERSION}\n"
                 "Comandos disponíveis: help, clc, clear, whos, pwd, ls, dir, cd <pasta>\n"
                 "Exemplos: 4/(s^2+2*s+4), K = 10, 2 + 2"
             )
@@ -529,10 +527,6 @@ def dispatch(data):
 
 
 def main():
-    if "--script-worker" in sys.argv:
-        from script_service import main as script_main
-        script_main()
-        return
     try:
         if len(sys.argv) > 1:
             raw_input = sys.argv[1]

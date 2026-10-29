@@ -71,10 +71,9 @@ cargo run --offline --bin controlab
 cargo build --offline --release
 ```
 
-`target/debug/` (ou `target/release/`) contém `controlab` e `controlab-runtime`
-(com `.exe` no Windows). O pacote `native/runtime` aponta diretamente para o
-adaptador vendorizado e depende das mesmas crates openMAT; nenhuma fonte do
-motor foi alterada. `Cargo.lock` fica na raiz. `run.sh` usa o mesmo fluxo Cargo.
+`target/debug/` (ou `target/release/`) contém `controlab` (com `.exe` no
+Windows), que já inclui o interpretador `.m` (`crates/mscript`). `Cargo.lock`
+fica na raiz. `run.sh` usa o mesmo fluxo Cargo.
 O launcher Python intermediário mencionado na validação histórica acima foi
 substituído; Python continua necessário para os módulos científicos.
 
@@ -89,8 +88,8 @@ Validado nesta atualização:
 - `cargo clippy --offline -p controlab-native --all-targets -- -D warnings`,
   `cargo fmt -p controlab-native --check`, `bash -n run.sh` e `git diff --check`:
   aprovados.
-- `cargo fmt --all --check` aponta formatação preexistente em fontes vendorizadas;
-  elas foram preservadas. O check de formatação da interface passou.
+- `cargo fmt --all --check` apontava formatação pendente nas fontes do
+  interpretador `.m` (depois formatadas). O check de formatação da interface passou.
 
 O build otimizado está configurado pelo Cargo, mas não foi executado nesta
 atualização. Os limites de APK/Windows/instaladores listados acima permanecem.

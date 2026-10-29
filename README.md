@@ -1,7 +1,7 @@
 # ControLAB — Control Systems
 
 A native **Rust + egui/eframe** interface, **Python** scientific engine and
-**Rust/openMAT** `.m` interpreter. The application uses no browser, Electron,
+**Rust** `.m` interpreter (`mscript`). The application uses no browser, Electron,
 Capacitor, JavaScript, TypeScript, HTML or CSS.
 
 [Português (Brasil)](README.pt-BR.md) · [Native interface](native/README.md)
@@ -17,11 +17,11 @@ cargo build --workspace
 cargo run --bin controlab
 ```
 
-Both native executables are built under `target/debug/`. Use `--release` on
-build and run commands for an optimized build; `--offline` uses cached Cargo
-dependencies. The local `.venv` interpreter is selected automatically.
-`CONTROLAB_PYTHON` and `CONTROLAB_RUNTIME` override the scientific interpreter
-and `.m` runtime. Build scripts never install dependencies automatically.
+The `controlab` executable, which includes the `.m` interpreter, is built under
+`target/debug/`. Use `--release` on build and run commands for an optimized
+build; `--offline` uses cached Cargo dependencies. The local `.venv` interpreter
+is selected automatically; `CONTROLAB_PYTHON` overrides it. Build scripts never
+install dependencies automatically.
 
 ## Independent Linux distribution
 
@@ -60,14 +60,17 @@ so installing a newer build over an older one requires uninstalling first.
 
 ## Source and checks
 
-- `native/`: Rust UI and Cargo runtime adapter.
+- `native/`: Rust UI, including the JSON bridge for `.m` scripts (`native/src/scripts.rs`).
 - `src/python/`: scientific calculations and local JSON-lines transport; no HTTP server.
 - `assets/`: canonical fonts, licenses, icons and translation data with a SHA-256 manifest.
-- `vendor/openmat/`: independently copied Rust interpreter with its provenance and license.
+- `crates/mscript/`: `.m` interpreter (numeric arrays, control models, plots, documents), run in-process by the UI.
+- `scripts/`: packaging, version and source checks in Python; Rust builds use Cargo.
+- `packaging/`: Linux desktop entry, Windows NSIS script and installer icons.
 
 ```bash
 cargo test --workspace
-cargo clippy -p controlab-native --all-targets -- -D warnings
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all --check
 PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
 python3 scripts/check_native_sources.py
 ```
@@ -75,5 +78,5 @@ python3 scripts/check_native_sources.py
 CI runs the full Rust/Python test suite and UI check on Linux; the Windows job
 validates the packaged engine and a silent install. The APK is built in CI but
 not exercised on a device.
-Historical changelogs and validation notes describe earlier versions; the web
-implementation and Node build tools have been removed.
+Notes and screenshots of the removed Electron/Capacitor interface are kept in
+`docs/history`.

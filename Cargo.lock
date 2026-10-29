@@ -350,19 +350,12 @@ dependencies = [
  "egui_plot",
  "image",
  "jni",
+ "mscript",
  "resvg",
  "rfd",
  "serde",
  "serde_json",
  "winit",
-]
-
-[[package]]
-name = "controlab-runtime-native"
-version = "0.1.0"
-dependencies = [
- "openmat-lang",
- "serde_json",
 ]
 
 [[package]]
@@ -1281,6 +1274,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "mscript"
+version = "5.0.0"
+
+[[package]]
 name = "naga"
 version = "30.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1675,30 +1672,6 @@ name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
-
-[[package]]
-name = "openmat-control"
-version = "0.1.0"
-dependencies = [
- "openmat-numeric",
-]
-
-[[package]]
-name = "openmat-graphics"
-version = "0.1.0"
-
-[[package]]
-name = "openmat-lang"
-version = "0.1.0"
-dependencies = [
- "openmat-control",
- "openmat-graphics",
- "openmat-numeric",
-]
-
-[[package]]
-name = "openmat-numeric"
-version = "0.1.0"
 
 [[package]]
 name = "option-ext"

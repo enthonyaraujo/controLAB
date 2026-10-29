@@ -9,6 +9,7 @@ mod model;
 mod overlays;
 mod page;
 mod results;
+mod scripts;
 mod studio;
 mod texfmt;
 mod theme;
@@ -1201,6 +1202,8 @@ impl eframe::App for Controlab {
                     ) {
                         eprintln!("{e}");
                     }
+                    // A captured script is never saved; do not ask to discard it.
+                    self.allow_close = true;
                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                 }
             }
@@ -1211,7 +1214,7 @@ impl eframe::App for Controlab {
     }
 }
 
-const HELP: &str = "Scripts .m · openMAT\n\
+const HELP: &str = "Scripts .m · ControLAB\n\
 F5: executar · Ctrl+S: salvar · Ctrl+O: abrir · Ctrl+N: novo script\n\
 Exemplo: A=[1 2;3 4]; disp(A*A)\n\
 Gráficos: x=0:0.1:6; plot(x,sin(x))\n\

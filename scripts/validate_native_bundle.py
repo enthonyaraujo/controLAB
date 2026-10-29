@@ -26,8 +26,6 @@ def validate(bundle, ui=False):
         {'action': 'frequency_response', 'expr': '1/(s+1)', 'points': 150},
         {'action': 'controller_design', 'plant_expr': '5/(s*(s+1))', 'controller_type': 'lead', 'ts': 2.0, 'xi': 0.5, 'points': 150},
         {'action': 'state_space', 'mode': 'matrices', 'A': '[[0,1],[-2,-3]]', 'B': '[[0],[1]]', 'C': '[[1,0]]', 'D': '[[0]]'},
-        {'action': 'script_request', 'operation': 'execute', 'source': 'a=7;'},
-        {'action': 'script_request', 'operation': 'execute', 'source': 'a+2'},
     ]
     with tempfile.TemporaryDirectory(prefix='controlab-bundle-check-') as temp:
         env = dict(os.environ)
@@ -36,7 +34,6 @@ def validate(bundle, ui=False):
         env.pop('CONTROLAB_ENGINE', None)
         env['CONTROLAB_PYTHON'] = str(Path(temp) / 'no-python')
         env['CONTROLAB_NATIVE_BRIDGE'] = str(Path(temp) / 'no-source-bridge')
-        env.pop('CONTROLAB_RUNTIME', None)
         # Same protocol encoding the UI sets; Windows pipes otherwise use the ANSI code page.
         env['PYTHONIOENCODING'] = 'utf-8'
         completed = subprocess.run([str(bundle / metadata['engine'])],
@@ -48,7 +45,6 @@ def validate(bundle, ui=False):
         assert all(reply.get('success') for reply in replies), replies
         assert 'Time' in replies[1]['title']
         assert replies[2]['images'][0]
-        assert '9' in replies[-1]['output']
         if ui:
             screenshot = bundle / 'validation-ui.png'
             env.update(CONTROLAB_SCREENSHOT=str(screenshot), CONTROLAB_SCREENSHOT_PAGE='time',
@@ -57,8 +53,17 @@ def validate(bundle, ui=False):
                 text=True, encoding='utf-8', errors='replace', capture_output=True, timeout=60)
             assert completed.returncode == 0, completed.stderr
             assert screenshot.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
-    print('Bundle validated: independent resources, all six scientific engines, formulas and persistent .m session' +
-          (', native UI' if ui else ''))
+            # .m scripts run inside the UI process: they must work with no engine at all.
+            script = Path(temp) / 'validation-script.png'
+            env.update(CONTROLAB_SCREENSHOT=str(script), CONTROLAB_ENGINE=str(Path(temp) / 'no-engine'),
+                CONTROLAB_SCREENSHOT_SCRIPT='A=[1 2;3 4];\ndisp(A*A)\nstep(tf([1],[1 2 1]))')
+            env.pop('CONTROLAB_SCREENSHOT_PAGE')
+            completed = subprocess.run([str(bundle / metadata['ui'])], cwd=temp, env=env,
+                text=True, encoding='utf-8', errors='replace', capture_output=True, timeout=60)
+            assert completed.returncode == 0, completed.stderr
+            assert script.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
+    print('Bundle validated: independent resources, all six scientific engines and formulas' +
+          (', native UI and in-process .m scripts' if ui else ''))
 
 
 if __name__ == '__main__':

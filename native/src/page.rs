@@ -584,7 +584,11 @@ impl Controlab {
                     .filter(|v| !v.is_empty())
                     .unwrap_or_else(|| "4 / (s^2 + 2*s + 4)".into());
                 let code = format!(
-                    "# ControLAB v5.0.0 - Script de Simulação\nimport control as ct\nimport matplotlib.pyplot as plt\n\ns = ct.tf('s')\nG = {}\nT = ct.feedback(G, 1)\nt, y = ct.step_response(T, T=10)\n\nplt.figure(figsize=(8, 4.5), dpi=120)\nplt.plot(t, y, label='Degrau unitário')\nplt.grid(True)\nplt.title('Resposta ao Degrau - ControLAB')\nplt.xlabel('Tempo (s)')\nplt.ylabel('Amplitude')\nplt.legend()\nplt.show()\n",
+                    concat!(
+                        "# ControLAB v",
+                        env!("CARGO_PKG_VERSION"),
+                        " - Script de Simulação\nimport control as ct\nimport matplotlib.pyplot as plt\n\ns = ct.tf('s')\nG = {}\nT = ct.feedback(G, 1)\nt, y = ct.step_response(T, T=10)\n\nplt.figure(figsize=(8, 4.5), dpi=120)\nplt.plot(t, y, label='Degrau unitário')\nplt.grid(True)\nplt.title('Resposta ao Degrau - ControLAB')\nplt.xlabel('Tempo (s)')\nplt.ylabel('Amplitude')\nplt.legend()\nplt.show()\n"
+                    ),
                     expr.replace('^', "**")
                 );
                 ctx.copy_text(code);

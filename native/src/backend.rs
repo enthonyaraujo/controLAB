@@ -24,26 +24,36 @@ impl Backend {
         let (outgoing, replies) = mpsc::channel();
         let stop = Arc::new(AtomicBool::new(false));
         let worker_stop = stop.clone();
-        let worker = thread::spawn(move || {
-            #[cfg(not(target_os = "android"))]
-            let mut process: Option<desktop::PythonProcess> = None;
-            while !worker_stop.load(Ordering::Relaxed) {
-                let (tag, payload) = match incoming.recv_timeout(Duration::from_millis(100)) {
-                    Ok(request) => request,
-                    Err(mpsc::RecvTimeoutError::Timeout) => continue,
-                    Err(mpsc::RecvTimeoutError::Disconnected) => break,
-                };
-                #[cfg(target_os = "android")]
-                let result = crate::android::request(&payload);
+        // The .m interpreter recurses over expression trees; give it a generous stack.
+        let worker = thread::Builder::new()
+            .name("controlab-backend".into())
+            .stack_size(16 * 1024 * 1024)
+            .spawn(move || {
+                let mut scripts = crate::scripts::Scripts::default();
                 #[cfg(not(target_os = "android"))]
-                let result = desktop::request(&mut process, payload, &worker_stop);
-                if outgoing.send((tag, result)).is_err() {
-                    break;
+                let mut process: Option<desktop::PythonProcess> = None;
+                while !worker_stop.load(Ordering::Relaxed) {
+                    let (tag, payload) = match incoming.recv_timeout(Duration::from_millis(100)) {
+                        Ok(request) => request,
+                        Err(mpsc::RecvTimeoutError::Timeout) => continue,
+                        Err(mpsc::RecvTimeoutError::Disconnected) => break,
+                    };
+                    let result = if payload["action"] == "script_request" {
+                        Ok(scripts.request(&payload))
+                    } else {
+                        #[cfg(target_os = "android")]
+                        let result = crate::android::request(&payload);
+                        #[cfg(not(target_os = "android"))]
+                        let result = desktop::request(&mut process, payload, &worker_stop);
+                        result
+                    };
+                    if outgoing.send((tag, result)).is_err() {
+                        break;
+                    }
+                    ctx.request_repaint();
                 }
-                ctx.request_repaint();
-            }
-            // PythonProcess::drop also terminates its .m runtime process group.
-        });
+            })
+            .expect("backend worker thread");
         Self {
             requests,
             replies,
@@ -184,13 +194,13 @@ mod desktop {
                     .ok()
                     .and_then(|p| p.parent().and_then(packaged_engine))
             };
-            let (mut command, bridge_directory) = if let Some(engine) = engine {
-                (Command::new(engine), None)
+            let mut command = if let Some(engine) = engine {
+                Command::new(engine)
             } else {
                 let bridge = bridge_path()?;
                 let mut command = Command::new(python_path(&bridge));
                 command.arg("-u").arg(&bridge);
-                (command, bridge.parent().map(Path::to_path_buf))
+                command
             };
             command
                 .stdin(Stdio::piped())
@@ -198,28 +208,6 @@ mod desktop {
                 .stderr(Stdio::inherit())
                 .env("PYTHONIOENCODING", "utf-8")
                 .env("MPLBACKEND", "Agg");
-            // A bundled .m runtime lives next to the binary or its Python resources.
-            if std::env::var_os("CONTROLAB_RUNTIME").is_none() {
-                let name = if cfg!(windows) {
-                    "controlab-runtime.exe"
-                } else {
-                    "controlab-runtime"
-                };
-                let mut candidates = bridge_directory
-                    .iter()
-                    .map(|path| path.join(name))
-                    .collect::<Vec<_>>();
-                if let Ok(executable) = std::env::current_exe()
-                    && let Some(directory) = executable.parent()
-                {
-                    candidates.push(directory.join(name));
-                    candidates.push(directory.join("runtime").join(name));
-                    candidates.push(directory.join("resources/runtime").join(name));
-                }
-                if let Some(runtime) = candidates.into_iter().find(|path| path.is_file()) {
-                    command.env("CONTROLAB_RUNTIME", runtime);
-                }
-            }
             #[cfg(unix)]
             {
                 use std::os::unix::process::CommandExt;
@@ -349,7 +337,7 @@ mod desktop {
                 unsafe extern "C" {
                     fn kill(pid: i32, sig: i32) -> i32;
                 }
-                // Signal the whole private group, including any persistent .m child.
+                // Signal the whole private group, including any helper the engine spawned.
                 unsafe {
                     kill(-(self.child.id() as i32), 15);
                 }

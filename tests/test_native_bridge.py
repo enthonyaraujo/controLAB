@@ -88,12 +88,9 @@ native_bridge.main()
         self.assertFalse(replies[1]['success'])
         self.assertEqual(replies[2]['num'], [2.0])
 
-    def test_script_session_is_persistent(self):
-        replies = self.exchange([{'action':'script_request','operation':'execute','source':'a=7;'},
-            {'action':'script_request','operation':'execute','source':'a+2'}])
-        self.assertTrue(replies[0]['success'], replies[0])
-        self.assertTrue(replies[1]['success'], replies[1])
-        self.assertIn('9', replies[1]['output'])
+    def test_scripts_are_run_by_the_native_interface_not_the_engine(self):
+        replies = self.exchange([{'action':'script_request','operation':'execute','source':'a=7;'}])
+        self.assertFalse(replies[0]['success'])
 
     def test_all_six_engines_return_plots_and_recover_from_invalid_input(self):
         requests = [

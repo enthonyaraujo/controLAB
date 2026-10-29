@@ -4,13 +4,14 @@ A interface Android usa o mesmo cliente Rust/egui do desktop, renderizado por
 OpenGL ES em `android.app.NativeActivity`. Não há WebView, Capacitor ou servidor
 HTTP neste caminho. O projeto Gradle independente fica em `native/android`.
 
-O APK inclui três componentes:
+O APK inclui dois componentes:
 
-- `libcontrolab_native.so`: a interface Rust e o ciclo de vida `android-activity`;
+- `libcontrolab_native.so`: a interface Rust, o interpretador `.m` (`crates/mscript`)
+  e o ciclo de vida `android-activity`;
 - Python 3.10/Chaquopy 17.0.0 e os módulos canônicos de `src/python`, com as mesmas
-  versões científicas de `requirements-android.txt`;
-- `libcontrolab_runtime.so`: o executável Rust do motor `.m`, extraído para
-  `nativeLibraryDir` e iniciado pelo `script_service.py` canônico.
+  versões científicas de `requirements-android.txt`.
+
+Scripts `.m` rodam na thread de trabalho do Rust, sem passar por JNI ou Python.
 
 O worker Rust anexa sua thread à JVM, chama `NativeApplication.dispatchJson` por
 JNI e recebe JSON de `native_presentation.dispatch_android` (que preserva a compatibilidade de
@@ -39,7 +40,7 @@ export LGR_ANDROID_PYTHON=/caminho/para/python3.10
 native/android/gradlew --project-dir native/android :app:assembleDebug
 ```
 
-A tarefa Gradle compila a biblioteca Rust e o executável `.m` antes de empacotar
+A tarefa Gradle compila a biblioteca Rust (interface e interpretador `.m`) antes de empacotar
 o APK, por padrão somente para `arm64-v8a`. Saída:
 `native/android/app/build/outputs/apk/debug/app-debug.apk`.
 

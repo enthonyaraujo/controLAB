@@ -10,9 +10,6 @@ try:
 
     application = jclass("com.chaquo.python.Python").getPlatform().getApplication()
     cache_root = Path(str(application.getCacheDir().getAbsolutePath())) / "lgr-studio"
-    # Android only allows executing app files from nativeLibraryDir, where the APK installs the .m runtime.
-    native_dir = str(application.getApplicationInfo().nativeLibraryDir)
-    os.environ.setdefault("CONTROLAB_RUNTIME", os.path.join(native_dir, "libcontrolab_runtime.so"))
 except ImportError:
     cache_root = Path(tempfile.gettempdir()) / "lgr-studio"
 

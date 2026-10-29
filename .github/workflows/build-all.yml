@@ -30,7 +30,6 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}/src/python
       CONTROLAB_PYTHON: python
-      CONTROLAB_RUNTIME: ${{ github.workspace }}/target/release/controlab-runtime
     steps:
       - uses: actions/checkout@v5
 
@@ -70,8 +69,8 @@ jobs:
       - name: Testes de regressão Rust e Python
         run: |
           cargo test --locked --workspace
-          cargo clippy --locked -p controlab-native --all-targets -- -D warnings
-          cargo fmt -p controlab-native --check
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo fmt --all --check
           python -m unittest discover -s tests
           desktop-file-validate packaging/linux/controlab.desktop
 
