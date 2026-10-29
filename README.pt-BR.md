@@ -108,3 +108,19 @@ A paridade com a engine Python retirada é verificada por `cargo xtask parity`:
 valores numéricos com `atol=1e-9, rtol=1e-7`, textos exatos e os rótulos e
 cores de cada gráfico. Documentos e capturas da interface Electron/Capacitor
 removida ficam em `docs/history`.
+
+## Diagrama de Blocos
+
+Em **Apps → Diagrama de Blocos**, abra o editor em uma janela independente
+no mesmo processo. O editor inclui redução simbólica/numérica por Mason,
+exemplos, tutoriais, histórico de edição, arquivos JSON e exportação SVG/PNG.
+Os arquivos JSON existentes do BlockLab continuam compatíveis.
+
+```bash
+cargo run --bin controlab -- --diagram caminho/diagrama.json
+cargo run --bin controlab -- --export-diagram caminho/diagrama.json resultado.svg
+```
+
+A integração incorpora as bibliotecas do BlockLab em `crates/blocklab-core`
+e `crates/blocklab-gui`; não exige outra instalação ou o repositório original.
+A conexão automática com os outros Apps não faz parte desta entrega.

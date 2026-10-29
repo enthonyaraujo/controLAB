@@ -1,6 +1,6 @@
 [workspace]
-members = ["native", "crates/mscript", "crates/control-engine", "xtask"]
-default-members = ["native", "crates/mscript", "crates/control-engine", "xtask"]
+members = ["native", "crates/mscript", "crates/control-engine", "xtask", "crates/blocklab-core", "crates/blocklab-gui"]
+default-members = ["native", "crates/mscript", "crates/control-engine", "xtask", "crates/blocklab-core", "crates/blocklab-gui"]
 resolver = "3"
 
 # `cargo xtask version` updates this version, shared by every crate.
@@ -8,3 +8,6 @@ resolver = "3"
 version = "6.1.0"
 license = "MIT"
 edition = "2024"
+
+[workspace.lints.rust]
+unsafe_code = "deny"

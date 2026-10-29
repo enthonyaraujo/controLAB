@@ -38,7 +38,7 @@ impl Controlab {
                 ctx,
                 &p,
                 "Alterações não salvas",
-                "Há scripts com alterações não salvas. Deseja descartá-las e sair?",
+                "Há documentos com alterações não salvas. Deseja descartá-las e sair?",
                 "Descartar e sair",
             ) {
                 Some(true) => {
@@ -354,7 +354,7 @@ impl Controlab {
                         ui.add_space(24.0);
                         section(ui, p, Some(icons::EXPORT), "Atualizações do Aplicativo");
                         card(ui, p, |ui| {
-                            ui.with_layout(if compact{egui::Layout::top_down(egui::Align::Min)}else{egui::Layout::left_to_right(egui::Align::Center)},|ui| {
+                            ui.allocate_ui_with_layout(vec2(ui.available_width(), 0.0), if compact{egui::Layout::top_down(egui::Align::Min)}else{egui::Layout::left_to_right(egui::Align::Center)},|ui| {
                                 ui.vertical(|ui| {
                                     ui.set_max_width(if compact{ui.available_width()}else{width-48.0-30.0-190.0});
                                     ui.horizontal_wrapped(|ui| {
@@ -367,7 +367,7 @@ impl Controlab {
                                     ui.add_space(6.0);
                                     kit::paragraph(ui, "Consulte a versão estável mais recente publicada no GitHub Releases.", sans(13.0, Weight::Regular), p.muted);
                                 });
-                                ui.with_layout(if compact{egui::Layout::left_to_right(egui::Align::Center)}else{egui::Layout::right_to_left(egui::Align::Center)}, |ui| {
+                                ui.allocate_ui_with_layout(vec2(ui.available_width(), 40.0), if compact{egui::Layout::left_to_right(egui::Align::Center)}else{egui::Layout::right_to_left(egui::Align::Center)}, |ui| {
                                     let label = match &self.update {
                                         Some(UpdateState::Loading) => "Verificando...",
                                         Some(_) => "Verificar Novamente",
