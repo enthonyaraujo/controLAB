@@ -14,6 +14,8 @@ name = "controlab"
 path = "src/main.rs"
 
 [dependencies]
+blocklab-gui = { path = "../crates/blocklab-gui" }
+blocklab-core = { path = "../crates/blocklab-core" }
 mscript = { path = "../crates/mscript" }
 eframe = { version = "=0.36.2", default-features = false, features = ["default_fonts", "glow", "x11", "wayland", "android-native-activity"] }
 egui_plot = "=0.37.0"

@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 08644e158c88e2feb97b72c59717af67cbaf1475b1fceff9a6af815ea5dbd09a # shrinks to g = Sfg { nodes: [SfgNode { label: "n0", origin: None }, SfgNode { label: "n1", origin: None }], edges: [SfgEdge { from: 0, to: 1, gain: e0 }, SfgEdge { from: 1, to: 1, gain: e1 }], source: 0, sink: 1 }

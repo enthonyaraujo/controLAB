@@ -146,6 +146,7 @@ pub struct Preview {
 }
 
 struct Analysis {
+    revision: u64,
     values: BTreeMap<String, String>,
     result: Value,
     figures: Vec<(String, String, egui::TextureHandle)>,
@@ -164,6 +165,7 @@ struct Analysis {
 impl Analysis {
     fn new(module: &Module) -> Self {
         Self {
+            revision: 0,
             values: module.defaults(),
             result: Value::Null,
             figures: vec![],
@@ -204,6 +206,9 @@ enum Picked {
 }
 
 pub struct Controlab {
+    block_editor: Option<blocklab_gui::app::App>,
+    block_open: bool,
+    block_exit_requested: bool,
     backend: backend::Backend,
     formulas: results::Formulas,
     schema: Schema,
@@ -353,6 +358,9 @@ impl Controlab {
             .map(|(id, m)| (id.clone(), Analysis::new(m)))
             .collect();
         Self {
+            block_editor: None,
+            block_open: std::env::args().any(|a| a == "--diagram"),
+            block_exit_requested: false,
             backend: backend::Backend::new(ctx.clone()),
             formulas: results::Formulas::new(ctx),
             schema,
@@ -434,7 +442,10 @@ impl Controlab {
                 self.formulas.receive(&Value::Null);
                 return;
             }
-            if let Some(a) = self.analyses.get_mut(tag) {
+            if let Some(a) = self
+                .analyses
+                .get_mut(tag.split_once('@').map_or(tag, |(id, _)| id))
+            {
                 a.pending = false;
                 a.error = error.clone();
             }
@@ -484,7 +495,9 @@ impl Controlab {
                 a.pending = true;
                 a.error.clear();
                 a.mobile_tab = 1;
-                self.send(id, payload);
+                a.revision += 1;
+                let tag = format!("{id}@{}", a.revision);
+                self.send(&tag, payload);
             }
             Err(e) => {
                 self.analyses.get_mut(id).unwrap().error = e.clone();
@@ -511,7 +524,9 @@ impl Controlab {
                 let Some(a) = self.analyses.get_mut(id) else {
                     continue;
                 };
-                let sent = a.preview.in_flight.take().unwrap_or_default();
+                let Some(sent) = a.preview.in_flight.take() else {
+                    continue;
+                };
                 if a.values.get(field).map(|v| v.trim()) != Some(sent.trim()) {
                     continue; // Superseded by a newer edit.
                 }
@@ -532,8 +547,10 @@ impl Controlab {
                 }
                 continue;
             }
-            if self.analyses.contains_key(&tag) {
-                self.finish_calculation(ctx, &tag, reply, success, error);
+            if let Some((id, revision)) = tag.split_once('@') {
+                if let Ok(revision) = revision.parse::<u64>() {
+                    self.finish_calculation(ctx, id, revision, reply, success, error);
+                }
                 continue;
             }
             self.finish_script(&tag, reply, success, error);
@@ -544,10 +561,18 @@ impl Controlab {
         &mut self,
         ctx: &egui::Context,
         tag: &str,
+        revision: u64,
         reply: Value,
         success: bool,
         error: String,
     ) {
+        if !self
+            .analyses
+            .get(tag)
+            .is_some_and(|a| a.revision == revision && a.pending)
+        {
+            return;
+        }
         let field = self.expression_field(tag);
         let title = self.schema[tag].title.clone();
         let a = self.analyses.get_mut(tag).unwrap();
@@ -1228,6 +1253,70 @@ impl eframe::App for Controlab {
             }
         }
         self.frame(ui);
+        if ctx.input(|i| i.viewport().close_requested())
+            && !self.allow_close
+            && let Some(editor) = self.block_editor.as_mut().filter(|e| e.is_dirty())
+        {
+            ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);
+            editor.pending = Some(blocklab_gui::file_actions::Pending::Close);
+            self.block_exit_requested = true;
+            ctx.request_repaint();
+        }
+        if self.block_open {
+            let editor = self.block_editor.get_or_insert_with(|| {
+                let mut app = blocklab_gui::app::App::new(
+                    &ctx,
+                    blocklab_gui::app::startup_diagram(),
+                    None,
+                    blocklab_core::format::Mode::Symbolic,
+                );
+                app.show_home();
+                if let Some(path) =
+                    dirs::config_dir().map(|p| p.join("controlab-native/diagrams/preferences.txt"))
+                {
+                    app.prefs = blocklab_gui::prefs::Prefs::load(&path);
+                    app.prefs_path = Some(path);
+                }
+                let args: Vec<String> = std::env::args().collect();
+                if let Some(path) = args
+                    .iter()
+                    .position(|a| a == "--diagram")
+                    .and_then(|i| args.get(i + 1))
+                {
+                    match blocklab_gui::files::load(std::path::Path::new(path)) {
+                        Ok(diagram) => app.reset(diagram, Some(path.into())),
+                        Err(error) => app.error = Some(error),
+                    }
+                }
+                app
+            });
+            let mut closed = false;
+            ctx.show_viewport_immediate(
+                egui::ViewportId::from_hash_of("block-diagram"),
+                egui::ViewportBuilder::default()
+                    .with_title("controLAB — Diagrama de Blocos")
+                    .with_inner_size([1100.0, 760.0]),
+                |ctx, _| {
+                    egui::CentralPanel::default().show(ctx, |ui| {
+                        eframe::App::ui(editor, ui, _frame);
+                    });
+                    closed = editor.allow_close
+                        || ctx.input(|i| i.viewport().close_requested())
+                            && (!editor.is_dirty() || editor.allow_close);
+                },
+            );
+            if !closed && self.block_exit_requested && editor.pending.is_none() {
+                self.block_exit_requested = false;
+            }
+            if closed {
+                self.block_open = false;
+                self.block_editor = None;
+                if self.block_exit_requested {
+                    self.block_exit_requested = false;
+                    ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                }
+            }
+        }
         if let Some(payload) = self.formulas.next_request() {
             self.send("formulas", payload);
         }
@@ -1236,6 +1325,7 @@ impl eframe::App for Controlab {
         }
         if ctx.input(|i| i.viewport().close_requested())
             && !self.allow_close
+            && !self.block_exit_requested
             && self.documents.iter().any(Document::dirty)
         {
             ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);

@@ -5,7 +5,13 @@ use crate::kit::{self, fill, galley};
 use crate::theme::{Palette, Weight, sans};
 use eframe::egui::{self, Rect, Sense, Stroke, Ui, pos2, vec2};
 
-pub const APPS: [(&str, Icon, &str, &str); 6] = [
+pub const APPS: [(&str, Icon, &str, &str); 7] = [
+    (
+        "block-diagram",
+        icons::S_STATE,
+        "Diagrama de Blocos",
+        "Editor de diagramas e redução simbólica e numérica.",
+    ),
     (
         "time",
         icons::S_TIME,
@@ -129,7 +135,15 @@ impl Controlab {
                             vec2(card_w, height),
                         );
                         if app_card(ui, p, rect, id, *icon, title, desc).clicked() {
-                            self.page = (*id).into();
+                            if *id == "block-diagram" {
+                                self.block_open = true;
+                                ui.ctx().send_viewport_cmd_to(
+                                    egui::ViewportId::from_hash_of("block-diagram"),
+                                    egui::ViewportCommand::Focus,
+                                );
+                            } else {
+                                self.page = (*id).into();
+                            }
                         }
                     }
                     ui.add_space(8.0);

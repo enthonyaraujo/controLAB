@@ -1,0 +1,331 @@
+{
+  "format_version": 1,
+  "nodes": [
+    {
+      "id": 0,
+      "pos": {
+        "x": 40.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Input",
+      "name": "X"
+    },
+    {
+      "id": 1,
+      "pos": {
+        "x": 120.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Sum",
+      "inputs": [
+        {
+          "sign": "+",
+          "side": "left"
+        },
+        {
+          "sign": "-",
+          "side": "bottom"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "pos": {
+        "x": 200.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Sum",
+      "inputs": [
+        {
+          "sign": "+",
+          "side": "left"
+        },
+        {
+          "sign": "+",
+          "side": "bottom"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "pos": {
+        "x": 300.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Block",
+      "expr": "G1"
+    },
+    {
+      "id": 4,
+      "pos": {
+        "x": 420.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Block",
+      "expr": "G4"
+    },
+    {
+      "id": 5,
+      "pos": {
+        "x": 520.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Branch",
+      "outputs": 3
+    },
+    {
+      "id": 6,
+      "pos": {
+        "x": 620.0,
+        "y": 140.0
+      },
+      "flipped": false,
+      "type": "Block",
+      "expr": "G2"
+    },
+    {
+      "id": 7,
+      "pos": {
+        "x": 620.0,
+        "y": 260.0
+      },
+      "flipped": false,
+      "type": "Block",
+      "expr": "G3"
+    },
+    {
+      "id": 8,
+      "pos": {
+        "x": 360.0,
+        "y": 300.0
+      },
+      "flipped": true,
+      "type": "Block",
+      "expr": "H1"
+    },
+    {
+      "id": 9,
+      "pos": {
+        "x": 720.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Sum",
+      "inputs": [
+        {
+          "sign": "+",
+          "side": "top"
+        },
+        {
+          "sign": "+",
+          "side": "bottom"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "pos": {
+        "x": 800.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Branch",
+      "outputs": 2
+    },
+    {
+      "id": 11,
+      "pos": {
+        "x": 880.0,
+        "y": 200.0
+      },
+      "flipped": false,
+      "type": "Output",
+      "name": "Y"
+    },
+    {
+      "id": 12,
+      "pos": {
+        "x": 460.0,
+        "y": 380.0
+      },
+      "flipped": true,
+      "type": "Block",
+      "expr": "H2"
+    }
+  ],
+  "wires": [
+    {
+      "id": 13,
+      "from": {
+        "node": 0,
+        "port": 0
+      },
+      "to": {
+        "node": 1,
+        "port": 0
+      }
+    },
+    {
+      "id": 14,
+      "from": {
+        "node": 1,
+        "port": 0
+      },
+      "to": {
+        "node": 2,
+        "port": 0
+      }
+    },
+    {
+      "id": 15,
+      "from": {
+        "node": 2,
+        "port": 0
+      },
+      "to": {
+        "node": 3,
+        "port": 0
+      }
+    },
+    {
+      "id": 16,
+      "from": {
+        "node": 3,
+        "port": 0
+      },
+      "to": {
+        "node": 4,
+        "port": 0
+      }
+    },
+    {
+      "id": 17,
+      "from": {
+        "node": 4,
+        "port": 0
+      },
+      "to": {
+        "node": 5,
+        "port": 0
+      }
+    },
+    {
+      "id": 18,
+      "from": {
+        "node": 5,
+        "port": 0
+      },
+      "to": {
+        "node": 6,
+        "port": 0
+      }
+    },
+    {
+      "id": 19,
+      "from": {
+        "node": 5,
+        "port": 1
+      },
+      "to": {
+        "node": 7,
+        "port": 0
+      }
+    },
+    {
+      "id": 20,
+      "from": {
+        "node": 5,
+        "port": 2
+      },
+      "to": {
+        "node": 8,
+        "port": 0
+      }
+    },
+    {
+      "id": 21,
+      "from": {
+        "node": 8,
+        "port": 0
+      },
+      "to": {
+        "node": 2,
+        "port": 1
+      }
+    },
+    {
+      "id": 22,
+      "from": {
+        "node": 6,
+        "port": 0
+      },
+      "to": {
+        "node": 9,
+        "port": 0
+      }
+    },
+    {
+      "id": 23,
+      "from": {
+        "node": 7,
+        "port": 0
+      },
+      "to": {
+        "node": 9,
+        "port": 1
+      }
+    },
+    {
+      "id": 24,
+      "from": {
+        "node": 9,
+        "port": 0
+      },
+      "to": {
+        "node": 10,
+        "port": 0
+      }
+    },
+    {
+      "id": 25,
+      "from": {
+        "node": 10,
+        "port": 0
+      },
+      "to": {
+        "node": 11,
+        "port": 0
+      }
+    },
+    {
+      "id": 26,
+      "from": {
+        "node": 10,
+        "port": 1
+      },
+      "to": {
+        "node": 12,
+        "port": 0
+      }
+    },
+    {
+      "id": 27,
+      "from": {
+        "node": 12,
+        "port": 0
+      },
+      "to": {
+        "node": 1,
+        "port": 1
+      }
+    }
+  ],
+  "params": {},
+  "next_id": 28
+}

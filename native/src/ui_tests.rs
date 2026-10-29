@@ -1028,3 +1028,47 @@ fn settings_and_confirmations_fit_phone_and_short_landscape_viewports() {
         assert!(rect.width() <= safe.width() + 1.0);
     }
 }
+
+#[test]
+fn settings_updates_card_does_not_expand_into_empty_vertical_space() {
+    fn text_top(shape: &Shape, needle: &str) -> Option<f32> {
+        match shape {
+            Shape::Text(text) if text.galley.text().contains(needle) => Some(text.pos.y),
+            Shape::Vec(shapes) => shapes.iter().find_map(|shape| text_top(shape, needle)),
+            _ => None,
+        }
+    }
+    for width in [390.0, 1440.0] {
+        let ctx = egui::Context::default();
+        let mut app = fixture(&ctx, true);
+        app.settings = true;
+        for _ in 0..4 {
+            render_sized(&mut app, &ctx, width, 2000.0);
+        }
+        let mut output = ctx.run_ui(
+            egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(width, 2000.0),
+                )),
+                ..Default::default()
+            },
+            |ui| app.frame(ui),
+        );
+        let shapes = std::mem::take(&mut output.shapes);
+        output.drop_without_applying_deltas();
+        let top = |needle| {
+            shapes
+                .iter()
+                .find_map(|shape| text_top(&shape.shape, needle))
+                .expect(needle)
+        };
+        let version_y = top("Versão Instalada");
+        let releases_y = top("Ver histórico completo");
+        assert!(
+            releases_y - version_y < 220.0,
+            "Update card wastes vertical space at {width}: {}",
+            releases_y - version_y
+        );
+    }
+}

@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 0abaac9c149934cde5258448f012534a948cae5ca2af69411ccabaf4c3556b86 # shrinks to a = (-1)/(s - G1), b = (s*H1 - G1)/(s^2*G1^2*a + G1*H1 + 1)

@@ -550,7 +550,19 @@ impl Controlab {
             }
             Action::Clear => {
                 let a = self.analyses.get_mut(id).unwrap();
+                a.revision += 1;
+                a.result = serde_json::Value::Null;
+                a.figures.clear();
+                a.error.clear();
+                a.pending = false;
+                a.view = 0;
+                a.deductions = false;
+                a.deduction_filter = 0;
+                a.mobile_tab = 0;
                 a.values.insert(field.into(), String::new());
+                a.preview.error.clear();
+                a.preview.valid_for.clear();
+                a.preview.in_flight = None;
                 a.preview.state = PreviewState::Waiting;
                 a.preview.tex.clear();
                 a.preview.due = None;
@@ -1418,5 +1430,81 @@ mod tests {
         recompute_controller(&mut v, "wn");
         assert_eq!(v["ts"], "1,9817");
         assert_eq!(v["primary_freq_spec"], "wn");
+    }
+}
+
+#[cfg(test)]
+mod clear_regression_tests {
+    use super::*;
+
+    #[test]
+    fn clear_removes_outputs_for_every_scientific_app() {
+        let ctx = egui::Context::default();
+        let schema = serde_json::from_str(include_str!("../modules.json")).unwrap();
+        let mut app = Controlab::with(ctx.clone(), schema, crate::Preferences::default());
+        let texture = ctx.load_texture(
+            "clear-fixture",
+            egui::ColorImage::filled([1, 1], egui::Color32::WHITE),
+            Default::default(),
+        );
+        for id in crate::ORDER {
+            let a = app.analyses.get_mut(id).unwrap();
+            a.result = serde_json::json!({"success": true, "test_output": "old result"});
+            a.figures
+                .push(("old".into(), "svg".into(), texture.clone()));
+            a.error = "old error".into();
+            a.pending = true;
+            a.deductions = true;
+            a.view = 2;
+            a.preview.error = "old preview error".into();
+            app.ribbon_action(&ctx, id, Action::Clear);
+            let a = &app.analyses[id];
+            assert!(a.result.is_null(), "result remained for {id}");
+            assert!(a.figures.is_empty(), "figures remained for {id}");
+            assert!(a.error.is_empty(), "error remained for {id}");
+            assert!(
+                !a.pending && !a.deductions,
+                "active state remained for {id}"
+            );
+            assert_eq!(a.view, 0);
+            assert!(a.preview.error.is_empty());
+            let cleared_revision = a.revision;
+            // A reply to a calculation started before Clear must be ignored.
+            app.finish_calculation(
+                &ctx,
+                id,
+                cleared_revision - 1,
+                serde_json::json!({"success": true}),
+                true,
+                String::new(),
+            );
+            assert!(app.analyses[id].result.is_null());
+            // Even after another calculation starts, the old reply cannot
+            // finish it or reintroduce the previous graph/results.
+            let a = app.analyses.get_mut(id).unwrap();
+            a.revision += 1;
+            a.pending = true;
+            let current_revision = a.revision;
+            app.finish_calculation(
+                &ctx,
+                id,
+                cleared_revision - 1,
+                serde_json::Value::Null,
+                false,
+                "old failure".into(),
+            );
+            assert!(app.analyses[id].pending);
+            assert!(app.analyses[id].error.is_empty());
+            app.finish_calculation(
+                &ctx,
+                id,
+                current_revision,
+                serde_json::json!({"success": true}),
+                true,
+                String::new(),
+            );
+            assert!(!app.analyses[id].pending);
+            assert!(!app.analyses[id].result.is_null());
+        }
     }
 }
