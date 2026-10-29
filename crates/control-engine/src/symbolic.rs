@@ -491,10 +491,10 @@ fn join_terms(mut terms: Vec<(String, bool)>) -> String {
     out
 }
 pub fn polynomial_latex(p: &Polynomial) -> String {
-    if p.0.len() == 1 {
-        if let Some(c) = p.0.get(&(0, 0)) {
-            return rational_latex(c);
-        }
+    if p.0.len() == 1
+        && let Some(c) = p.0.get(&(0, 0))
+    {
+        return rational_latex(c);
     }
     let mut entries: Vec<_> = p.0.iter().rev().collect();
     // SymPy presents a two-term subtraction with its positive constant first.
@@ -760,11 +760,7 @@ impl SPolynomial {
                 out.push_str(&term);
             }
         }
-        if out.is_empty() {
-            "0".into()
-        } else {
-            out
-        }
+        if out.is_empty() { "0".into() } else { out }
     }
 }
 #[derive(Clone, Debug)]
@@ -862,7 +858,7 @@ fn lex(s: &str) -> Result<Vec<Token>> {
             _ => {
                 return Err(
                     "Erro ao analisar a expressão matemática: símbolo não suportado.".into(),
-                )
+                );
             }
         });
         p += 1;
@@ -968,7 +964,9 @@ impl Parser {
     }
     fn atom(&mut self) -> Result<SFraction> {
         match self.take() {
-            Some(Token::Number(n)) => Ok(SFraction::scalar(Expr::rational(parse_rational(&n)?))),
+            Some(Token::Number(n)) => Ok(SFraction::scalar(
+                Expr::rational(parse_rational(&n)?).with_approximate(n.contains(['.', 'e', 'E'])),
+            )),
             Some(Token::K) => Ok(SFraction::scalar(Expr::k())),
             Some(Token::S) => Ok(SFraction {
                 num: SPolynomial(vec![Expr::integer(0), Expr::integer(1)]),
@@ -1006,9 +1004,13 @@ pub fn parse_transfer(source: &str) -> Result<(SPolynomial, SPolynomial)> {
     Ok((f.num, f.den))
 }
 pub fn parse_characteristic(source: &str, has_k_loop: bool) -> Result<(SPolynomial, bool)> {
+    crate::execution::checkpoint()?;
     let mut source = source.trim();
     if source.is_empty() {
         return Err("A expressão não pode estar vazia.".into());
+    }
+    if !source.contains(['s', 'S']) {
+        return Err("O grau do polinômio característico deve ser pelo menos 1.".into());
     }
     if let Some(s) = source
         .strip_suffix("= 0")

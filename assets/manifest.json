@@ -34,6 +34,7 @@
     "fonts/katex/LICENSE": "766ccc1f306c885aa45542a9846bbd0a505b27a0374f146778171c2254ce18e3",
     "icons/app-icon.png": "39d1b9df195dd3d5b3bc7422f145b93af9f1c98923e1e0bdeb87e0c7ebe0f79a",
     "icons/app-icon.svg": "c9e5ab914d14d0d2d1f4b7cf5abfc0b25f642eba2f8c97f0878b10a2f203fd36",
-    "locales/en.json": "0851cb59c731a85d814e10791613f7a95868969905b451bbd6afe8b121c23d3c"
+    "locales/en.json": "0851cb59c731a85d814e10791613f7a95868969905b451bbd6afe8b121c23d3c",
+    "licenses/STIXTwoMath-OFL.txt": "bec17cee6412788db45fd2644b301afbc99cc5d372ddd3345dc4a7bfdefb9f04"
   }
 }

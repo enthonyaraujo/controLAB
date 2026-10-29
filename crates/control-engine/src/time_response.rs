@@ -321,7 +321,7 @@ pub fn analyze(p: &Value) -> Result<Value> {
     ) {
         rows.push(json!({"label":label,"value":display(Some(v),"—")}));
     }
-    let (latex,factored) = tf.latex_formatted(false);
+    let (latex, factored) = crate::transfer::expression_latex(expr)?;
     let expression = latex.trim_start_matches("G(s) = ");
     let factored_expression = factored.trim_start_matches("G(s) = ");
     let poles: Vec<Value> = poles.iter().map(|v| complex(*v)).collect();
@@ -397,7 +397,7 @@ impl Chart {
             max + pad,
         );
     }
-    fn xy(&self, x: f64, y: f64) -> (f64, f64) {
+    pub(crate) fn xy(&self, x: f64, y: f64) -> (f64, f64) {
         let (a, b, c, d) = self.bounds;
         let (l, t, w, h) = self.rect;
         let xx = if self.log {

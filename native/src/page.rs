@@ -10,12 +10,12 @@ use eframe::egui::{self, Color32, Rect, Sense, Stroke, Ui, pos2, vec2};
 /// `MODULE_METAS[*].solverMeta` and the LGR/Routh footers.
 fn solver_meta(id: &str) -> &'static str {
     match id {
-        "time" => "Módulo: Resposta no Tempo • Solver: scipy",
-        "frequency" => "Módulo: Resposta em Frequência • Solver: scipy / python-control",
-        "controllers" => "Módulo: Projeto de Controladores • Solver: LGR / sympy / python-control",
-        "state-space" => "Módulo: Espaço de Estados • Solver: scipy / sympy",
-        "lgr" => "Módulo: Lugar Geométrico das Raízes • Solver: python-control",
-        "routh" => "Módulo: Estabilidade • Solver: sympy",
+        "time" => "Módulo: Resposta no Tempo • Solver: Rust",
+        "frequency" => "Módulo: Resposta em Frequência • Solver: Rust",
+        "controllers" => "Módulo: Projeto de Controladores • Solver: Rust",
+        "state-space" => "Módulo: Espaço de Estados • Solver: Rust",
+        "lgr" => "Módulo: Lugar Geométrico das Raízes • Solver: Rust",
+        "routh" => "Módulo: Estabilidade • Solver: Rust",
         _ => "Pronto",
     }
 }

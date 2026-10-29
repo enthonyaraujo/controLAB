@@ -436,7 +436,12 @@ pub fn analyze(p: &Value) -> Result<Value> {
             ))
         }
     }
-    let (latex,factored) = tf.latex_formatted(false);
+    let (latex, factored) = crate::transfer::expression_latex(
+        p["expr"]
+            .as_str()
+            .filter(|s| !s.is_empty())
+            .unwrap_or("10 / (s * (s + 2) * (s + 5))"),
+    )?;
     Ok(
         json!({"success":true,"module":"frequency_response","title":"Resposta em Frequência","description":"Bode real e assintótico, Nyquist e métricas de estabilidade relativa.","image":image,"svg":svg,
  "latex":[{"label":"Planta","value":factored.trim_start_matches("G(s) = ")},{"label":"Resposta senoidal","value":r"G(j\omega)=G(s)\vert_{s=j\omega}"},{"label":"Critério de Nyquist","value":format!(r"Z=N+P\;\Rightarrow\;{zc}={nc}+{pc}")}],"metrics":rows,

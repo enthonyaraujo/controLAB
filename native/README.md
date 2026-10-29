@@ -1,33 +1,40 @@
 # ControLAB nativo — Rust + egui/eframe
 
 A interface nativa executa em Linux, Windows e Android, sem navegador, WebView,
-HTML, CSS ou JavaScript. O motor científico continua em `src/python`; scripts
-`.m` são executados pelo interpretador `crates/mscript`, dentro do aplicativo.
+HTML, CSS ou JavaScript. O motor científico Rust está em `crates/control-engine`;
+scripts `.m` são executados pelo interpretador `crates/mscript`, dentro do aplicativo.
+Desktop executa o serviço científico Rust local; Android usa a mesma biblioteca
+diretamente na thread de trabalho.
 
 ## Desktop
 
-Requer Rust/Cargo e o ambiente Python científico já usado pelo projeto. Cargo compila
-as dependências especificadas em `Cargo.lock`; `--offline` exige cache completo.
+Requer Rust/Cargo. Cargo compila as dependências especificadas em `Cargo.lock`;
+`--offline` exige cache completo.
 
 ```bash
-# Na raiz do repositório: interface e runtime .m
-cargo build --offline
-cargo run --offline
+# Na raiz do repositório: interface, serviço científico e runtime .m
+cargo build --locked --offline
+cargo run --locked --offline -p controlab-native
 
 # Compilação otimizada
-cargo build --offline --release
-cargo run --offline --release
+cargo build --locked --offline --release
+cargo run --locked --offline --release -p controlab-native
 # Linux também aceita:
 ./run.sh
 ```
 
-O workspace Cargo compila a interface e o interpretador `.m` (`crates/mscript`),
-ligado à própria interface. `cargo run` executa a interface (`default-run`); o
-executável fica em `target/debug/` ou `target/release/`. O caminho padrão não
-depende de Node ou de um launcher Python. O Python da `.venv` é escolhido
-automaticamente. É possível selecionar outro com `CONTROLAB_PYTHON`, e
-`CONTROLAB_NATIVE_BRIDGE` seleciona a ponte Python. A comunicação com Python usa
-JSON por stdin/stdout de um processo persistente, sem abrir portas de rede. Os
+O workspace Cargo compila a interface, o serviço científico (`crates/control-engine`)
+e o interpretador `.m` (`crates/mscript`), ligado à própria interface. Os executáveis
+ficam em `target/debug/` ou `target/release/`. O cliente procura `CONTROLAB_ENGINE`,
+`engine/controlab-engine` ao lado do aplicativo, depois
+`target/debug/controlab-engine` ou `target/release/controlab-engine` do repositório
+(no Windows, com sufixo `.exe`). Um caminho explícito inválido ou uma falha do
+motor produz erro. `CONTROLAB_SCIENTIFIC_BACKEND` é opcional e aceita somente
+`rust`; outros valores são rejeitados. A comunicação usa
+JSON UTF-8 por linha em stdin/stdout de um processo persistente, sem portas de
+rede, com fila de 16 pedidos, limite de 8 MiB por pedido e 32 MiB por resposta.
+`CONTROLAB_REQUEST_TIMEOUT` define o prazo em segundos (60 por padrão, limitado
+a 1–300); timeout encerra o grupo de processos e o próximo pedido inicia outro. Os
 scripts `.m` são executados na mesma thread de trabalho, sem processo separado
 (`native/src/scripts.rs`), com limites de tempo, memória e eventos do
 interpretador. Cálculos são serializados nessa thread; erro/timeout não bloqueia
@@ -44,14 +51,12 @@ laterais, como no CSS anterior. F5 executa o documento; Ctrl/Cmd+S, +O e +N
 salvam, abrem e criam scripts; Ctrl/Cmd+Enter calcula o módulo atual. Abrir,
 salvar, selecionar pasta e exportar figuras usam os diálogos do sistema.
 
-Os gráficos científicos são gerados pelo mesmo Matplotlib em Python, como
-imagens locais, com zoom (botões, roda do mouse e arraste) e exportação em PNG
-ou SVG; Copiar envia a figura para a área de transferência. As fórmulas, prévias
-e memoriais são compostos pelo MathText com as fontes do KaTeX vendorizadas
-(`assets/fonts/katex`), em modo display, com matrizes e setas AMS
-adaptadas; a imagem é branca e recebe a cor do contexto na interface. Fórmulas
-não suportadas continuam legíveis como texto. Não há navegador, KaTeX em
-JavaScript nem instalação externa de LaTeX.
+Os gráficos científicos são compostos em Rust e exibidos como imagens locais,
+com zoom (botões, roda do mouse e arraste) e exportação em PNG ou SVG; Copiar
+envia a figura para a área de transferência. As fórmulas, prévias e memoriais
+são compostos pelo motor TeX nativo com fontes incorporadas, incluindo KaTeX
+(`assets/fonts/katex`). A imagem branca recebe a cor do contexto na interface;
+fórmulas não suportadas continuam legíveis como texto.
 
 Para comparar visualmente com a versão anterior, `CONTROLAB_SCREENSHOT=<arquivo.png>`
 captura a janela em 1920×1048 e encerra; `CONTROLAB_SCREENSHOT_PAGE`,
@@ -62,22 +67,25 @@ captura a janela em 1920×1048 e encerra; `CONTROLAB_SCREENSHOT_PAGE`,
 ## Android
 
 Consulte [ANDROID.md](ANDROID.md): projeto Gradle separado, NativeActivity,
-interface Rust e Chaquopy, sem Capacitor. Fontes Python são canônicas, sem cópias
-sincronizadas por JavaScript.
+interface e motor científico Rust, sem Capacitor ou Python. JNI obtém somente
+o diretório privado do aplicativo; os pedidos científicos executam na thread
+de trabalho com cancelamento e prazo. Gradle chama `cargo run --locked
+--manifest-path <raiz>/Cargo.toml -p xtask -- android`, que compila as ABIs
+selecionadas com `-PnativeAbis=arm64-v8a,x86_64`. Fontes e traduções
+são incorporadas ao motor Rust.
 
 ## Validação
 
 ```bash
 cargo test --workspace --offline
 cargo clippy --workspace --offline --all-targets -- -D warnings
-PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
+cargo run --locked --offline -p xtask -- parity --data-only
 ```
 
-A implementação web e seus scripts foram removidos. O build usa Cargo e o
-pacote Linux é produzido por `scripts/package_native.py`, que inclui uma engine
-Python independente com recursos em `assets/`. O cliente detecta a engine ao
-lado do aplicativo em `engine/controlab-engine`; `CONTROLAB_ENGINE` permite
-selecionar outra engine empacotada. O transporte continua local por stdin/stdout.
+O build usa Cargo e as ferramentas do workspace `xtask`. O cliente
+carrega o executável científico em `engine/controlab-engine`; `CONTROLAB_ENGINE`
+permite selecionar outro caminho. O transporte desktop permanece local por
+stdin/stdout.
 Veja a [separação e validação Linux](../docs/validation/native-linux-only.md).
 
 A interface nativa está em português; a migração do seletor de inglês ainda está

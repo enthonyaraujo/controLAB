@@ -1,5 +1,5 @@
 use controlab_engine::controllers;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 #[test]
 fn universal_controller_parameters_follow_python_references() {
     let base =
@@ -32,6 +32,13 @@ fn universal_controller_parameters_follow_python_references() {
 #[test]
 fn classical_pid_manual_parameters_and_endpoint() {
     let r=controllers::analyze(&json!({"plant_expr":"1/(s*(s+1)*(s+5))","controller_type":"PID","method":"zn_critical_manual","critical_gain":6,"critical_period":2,"points":200})).unwrap();
-    assert_eq!(r["details"]["controller_parameters"]["kp"], 3.6);
+    assert!(
+        (r["details"]["controller_parameters"]["kp"]
+            .as_f64()
+            .unwrap()
+            - 3.6)
+            .abs()
+            < 1e-12
+    );
     assert_eq!(r["module"], "controller_design");
 }

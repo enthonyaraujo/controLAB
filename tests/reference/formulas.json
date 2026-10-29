@@ -1,0 +1,2342 @@
+{
+  "origin": "Python MathText acceptance frozen during migration; native renderer may support additional sources.",
+  "source_sha256": {
+    "crates/control-engine/src/formulas.rs": "7132d0cca3b80619639d3c6350c84eaf2e799a2ab1cc8cccd562fd87a44faa97",
+    "src/python/native_presentation.py": "a6fa94b2f74d8e5d548ac98d3bede760d5b8f0bd5848e08567a5f53c13430d17",
+    "Cargo.lock": "4c2f7dd93adde70add369978a6d7ef4be60d1a7928a501f5bfa637d020865caa"
+  },
+  "cases": [
+    {
+      "source": "G(s) = \\frac{3}{100.0 s \\left(0.2 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 53{,}33(1 + 0{,}625s) = 53{,}33\\cdot 0{,}625(s + 1{,}6)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{100.0 s + 160.0}{20.0 s^{3} + 120.0 s^{2} + 100.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 53{,}33(1 + 0{,}625s) = 53{,}33\\cdot 0{,}625(s + 1{,}6) \\cdot \\left(\\frac{3}{100.0 s \\left(0.2 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{3}{20.0 s^{3} + 120.0 s^{2} + 100.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{3.0}{20.0 s^{3} + 120.0 s^{2} + 100.0 s + 3.0}",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0",
+      "python_png": true
+    },
+    {
+      "source": "s = -1 \\pm 1j \\text{ (polo dominante informado)}",
+      "python_png": true
+    },
+    {
+      "source": "\\omega_n = |s| = \\sqrt{1^2 + 1^2} = 1{,}414\\text{ rad/s}, \\quad \\xi = \\frac{\\text{Re}}{\\omega_n} = 0{,}7071",
+      "python_png": true
+    },
+    {
+      "source": "M_p = 4{,}321\\%, \\quad t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 4\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1}{1 - 0}\\right) = 180^\\circ - 45^\\circ = 135^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = \\text{Re} = 1 \\implies \\theta = 90^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_3: p_i = 5 > \\text{Re} (1) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{1}{5 - 1}\\right) = 14{,}04^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 239^\\circ - 0^\\circ - 180^\\circ = 59{,}04^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 59{,}04^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{1}{z - 1}\\right) = 59{,}04^\\circ \\implies z = \\frac{1 + 1 \\times \\tan(59{,}04^\\circ)}{\\tan(59{,}04^\\circ)} = 1{,}6",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_d = \\frac{1}{z} = \\frac{1}{1{,}6} = 0{,}625\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|1 + \\tau_d s\\right| = \\left|1 + 0{,}625(-1 + 1j)\\right| = \\sqrt{(0{,}375)^2 + (0{,}625)^2} = 0{,}7289",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-1)^2 + (1)^2} = 1{,}414",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1)\\right| = \\sqrt{(0)^2 + (1)^2} = 1",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 5)\\right| = \\sqrt{(4)^2 + (1)^2} = 4{,}123",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{5{,}831}{0{,}1093} = 53{,}33",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{100.0 s + 160.0}{20.0 s^{3} + 120.0 s^{2} + 200.0 s + 160.0}",
+      "python_png": true
+    },
+    {
+      "source": "0",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{5}{s \\left(s + 1\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{4{,}16(s + 2)}{s + 5{,}6}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{20.8 s + 41.6}{1.0 s^{3} + 6.6 s^{2} + 5.6 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{4{,}16(s + 2)}{s + 5{,}6} \\cdot \\left(\\frac{5}{s \\left(s + 1\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{5}{s^{2} + s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{5.0}{1.0 s^{2} + 1.0 s + 5.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 2{,}236\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}2236",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 16\\% \\iff \\xi = 0{,}5",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 2\\text{ s} \\implies \\xi\\omega_n = 2 \\implies \\omega_n = \\frac{2}{0{,}5} = 4\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -2 \\pm 3{,}464j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Zero do controlador alocado em } z = 2 \\implies \\theta_z = 90^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0 < \\text{Re} (2) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{3{,}464}{2 - 0}\\right) = 180^\\circ - 60^\\circ = 120^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 1 < \\text{Re} (2) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{3{,}464}{2 - 1}\\right) = 180^\\circ - 73{,}9^\\circ = 106{,}1^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z + \\sum \\theta_{\\text{zeros de } G} - \\sum \\theta_{\\text{polos de } G} - \\theta_p = -180^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "90^\\circ + 0^\\circ - 226{,}1^\\circ - \\theta_p = -180^\\circ \\implies \\theta_p = 43{,}9^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_{p} = 43{,}9^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{3{,}464}{p - 2}\\right) = 43{,}9^\\circ \\implies p = \\frac{3{,}464 + 2 \\times \\tan(43{,}9^\\circ)}{\\tan(43{,}9^\\circ)} = 5{,}6",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2)\\right| = \\sqrt{(0)^2 + (3{,}464)^2} = 3{,}464",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 5{,}6)\\right| = \\sqrt{(3{,}6)^2 + (3{,}464)^2} = 4{,}996",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-2)^2 + (3{,}464)^2} = 4",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1)\\right| = \\sqrt{(-1)^2 + (3{,}464)^2} = 3{,}606",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K(s + 2)}{s + 5{,}6} G(s)\\right| = 1 \\implies K = \\frac{72{,}05}{17{,}32} = 4{,}16",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{20.8 s + 41.6}{1.0 s^{3} + 6.6 s^{2} + 26.4 s + 41.6}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{(s + 0{,}19)}{s + 0{,}01}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 1.025 s + 0.01}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{(s + 0{,}19)}{s + 0{,}01} \\cdot \\left(\\frac{1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{1.0 s^{2} + 2.5 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 2.5 s + 2.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1{,}414\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}8839",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0{,}5",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = 0{,}5, \\quad \\text{Fator de redução} = 10 \\implies e_{\\text{novo}}(\\infty) = \\frac{0{,}5}{10} = 0{,}05",
+      "python_png": true
+    },
+    {
+      "source": "\\lim_{s \\to 0} s\\left(\\frac{1}{1 + G_c(s)G(s)}\\right)R(s) = e_{\\text{novo}}(\\infty) \\implies \\frac{1}{1 + K\\frac{z}{p}G(0)} = 0{,}05",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{z}{p} = 19",
+      "python_png": true
+    },
+    {
+      "source": "p = 0{,}01",
+      "python_png": true
+    },
+    {
+      "source": "z = \\left(\\frac{z}{p}\\right) \\times p = 19 \\times 0{,}01 = 0{,}19",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0{,}05",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 2.025 s + 0.2}",
+      "python_png": true
+    },
+    {
+      "source": "0{,}5",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = K_p = 0{,}9282",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = K_p = 0{,}9282 \\cdot \\left(\\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{3} + 3 s^{2} + 2 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{3} + 3.0 s^{2} + 2.0 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 0{,}6559\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}5148",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 10\\% \\iff \\xi = 0{,}591",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 10\\text{ s} \\implies \\xi\\omega_n = 0{,}4 \\implies \\omega_n = \\frac{0{,}4}{0{,}591} = 0{,}6768\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -0{,}4 \\pm 0{,}546j",
+      "python_png": true
+    },
+    {
+      "source": "s = -0{,}4 \\pm 0{,}546j",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-0{,}4)^2 + (0{,}546)^2} = 0{,}6768",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1)\\right| = \\sqrt{(0{,}6)^2 + (0{,}546)^2} = 0{,}8112",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2)\\right| = \\sqrt{(1{,}6)^2 + (0{,}546)^2} = 1{,}691",
+      "python_png": true
+    },
+    {
+      "source": "1 + K_p G(s) = 0 \\implies K_p = \\left|\\frac{1}{G(s)}\\right| = \\frac{0{,}9282}{1} = 0{,}9282",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s + 0.92822}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{\\left(s + 1\\right) \\left(s + 5\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = K_p = 20{,}77",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{20.767}{1.0 s^{2} + 6.0 s + 5.0}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = K_p = 20{,}77 \\cdot \\left(\\frac{1}{\\left(s + 1\\right) \\left(s + 5\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{2} + 6 s + 5}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 6.0 s + 6.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 2{,}449\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 1{,}225",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0{,}8333",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 2\\text{ s} \\implies \\xi\\omega_n = 2 \\implies \\omega_n = \\frac{2}{0{,}591} = 3{,}384\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -2 \\pm 2{,}73j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Ramo vertical do LGR em } -\\text{Re}_{\\text{LGR}} = -3 \\neq -2",
+      "python_png": true
+    },
+    {
+      "source": "\\theta = \\tan^{-1}\\!\\left(\\frac{\\text{Im}}{\\text{Re}}\\right) = \\tan^{-1}\\!\\left(\\frac{2{,}73}{2}\\right) = 53{,}77^\\circ \\quad (\\tan\\theta = 1{,}365)",
+      "python_png": true
+    },
+    {
+      "source": "\\omega_d = \\text{Re}_{\\text{LGR}} \\times \\tan\\theta = 3 \\times 1{,}365 = 4{,}095",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\text{Re}_{\\text{LGR}} \\pm \\omega_d j = -3 \\pm 4{,}095j",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1)\\right| = \\sqrt{(-2)^2 + (4{,}095)^2} = 4{,}557",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 5)\\right| = \\sqrt{(2)^2 + (4{,}095)^2} = 4{,}557",
+      "python_png": true
+    },
+    {
+      "source": "1 + K_p G(s) = 0 \\implies K_p = \\left|\\frac{1}{G(s)}\\right| = \\frac{20{,}77}{1} = 20{,}77",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0{,}194",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{20.767}{1.0 s^{2} + 6.0 s + 25.767}",
+      "python_png": true
+    },
+    {
+      "source": "0{,}8333",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{40}{s \\left(s + 2\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 2{,}5(1 + 0{,}06s) = 2{,}5\\cdot 0{,}06(s + 16{,}67)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{6.0 s + 100.0}{1.0 s^{2} + 2.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 2{,}5(1 + 0{,}06s) = 2{,}5\\cdot 0{,}06(s + 16{,}67) \\cdot \\left(\\frac{40}{s \\left(s + 2\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{40}{s^{2} + 2 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{40.0}{1.0 s^{2} + 2.0 s + 40.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 6{,}325\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}1581",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 25\\% \\iff \\xi = 0{,}4",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 1\\text{ s} \\implies \\xi\\omega_n = 4 \\implies \\omega_n = \\frac{4}{0{,}4} = 10\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -4 \\pm 9{,}165j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0 < \\text{Re} (4) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - 0}\\right) = 180^\\circ - 66{,}42^\\circ = 113{,}6^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 2 < \\text{Re} (4) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - 2}\\right) = 180^\\circ - 77{,}69^\\circ = 102{,}3^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 215{,}9^\\circ - 0^\\circ - 180^\\circ = 35{,}89^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 35{,}89^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{9{,}165}{z - 4}\\right) = 35{,}89^\\circ \\implies z = \\frac{9{,}165 + 4 \\times \\tan(35{,}89^\\circ)}{\\tan(35{,}89^\\circ)} = 16{,}67",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_d = \\frac{1}{z} = \\frac{1}{16{,}67} = 0{,}06\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|1 + \\tau_d s\\right| = \\left|1 + 0{,}06(-4 + 9{,}165j)\\right| = \\sqrt{(0{,}76)^2 + (0{,}5499)^2} = 0{,}9381",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-4)^2 + (9{,}165)^2} = 10",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2)\\right| = \\sqrt{(-2)^2 + (9{,}165)^2} = 9{,}381",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{93{,}81}{37{,}52} = 2{,}5",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{6.0 s + 100.0}{1.0 s^{2} + 8.0 s + 100.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s \\left(s + 4\\right) \\left(s + 6\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 136(1 + 0{,}1898s) = 136\\cdot 0{,}1898(s + 5{,}27)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{25.806 s + 136.0}{1.0 s^{3} + 10.0 s^{2} + 24.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 136(1 + 0{,}1898s) = 136\\cdot 0{,}1898(s + 5{,}27) \\cdot \\left(\\frac{1}{s \\left(s + 4\\right) \\left(s + 6\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{3} + 10 s^{2} + 24 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{3} + 10.0 s^{2} + 24.0 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 20\\% \\iff \\xi = 0{,}456",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 1{,}754\\text{ s} \\implies \\xi\\omega_n = 2{,}28 \\implies \\omega_n = \\frac{2{,}28}{0{,}456} = 5\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -2{,}28 \\pm 4{,}45j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0 < \\text{Re} (2{,}28) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{4{,}45}{2{,}28 - 0}\\right) = 180^\\circ - 62{,}87^\\circ = 117{,}1^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 4 > \\text{Re} (2{,}28) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{4{,}45}{4 - 2{,}28}\\right) = 68{,}87^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_3: p_i = 6 > \\text{Re} (2{,}28) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{4{,}45}{6 - 2{,}28}\\right) = 50{,}11^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 236{,}1^\\circ - 0^\\circ - 180^\\circ = 56{,}1^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 56{,}1^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{4{,}45}{z - 2{,}28}\\right) = 56{,}1^\\circ \\implies z = \\frac{4{,}45 + 2{,}28 \\times \\tan(56{,}1^\\circ)}{\\tan(56{,}1^\\circ)} = 5{,}27",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_d = \\frac{1}{z} = \\frac{1}{5{,}27} = 0{,}1898\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|1 + \\tau_d s\\right| = \\left|1 + 0{,}1898(-2{,}28 + 4{,}45j)\\right| = \\sqrt{(0{,}5674)^2 + (0{,}8444)^2} = 1{,}017",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-2{,}28)^2 + (4{,}45)^2} = 5",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 4)\\right| = \\sqrt{(1{,}72)^2 + (4{,}45)^2} = 4{,}771",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 6)\\right| = \\sqrt{(3{,}72)^2 + (4{,}45)^2} = 5{,}8",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{138{,}4}{1{,}017} = 136",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{25.806 s + 136.0}{1.0 s^{3} + 10.0 s^{2} + 49.806 s + 136.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{10}{\\left(s + 2\\right) \\left(s + 5\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{0{,}7446(s + 2{,}194)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{7.4463 s + 16.339}{1.0 s^{3} + 7.0 s^{2} + 10.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{0{,}7446(s + 2{,}194)}{s} \\cdot \\left(\\frac{10}{\\left(s + 2\\right) \\left(s + 5\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{10}{s^{2} + 7 s + 10}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{10.0}{1.0 s^{2} + 7.0 s + 20.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 4{,}472\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}7826",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 0{,}63\\% \\iff \\xi = 0{,}857",
+      "python_png": true
+    },
+    {
+      "source": "t_s(5\\%) = \\frac{3}{\\xi\\omega_n} = 1{,}5\\text{ s} \\implies \\xi\\omega_n = 2 \\implies \\omega_n = \\frac{2}{0{,}857} = 2{,}334\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -2 \\pm 1{,}203j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1 (inclui polo do PI em s = 0): p_i = 0 < \\text{Re} (2) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1{,}203}{2 - 0}\\right) = 180^\\circ - 31{,}02^\\circ = 149^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = \\text{Re} = 2 \\implies \\theta = 90^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_3: p_i = 5 > \\text{Re} (2) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{1{,}203}{5 - 2}\\right) = 21{,}84^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos totais}} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 260{,}8^\\circ - 0^\\circ - 180^\\circ = 80{,}83^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 80{,}83^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{1{,}203}{z - 2}\\right) = 80{,}83^\\circ \\implies z = \\frac{1{,}203 + 2 \\times \\tan(80{,}83^\\circ)}{\\tan(80{,}83^\\circ)} = 2{,}194",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_i = \\frac{1}{z} = \\frac{1}{2{,}194} = 0{,}4557\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2{,}194)\\right| = \\sqrt{(0{,}1942)^2 + (1{,}203)^2} = 1{,}218",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-2)^2 + (1{,}203)^2} = 2{,}334",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2)\\right| = \\sqrt{(0)^2 + (1{,}203)^2} = 1{,}203",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 5)\\right| = \\sqrt{(3)^2 + (1{,}203)^2} = 3{,}232",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K_p(s + 2{,}194)}{s}G(s)\\right| = 1 \\implies K_p = \\frac{9{,}071}{12{,}18} = 0{,}7446",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{7.4463 s + 16.339}{1.0 s^{3} + 7.0 s^{2} + 17.446 s + 16.339}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s \\left(s + 4\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{9{,}25(s + 0{,}6757)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{9.25 s + 6.25}{1.0 s^{3} + 4.0 s^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{9{,}25(s + 0{,}6757)}{s} \\cdot \\left(\\frac{1}{s \\left(s + 4\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{2} + 4 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 4.0 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 2",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 4",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 10\\% \\iff \\xi = 0{,}6",
+      "python_png": true
+    },
+    {
+      "source": "t_s(5\\%) = \\frac{3}{\\xi\\omega_n} = 2\\text{ s} \\implies \\xi\\omega_n = 1{,}5 \\implies \\omega_n = \\frac{1{,}5}{0{,}6} = 2{,}5\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -1{,}5 \\pm 2j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1 (inclui polo do PI em s = 0): p_i = 0 < \\text{Re} (1{,}5) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{2}{1{,}5 - 0}\\right) = 180^\\circ - 53{,}13^\\circ = 126{,}9^\\circ \\implies 2 \\times 126{,}9^\\circ = 253{,}7^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 4 > \\text{Re} (1{,}5) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{2}{4 - 1{,}5}\\right) = 38{,}66^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos totais}} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 292{,}4^\\circ - 0^\\circ - 180^\\circ = 112{,}4^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 112{,}4^\\circ > 90^\\circ \\implies 180^\\circ - \\tan^{-1}\\!\\left(\\frac{2}{1{,}5 - z}\\right) = 112{,}4^\\circ \\implies -\\frac{2}{1{,}5 - z} = \\tan(112{,}4^\\circ) \\implies z = 0{,}6757",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_i = \\frac{1}{z} = \\frac{1}{0{,}6757} = 1{,}48\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}6757)\\right| = \\sqrt{(-0{,}8243)^2 + (2)^2} = 2{,}163",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s^2\\right| = \\sqrt{(-1{,}5)^2 + (2)^2}^{2} = 6{,}25",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 4)\\right| = \\sqrt{(2{,}5)^2 + (2)^2} = 3{,}202",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K_p(s + 0{,}6757)}{s}G(s)\\right| = 1 \\implies K_p = \\frac{20{,}01}{2{,}163} = 9{,}25",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s^2} = 0",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{9.25 s + 6.25}{1.0 s^{3} + 4.0 s^{2} + 9.25 s + 6.25}",
+      "python_png": true
+    },
+    {
+      "source": "4",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01} \\cdot \\left(\\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{-1}{1.0 s^{2} + 2.5 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{-1.0}{1.0 s^{2} + 2.5 s}",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = \\infty",
+      "python_png": true
+    },
+    {
+      "source": "K_{G} = -1 < 0 \\implies K_c \\to -K_c",
+      "python_png": true
+    },
+    {
+      "source": "\\infty",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{(s + 0{,}1)}{s + 0{,}01}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 0.08 s^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{(s + 0{,}1)}{s + 0{,}01} \\cdot \\left(\\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{2 s + 2}{s^{4} + 6 s^{3} + 8 s^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{2.0 s + 2.0}{1.0 s^{4} + 6.0 s^{3} + 8.0 s^{2} + 2.0 s + 2.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 0{,}5194\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}05137",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = 4, \\quad \\text{Fator de redução} = 10 \\implies e_{\\text{novo}}(\\infty) = \\frac{4}{10} = 0{,}4",
+      "python_png": true
+    },
+    {
+      "source": "\\lim_{s \\to 0} s\\left(\\frac{1}{1 + G_c(s)G(s)}\\right)R(s) = e_{\\text{novo}}(\\infty)",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{z}{p} = 10",
+      "python_png": true
+    },
+    {
+      "source": "z = \\left(\\frac{z}{p}\\right) \\times p = 10 \\times 0{,}01 = 0{,}1",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s^3} = 0{,}4",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 2.08 s^{2} + 2.2 s + 0.2}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{1.0 \\left(1.0 s^{2} + 0.844 s + 0.1288\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{0{,}4705(s + 0{,}3219)}{s + 0{,}1399}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{0.47049 s + 0.15147}{1.0 s^{3} + 0.98391 s^{2} + 0.24689 s + 0.018021}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{0{,}4705(s + 0{,}3219)}{s + 0{,}1399} \\cdot \\left(\\frac{1}{1.0 \\left(1.0 s^{2} + 0.844 s + 0.1288\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{1.0 s^{2} + 0.844 s + 0.1288}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 0.844 s + 1.1288}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1{,}062\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}3972",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0{,}1141",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 12{,}42\\text{ s} \\implies \\xi\\omega_n = 0{,}3219 \\implies \\omega_n = \\frac{0{,}3219}{0{,}456} = 0{,}706\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -0{,}3219 \\pm 0{,}6283j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Zero do controlador alocado em } z = 0{,}3219 \\implies \\theta_z = 90^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0{,}2 < \\text{Re} (0{,}3219) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}3219 - 0{,}2}\\right) = 180^\\circ - 79{,}02^\\circ = 101^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 0{,}644 > \\text{Re} (0{,}3219) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}644 - 0{,}3219}\\right) = 62{,}86^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "90^\\circ + 0^\\circ - 163{,}8^\\circ - \\theta_p = -180^\\circ \\implies \\theta_p = 106{,}2^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_{p} = 106{,}2^\\circ > 90^\\circ \\implies 180^\\circ - \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}3219 - p}\\right) = 106{,}2^\\circ \\implies -\\frac{0{,}6283}{0{,}3219 - p} = \\tan(106{,}2^\\circ) \\implies p = 0{,}1399",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}3219)\\right| = \\sqrt{(0)^2 + (0{,}6283)^2} = 0{,}6283",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}1399)\\right| = \\sqrt{(-0{,}182)^2 + (0{,}6283)^2} = 0{,}6542",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}2)\\right| = \\sqrt{(-0{,}1219)^2 + (0{,}6283)^2} = 0{,}64",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}644)\\right| = \\sqrt{(0{,}3221)^2 + (0{,}6283)^2} = 0{,}7061",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K(s + 0{,}3219)}{s + 0{,}1399} G(s)\\right| = 1 \\implies K = \\frac{0{,}2956}{0{,}6283} = 0{,}4705",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0{,}1063",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{0.47049 s + 0.15147}{1.0 s^{3} + 0.98391 s^{2} + 0.71738 s + 0.16949}",
+      "python_png": true
+    },
+    {
+      "source": "0{,}1141",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{0{,}4985(s + 0{,}2001)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{0.49849 s + 0.099751}{1.0 s^{3} + 0.844 s^{2} + 0.1288 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{0{,}4985(s + 0{,}2001)}{s} \\cdot \\left(\\frac{1}{1.0 \\left(1.0 s^{2} + 0.844 s + 0.1288\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1 (inclui polo do PI em s = 0): p_i = 0 < \\text{Re} (0{,}3219) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}3219 - 0}\\right) = 180^\\circ - 62{,}87^\\circ = 117{,}1^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 0{,}2 < \\text{Re} (0{,}3219) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}3219 - 0{,}2}\\right) = 180^\\circ - 79{,}02^\\circ = 101^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_3: p_i = 0{,}644 > \\text{Re} (0{,}3219) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}644 - 0{,}3219}\\right) = 62{,}86^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos totais}} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 281^\\circ - 0^\\circ - 180^\\circ = 101^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 101^\\circ > 90^\\circ \\implies 180^\\circ - \\tan^{-1}\\!\\left(\\frac{0{,}6283}{0{,}3219 - z}\\right) = 101^\\circ \\implies -\\frac{0{,}6283}{0{,}3219 - z} = \\tan(101^\\circ) \\implies z = 0{,}2001",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_i = \\frac{1}{z} = \\frac{1}{0{,}2001} = 4{,}997\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}2001)\\right| = \\sqrt{(-0{,}1218)^2 + (0{,}6283)^2} = 0{,}64",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-0{,}3219)^2 + (0{,}6283)^2} = 0{,}706",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K_p(s + 0{,}2001)}{s}G(s)\\right| = 1 \\implies K_p = \\frac{0{,}319}{0{,}64} = 0{,}4985",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{0.49849 s + 0.099751}{1.0 s^{3} + 0.844 s^{2} + 0.62729 s + 0.099751}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{2} + 1}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 3(1 + 0{,}6667s) = 3\\cdot 0{,}6667(s + 1{,}5)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{2.0 s + 3.0}{1.0 s^{2} + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 3(1 + 0{,}6667s) = 3\\cdot 0{,}6667(s + 1{,}5) \\cdot \\left(\\frac{1}{s^{2} + 1}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 2.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1{,}414\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 16{,}3\\% \\iff \\xi = 0{,}5",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 4\\text{ s} \\implies \\xi\\omega_n = 1 \\implies \\omega_n = \\frac{1}{0{,}5} = 2\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -1 \\pm 1{,}732j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: \\theta = \\angle\\!\\left((-1 + 1{,}732j) - (0 - 1j)\\right) = 110{,}1^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: \\theta = \\angle\\!\\left((-1 + 1{,}732j) - (0 + 1j)\\right) = 143{,}8^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 253{,}9^\\circ - 0^\\circ - 180^\\circ = 73{,}9^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 73{,}9^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{1{,}732}{z - 1}\\right) = 73{,}9^\\circ \\implies z = \\frac{1{,}732 + 1 \\times \\tan(73{,}9^\\circ)}{\\tan(73{,}9^\\circ)} = 1{,}5",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_d = \\frac{1}{z} = \\frac{1}{1{,}5} = 0{,}6667\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|1 + \\tau_d s\\right| = \\left|1 + 0{,}6667(-1 + 1{,}732j)\\right| = \\sqrt{(0{,}3333)^2 + (1{,}155)^2} = 1{,}202",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s - (0 - 1j))\\right| = \\sqrt{(-1)^2 + (2{,}732)^2} = 2{,}909",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s - (0 + 1j))\\right| = \\sqrt{(-1)^2 + (0{,}7321)^2} = 1{,}239",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{3{,}606}{1{,}202} = 3",
+      "python_png": true
+    },
+    {
+      "source": "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0{,}25",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{2.0 s + 3.0}{1.0 s^{2} + 2.0 s + 4.0}",
+      "python_png": true
+    },
+    {
+      "source": "H(s) = \\frac{0.05}{1}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{5}{1.0 \\left(1.0 s + 0.1\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{7{,}6(s + 2{,}105)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{1.9 s + 4.0}{1.0 s^{2} + 0.1 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s)H(s) = \\frac{7{,}6(s + 2{,}105)}{s} \\cdot \\left(\\frac{0.25}{1.0 \\left(1.0 s + 0.1\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s)H(s) = \\frac{0.25}{1.0 s + 0.1}",
+      "python_png": true
+    },
+    {
+      "source": "G(s)H(s) = \\frac{0.25}{1.0 \\left(1.0 s + 0.1\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{0.25}{1.0 s + 0.35}",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0{,}2857",
+      "python_png": true
+    },
+    {
+      "source": "s = -1 \\pm 1{,}732j \\text{ (polo dominante informado)}",
+      "python_png": true
+    },
+    {
+      "source": "\\omega_n = |s| = \\sqrt{1^2 + 1{,}732^2} = 2\\text{ rad/s}, \\quad \\xi = \\frac{\\text{Re}}{\\omega_n} = 0{,}5",
+      "python_png": true
+    },
+    {
+      "source": "M_p = 16{,}3\\%, \\quad t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 4\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1 (inclui polo do PI em s = 0): p_i = 0 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1{,}732}{1 - 0}\\right) = 180^\\circ - 60^\\circ = 120^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 0{,}1 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1{,}732}{1 - 0{,}1}\\right) = 180^\\circ - 62{,}54^\\circ = 117{,}5^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos totais}} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 237{,}5^\\circ - 0^\\circ - 180^\\circ = 57{,}46^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 57{,}46^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{1{,}732}{z - 1}\\right) = 57{,}46^\\circ \\implies z = \\frac{1{,}732 + 1 \\times \\tan(57{,}46^\\circ)}{\\tan(57{,}46^\\circ)} = 2{,}105",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_i = \\frac{1}{z} = \\frac{1}{2{,}105} = 0{,}475\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2{,}105)\\right| = \\sqrt{(1{,}105)^2 + (1{,}732)^2} = 2{,}055",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-1)^2 + (1{,}732)^2} = 2",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}1)\\right| = \\sqrt{(-0{,}9)^2 + (1{,}732)^2} = 1{,}952",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K_p(s + 2{,}105)}{s}G(s)\\right| = 1 \\implies K_p = \\frac{3{,}904}{0{,}5137} = 7{,}6",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{38.0 s + 80.0}{1.0 s^{2} + 2.0 s + 4.0}",
+      "python_png": true
+    },
+    {
+      "source": "0{,}2857",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{\\left(s + 1\\right)^{2} \\left(s + 8\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 197 + \\frac{62{,}87}{s} + 99{,}63s = \\frac{99{,}63(s + 0{,}4)(s + 1{,}578)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{99.629 s^{2} + 197.03 s + 62.871}{1.0 s^{4} + 10.0 s^{3} + 17.0 s^{2} + 8.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 197 + \\frac{62{,}87}{s} + 99{,}63s = \\frac{99{,}63(s + 0{,}4)(s + 1{,}578)}{s} \\cdot \\left(\\frac{1}{\\left(s + 1\\right)^{2} \\left(s + 8\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{3} + 10 s^{2} + 17 s + 8}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{3} + 10.0 s^{2} + 17.0 s + 9.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1{,}059\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}9344",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0{,}8889",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 25{,}38\\% \\iff \\xi = 0{,}4",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Zero da parte PI alocado em } z_i = 0{,}4: p_i = 0{,}4 < \\text{Re} (4) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - 0{,}4}\\right) = 180^\\circ - 68{,}56^\\circ = 111{,}4^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1 (inclui polo do PID em s = 0): p_i = 0 < \\text{Re} (4) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - 0}\\right) = 180^\\circ - 66{,}42^\\circ = 113{,}6^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 1 < \\text{Re} (4) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - 1}\\right) = 180^\\circ - 71{,}88^\\circ = 108{,}1^\\circ \\implies 2 \\times 108{,}1^\\circ = 216{,}2^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_3: p_i = 8 > \\text{Re} (4) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{9{,}165}{8 - 4}\\right) = 66{,}42^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_{z_d} = \\sum \\theta_{\\text{polos}} - \\sum \\theta_{\\text{zeros}} - \\theta_{z_i} + 180^\\circ \\pmod{360^\\circ} = 396{,}2^\\circ - 0^\\circ - 111{,}4^\\circ - 180^\\circ = 104{,}8^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z_d} = 104{,}8^\\circ > 90^\\circ \\implies 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - z_d}\\right) = 104{,}8^\\circ \\implies -\\frac{9{,}165}{4 - z_d} = \\tan(104{,}8^\\circ) \\implies z_d = 1{,}578",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}4)\\right| = \\sqrt{(-3{,}6)^2 + (9{,}165)^2} = 9{,}847",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1{,}578)\\right| = \\sqrt{(-2{,}422)^2 + (9{,}165)^2} = 9{,}48",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1)^2\\right| = \\sqrt{(-3)^2 + (9{,}165)^2}^{2} = 93",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 8)\\right| = \\sqrt{(4)^2 + (9{,}165)^2} = 10",
+      "python_png": true
+    },
+    {
+      "source": "\\left|\\frac{K(s + 0{,}4)(s + 1{,}578)}{s}G(s)\\right| = 1 \\implies K = \\frac{9300}{93{,}35} = 99{,}63",
+      "python_png": true
+    },
+    {
+      "source": "K_p = K(z_i + z_d) = 197, \\quad K_i = K z_i z_d = 62{,}87, \\quad K_d = K = 99{,}63",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{99.629 s^{2} + 197.03 s + 62.871}{1.0 s^{4} + 10.0 s^{3} + 116.63 s^{2} + 205.03 s + 62.871}",
+      "python_png": true
+    },
+    {
+      "source": "0{,}8889",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 200 + \\frac{100}{s} + 100s = \\frac{100(s + 1)(s + 1)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{100.0 s^{2} + 200.0 s + 100.0}{1.0 s^{4} + 10.0 s^{3} + 17.0 s^{2} + 8.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 200 + \\frac{100}{s} + 100s = \\frac{100(s + 1)(s + 1)}{s} \\cdot \\left(\\frac{1}{\\left(s + 1\\right)^{2} \\left(s + 8\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Zero da parte PI alocado em } z_i = 1: p_i = 1 < \\text{Re} (4) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - 1}\\right) = 180^\\circ - 71{,}88^\\circ = 108{,}1^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_{z_d} = \\sum \\theta_{\\text{polos}} - \\sum \\theta_{\\text{zeros}} - \\theta_{z_i} + 180^\\circ \\pmod{360^\\circ} = 396{,}2^\\circ - 0^\\circ - 108{,}1^\\circ - 180^\\circ = 108{,}1^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z_d} = 108{,}1^\\circ > 90^\\circ \\implies 180^\\circ - \\tan^{-1}\\!\\left(\\frac{9{,}165}{4 - z_d}\\right) = 108{,}1^\\circ \\implies -\\frac{9{,}165}{4 - z_d} = \\tan(108{,}1^\\circ) \\implies z_d = 1",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 1)\\right| = \\sqrt{(-3)^2 + (9{,}165)^2} = 9{,}644",
+      "python_png": true
+    },
+    {
+      "source": "\\left|\\frac{K(s + 1)(s + 1)}{s}G(s)\\right| = 1 \\implies K = \\frac{9300}{93} = 100",
+      "python_png": true
+    },
+    {
+      "source": "K_p = K(z_i + z_d) = 200, \\quad K_i = K z_i z_d = 100, \\quad K_d = K = 100",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{100.0 s^{2} + 200.0 s + 100.0}{1.0 s^{4} + 10.0 s^{3} + 117.0 s^{2} + 208.0 s + 100.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s \\left(s + 2\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = K_p + K_d s = 4 \\quad (K_d = 0)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{4.0}{1.0 s^{2} + 2.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = K_p + K_d s = 4 \\quad (K_d = 0) \\cdot \\left(\\frac{1}{s \\left(s + 2\\right)}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{2} + 2 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 2.0 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 1",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1{,}732}{1 - 0}\\right) = 180^\\circ - 60^\\circ = 120^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 2 > \\text{Re} (1) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{1{,}732}{2 - 1}\\right) = 60^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} = 180^\\circ = 180^\\circ \\implies \\theta_z = 0^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_d = 0 \\implies K_d = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\left|1 + \\tau_d s\\right| = \\left|1 + 0(-1 + 1{,}732j)\\right| = \\sqrt{(1)^2 + (0)^2} = 1",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2)\\right| = \\sqrt{(1)^2 + (1{,}732)^2} = 2",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{4}{1} = 4",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{4.0}{1.0 s^{2} + 2.0 s + 4.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{5}{s \\left(s + 2\\right)^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2) \\cdot \\left(\\frac{5}{s \\left(s + 2\\right)^{2}}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{5}{s^{3} + 4 s^{2} + 4 s}",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{5.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s + 5.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1{,}242\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}3052",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 2 > \\text{Re} (1) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{1{,}732}{2 - 1}\\right) = 60^\\circ \\implies 2 \\times 60^\\circ = 120^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 240^\\circ - 0^\\circ - 180^\\circ = 60^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 60^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{1{,}732}{z - 1}\\right) = 60^\\circ \\implies z = \\frac{1{,}732 + 1 \\times \\tan(60^\\circ)}{\\tan(60^\\circ)} = 2",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_d = \\frac{1}{z} = \\frac{1}{2} = 0{,}5\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|1 + \\tau_d s\\right| = \\left|1 + 0{,}5(-1 + 1{,}732j)\\right| = \\sqrt{(0{,}5)^2 + (0{,}866)^2} = 1",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 2)^2\\right| = \\sqrt{(1)^2 + (1{,}732)^2}^{2} = 4",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{8}{5} = 1{,}6",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 8.0 s + 8.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{-7.2}{5 s + 1}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = \\frac{-1{,}25(s + 3{,}409)}{s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{9.0 s + 30.678}{5.0 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = \\frac{-1{,}25(s + 3{,}409)}{s} \\cdot \\left(\\frac{-7.2}{5 s + 1}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{-7.2}{5.0 s - 6.2}",
+      "python_png": true
+    },
+    {
+      "source": "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = -0{,}1613",
+      "python_png": true
+    },
+    {
+      "source": "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 25\\% \\iff \\xi = 0{,}4037",
+      "python_png": true
+    },
+    {
+      "source": "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 4\\text{ s} \\implies \\xi\\omega_n = 1 \\implies \\omega_n = \\frac{1}{0{,}4037} = 2{,}477\\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -1 \\pm 2{,}266j",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1 (inclui polo do PI em s = 0): p_i = 0 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{2{,}266}{1 - 0}\\right) = 180^\\circ - 66{,}19^\\circ = 113{,}8^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_2: p_i = 0{,}2 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{2{,}266}{1 - 0{,}2}\\right) = 180^\\circ - 70{,}56^\\circ = 109{,}4^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\theta_z = \\sum \\theta_{\\text{polos totais}} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 223{,}3^\\circ - 0^\\circ - 180^\\circ = 43{,}25^\\circ",
+      "python_png": false
+    },
+    {
+      "source": "\\theta_{z} = 43{,}25^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{2{,}266}{z - 1}\\right) = 43{,}25^\\circ \\implies z = \\frac{2{,}266 + 1 \\times \\tan(43{,}25^\\circ)}{\\tan(43{,}25^\\circ)} = 3{,}409",
+      "python_png": true
+    },
+    {
+      "source": "\\tau_i = \\frac{1}{z} = \\frac{1}{3{,}409} = 0{,}2934\\text{ s}",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 3{,}409)\\right| = \\sqrt{(2{,}409)^2 + (2{,}266)^2} = 3{,}307",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s\\right| = \\sqrt{(-1)^2 + (2{,}266)^2} = 2{,}477",
+      "python_png": true
+    },
+    {
+      "source": "\\left|(s + 0{,}2)\\right| = \\sqrt{(-0{,}8)^2 + (2{,}266)^2} = 2{,}403",
+      "python_png": true
+    },
+    {
+      "source": "\\left|G_{ma}(s)\\right| = \\left|\\frac{K_p(s + 3{,}409)}{s}G(s)\\right| = 1 \\implies K_p = \\frac{5{,}953}{4{,}762} = 1{,}25",
+      "python_png": true
+    },
+    {
+      "source": "K_{G} = -1{,}44 < 0 \\implies K_c \\to -K_c",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{9.0 s + 30.678}{5.0 s^{2} + 10.0 s + 30.678}",
+      "python_png": true
+    },
+    {
+      "source": "-0{,}1613",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "G_c(s) = 4(1 + 0{,}5s) = 4\\cdot 0{,}5(s + 2)",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = \\frac{2.0 s + 4.0}{1.0 s^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "G_{ma}(s) = G_c(s)G(s) = 4(1 + 0{,}5s) = 4\\cdot 0{,}5(s + 2) \\cdot \\left(\\frac{1}{s^{2}}\\right)",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{1.0}{1.0 s^{2} + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Polo } p_1: p_i = 0 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1{,}732}{1 - 0}\\right) = 180^\\circ - 60^\\circ = 120^\\circ \\implies 2 \\times 120^\\circ = 240^\\circ",
+      "python_png": true
+    },
+    {
+      "source": "\\left|s^2\\right| = \\sqrt{(-1)^2 + (1{,}732)^2}^{2} = 4",
+      "python_png": true
+    },
+    {
+      "source": "T(s) = \\frac{2.0 s + 4.0}{1.0 s^{2} + 2.0 s + 4.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{3} + 6 s^{2} + 5 s}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{1}{s \\left(s + 1\\right) \\left(s + 5\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{6.955 s^{2} + 18.45 s + 12.81}{0.03512 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{0.99 s^{2} + 3.69 s + 3.6}{0.025 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{1}{s+1}",
+      "python_png": true
+    },
+    {
+      "source": "\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}",
+      "python_png": true
+    },
+    {
+      "source": "\\unknowncommand{x}",
+      "python_png": false
+    },
+    {
+      "source": "G(s) = \\frac{1}{s + 1}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{1}{s + 1}",
+      "python_png": true
+    },
+    {
+      "source": "G(j\\omega)=G(s)\\vert_{s=j\\omega}",
+      "python_png": true
+    },
+    {
+      "source": "Z=N+P\\;\\Rightarrow\\;0=0+0",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{25}{s^{2} + 4 s + 25}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{25}{s^{2} + 4 s + 25}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{10}{s^{3} + 7 s^{2} + 10 s}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{10}{s \\left(s + 2\\right) \\left(s + 5\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s - 1}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{1}{s - 1}",
+      "python_png": true
+    },
+    {
+      "source": "Z=N+P\\;\\Rightarrow\\;0=-1+1",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.0 s + 1.0}{1.0 s + 5.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{2.8}{1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.386 s + 2.8}{0.045 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{2.4 s + 0.6}{1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.965 s^{2} + 3.832 s + 0.6786}{0.047 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.2}{1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{0.66 s + 1.2}{0.05 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.4 s + 0.2917}{1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.32 s^{2} + 2.43 s + 0.6}{0.05 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{4.333}{1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.374 s + 5.167}{0.02418 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{3.683 s + 1.677}{1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{2.136 s^{2} + 5.67 s + 2.5}{0.03478 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{15.0}{1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{9.273 s + 24.0}{0.03512 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{13.5 s + 5.765}{1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{3.0}{1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{1.32 s + 4.8}{0.025 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{2.7 s + 1.62}{1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{4.0}{1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{2.64 s + 4.8}{0.05 s + 1.0}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{3.6 s + 1.081}{1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "C(s)=\\frac{2.64 s^{2} + 4.92 s + 2.4}{0.05 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = -0.00 \\le 0",
+      "python_png": false
+    },
+    {
+      "source": "\\textstyle K = 0.15 > 0",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{s^{2} + 6 s + 12}{s^{3} + 4 s^{2} + 4 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{s^{2} + 6 s + 12}{s \\left(s + 2\\right)^{2}}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = 0.59 > 0",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0 s + 2.0}{1.0 s^{3} + 5.0 s^{2} + 4.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{2.0 \\left(0.5 s + 1.0\\right)}{4.0 s \\left(0.25 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{1.0 s^{3} + 2.0 s^{2} + 2.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{2.0 s \\left(0.5 s^{2} + 1.0 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = -68.25 \\le 0",
+      "python_png": false
+    },
+    {
+      "source": "\\textstyle K = 0.51 > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = -0.26 \\le 0",
+      "python_png": false
+    },
+    {
+      "source": "G(s) = \\frac{1.0 s - 2.0}{1.0 s^{3} + 4.0 s^{2} + 3.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{2.0 \\left(0.5 s - 1.0\\right)}{3.0 s \\left(0.333333333333333 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = 5.83 > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = 0.17 > 0",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0 s + 2.0}{1.0 s^{2} + 1.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{2.0 \\left(0.5 s + 1.0\\right)}{1.0 s \\left(s + 1\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = 1.00 > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = -0.56 \\le 0",
+      "python_png": false
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{1.0 s^{4} + 6.0 s^{3} + 11.0 s^{2} + 6.0 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{6.0 s \\left(0.333333333333333 s + 1.0\\right) \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = -4.00 \\le 0",
+      "python_png": false
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{1.0 s^{2} + 2.0 s + 5.0}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{5.0 \\left(0.2 s^{2} + 0.4 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{s + 2}{s^{3} + 5 s^{2} + 4 s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{s + 2}{s \\left(s + 1\\right) \\left(s + 4\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{0.001 s + 0.002}{s^{2} + s}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{0.002 \\left(0.5 s + 1.0\\right)}{s \\left(s + 1\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s",
+      "python_png": true
+    },
+    {
+      "source": "2 - \\frac{K}{3}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2 - \\frac{K}{3}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{0}",
+      "python_png": true
+    },
+    {
+      "source": "K",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K",
+      "python_png": true
+    },
+    {
+      "source": "s^{3} + 3 s^{2} + 2 s + K = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{3} + 3 s^{2} + 2 s + K = 0",
+      "python_png": true
+    },
+    {
+      "source": "1",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 1",
+      "python_png": true
+    },
+    {
+      "source": "3",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 3",
+      "python_png": true
+    },
+    {
+      "source": "2 - \\frac{K}{3} > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2 - \\frac{K}{3} > 0",
+      "python_png": true
+    },
+    {
+      "source": "K > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K > 0",
+      "python_png": true
+    },
+    {
+      "source": "6",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 6",
+      "python_png": true
+    },
+    {
+      "source": "\\omega_{osc} = 1.414 \\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\omega_{osc} = 1.414 \\text{ rad/s}",
+      "python_png": true
+    },
+    {
+      "source": "K = 6",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = 6",
+      "python_png": true
+    },
+    {
+      "source": "s = \\pm 1.414 j",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s = \\pm 1.414 j",
+      "python_png": true
+    },
+    {
+      "source": "K = 6 \\; (\\omega_{osc} = 1.414 \\text{ rad/s})",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K = 6 \\; (\\omega_{osc} = 1.414 \\text{ rad/s})",
+      "python_png": true
+    },
+    {
+      "source": "0 < K < 6",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 0 < K < 6",
+      "python_png": true
+    },
+    {
+      "source": "K < 0 \\quad \\text{ou} \\quad K > 6",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K < 0 \\quad \\text{ou} \\quad K > 6",
+      "python_png": true
+    },
+    {
+      "source": "2",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{3}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{2}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 0",
+      "python_png": true
+    },
+    {
+      "source": "10",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 10",
+      "python_png": true
+    },
+    {
+      "source": "s^{3} + 6 s^{2} + 11 s + 6 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{3} + 6 s^{2} + 11 s + 6 = 0",
+      "python_png": true
+    },
+    {
+      "source": "Não aplicável (sem ganho K variável)",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle Não aplicável (sem ganho K variável)",
+      "python_png": true
+    },
+    {
+      "source": "11",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 11",
+      "python_png": true
+    },
+    {
+      "source": "-22",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle -22",
+      "python_png": true
+    },
+    {
+      "source": "24",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 24",
+      "python_png": true
+    },
+    {
+      "source": "s^{3} + s^{2} + 2 s + 24 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{3} + s^{2} + 2 s + 24 = 0",
+      "python_png": true
+    },
+    {
+      "source": "2 - \\frac{3}{\\varepsilon}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2 - \\frac{3}{\\varepsilon}",
+      "python_png": true
+    },
+    {
+      "source": "s^{4} + s^{3} + 2 s^{2} + 2 s + 3 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{4} + s^{3} + 2 s^{2} + 2 s + 3 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\varepsilon",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\varepsilon",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{4}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\varepsilon > 0",
+      "python_png": true
+    },
+    {
+      "source": "8",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 8",
+      "python_png": true
+    },
+    {
+      "source": "s^{4} + 2 s^{3} + 6 s^{2} + 8 s + 8 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{4} + 2 s^{3} + 6 s^{2} + 8 s + 8 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 4",
+      "python_png": true
+    },
+    {
+      "source": "4 s",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 4 s",
+      "python_png": true
+    },
+    {
+      "source": "2 s^{2} + 8",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2 s^{2} + 8",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{1}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle A(s) = 2 s^{2} + 8",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\frac{dA}{ds} = 4 s",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{1} (Ajustada)",
+      "python_png": true
+    },
+    {
+      "source": "4 - \\frac{12}{\\varepsilon}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 4 - \\frac{12}{\\varepsilon}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "s^{5} + 2 s^{4} + 2 s^{3} + 4 s^{2} + 11 s + 10 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{5} + 2 s^{4} + 2 s^{3} + 4 s^{2} + 11 s + 10 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{5}",
+      "python_png": true
+    },
+    {
+      "source": "s + 5 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s + 5 = 0",
+      "python_png": true
+    },
+    {
+      "source": "5",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 5",
+      "python_png": true
+    },
+    {
+      "source": "s - 5 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s - 5 = 0",
+      "python_png": true
+    },
+    {
+      "source": "-5",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle -5",
+      "python_png": true
+    },
+    {
+      "source": "s^{2} + 3 s + 2 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{2} + 3 s + 2 = 0",
+      "python_png": true
+    },
+    {
+      "source": "s^{2} - 3 s + 2 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{2} - 3 s + 2 = 0",
+      "python_png": true
+    },
+    {
+      "source": "-3",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle -3",
+      "python_png": true
+    },
+    {
+      "source": "-6",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle -6",
+      "python_png": true
+    },
+    {
+      "source": "-8",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle -8",
+      "python_png": true
+    },
+    {
+      "source": "9",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 9",
+      "python_png": true
+    },
+    {
+      "source": "s^{6} + s^{5} + 5 s^{4} + 3 s^{3} + 2 s^{2} + 8 s + 4 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{6} + s^{5} + 5 s^{4} + 3 s^{3} + 2 s^{2} + 8 s + 4 = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{6}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{3 K}{5} + 4",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\frac{3 K}{5} + 4",
+      "python_png": true
+    },
+    {
+      "source": "2 K",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2 K",
+      "python_png": true
+    },
+    {
+      "source": "s^{3} + 5 s^{2} + (K + 4) s + 2 K = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle s^{3} + 5 s^{2} + (K + 4) s + 2 K = 0",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{3 K}{5} + 4 > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\frac{3 K}{5} + 4 > 0",
+      "python_png": true
+    },
+    {
+      "source": "2 K > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle 2 K > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\text{Nenhum ponto marginal em } K > 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle \\text{Nenhum ponto marginal em } K > 0",
+      "python_png": true
+    },
+    {
+      "source": "K < 0",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K < 0",
+      "python_png": true
+    },
+    {
+      "source": "K + 4",
+      "python_png": true
+    },
+    {
+      "source": "\\textstyle K + 4",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{s^{2} + 3 s + 2}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1.0}{1.0 s^{2} + 3.0 s + 2.0}",
+      "python_png": true
+    },
+    {
+      "source": "\\dot{x}=Ax+Bu,\\qquad y=Cx+Du",
+      "python_png": true
+    },
+    {
+      "source": "\\mathcal{C}=[B\\;AB\\;\\cdots\\;A^{n-1}B]",
+      "python_png": true
+    },
+    {
+      "source": "\\mathcal{O}=[C^T\\;A^TC^T\\;\\cdots\\;(A^T)^{n-1}C^T]^T",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{0.999999999999999}{4.0 \\left(0.25 s^{2} + 1.0\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{0.999999999999999}{1.0 s^{2} + 4.0}",
+      "python_png": true
+    },
+    {
+      "source": "K=\\left[\\begin{matrix}18.0 & 6.0\\end{matrix}\\right]",
+      "python_png": true
+    },
+    {
+      "source": "L=\\left[\\begin{matrix}10.0\\\\10.0\\end{matrix}\\right]",
+      "python_png": true
+    },
+    {
+      "source": "K_p=\\lim_{s\\to0}G(s),\\quad K_v=\\lim_{s\\to0}sG(s),\\quad K_a=\\lim_{s\\to0}s^2G(s)",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{4}{s^{2} + 2 s + 4}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{4}{s^{2} + 2 s + 4}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{1}{2 s + 1}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{1}{2 s + 1}",
+      "python_png": true
+    },
+    {
+      "source": "G(s) = \\frac{5}{s^{2} + 2 s}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{5}{s \\left(s + 2\\right)}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{5}{s^{2} + 2 s}",
+      "python_png": true
+    },
+    {
+      "source": "\\frac{10}{s^{3} + 7 s^{2} + 10 s}",
+      "python_png": true
+    }
+  ]
+}

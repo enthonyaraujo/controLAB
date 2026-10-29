@@ -1,5 +1,5 @@
 use controlab_engine::routh;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 #[test]
 fn reference_routh_tables_and_deductions_are_preserved() {
@@ -60,11 +60,13 @@ fn evaluates_gain_without_symbolic_epsilon_approximation() {
 fn gain_intervals_preserve_python_partition_policy() {
     // Preserve the Python policy: symbolic leading coefficients imply positive conditions. Only positive numerator roots delimit the public intervals.
     let result = routh::analyze(&json!({"expr":"(K+2)*s^2+(K+1)*s+1"})).unwrap();
-    assert!(result["k_range"]["stable_intervals"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .any(|s| s.as_str() == Some("K > 0")));
+    assert!(
+        result["k_range"]["stable_intervals"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|s| s.as_str() == Some("K > 0"))
+    );
     assert_eq!(result["verdict"], "Dependente de K");
 }
 

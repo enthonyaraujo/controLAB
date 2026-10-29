@@ -1,15 +1,14 @@
 //! Routh-Hurwitz table and gain sign chart, using exact symbolic arithmetic.
 use crate::{
-    polynomial,
+    Result, polynomial,
     symbolic::{
-        parse_characteristic, rational_latex, real_roots, Expr, Polynomial, Rational, RealRoot,
-        SPolynomial,
+        Expr, Polynomial, Rational, RealRoot, SPolynomial, parse_characteristic, rational_latex,
+        real_roots,
     },
-    Result,
 };
 use num_complex::Complex64;
 use num_traits::{One, Signed, ToPrimitive, Zero};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 fn power(n: usize) -> String {
     if n > 1 {
@@ -72,12 +71,20 @@ fn table(coeffs: &[Expr]) -> Result<Table> {
             let mut replacement = deriv.0.iter().rev().step_by(2).cloned().collect::<Vec<_>>();
             replacement.resize(m, Expr::integer(0));
             rows[i - 1] = replacement;
-            let note=format!("Linha de zeros detectada em $s^{{{}}}$. Polinômio auxiliar: $A(s) = {}$. Derivada substituída: $\\frac{{dA}}{{ds}} = {}$.",p+1,aux.latex(),deriv.latex());
+            let note = format!(
+                "Linha de zeros detectada em $s^{{{}}}$. Polinômio auxiliar: $A(s) = {}$. Derivada substituída: $\\frac{{dA}}{{ds}} = {}$.",
+                p + 1,
+                aux.latex(),
+                deriv.latex()
+            );
             special.push(json!({"type":"row_of_zeros","power":format!("s^{{{}}}",p+1),"aux_poly_latex":aux.latex(),"aux_deriv_latex":deriv.latex(),"desc":note}));
             steps.push(json!({"power":format!("s^{{{}}} (Ajustada)",p+1),"desc":note,"values":latex_values(&rows[i-1])}));
         } else if rows[i - 1][0].is_zero() && !rows[i - 1][0].approximate {
             rows[i - 1][0] = Expr::epsilon();
-            let note=format!("Primeiro elemento nulo em $s^{{{}}}$. Substituído por termo infinitesimal positivo $\\varepsilon > 0$.",p+1);
+            let note = format!(
+                "Primeiro elemento nulo em $s^{{{}}}$. Substituído por termo infinitesimal positivo $\\varepsilon > 0$.",
+                p + 1
+            );
             special.push(
                 json!({"type":"zero_first_element","power":format!("s^{{{}}}",p+1),"desc":note}),
             );
@@ -139,7 +146,12 @@ fn signs(first: &[Expr], special: &[Value]) -> (Vec<Value>, usize, &'static str,
     } else if changes == 0 && zero_rows {
         ("Marginalmente Estável","Não ocorrem trocas de sinal fora da linha de zeros, indicando a existência de pares de polos puramente imaginários sobre o eixo jω (sem amortecimento). O sistema oscila com amplitude sustentada.".into())
     } else {
-        ("Instável",format!("Ocorrem {changes} troca(s) de sinal na primeira coluna da tabela de Routh, o que indica exatamente {changes} polo(s) em malha fechada no semiplano direito (RHP)."))
+        (
+            "Instável",
+            format!(
+                "Ocorrem {changes} troca(s) de sinal na primeira coluna da tabela de Routh, o que indica exatamente {changes} polo(s) em malha fechada no semiplano direito (RHP)."
+            ),
+        )
     };
     (signs, changes, verdict, summary)
 }
@@ -222,29 +234,29 @@ fn boundary_latex(p: &Polynomial, r: &RealRoot, approximate: bool) -> String {
         let delta = &center * &center - &c[2] / &c[0];
         let mut coefficient = Rational::one();
         let mut radicand = delta.clone();
-        if let (Some(n), Some(d)) = (delta.numer().to_u64(), delta.denom().to_u64()) {
-            if let Some(mut value) = n.checked_mul(d) {
-                let mut square = 1u64;
-                let mut rem = 1u64;
-                let mut prime = 2u64;
-                while prime * prime <= value && prime <= 1_000_000 {
-                    let mut power = 0;
-                    while value % prime == 0 {
-                        value /= prime;
-                        power += 1;
-                    }
-                    for _ in 0..power / 2 {
-                        square *= prime;
-                    }
-                    if power % 2 == 1 {
-                        rem *= prime;
-                    }
-                    prime += 1;
+        if let (Some(n), Some(d)) = (delta.numer().to_u64(), delta.denom().to_u64())
+            && let Some(mut value) = n.checked_mul(d)
+        {
+            let mut square = 1u64;
+            let mut rem = 1u64;
+            let mut prime = 2u64;
+            while prime * prime <= value && prime <= 1_000_000 {
+                let mut power = 0;
+                while value % prime == 0 {
+                    value /= prime;
+                    power += 1;
                 }
-                rem *= value;
-                coefficient = Rational::new(square.into(), d.into());
-                radicand = Rational::from_integer(rem.into());
+                for _ in 0..power / 2 {
+                    square *= prime;
+                }
+                if power % 2 == 1 {
+                    rem *= prime;
+                }
+                prime += 1;
             }
+            rem *= value;
+            coefficient = Rational::new(square.into(), d.into());
+            radicand = Rational::from_integer(rem.into());
         }
         let radical = if radicand.is_one() {
             rational_latex(&coefficient)
@@ -511,21 +523,138 @@ pub fn analyze(data: &Value) -> Result<Value> {
             ));
         }
     }
-    let refs = curves
-        .iter()
-        .map(|(name, x, y)| (name.as_str(), x.as_slice(), y.as_slice()))
-        .collect::<Vec<_>>();
-    let (image, svg) = crate::presentation::plot(
-        &refs,
-        title,
-        "Eixo Real (σ)",
-        "Eixo Imaginário (jω)",
-        theme,
-        false,
-    )?;
+    let _ = (theme, title); // Both canonical scientific themes use the same palette.
+    let (image, svg) = stability_plot(&poly, &k, &roots, &curves)?;
     Ok(
         json!({"success":true,"input_str":source,"is_fraction":is_fraction,"char_poly_latex":format!("{} = 0",poly.latex()),"degree":poly.degree(),"coeffs_latex":latex_values(&coeffs),"routh_table":formatted,"special_cases":t.special,"steps":t.steps,"cell_details":t.cells,"first_col_signs":evaluated,"sign_changes":changes,"rhp_poles":changes,"verdict":verdict,"summary":summary,"k_range":k,"plot_image":image,"plot_svg":svg,"exact_roots":roots.into_iter().map(|z|root_json(z,false)).collect::<Vec<_>>()}),
     )
+}
+
+fn stability_plot(
+    poly: &SPolynomial,
+    k: &Value,
+    roots: &[Complex64],
+    curves: &[(String, Vec<f64>, Vec<f64>)],
+) -> Result<(String, String)> {
+    use crate::time_response::Chart;
+    let mut chart = Chart::new(
+        1148.,
+        1008.,
+        (110., 45., 990., 865.),
+        "Eixo Real (σ)",
+        "Eixo Imaginário (jω)",
+        false,
+    );
+    let mut xs = vec![0.];
+    let mut ys = vec![0.];
+    for (_, x, y) in curves {
+        xs.extend(x);
+        ys.extend(y);
+    }
+    let min = xs.iter().copied().fold(0., f64::min);
+    let max = xs.iter().copied().fold(0., f64::max);
+    let im = ys.iter().map(|v| v.abs()).fold(2., f64::max);
+    let pad = (max - min).max(4.) * 0.18;
+    let (mut left, mut right, mut top) = ((min - pad).min(-1.), (max + pad).max(1.5), im * 1.3);
+    let aspect = 990. / 865.;
+    if (right - left) / (2. * top) < aspect {
+        let c = (left + right) / 2.;
+        let span = 2. * top * aspect;
+        left = c - span / 2.;
+        right = c + span / 2.;
+    } else {
+        top = (right - left) / aspect / 2.;
+    }
+    chart.bounds = (left, right, -top, top);
+    chart.axes();
+    chart.line(&[left, right], &[0., 0.], "black", 0.8, "");
+    chart.line(&[0., 0.], &[-top, top], "black", 0.8, "");
+    let poles = if poly.has_k() {
+        numerical_roots(poly, 0.)?
+    } else {
+        roots.to_vec()
+    };
+    if poly.has_k() {
+        for (_, x, y) in curves {
+            chart.line(x, y, "black", 2., "");
+        }
+    }
+    for pole in &poles {
+        let (x, y) = chart.xy(pole.re, pole.im);
+        chart.svg += &format!(
+            r#"<path data-pole="original" d="M{} {}l12 12m-12 0l12 -12" stroke="black" stroke-width="2.2" fill="none"/>"#,
+            x - 6.,
+            y - 6.
+        );
+        let tag = if pole.re < -1e-4 {
+            "SPE"
+        } else if pole.re > 1e-4 {
+            "SPD"
+        } else {
+            "jω"
+        };
+        let label = if poly.has_k() {
+            format!("p={}", root_string(*pole))
+        } else {
+            format!("p={} [{tag}]", root_string(*pole))
+        };
+        chart.label(
+            pole.re,
+            pole.im,
+            &label,
+            0.,
+            if pole.im >= 0. { -18. } else { 24. },
+            true,
+        );
+    }
+    if poly.has_k() {
+        let n = polynomial::add(&poly.numeric(1.), &poly.numeric(0.), -1.);
+        for zero in polynomial::roots(&n)? {
+            let (x, y) = chart.xy(zero.re, zero.im);
+            chart.svg += &format!(
+                r#"<circle data-zero="finite" cx="{x}" cy="{y}" r="6" stroke="black" stroke-width="2" fill="white"/>"#
+            );
+            chart.label(
+                zero.re,
+                zero.im,
+                &format!("z={}", root_string(zero)),
+                0.,
+                24.,
+                true,
+            );
+        }
+        for critical in k["critical_k"].as_array().into_iter().flatten() {
+            if let Some(gain) = critical["k_val"].as_f64() {
+                for p in numerical_roots(poly, gain)? {
+                    if p.re.abs() < 1e-2 && p.im.abs() > 1e-4 {
+                        let (x, y) = chart.xy(0., p.im);
+                        chart.svg += &format!(
+                            r##"<circle data-critical-k="{gain}" cx="{x}" cy="{y}" r="6" stroke="#B91C1C" stroke-width="2" fill="white"/>"##
+                        );
+                        chart.label(
+                            0.,
+                            p.im,
+                            &format!("jω={:+.2}; K={gain:.1}", p.im),
+                            14.,
+                            0.,
+                            true,
+                        );
+                    }
+                }
+            }
+        }
+        chart.legend(
+            &[
+                ("Ramos do LGR", "black", false),
+                ("Polos (Início)", "black", false),
+                ("Zeros (Término)", "black", false),
+            ],
+            true,
+        );
+    } else {
+        chart.legend(&[("Polos no plano s", "black", false)], true);
+    }
+    chart.finish()
 }
 
 pub fn evaluate_k(data: &Value) -> Result<Value> {

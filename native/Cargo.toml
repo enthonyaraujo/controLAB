@@ -32,5 +32,6 @@ winit = { version = "=0.30.13", default-features = false, features = ["wayland-c
 rfd = { version = "=0.17.2", default-features = false, features = ["xdg-portal"] }
 
 [target.'cfg(target_os = "android")'.dependencies]
+controlab-engine = { path = "../crates/control-engine" }
 jni = "=0.22.4"
 android-activity = { version = "0.6.1", features = ["native-activity"] }
