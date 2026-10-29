@@ -1,0 +1,13 @@
+{
+  "id": "frequency_too_many_decades",
+  "input": {
+    "action": "frequency_response",
+    "omega_max": 100000000.0,
+    "omega_min": 1e-08
+  },
+  "module": "frequency",
+  "output": {
+    "error": "ValueError: A faixa de frequências não pode exceder 12 décadas.",
+    "success": false
+  }
+}

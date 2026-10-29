@@ -1,4 +1,4 @@
-//! Headless rendering checks: run the real forms and studio without starting Python.
+//! Headless rendering checks: run the real forms and studio without starting the scientific service.
 use super::*;
 use egui::epaint::{Primitive, Shape};
 
@@ -289,7 +289,7 @@ fn backend_transport_recovers_from_engine_errors_and_preserves_the_script_sessio
         } else {
             assert!(
                 Instant::now() < deadline,
-                "Timed out waiting for the native Python transport"
+                "Timed out waiting for the native scientific transport"
             );
             std::thread::sleep(Duration::from_millis(10));
         }

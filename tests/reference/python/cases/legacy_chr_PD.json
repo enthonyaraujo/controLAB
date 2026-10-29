@@ -1,0 +1,183 @@
+{
+  "id": "legacy_chr_PD",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "PD",
+    "method": "chr",
+    "plant_expr": "1/(s*(s+1)*(s+5))",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "description": "Comparação da resposta ao degrau e do LGR antes e depois da compensação.",
+    "details": {
+      "after": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9994983022756275,
+        "peak_time": 25.50750282791445,
+        "rise_time": 7.785422549885535,
+        "settling_time": 13.829369003086148,
+        "steady_state_value": 1.0
+      },
+      "before": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9992081378142175,
+        "peak_time": 25.50750282791445,
+        "rise_time": 8.40006117224492,
+        "settling_time": 15.058646247804917,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -20.041904324066483,
+          "text": "-20.042+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -4.858616143809798,
+          "text": "-4.8586+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.7858463217710306,
+          "text": "-0.78585+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.3136332103527242,
+          "text": "-0.31363+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -5.0489173395223,
+          "text": "-5.0489+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.6431041321077906,
+          "text": "-0.6431+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.3079785283699039,
+          "text": "-0.30798+0j"
+        }
+      ],
+      "controller_parameters": {
+        "kcr": null,
+        "kd": 0.6,
+        "ki": 0.0,
+        "kp": 1.2,
+        "method_label": "CHR — 0% de sobressinal",
+        "pcr": null,
+        "td": 0.5,
+        "ti": null,
+        "wcr": null
+      },
+      "design_label": "PD por CHR — 0% de sobressinal",
+      "design_type": "pid",
+      "frequency_margins_after": {
+        "gain_crossover_frequency": 0.23529166989075548,
+        "gain_margin_db": 43.52182518111363,
+        "phase_crossover_frequency": 8.94427190999916,
+        "phase_margin_deg": 80.76501728105342
+      },
+      "frequency_margins_before": {
+        "gain_crossover_frequency": 0.19611076348053946,
+        "gain_margin_db": 29.542425094393252,
+        "phase_crossover_frequency": 2.23606797749979,
+        "phase_margin_deg": 76.65838059590112
+      },
+      "kcr": null,
+      "pcr": null,
+      "plant_latex_expanded": "G(s) = \\frac{1}{s^{3} + 6 s^{2} + 5 s}",
+      "stable": true,
+      "warning": null,
+      "wcr": null
+    },
+    "image": {
+      "$asset": "assets/648b6d31b270be691cfd93ae3ef611a6ed46bd2f0d14bf269e9740cd186cdc76.png",
+      "bytes": 230164,
+      "encoding": "data:image/png;base64",
+      "sha256": "648b6d31b270be691cfd93ae3ef611a6ed46bd2f0d14bf269e9740cd186cdc76"
+    },
+    "latex": [
+      {
+        "label": "Planta",
+        "value": "\\frac{1}{s \\left(s + 1\\right) \\left(s + 5\\right)}"
+      },
+      {
+        "label": "Controlador",
+        "value": "C(s)=\\frac{0.66 s + 1.2}{0.05 s + 1.0}"
+      },
+      {
+        "label": "Malha fechada compensada",
+        "value": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Kp",
+        "value": "1.2"
+      },
+      {
+        "label": "Ki",
+        "value": "0"
+      },
+      {
+        "label": "Kd",
+        "value": "0.6"
+      },
+      {
+        "label": "Ti",
+        "unit": "",
+        "value": "—"
+      },
+      {
+        "label": "Td",
+        "unit": "s",
+        "value": "0.5"
+      },
+      {
+        "label": "Sobressinal (%OS)",
+        "unit": "%",
+        "value": "0.0"
+      },
+      {
+        "label": "Tempo de acomodação (ts)",
+        "unit": "s",
+        "value": "13.829369003086148"
+      },
+      {
+        "label": "Margem de ganho (MG)",
+        "unit": "dB",
+        "value": "43.52182518111363"
+      },
+      {
+        "label": "Margem de fase (MF)",
+        "unit": "°",
+        "value": "80.76501728105342"
+      },
+      {
+        "label": "Projeto",
+        "value": "PD por CHR — 0% de sobressinal"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/fac3330d527223ef4118cd65e4e4af21e5e382cf272537255b7df78724a0383a.svg",
+      "bytes": 98408,
+      "encoding": "utf-8",
+      "sha256": "fac3330d527223ef4118cd65e4e4af21e5e382cf272537255b7df78724a0383a"
+    },
+    "title": "Projeto de Controladores"
+  }
+}

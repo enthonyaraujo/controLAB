@@ -1,4 +1,4 @@
-//! Native ControLAB UI. Scientific calculations remain in the canonical Python engine;
+//! Native ControLAB UI. Scientific calculations run in the Rust engine;
 //! the interface preserves ControLAB’s visual identity using native egui widgets.
 #[cfg(target_os = "android")]
 pub mod android;
@@ -1018,7 +1018,7 @@ impl Controlab {
         }
     }
 
-    /// Debounced previews: instant formatting while typing, Python validation after a pause.
+    /// Debounced previews: instant formatting while typing, scientific engine validation after a pause.
     fn schedule_previews(&mut self) {
         let ids: Vec<String> = self.analyses.keys().cloned().collect();
         for id in ids {

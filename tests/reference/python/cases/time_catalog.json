@@ -1,0 +1,27 @@
+{
+  "id": "time_catalog",
+  "input": {
+    "action": "time_response_presets"
+  },
+  "module": "time",
+  "output": {
+    "presets": [
+      {
+        "expr": "4 / (s^2 + 2*s + 4)",
+        "id": "Segunda ordem subamortecida",
+        "title": "Segunda ordem subamortecida"
+      },
+      {
+        "expr": "1 / (2*s + 1)",
+        "id": "Primeira ordem",
+        "title": "Primeira ordem"
+      },
+      {
+        "expr": "5 / (s * (s + 2))",
+        "id": "Sistema tipo 1",
+        "title": "Sistema tipo 1"
+      }
+    ],
+    "success": true
+  }
+}

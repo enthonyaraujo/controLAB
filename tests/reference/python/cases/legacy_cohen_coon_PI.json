@@ -1,0 +1,183 @@
+{
+  "id": "legacy_cohen_coon_PI",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "PI",
+    "method": "cohen_coon",
+    "plant_expr": "1/(s*(s+1)*(s+5))",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "description": "Comparação da resposta ao degrau e do LGR antes e depois da compensação.",
+    "details": {
+      "after": {
+        "overshoot_percent": 80.18328781396795,
+        "peak": 1.8018328781396793,
+        "peak_time": 4.20691239095516,
+        "rise_time": 1.502468711055414,
+        "settling_time": 36.660236549752106,
+        "steady_state_value": 0.9999999999999999
+      },
+      "before": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9999999997992821,
+        "peak_time": 74.82294181055963,
+        "rise_time": 8.41382478191032,
+        "settling_time": 15.024687110554142,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -5.156668920295296,
+          "text": "-5.1567+0j"
+        },
+        {
+          "im": 0.7107598299225917,
+          "re": -0.10691907864642358,
+          "text": "-0.10692+0.71076j"
+        },
+        {
+          "im": -0.7107598299225917,
+          "re": -0.10691907864642358,
+          "text": "-0.10692-0.71076j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.6294929224118663,
+          "text": "-0.62949+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -5.0489173395223,
+          "text": "-5.0489+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.6431041321077906,
+          "text": "-0.6431+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.3079785283699039,
+          "text": "-0.30798+0j"
+        }
+      ],
+      "controller_parameters": {
+        "kcr": null,
+        "kd": 0.0,
+        "ki": 1.6769647696476964,
+        "kp": 3.6833333333333336,
+        "method_label": "Cohen-Coon",
+        "pcr": null,
+        "td": 0.0,
+        "ti": 2.1964285714285716,
+        "wcr": null
+      },
+      "design_label": "PI por Cohen-Coon",
+      "design_type": "pid",
+      "frequency_margins_after": {
+        "gain_crossover_frequency": 0.7078512279351771,
+        "gain_margin_db": 11.352186378327529,
+        "phase_crossover_frequency": 1.5060852176841888,
+        "phase_margin_deg": 13.900536959577806
+      },
+      "frequency_margins_before": {
+        "gain_crossover_frequency": 0.19611076348053946,
+        "gain_margin_db": 29.542425094393252,
+        "phase_crossover_frequency": 2.23606797749979,
+        "phase_margin_deg": 76.65838059590112
+      },
+      "kcr": null,
+      "pcr": null,
+      "plant_latex_expanded": "G(s) = \\frac{1}{s^{3} + 6 s^{2} + 5 s}",
+      "stable": true,
+      "warning": null,
+      "wcr": null
+    },
+    "image": {
+      "$asset": "assets/c67fbeb3bd7f254b4adb65d2427b16fc3b4ffd05e07e54150f5e20454e9fe13b.png",
+      "bytes": 228778,
+      "encoding": "data:image/png;base64",
+      "sha256": "c67fbeb3bd7f254b4adb65d2427b16fc3b4ffd05e07e54150f5e20454e9fe13b"
+    },
+    "latex": [
+      {
+        "label": "Planta",
+        "value": "\\frac{1}{s \\left(s + 1\\right) \\left(s + 5\\right)}"
+      },
+      {
+        "label": "Controlador",
+        "value": "C(s)=\\frac{3.683 s + 1.677}{1.0 s}"
+      },
+      {
+        "label": "Malha fechada compensada",
+        "value": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Kp",
+        "value": "3.6833"
+      },
+      {
+        "label": "Ki",
+        "value": "1.677"
+      },
+      {
+        "label": "Kd",
+        "value": "0"
+      },
+      {
+        "label": "Ti",
+        "unit": "s",
+        "value": "2.1964"
+      },
+      {
+        "label": "Td",
+        "unit": "s",
+        "value": "0"
+      },
+      {
+        "label": "Sobressinal (%OS)",
+        "unit": "%",
+        "value": "80.18328781396795"
+      },
+      {
+        "label": "Tempo de acomodação (ts)",
+        "unit": "s",
+        "value": "36.660236549752106"
+      },
+      {
+        "label": "Margem de ganho (MG)",
+        "unit": "dB",
+        "value": "11.352186378327529"
+      },
+      {
+        "label": "Margem de fase (MF)",
+        "unit": "°",
+        "value": "13.900536959577806"
+      },
+      {
+        "label": "Projeto",
+        "value": "PI por Cohen-Coon"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/b721fa244f8d9853d7801d3ac52ecc89052b6aea71527972f3df32e183907c88.svg",
+      "bytes": 97060,
+      "encoding": "utf-8",
+      "sha256": "b721fa244f8d9853d7801d3ac52ecc89052b6aea71527972f3df32e183907c88"
+    },
+    "title": "Projeto de Controladores"
+  }
+}

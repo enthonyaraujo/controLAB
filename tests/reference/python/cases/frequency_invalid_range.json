@@ -1,0 +1,12 @@
+{
+  "id": "frequency_invalid_range",
+  "input": {
+    "action": "frequency_response",
+    "omega_min": 0
+  },
+  "module": "frequency",
+  "output": {
+    "error": "ValueError: Use frequências positivas com ω máximo maior que ω mínimo.",
+    "success": false
+  }
+}

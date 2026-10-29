@@ -1,0 +1,34 @@
+{
+  "id": "console_whos",
+  "input": {
+    "action": "console_exec",
+    "command": "whos"
+  },
+  "module": "tools",
+  "output": {
+    "output": "Nome\tTipo\tValor\nG\ttf\t4/(s^2 + 2*s + 4)\nC\tpid\tKp=18, Ti=1.405, Td=0.351\nt\tvetor\tarray([0.0, ..., 10.0])\ny\tvetor\tarray([0.0, ..., 1.0])",
+    "success": true,
+    "workspace": [
+      {
+        "name": "G",
+        "type": "tf",
+        "value": "4/(s^2 + 2*s + 4)"
+      },
+      {
+        "name": "C",
+        "type": "pid",
+        "value": "Kp=18, Ti=1.405, Td=0.351"
+      },
+      {
+        "name": "t",
+        "type": "vetor",
+        "value": "array([0.0, ..., 10.0])"
+      },
+      {
+        "name": "y",
+        "type": "vetor",
+        "value": "array([0.0, ..., 1.0])"
+      }
+    ]
+  }
+}

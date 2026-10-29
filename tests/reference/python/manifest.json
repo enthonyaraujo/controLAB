@@ -1,0 +1,1413 @@
+{
+  "cases": [
+    {
+      "action": "presets",
+      "id": "lgr_catalog",
+      "module": "lgr",
+      "path": "cases/lgr_catalog.json",
+      "sha256": "8bc3e48d51c8f6c2f2776a99d6dc4a648c0ee6b15dc10f26108f18d69c0b0bfa",
+      "success": true
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_preset_00",
+      "module": "lgr",
+      "path": "cases/lgr_preset_00.json",
+      "sha256": "9270f05271d09b8c759602bc4cfdf79240ebf0cb3fb4a08ae66a3496daee257e",
+      "success": true
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_preset_01",
+      "module": "lgr",
+      "path": "cases/lgr_preset_01.json",
+      "sha256": "77dab3e066efc362d3d12f474cce9943e05f5f8b06a95fc5f11fce1be9a50919",
+      "success": true
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_preset_02",
+      "module": "lgr",
+      "path": "cases/lgr_preset_02.json",
+      "sha256": "758444272d61b9fec231be0c6ddf2e25eac5aae979d73a600fd8b2bb275ceb52",
+      "success": true
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_preset_03",
+      "module": "lgr",
+      "path": "cases/lgr_preset_03.json",
+      "sha256": "b2319b769ae87033abda5111382e84a8740d7ee871f48c8167e8d12e7e2972a2",
+      "success": true
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_preset_04",
+      "module": "lgr",
+      "path": "cases/lgr_preset_04.json",
+      "sha256": "c710b9564c2ef67fd933c55153d26eed940ac0d0dcc1258f0cf16559199a6751",
+      "success": true
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_preset_05",
+      "module": "lgr",
+      "path": "cases/lgr_preset_05.json",
+      "sha256": "f09017f2d1823824ad7af64eaa2501814d03d59f5a0d36787205478bbe1a2d80",
+      "success": true
+    },
+    {
+      "action": "routh_presets",
+      "id": "routh_catalog",
+      "module": "routh",
+      "path": "cases/routh_catalog.json",
+      "sha256": "06b9617704104e6acfdeb56d316cd79d00589402f38e2f28cc0df8591ea1bdbf",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_preset_00",
+      "module": "routh",
+      "path": "cases/routh_preset_00.json",
+      "sha256": "2654d2016c27f15a6bf631b42a35525931bde772c3ff4dd2e1f26fa617dd35ba",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_preset_01",
+      "module": "routh",
+      "path": "cases/routh_preset_01.json",
+      "sha256": "cdebe884dbf8bbf30399593dd9f929274e0e6234a91ba99fc784bd8503230af0",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_preset_02",
+      "module": "routh",
+      "path": "cases/routh_preset_02.json",
+      "sha256": "b47e75ebd6296e43ff7a2ba26f9374e438a81b8583e2caeaac153a542fd1aab9",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_preset_03",
+      "module": "routh",
+      "path": "cases/routh_preset_03.json",
+      "sha256": "20a88ac79fcfacb404088763f02f1051b5c0830c3bb0bfb3ffe3a04f773ae309",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_preset_04",
+      "module": "routh",
+      "path": "cases/routh_preset_04.json",
+      "sha256": "fa21c4be96b52fdf1495cb721574dfd9e062562be87985d2fc5cd6bc520065f7",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_preset_05",
+      "module": "routh",
+      "path": "cases/routh_preset_05.json",
+      "sha256": "de0c1d145f66625f2b7aabdd73f7bb4cfcd059a7198534a66e5d051ebdf6edb3",
+      "success": true
+    },
+    {
+      "action": "time_response_presets",
+      "id": "time_catalog",
+      "module": "time",
+      "path": "cases/time_catalog.json",
+      "sha256": "2d47c63ae462e2ef1f4b72b2da39baaf3d5bd59f2fb80406fe78d34e37328341",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_preset_00",
+      "module": "time",
+      "path": "cases/time_preset_00.json",
+      "sha256": "b00f2b9955a416aae92adea0817bacd42cf8c023b1459cf1125308f7b1d9374f",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_preset_01",
+      "module": "time",
+      "path": "cases/time_preset_01.json",
+      "sha256": "23526bd0089b159c4052030b3ded22a00cc63078d8e04b1d4d87dd361d814563",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_preset_02",
+      "module": "time",
+      "path": "cases/time_preset_02.json",
+      "sha256": "01cebdae15ec6ff08e4887f90d619c22a0651d76075888b46ff6f632c2b24df0",
+      "success": true
+    },
+    {
+      "action": "frequency_response_presets",
+      "id": "frequency_catalog",
+      "module": "frequency",
+      "path": "cases/frequency_catalog.json",
+      "sha256": "748a84aee15e56af93e9d2b6eae584c32f5abe0483eb6b9f2368551a961fa758",
+      "success": true
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_preset_00",
+      "module": "frequency",
+      "path": "cases/frequency_preset_00.json",
+      "sha256": "ef05ab6a598d2e851d3fe91388f7502db877b8c5986a813c2dfc80eecd476650",
+      "success": true
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_preset_01",
+      "module": "frequency",
+      "path": "cases/frequency_preset_01.json",
+      "sha256": "26670ca85897001e601f37a513b032b23bd485d571367d6073ed12f36214315e",
+      "success": true
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_preset_02",
+      "module": "frequency",
+      "path": "cases/frequency_preset_02.json",
+      "sha256": "12ba515a0e90119b22c24b04dbcf48f5e06b4529518a3fcf8c41748bc93d3e4a",
+      "success": true
+    },
+    {
+      "action": "controller_presets",
+      "id": "controller_catalog",
+      "module": "controller",
+      "path": "cases/controller_catalog.json",
+      "sha256": "62dee76916175cbccca3705ad0a6fcefaa1948fc59b85192cacfdf751b0f383e",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_00",
+      "module": "controller",
+      "path": "cases/controller_preset_00.json",
+      "sha256": "68ad22ae5aedf3aa8f3ac1182bab59f7ddde274049ad861d235c1837bed520c2",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_01",
+      "module": "controller",
+      "path": "cases/controller_preset_01.json",
+      "sha256": "0ca3182cc78da444a99067c6cefb0f6d0ccf2e5dca533b901d56703886889b5d",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_02",
+      "module": "controller",
+      "path": "cases/controller_preset_02.json",
+      "sha256": "30cfb629a12aa868c778d74bb81d94b6b5f3228035e15546fe5211e022587319",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_03",
+      "module": "controller",
+      "path": "cases/controller_preset_03.json",
+      "sha256": "9804f583f7fb3d5e2c08db93793f1bc31b3783a3a786608d96e7fdc3869cd311",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_04",
+      "module": "controller",
+      "path": "cases/controller_preset_04.json",
+      "sha256": "d3e49deda4aed5110097c37158fa7cf79726f5341b22f11eb7dfa3eeff12b8ff",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_05",
+      "module": "controller",
+      "path": "cases/controller_preset_05.json",
+      "sha256": "d60aac1f387659a35904047a9bee017c3bd756bd6e9a4f3b13340c2e57eb4d0b",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_06",
+      "module": "controller",
+      "path": "cases/controller_preset_06.json",
+      "sha256": "3d0883bea8e291e5d4c29d04e1bc833751056df03a198fb41e735b8fa9a7d128",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_preset_07",
+      "module": "controller",
+      "path": "cases/controller_preset_07.json",
+      "sha256": "2aad21ef0c6b1d2e8e6ae3cf59125232f4b1b2a4593fe680297c59046e18367b",
+      "success": true
+    },
+    {
+      "action": "state_space_presets",
+      "id": "state_space_catalog",
+      "module": "state_space",
+      "path": "cases/state_space_catalog.json",
+      "sha256": "b2f6204fbdd1b4f9e5a5396bab0759c4eaf3a582ad8d0cbe622ce01ee54d5483",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_space_preset_00",
+      "module": "state_space",
+      "path": "cases/state_space_preset_00.json",
+      "sha256": "f7c19e90b792117e182f2f7f1a6e2b6c6630df4a1a9345f74573a68c740a29d6",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_space_preset_01",
+      "module": "state_space",
+      "path": "cases/state_space_preset_01.json",
+      "sha256": "677ffb2006f297489180fac202dc2813eb77f92067ec727b987a29694a71b652",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_1_lead_compensator_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_1_lead_compensator_0.json",
+      "sha256": "c6572329801fc026ef4f475f5631c51d1615ca1344c11f2547397bf46e991a45",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_2_lag_compensator_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_2_lag_compensator_0.json",
+      "sha256": "4b18af526c72357fdd8e16f72858048c575cc67bef2e20a7feb764a9e2ec5c4b",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_3_proportional_example_1_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_3_proportional_example_1_0.json",
+      "sha256": "5c1ed5853c376b71790970aef5a0fbf84a22e4347cebab52f7a00c59a074c0f2",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_4_proportional_example_2_vertical_lgr_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_4_proportional_example_2_vertical_lgr_0.json",
+      "sha256": "8fe47c4772c3b7ed1001286c22e281cd95f2205f7d55a7b565f579329b2aefae",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_5_pd_example_1_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_5_pd_example_1_0.json",
+      "sha256": "bd535eab98ec312072fcc75a71a1b6716ac924320b26e4e523dc109b9b2b026d",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_6_pd_example_2_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_6_pd_example_2_0.json",
+      "sha256": "780d05654909317a3b16cfa62810ab52a9eda2ac81bfc88b8d6712bc88e7ff88",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_case_7_pi_example_1_0",
+      "module": "controller",
+      "path": "cases/controller_test_case_7_pi_example_1_0.json",
+      "sha256": "c36297bd9a96b6227c36e8f06fe7b1d0400736a9462ec3c6f99793aa91633b65",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_parabola_input_steady_state_error_and_lag_controller_0",
+      "module": "controller",
+      "path": "cases/controller_test_parabola_input_steady_state_error_and_lag_controller_0.json",
+      "sha256": "59c922eed165c6c676bfbcdf2a0c86abaf370ab86607589cb43ea8a58c57648a",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_ziegler_nichols_critical_pid_auto_0",
+      "module": "controller",
+      "path": "cases/controller_test_ziegler_nichols_critical_pid_auto_0.json",
+      "sha256": "7d6de001735b4932e22bd403acaef2d38f46ea009f0c0127c96620624aedd29d",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_ziegler_nichols_critical_pid_manual_unstable_0",
+      "module": "controller",
+      "path": "cases/controller_test_ziegler_nichols_critical_pid_manual_unstable_0.json",
+      "sha256": "e45421a8bd42ed76acbae177baeb31847de2bde9eac665b3c04a7e17e2c0bf54",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q1_pi_cancels_slow_pole_0",
+      "module": "controller",
+      "path": "cases/controller_test_q1_pi_cancels_slow_pole_0.json",
+      "sha256": "9bf9a40935d9f3ba10c1dbb24e5f6bf53d121be6f1612f07ae2eb749374a0e62",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q1_pd_reports_point_right_of_locus_0",
+      "module": "controller",
+      "path": "cases/controller_test_q1_pd_reports_point_right_of_locus_0.json",
+      "sha256": "613331fb9e2594d13ae87d1c05ba94a3aa675402551bab6f389406866aab0e5a",
+      "success": false
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q1_lead_warns_when_result_is_lag_0",
+      "module": "controller",
+      "path": "cases/controller_test_q1_lead_warns_when_result_is_lag_0.json",
+      "sha256": "962dfedbf7b74eea9461a22f7139a07b8364ff64d0bc02f12083c298abd118d2",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q2_pd_with_complex_plant_poles_0",
+      "module": "controller",
+      "path": "cases/controller_test_q2_pd_with_complex_plant_poles_0.json",
+      "sha256": "359c28e9e785b932cd1dcb4cb35a6f612ee4b0fb1882e17afa48876444954dd9",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q4_pi_with_non_unity_feedback_0",
+      "module": "controller",
+      "path": "cases/controller_test_q4_pi_with_non_unity_feedback_0.json",
+      "sha256": "acf60648fd729b9051000887414d5f2aa0cb4547e87bb2e01e1d3ed9e4ca1404",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q5_pid_by_root_locus_0",
+      "module": "controller",
+      "path": "cases/controller_test_q5_pid_by_root_locus_0.json",
+      "sha256": "5ca8acb4285ff7da8c859b0e774dad346da5db7a29ba1154cf042b1d326f5465",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q5_pid_custom_pi_zero_0",
+      "module": "controller",
+      "path": "cases/controller_test_q5_pid_custom_pi_zero_0.json",
+      "sha256": "7ce8155579b30a59cdeb963097c5d598b4a14b5cb6750e72ea1f323b169a38c3",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q6_pd_when_point_already_on_locus_0",
+      "module": "controller",
+      "path": "cases/controller_test_q6_pd_when_point_already_on_locus_0.json",
+      "sha256": "65066dc1500ea66bdd5cb88dcc07d890cd0f8c5706b6ee52b13cc97613e5ccd8",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q7_pd_with_inner_velocity_loop_0",
+      "module": "controller",
+      "path": "cases/controller_test_q7_pd_with_inner_velocity_loop_0.json",
+      "sha256": "9b638edee557db3ee66a041650256ceaf29eb43a466e55d574eb8c9840f54dbd",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q8_pi_negative_plant_gain_0",
+      "module": "controller",
+      "path": "cases/controller_test_q8_pi_negative_plant_gain_0.json",
+      "sha256": "d4dcb8e3b388b2f03c389584638a7691699ef8b0479949ae8ab1abb3e5dd2147",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_lag_negative_plant_gain_0",
+      "module": "controller",
+      "path": "cases/controller_test_lag_negative_plant_gain_0.json",
+      "sha256": "0bf50097569da4880a1afd3bc7511b219bd591139d455ea842292bad4838109e",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_test_q9_pd_double_integrator_0",
+      "module": "controller",
+      "path": "cases/controller_test_q9_pd_double_integrator_0.json",
+      "sha256": "29eb79fc52b15d14db590413046035869b45121739fc993ea8b226847bd23f45",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_test_second_order_metrics_and_graph_0",
+      "module": "time",
+      "path": "cases/time_test_second_order_metrics_and_graph_0.json",
+      "sha256": "6dfbc8fbfd69a9634daf042d029743f64bd6a5745b303ade2798becdb89d2bf9",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_test_higher_order_omits_zeta_wn_0",
+      "module": "time",
+      "path": "cases/time_test_higher_order_omits_zeta_wn_0.json",
+      "sha256": "961decbaff0a9bb998a37948bdb4f6ec2b771ec0c93851fb9ad6ce3bfe1b3200",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_test_improper_system_raises_error_0",
+      "module": "time",
+      "path": "cases/time_test_improper_system_raises_error_0.json",
+      "sha256": "ca3c624aa86a84ba20cfd19547ffb476044bf72a21ef7654a96c6e4403634de3",
+      "success": false
+    },
+    {
+      "action": "time_response",
+      "id": "time_test_static_error_constants_for_type_one_0",
+      "module": "time",
+      "path": "cases/time_test_static_error_constants_for_type_one_0.json",
+      "sha256": "038e6fd654f367051a80dc0503a98dffa152f70297dba2872c6e374aece6f07a",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_test_bridge_dispatch_0",
+      "module": "time",
+      "path": "cases/time_test_bridge_dispatch_0.json",
+      "sha256": "9a6509b37f97d487946ac29f5e82d8cb5b50b1f616a56a209d1c721ce292228d",
+      "success": true
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_test_bode_nyquist_and_metrics_0",
+      "module": "frequency",
+      "path": "cases/frequency_test_bode_nyquist_and_metrics_0.json",
+      "sha256": "b7b0c278f8315d2961d3cdb311ab440ef603c5e5c59f358e443a604fa8926c82",
+      "success": true
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_test_bridge_dispatch_0",
+      "module": "frequency",
+      "path": "cases/frequency_test_bridge_dispatch_0.json",
+      "sha256": "09f8fe61362808c626c89c08e4dfb9ae89cf78b964c6cb1dc7766729547f598c",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_space_test_structural_analysis_and_ackermann_0",
+      "module": "state_space",
+      "path": "cases/state_space_test_structural_analysis_and_ackermann_0.json",
+      "sha256": "f7e9b57ac2206a54e5d26a249d7db33c42c651954a911868f80a023492386487",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_space_test_transfer_function_conversion_and_diagonal_form_0",
+      "module": "state_space",
+      "path": "cases/state_space_test_transfer_function_conversion_and_diagonal_form_0.json",
+      "sha256": "8912c4512a741166604f9b1ad45a65c5e9bcba02d9f7a8c2caf4d7f3287d2578",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_space_test_bridge_dispatch_0",
+      "module": "state_space",
+      "path": "cases/state_space_test_bridge_dispatch_0.json",
+      "sha256": "dc3b18100c863fc4cc892a59cb3ab98a739d6a836fe9ed4dbae0985aff65a95a",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_degree_1_and_2_0",
+      "module": "routh",
+      "path": "cases/routh_test_degree_1_and_2_0.json",
+      "sha256": "b4fb890f77ef8d586868930368b7d4f272a4a33b185c7e7c4189ecaa6b6b8b38",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_degree_1_and_2_1",
+      "module": "routh",
+      "path": "cases/routh_test_degree_1_and_2_1.json",
+      "sha256": "89def6bff9b212568b2fe76f79a9cc84956fbac7858fdba6c4b491cd4d9aebd3",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_degree_1_and_2_2",
+      "module": "routh",
+      "path": "cases/routh_test_degree_1_and_2_2.json",
+      "sha256": "f9b1264f5d7fba2cef5a2004c2abb044c313cc25ad65c58cc594dbda0f1f9699",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_degree_1_and_2_3",
+      "module": "routh",
+      "path": "cases/routh_test_degree_1_and_2_3.json",
+      "sha256": "35b336ffb800dc5684866ae82048ea424c82c93de258964f4f809cad0931c01d",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_degree_3_with_k_range_0",
+      "module": "routh",
+      "path": "cases/routh_test_degree_3_with_k_range_0.json",
+      "sha256": "ae0d40d1782c2b057da34fdfc904c102e8ac10a2964e154126e7e6b5bda65ed1",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_degree_5_and_high_order_1",
+      "module": "routh",
+      "path": "cases/routh_test_degree_5_and_high_order_1.json",
+      "sha256": "a0dde0511bc4645c79e6760b9955fc754acf51f1885874fe195ddff257c26aac",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_transfer_function_rational_input_0",
+      "module": "routh",
+      "path": "cases/routh_test_transfer_function_rational_input_0.json",
+      "sha256": "f854b116a6994899bf9191194f1b5ef8bbe8cb08be8c065ea67f38b5b09ac6c0",
+      "success": true
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_test_python_bridge_dispatch_routh_1",
+      "module": "routh",
+      "path": "cases/routh_test_python_bridge_dispatch_routh_1.json",
+      "sha256": "b341cc3857b662b5f5dfd4a965bb514538b46d4afb085e21f5588c7958bc74f9",
+      "success": true
+    },
+    {
+      "action": "routh_evaluate_k",
+      "id": "routh_test_python_bridge_dispatch_routh_2",
+      "module": "routh",
+      "path": "cases/routh_test_python_bridge_dispatch_routh_2.json",
+      "sha256": "c3114420857b6c93b52c436cb0e97b720f71c8133393b7354ca318872962b9b3",
+      "success": true
+    },
+    {
+      "action": "routh_evaluate_k",
+      "id": "routh_test_python_bridge_dispatch_routh_3",
+      "module": "routh",
+      "path": "cases/routh_test_python_bridge_dispatch_routh_3.json",
+      "sha256": "ee56928d647e19b20e195d5073d10d2e5beecbb362a84d010ea478ff36415a27",
+      "success": true
+    },
+    {
+      "action": "routh_evaluate_k",
+      "id": "routh_test_python_bridge_dispatch_routh_4",
+      "module": "routh",
+      "path": "cases/routh_test_python_bridge_dispatch_routh_4.json",
+      "sha256": "cac9f7cd9441c34b0aaa50ad16a3623cc00d95e6ae3bbe3de40d92a0dbb3c8b8",
+      "success": true
+    },
+    {
+      "action": "preview",
+      "id": "preview_unicode",
+      "module": "lgr",
+      "path": "cases/preview_unicode.json",
+      "sha256": "19c5ccddf6fee9f9f496f42f4e72725f48ae4cd7777da04f8b3b3ef84828b9fd",
+      "success": true
+    },
+    {
+      "action": "preview",
+      "id": "preview_scientific",
+      "module": "lgr",
+      "path": "cases/preview_scientific.json",
+      "sha256": "6291d9c09fd1853f4d6cc5e90e49d00d0c9935ab0028c3a767c9ab547dd76d44",
+      "success": true
+    },
+    {
+      "action": "preview",
+      "id": "preview_parts",
+      "module": "lgr",
+      "path": "cases/preview_parts.json",
+      "sha256": "ff17ecf433eb7bc120af05d3e83b017a200f6037a0396dd46dccd10daf044489",
+      "success": true
+    },
+    {
+      "action": "preview",
+      "id": "preview_coeffs",
+      "module": "lgr",
+      "path": "cases/preview_coeffs.json",
+      "sha256": "1ad289e15c210ec75d06fa3c10a3820324640b5cfb5cdeb45385edcacf47647a",
+      "success": true
+    },
+    {
+      "action": "preview",
+      "id": "preview_zpk",
+      "module": "lgr",
+      "path": "cases/preview_zpk.json",
+      "sha256": "409b9b4176285f58136f492ef5ef3ee8553313411784e1118dcac8a22d0f0866",
+      "success": true
+    },
+    {
+      "action": "preview",
+      "id": "preview_unknown_mode",
+      "module": "lgr",
+      "path": "cases/preview_unknown_mode.json",
+      "sha256": "22f59bb7b96e11b13470318974cbc8868909019b4205cf91acd4d41bf0cd99c7",
+      "success": false
+    },
+    {
+      "action": "preview",
+      "id": "preview_invalid_symbol",
+      "module": "lgr",
+      "path": "cases/preview_invalid_symbol.json",
+      "sha256": "bed605ee0c42e293075949b7306567bdc454d592b5316a7b20d072e001af9573",
+      "success": false
+    },
+    {
+      "action": "preview",
+      "id": "preview_empty",
+      "module": "lgr",
+      "path": "cases/preview_empty.json",
+      "sha256": "0f235c0ae547aa911d12194aed3e7e9fcb6f91857923336ad5019c65109f65d1",
+      "success": false
+    },
+    {
+      "action": "preview",
+      "id": "preview_zero_denominator",
+      "module": "lgr",
+      "path": "cases/preview_zero_denominator.json",
+      "sha256": "b901dc3ddaca23ab9b42cd56e9d52ed101cd0123a3af41691a7fff829fd28768",
+      "success": false
+    },
+    {
+      "action": "calculate",
+      "id": "lgr_complex_zero",
+      "module": "lgr",
+      "path": "cases/lgr_complex_zero.json",
+      "sha256": "f9e6733d4bdbfef882fbec8ffef873b20a0f5308b0737fff36d55e8e46d40ef2",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_ramp_light",
+      "module": "time",
+      "path": "cases/time_ramp_light.json",
+      "sha256": "c9882f264987d4b44a5b64e3253509884c0c80337bd87758fd3b5e0d714ba017",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_impulse",
+      "module": "time",
+      "path": "cases/time_impulse.json",
+      "sha256": "1597347e241448a70bfa71ffd6714300470627efebd2362f5c44c5db9e02228d",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_unstable",
+      "module": "time",
+      "path": "cases/time_unstable.json",
+      "sha256": "b571b5f02ff78e74c7b2bd3a7bfee79040e9a18ddeaf2c684bdfe149875ca7d5",
+      "success": true
+    },
+    {
+      "action": "time_response",
+      "id": "time_invalid_threshold",
+      "module": "time",
+      "path": "cases/time_invalid_threshold.json",
+      "sha256": "6055ed53cbf42ad6f241183936a5b8e6f2228f0be6e4d0bc73bb6ca5c5a68e32",
+      "success": false
+    },
+    {
+      "action": "time_response",
+      "id": "time_invalid_window",
+      "module": "time",
+      "path": "cases/time_invalid_window.json",
+      "sha256": "caf5c8dc946f268f00a1cc27dfff84803c2c84cb5923ef37783a8c9884f7ca9b",
+      "success": false
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_invalid_range",
+      "module": "frequency",
+      "path": "cases/frequency_invalid_range.json",
+      "sha256": "4eefee9e49334228a3c9466b0bdf29d47e2873275632f1a2e9c00fc2371a0602",
+      "success": false
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_too_many_decades",
+      "module": "frequency",
+      "path": "cases/frequency_too_many_decades.json",
+      "sha256": "ea858faf92fc5ffa9ae5726c0e2f9f11d23d76a362d81db88037fc8633c8139d",
+      "success": false
+    },
+    {
+      "action": "frequency_response",
+      "id": "frequency_unstable",
+      "module": "frequency",
+      "path": "cases/frequency_unstable.json",
+      "sha256": "4e03e39f8c0503ed19be9dfcffbfa3f188c3f256b7adedc34bf7cc3d94f135c2",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_observable",
+      "module": "state_space",
+      "path": "cases/state_observable.json",
+      "sha256": "061b3db30d92c977e499712280d9bd7394e9e1322ba103d91c96c2fa9b8075b7",
+      "success": true
+    },
+    {
+      "action": "state_space",
+      "id": "state_invalid_dimension",
+      "module": "state_space",
+      "path": "cases/state_invalid_dimension.json",
+      "sha256": "5d91b529f286f971c8a5534840b6bd141d5fc5d1b15c0c7a92be1ee225411439",
+      "success": false
+    },
+    {
+      "action": "state_space",
+      "id": "state_invalid_poles",
+      "module": "state_space",
+      "path": "cases/state_invalid_poles.json",
+      "sha256": "7183199bf860e62d9a5fdd7218ae22f32bd8ed94d1eb3aa44d7fd4648635267e",
+      "success": false
+    },
+    {
+      "action": "state_space",
+      "id": "state_uncontrollable",
+      "module": "state_space",
+      "path": "cases/state_uncontrollable.json",
+      "sha256": "d6dbda389f2afe6500b9a116a4183b517086b20356b05f2bc38f7d9de0eeb68b",
+      "success": false
+    },
+    {
+      "action": "routh_hurwitz",
+      "id": "routh_invalid_expression",
+      "module": "routh",
+      "path": "cases/routh_invalid_expression.json",
+      "sha256": "47693d0e0e6796ee8aac0de3216935d609341d1d62947cfadad97520a0364265",
+      "success": false
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_inner_loop_desired_pole",
+      "module": "controller",
+      "path": "cases/controller_inner_loop_desired_pole.json",
+      "sha256": "f43ea0fbc18b281359668a4fe3d2295559ddd9d8c3ca9e8f54100873e7cd959d",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_invalid_type",
+      "module": "controller",
+      "path": "cases/controller_invalid_type.json",
+      "sha256": "c19f3d993809070608183c36a7a5ddb22ab5656e1712022904cffaa8f182016f",
+      "success": false
+    },
+    {
+      "action": "controller_design",
+      "id": "controller_compensator",
+      "module": "controller",
+      "path": "cases/controller_compensator.json",
+      "sha256": "be75a702ed9b8e613f00650e920eeba8bdee5acc41576376d18b6e095b34c3a3",
+      "success": false
+    },
+    {
+      "action": "render_formulas",
+      "id": "formulas",
+      "module": "presentation",
+      "path": "cases/formulas.json",
+      "sha256": "2ae8953babd7fc6674fd531a7217c4ffb71dd22612035b58c556126f0731ee88",
+      "success": true
+    },
+    {
+      "action": "render_formulas",
+      "id": "formulas_invalid_sources",
+      "module": "presentation",
+      "path": "cases/formulas_invalid_sources.json",
+      "sha256": "10788a5d06b76e113b669a262d9f3c32b9f63c086d1597873e417f98820fa944",
+      "success": false
+    },
+    {
+      "action": "unknown",
+      "id": "unknown_action",
+      "module": "protocol",
+      "path": "cases/unknown_action.json",
+      "sha256": "1e31961d78e5f242e76ff6a76545788bc48adb77536775374d487169e22c761b",
+      "success": false
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_reaction_P",
+      "module": "controller",
+      "path": "cases/legacy_zn_reaction_P.json",
+      "sha256": "430bab0aef5cfab8f47fe4b816ab04179147ea0e7843fbd529e64a80c9d31a58",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_reaction_PI",
+      "module": "controller",
+      "path": "cases/legacy_zn_reaction_PI.json",
+      "sha256": "d5d163ed286aad57fbc215ede72a8a631b34c8a8fdb75559a5e98ea4bc8056b6",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_reaction_PD",
+      "module": "controller",
+      "path": "cases/legacy_zn_reaction_PD.json",
+      "sha256": "ccb0221c6ce8530c5455c2ec42a7d244a768424f5bf45f01a34e3786254d34d1",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_reaction_PID",
+      "module": "controller",
+      "path": "cases/legacy_zn_reaction_PID.json",
+      "sha256": "124ac9a7fd71205d9979dbee355ddd89cab31b6beeafb6b5a53ab9b6af14e0c1",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_P",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_P.json",
+      "sha256": "b299bc5098cd22dd69ec2848c52966fac7f2c3b301dd3859c64b001701e529aa",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_PI",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_PI.json",
+      "sha256": "33109f0f4a444209d6b83a727fac99b565370973accf449bd68e9c9f93935380",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_PD",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_PD.json",
+      "sha256": "dc8defd4f7cf6b8f9737928f8d409e5845490a262c41c89bb72c383232a3995c",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_PID",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_PID.json",
+      "sha256": "07721c69630da75dfa309bfebbc0750dab7c7cb897d21517173d213faf02dd55",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_manual_P",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_manual_P.json",
+      "sha256": "d8d3b3fe3b21ae9d1a8b2ad72b715252214a3ebf54eb87c4e316c7d7651ce7d8",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_manual_PI",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_manual_PI.json",
+      "sha256": "fa52ee7f5cccfe11f529dbbba8b50cee1931ff6f990ff032f185cbe9eb831bae",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_manual_PD",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_manual_PD.json",
+      "sha256": "aab5a2dd82c52839f34cb54647135699210594f0a27bb9e46c98547ad35ffbf1",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_zn_critical_manual_PID",
+      "module": "controller",
+      "path": "cases/legacy_zn_critical_manual_PID.json",
+      "sha256": "ea4767045a124036f421db19b1e0f4598babe43571aef52cdeac8f02d6a1090b",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_cohen_coon_P",
+      "module": "controller",
+      "path": "cases/legacy_cohen_coon_P.json",
+      "sha256": "64186bf07c94c1413d7b3efa02b889d8138a8d0fe67ac241dc4c928955b55aa0",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_cohen_coon_PI",
+      "module": "controller",
+      "path": "cases/legacy_cohen_coon_PI.json",
+      "sha256": "6211b90c23c0c7c317a661edbceddea21f0aac980d2ff52a47301cf8465dcb8f",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_cohen_coon_PD",
+      "module": "controller",
+      "path": "cases/legacy_cohen_coon_PD.json",
+      "sha256": "2cb2cd1a932a3e9e75f3f5ad46111ff60d32a4334eaf65097d24d7463a871061",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_cohen_coon_PID",
+      "module": "controller",
+      "path": "cases/legacy_cohen_coon_PID.json",
+      "sha256": "d7199043e1864abe312f44e49fca6179472dd022a6664e9e6a3b2876ba8e5ae0",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr_P",
+      "module": "controller",
+      "path": "cases/legacy_chr_P.json",
+      "sha256": "ec3693303ea556a1648415afa833d031981dbb080ff67604f9a73e8601c0faf9",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr_PI",
+      "module": "controller",
+      "path": "cases/legacy_chr_PI.json",
+      "sha256": "4c595406861fc734d6eb84e1e3b74ce52475c2fc6a2f16611bcc1a2f6f46b64e",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr_PD",
+      "module": "controller",
+      "path": "cases/legacy_chr_PD.json",
+      "sha256": "b40c3be87f5d2d30484d9deff14ebc30273e8e48f32652ff6f127a82c4503ab7",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr_PID",
+      "module": "controller",
+      "path": "cases/legacy_chr_PID.json",
+      "sha256": "353a590c28ca9f4d97b74075ca3b55802cb6c51f4de367a57315fd1604b1a515",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr20_P",
+      "module": "controller",
+      "path": "cases/legacy_chr20_P.json",
+      "sha256": "ae56a5fe777b3ed26e1b5f13ee767520cdd165f67733494e6e644c6171358512",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr20_PI",
+      "module": "controller",
+      "path": "cases/legacy_chr20_PI.json",
+      "sha256": "9b044a301991b990cdf95ce71e9f93f7283f2102c22beff2f3daab885b7602d4",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr20_PD",
+      "module": "controller",
+      "path": "cases/legacy_chr20_PD.json",
+      "sha256": "401395de8ce2111bf4a643167cb57b641807b757bbdac2c369719be2d27806ed",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "legacy_chr20_PID",
+      "module": "controller",
+      "path": "cases/legacy_chr20_PID.json",
+      "sha256": "f652338d2b2b48d5bce94bb0975d7087e8a18ccf785a7bddbffacdf9a7c70899",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "lead_lag_lead_frequency",
+      "module": "controller",
+      "path": "cases/lead_lag_lead_frequency.json",
+      "sha256": "4ea6f959beab018e7f2ee24ef1041408c748e480f4e10941b364c5f419678449",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "lead_lag_lead_time",
+      "module": "controller",
+      "path": "cases/lead_lag_lead_time.json",
+      "sha256": "e56535638ea29e7e0c6ed5d176f5dc7adf7309caa2c6a888c78ce70ba28696b7",
+      "success": true
+    },
+    {
+      "action": "controller_design",
+      "id": "lead_lag_lag_frequency",
+      "module": "controller",
+      "path": "cases/lead_lag_lag_frequency.json",
+      "sha256": "a26fab93cfb5c99f880e32a3773438f328f4c46c56251aec3a20b479f4ce8061",
+      "success": false
+    },
+    {
+      "action": "controller_design",
+      "id": "lead_lag_lag_time",
+      "module": "controller",
+      "path": "cases/lead_lag_lag_time.json",
+      "sha256": "25688be83255e01ba25605197ef61613135d1a0707e9699768169adf467caf54",
+      "success": false
+    },
+    {
+      "action": "console_exec",
+      "id": "console_empty",
+      "module": "tools",
+      "path": "cases/console_empty.json",
+      "sha256": "286bb2723d50f08bf432d2038a7ecaffc026d48dbaa8ba099c3e5d0305e04018",
+      "success": true
+    },
+    {
+      "action": "console_exec",
+      "id": "console_help",
+      "module": "tools",
+      "path": "cases/console_help.json",
+      "sha256": "ed5ffdb1cefc225ba1f26431c037d651077dd59996f7802ad4c42de9ef8decd5",
+      "success": true
+    },
+    {
+      "action": "console_exec",
+      "id": "console_ajuda",
+      "module": "tools",
+      "path": "cases/console_ajuda.json",
+      "sha256": "5c5c19c01dcdfa161ce97270961cee5504e0c0f3cfe8958394a869f1ac8ae0bb",
+      "success": true
+    },
+    {
+      "action": "console_exec",
+      "id": "console_clear",
+      "module": "tools",
+      "path": "cases/console_clear.json",
+      "sha256": "7a88b1841a97950949b83e271b57467f3f58087a0ff2b716060a8db47000c91d",
+      "success": true
+    },
+    {
+      "action": "console_exec",
+      "id": "console_clc",
+      "module": "tools",
+      "path": "cases/console_clc.json",
+      "sha256": "0b5550260d368cb02c3c43b903c63a491fcaf77ada911b0f7c91ac44aaa10145",
+      "success": true
+    },
+    {
+      "action": "console_exec",
+      "id": "console_whos",
+      "module": "tools",
+      "path": "cases/console_whos.json",
+      "sha256": "fba904925966de846c0f772e0be87f10c5bba7d93ef3f2e285f83d1cc5e0d293",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_0",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_0.json",
+      "sha256": "8953b80bbb700028f84066b5909af29aaf83750f7d1db86bb1f406ba8e388c99",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_1",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_1.json",
+      "sha256": "dc6fc6118badcb0e79655132b4a92f686a39a7c066baa4c539ccc9d2c6b60de6",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_2",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_2.json",
+      "sha256": "b63d79f3eb2af1ef26b4f7097a6bb04c71b0b3f270d4c99ad90e06485cc759a4",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_3",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_3.json",
+      "sha256": "637224655702da0b1019facc5ffff49353f48e47acaae4bb9d9e968c660dba0b",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_4",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_4.json",
+      "sha256": "c321cc24dd898aedbb0b81f84641db8dc2d940d059aba59647fceeb3274b80ea",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_5",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_5.json",
+      "sha256": "94c7143e2f5cbcf2211c439cf438acc9bbe3c1984c19684b64f14d94ad20b630",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_6",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_6.json",
+      "sha256": "5f29d6c9bf5c098ca9b88e1b43983e3943faa5fae660a4254ce16ce1664fdcb7",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_7",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_7.json",
+      "sha256": "631da14030a7600e42b3dc50b26791ce7f1e74f6ae683a9b18e9167a9bfefdf8",
+      "success": false
+    },
+    {
+      "action": "__core__",
+      "id": "parse_desired_pole_8",
+      "module": "controller",
+      "path": "cases/parse_desired_pole_8.json",
+      "sha256": "56eea8ba5dbd2f9ba40e3330a84684366e96d1f4637e0521c54d9cf9e429d52c",
+      "success": false
+    },
+    {
+      "action": "__core__",
+      "id": "parse_matrix_0",
+      "module": "state_space",
+      "path": "cases/parse_matrix_0.json",
+      "sha256": "31d6a07caac11ea2d4b36b5a47a2e25e11fa747974aba965e01045113db6e057",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_matrix_1",
+      "module": "state_space",
+      "path": "cases/parse_matrix_1.json",
+      "sha256": "d18b09ed5c96dd31e6e02101e8bcca079bbb1370d714248f092c2475eb8a6c9f",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_matrix_2",
+      "module": "state_space",
+      "path": "cases/parse_matrix_2.json",
+      "sha256": "78b3679b3c20cb7fc45e8fb80704f6a178ea9acbe332608411de627a972fca6f",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_matrix_3",
+      "module": "state_space",
+      "path": "cases/parse_matrix_3.json",
+      "sha256": "d46d81897ca8637df77385efa9247c3537aead1305ec388af9159c1bc14a1e02",
+      "success": false
+    },
+    {
+      "action": "__core__",
+      "id": "parse_coeffs_0",
+      "module": "lgr",
+      "path": "cases/parse_coeffs_0.json",
+      "sha256": "f3c3657d319dbddcf01ebe16b5c618e8eb0bea281e5ee0937cc02852ad5f4b9e",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_coeffs_1",
+      "module": "lgr",
+      "path": "cases/parse_coeffs_1.json",
+      "sha256": "3265a84cebaca1b1d5fd1f3298b15765565682bc396e03ec312cb2a121369054",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_coeffs_2",
+      "module": "lgr",
+      "path": "cases/parse_coeffs_2.json",
+      "sha256": "d1213fc7497107bebbf3a0e8ba92a9ac1770280f2c3707dafc4c8f48549d0dab",
+      "success": true
+    },
+    {
+      "action": "__core__",
+      "id": "parse_coeffs_3",
+      "module": "lgr",
+      "path": "cases/parse_coeffs_3.json",
+      "sha256": "9c33551da4fd73ffd4455d0b1006423fd7c9226339141c22cdd2dda9f32e1b65",
+      "success": false
+    },
+    {
+      "action": "__core__",
+      "id": "parse_coeffs_4",
+      "module": "lgr",
+      "path": "cases/parse_coeffs_4.json",
+      "sha256": "18bf8e6aac501a431247146593e629939915c40cab0824a5143670aec046fc0b",
+      "success": false
+    }
+  ],
+  "determinism": {
+    "SOURCE_DATE_EPOCH": "0",
+    "svg.hashsalt": "controlab-python-reference-v1"
+  },
+  "fixture_sources_sha256": {
+    "tests/test_app_version.py": "d252ba3311283a27a78ca728410fd99553fad2a989d3d510d85cb307f23f5f04",
+    "tests/test_controller_design.py": "06e607aaabead41c9e29504273fb7dd985e7d4a6425e63c9738715561192693e",
+    "tests/test_deductions.py": "67eef56b55c51fc438f25a0d969b1d5a3159e3ae03f9fd74477c1ed0c63536a9",
+    "tests/test_font_compat.py": "aef7bb663b378b8afd913f24a99db03fc6774758f83bb4a60d2313f2e35fffd8",
+    "tests/test_frequency_response.py": "cf5c8c99a85a6ca7c34866a78a13be7cd8f4d546af93da080690c6a03a910ace",
+    "tests/test_lgr_geometry.py": "c3603efc795191a8143200e1e247b2d4c5f05887d1c00a017c107386ab437a98",
+    "tests/test_localization.py": "b293dc6f424655e2bcf8984ed439234e5e61601b8633a96fea74d62773054a61",
+    "tests/test_native_bridge.py": "dd8220ac55328abd3a6806a0b79f32c5f0da64c14bfcce91540370ec80e9a6bc",
+    "tests/test_native_presentation.py": "fdca284bb9d9bf8c2ea5ad3d1573211a8bf2df18f262e515f5291cc192bdb547",
+    "tests/test_native_sources.py": "ea3bbf7724766dda6705cc391c16973abb36acf815f9092871216429fb200b07",
+    "tests/test_numerico.py": "5e49acbb25cc12839cf84d9cd2412011174f7deb29c25969e286396ce66d89fa",
+    "tests/test_resource_paths.py": "a9bbf04f91583cbd837f7c355e0c71741b90b03b2acd984f48f6281021353de2",
+    "tests/test_routh_hurwitz.py": "8d3fc0a4e150bc4af9befa58d0248875622938b0b02bdc67e8163227bf6c5015",
+    "tests/test_state_space.py": "b4b951350c55174c800c20d7203601c99e7a597ab9d9fc4604eb73ac7bff9ea2",
+    "tests/test_time_response.py": "2d138d4baa67ce7dd3de08aecf8debd97cd65a5e2d59436fd6ebdd1ee426631a",
+    "tests/test_transfer_inputs.py": "428c8b87ca439d30d2613ee1ebad5d8513d9b1490e5591b61b4b6aa2bd7318d4"
+  },
+  "generator_sha256": "98e2fde8ec897631fd682e033d0532d8a6ebbf4e6857fd34217340fd7749016a",
+  "modules": {
+    "controller": {
+      "covered_preset_ids": [
+        "Avanço de Fase — G(s) = 5 / (s(s+1))",
+        "Atraso de Fase — G(s) = 1 / ((s+0.5)(s+2))",
+        "Proporcional (P) Ex. 1 — G(s) = 1 / (s(s+1)(s+2))",
+        "Proporcional (P) Ex. 2 — G(s) = 1 / ((s+1)(s+5))",
+        "Proporcional-Derivativo (PD) Ex. 1 — G(s) = 40 / (s(s+2))",
+        "Proporcional-Derivativo (PD) Ex. 2 — G(s) = 1 / (s(s+4)(s+6))",
+        "Proporcional-Integral (PI) Ex. 1 — G(s) = 10 / ((s+2)(s+5))",
+        "Proporcional-Integral (PI) Ex. 2 — G(s) = 1 / (s(s+4))"
+      ],
+      "preset_ids": [
+        "Avanço de Fase — G(s) = 5 / (s(s+1))",
+        "Atraso de Fase — G(s) = 1 / ((s+0.5)(s+2))",
+        "Proporcional (P) Ex. 1 — G(s) = 1 / (s(s+1)(s+2))",
+        "Proporcional (P) Ex. 2 — G(s) = 1 / ((s+1)(s+5))",
+        "Proporcional-Derivativo (PD) Ex. 1 — G(s) = 40 / (s(s+2))",
+        "Proporcional-Derivativo (PD) Ex. 2 — G(s) = 1 / (s(s+4)(s+6))",
+        "Proporcional-Integral (PI) Ex. 1 — G(s) = 10 / ((s+2)(s+5))",
+        "Proporcional-Integral (PI) Ex. 2 — G(s) = 1 / (s(s+4))"
+      ]
+    },
+    "frequency": {
+      "covered_preset_ids": [
+        "Primeira ordem",
+        "Segunda ordem",
+        "Tipo 1 com dois polos"
+      ],
+      "preset_ids": [
+        "Primeira ordem",
+        "Segunda ordem",
+        "Tipo 1 com dois polos"
+      ]
+    },
+    "lgr": {
+      "covered_preset_ids": [
+        "Exemplo 1: 3ª Ordem com Breakaway e Cruzamento jω (Ogata)",
+        "Exemplo 2: Polos Complexos Conjugados e Ângulo de Partida",
+        "Exemplo 3: Zero de Fase Não-Mínima (Semiplano Direito)",
+        "Exemplo 4: Sistema com Break-in e Breakaway",
+        "Exemplo 5: 4ª Ordem com 4 Assíntotas",
+        "Exemplo 6: Sistema de 2ª Ordem com Amortecimento"
+      ],
+      "preset_ids": [
+        "Exemplo 1: 3ª Ordem com Breakaway e Cruzamento jω (Ogata)",
+        "Exemplo 2: Polos Complexos Conjugados e Ângulo de Partida",
+        "Exemplo 3: Zero de Fase Não-Mínima (Semiplano Direito)",
+        "Exemplo 4: Sistema com Break-in e Breakaway",
+        "Exemplo 5: 4ª Ordem com 4 Assíntotas",
+        "Exemplo 6: Sistema de 2ª Ordem com Amortecimento"
+      ]
+    },
+    "routh": {
+      "covered_preset_ids": [
+        "Exemplo 1: 3ª Ordem com Faixa de Ganho K (Ogata)",
+        "Exemplo 2: 3ª Ordem Estável (Numérico)",
+        "Exemplo 3: 3ª Ordem Instável (2 Raízes no RHP)",
+        "Exemplo 4: 4ª Ordem com Primeiro Elemento Nulo (Caso ε)",
+        "Exemplo 5: 4ª Ordem com Linha de Zeros (Marginalmente Estável)",
+        "Exemplo 6: 5ª Ordem de Alta Complexidade"
+      ],
+      "preset_ids": [
+        "Exemplo 1: 3ª Ordem com Faixa de Ganho K (Ogata)",
+        "Exemplo 2: 3ª Ordem Estável (Numérico)",
+        "Exemplo 3: 3ª Ordem Instável (2 Raízes no RHP)",
+        "Exemplo 4: 4ª Ordem com Primeiro Elemento Nulo (Caso ε)",
+        "Exemplo 5: 4ª Ordem com Linha de Zeros (Marginalmente Estável)",
+        "Exemplo 6: 5ª Ordem de Alta Complexidade"
+      ]
+    },
+    "state_space": {
+      "covered_preset_ids": [
+        "Segunda ordem controlável",
+        "Oscilador harmônico"
+      ],
+      "preset_ids": [
+        "Segunda ordem controlável",
+        "Oscilador harmônico"
+      ]
+    },
+    "time": {
+      "covered_preset_ids": [
+        "Segunda ordem subamortecida",
+        "Primeira ordem",
+        "Sistema tipo 1"
+      ],
+      "preset_ids": [
+        "Segunda ordem subamortecida",
+        "Primeira ordem",
+        "Sistema tipo 1"
+      ]
+    }
+  },
+  "packages": {
+    "Pillow": "12.3.0",
+    "control": "0.10.2",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "sympy": "1.14.0"
+  },
+  "python": "3.12.14",
+  "schema_version": 1,
+  "source_commit": "16e26a60de4a41cef42ac7e0f526bddc5da2efb7",
+  "source_sha256": {
+    "src/python/android_bridge.py": "3347c6a803f6c13e05193a3b4a5a9a19f9165480148ba6d06c7b21330c322e35",
+    "src/python/app_version.py": "7ead83be0e4093f532f670c4c3105718d7226179d696e0facdbe42438826a185",
+    "src/python/control_utils.py": "5398ba905fe1a20b45b90a5123bf441c6186c9754b0979ff63fdb697b08274f8",
+    "src/python/controller_design.py": "eec51a366a8465d400c6fb8e8a7e62774f71681b198a530ffd1396febb8c984c",
+    "src/python/frequency_response.py": "1c8bad63b12d1affd3318f8f25b7a12139faab23268d7c2f4bcc713eafa88b46",
+    "src/python/lgr_engine.py": "f4f120b93613428ea01c356c24d5f7fcb16619be8bcd0b3c37924382239ebfbc",
+    "src/python/localization.py": "b44b1ac45dc90be7815df50a82dad4e39bc0c4b47721dc885a0fbce45798a36f",
+    "src/python/native_bridge.py": "6cc083c93cfc054bbb59080792c18e691d1fe1f68a78eda7b9dfb09ddb36be6e",
+    "src/python/native_presentation.py": "a6fa94b2f74d8e5d548ac98d3bede760d5b8f0bd5848e08567a5f53c13430d17",
+    "src/python/plot_theme.py": "ec2d7bae33012b67ecf92fda311f4cda9de7a2dc736a09997bb738dc26736fff",
+    "src/python/python_bridge.py": "81364d525a797bfe1a2bd8350e5f741ecd078923d98edd5b97bf5c42a5556284",
+    "src/python/resource_paths.py": "e59a88de185c85fbc0840558cde521e199b4ae94143c616f81035fdb0b96b122",
+    "src/python/routh_hurwitz.py": "8af6cac6021c506d039b536cf39137223133a908a418f78d95515b58084b3d85",
+    "src/python/state_space.py": "92d00f903fd355876f7a969fa89e4b4d21e8ce3ea0b35a83e78f10b861cfcf62",
+    "src/python/time_response.py": "9dc20f3fa78098a4c570e6543ca8b92f065e2262dcd9d28ad674eb0b721432ca"
+  }
+}

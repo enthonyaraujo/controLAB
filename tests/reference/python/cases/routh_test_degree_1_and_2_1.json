@@ -1,0 +1,105 @@
+{
+  "id": "routh_test_degree_1_and_2_1",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s - 5"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [],
+    "char_poly_latex": "s - 5 = 0",
+    "coeffs_latex": [
+      "1",
+      "-5"
+    ],
+    "degree": 1,
+    "exact_roots": [
+      {
+        "imag": 0.0,
+        "real": 5.0,
+        "str": "5"
+      }
+    ],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "-",
+        "term_latex": "-5"
+      }
+    ],
+    "input_str": "s - 5",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [],
+      "critical_k": [],
+      "has_k": false,
+      "range_latex": "Não aplicável (sem ganho K variável)"
+    },
+    "plot_image": {
+      "$asset": "assets/a609d383e10663208877b1fd367e22d9a0db522fe88544f704cbfdb93a194efc.png",
+      "bytes": 51181,
+      "encoding": "data:image/png;base64",
+      "sha256": "a609d383e10663208877b1fd367e22d9a0db522fe88544f704cbfdb93a194efc"
+    },
+    "plot_svg": {
+      "$asset": "assets/8a82851f59c8b278934e125a9d3bb293a3bc62708cda883247df53cb8352e102.svg",
+      "bytes": 18841,
+      "encoding": "utf-8",
+      "sha256": "8a82851f59c8b278934e125a9d3bb293a3bc62708cda883247df53cb8352e102"
+    },
+    "rhp_poles": 1,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          }
+        ],
+        "power": "s",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "-5",
+            "sign": "-"
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 1
+      }
+    ],
+    "sign_changes": 1,
+    "special_cases": [],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{1}$.",
+        "power": "s^{1}",
+        "values": [
+          "1"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{0}$.",
+        "power": "s^{0}",
+        "values": [
+          "-5"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "Ocorrem 1 troca(s) de sinal na primeira coluna da tabela de Routh, o que indica exatamente 1 polo(s) em malha fechada no semiplano direito (RHP).",
+    "verdict": "Instável"
+  },
+  "source": "tests/test_routh_hurwitz.py:20"
+}

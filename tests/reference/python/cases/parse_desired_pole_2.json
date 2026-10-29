@@ -1,0 +1,18 @@
+{
+  "id": "parse_desired_pole_2",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "-1-1j"
+    ],
+    "method": "parse_desired_pole"
+  },
+  "module": "controller",
+  "output": {
+    "success": true,
+    "value": {
+      "im": 1.0,
+      "re": -1.0
+    }
+  }
+}

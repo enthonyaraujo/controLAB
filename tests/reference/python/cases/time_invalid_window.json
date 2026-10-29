@@ -1,0 +1,12 @@
+{
+  "id": "time_invalid_window",
+  "input": {
+    "action": "time_response",
+    "final_time": -1
+  },
+  "module": "time",
+  "output": {
+    "error": "ValueError: O tempo final deve estar entre 0,05 s e 10000 s.",
+    "success": false
+  }
+}

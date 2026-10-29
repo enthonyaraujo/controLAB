@@ -1,0 +1,210 @@
+{
+  "id": "state_space_test_transfer_function_conversion_and_diagonal_form_0",
+  "input": {
+    "action": "state_space",
+    "canonical_form": "diagonal",
+    "expr": "1 / (s^2 + 3*s + 2)",
+    "mode": "transfer"
+  },
+  "module": "state_space",
+  "output": {
+    "description": "Conversão de modelos, testes estruturais, realimentação de estados e observador de ordem plena.",
+    "details": {
+      "A": [
+        [
+          -3.0,
+          -2.0
+        ],
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "B": [
+        [
+          1.0
+        ],
+        [
+          0.0
+        ]
+      ],
+      "C": [
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "D": [
+        [
+          0.0
+        ]
+      ],
+      "canonical": {
+        "A": [
+          [
+            -2.0,
+            0.0
+          ],
+          [
+            0.0,
+            -1.0
+          ]
+        ],
+        "B": [
+          [
+            -2.23606797749979
+          ],
+          [
+            -1.4142135623730951
+          ]
+        ],
+        "C": [
+          [
+            0.4472135954999579,
+            -0.7071067811865475
+          ]
+        ],
+        "D": [
+          [
+            0.0
+          ]
+        ],
+        "label": "Canônica diagonal",
+        "transformation": [
+          [
+            -2.23606797749979,
+            -2.23606797749979
+          ],
+          [
+            -1.4142135623730951,
+            -2.8284271247461903
+          ]
+        ]
+      },
+      "controllability_matrix": [
+        [
+          1.0,
+          -3.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "controllability_rank": 2,
+      "feedback_poles": [],
+      "observability_matrix": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "observability_rank": 2,
+      "observer_error_poles": [],
+      "observer_gain": null,
+      "observer_method": null,
+      "original_poles": [
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "text": "-2+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -1.0,
+          "text": "-1+0j"
+        }
+      ],
+      "source_latex": "G(s) = \\frac{1}{s^{2} + 3 s + 2}",
+      "source_mode": "transfer",
+      "stable": true,
+      "state_feedback_gain": null,
+      "state_feedback_method": null,
+      "transfer_function": {
+        "denominator": [
+          1.0,
+          3.0,
+          2.0
+        ],
+        "latex": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+        "latex_expanded": "G(s) = \\frac{1.0}{1.0 s^{2} + 3.0 s + 2.0}",
+        "numerator": [
+          1.0000000000000018
+        ],
+        "siso": true
+      }
+    },
+    "image": {
+      "$asset": "assets/e0956422647e710849d413f0fa3a6ea94e04e60f67468ee9adc4b1be92078038.png",
+      "bytes": 55158,
+      "encoding": "data:image/png;base64",
+      "sha256": "e0956422647e710849d413f0fa3a6ea94e04e60f67468ee9adc4b1be92078038"
+    },
+    "latex": [
+      {
+        "label": "Modelo",
+        "value": "\\dot{x}=Ax+Bu,\\qquad y=Cx+Du"
+      },
+      {
+        "label": "Controlabilidade",
+        "value": "\\mathcal{C}=[B\\;AB\\;\\cdots\\;A^{n-1}B]"
+      },
+      {
+        "label": "Observabilidade",
+        "value": "\\mathcal{O}=[C^T\\;A^TC^T\\;\\cdots\\;(A^T)^{n-1}C^T]^T"
+      },
+      {
+        "label": "Função de transferência",
+        "value": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Autovalores de A",
+        "value": "-2; -1"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Controlabilidade (posto)",
+        "value": "2 / 2"
+      },
+      {
+        "label": "Observabilidade (posto)",
+        "value": "2 / 2"
+      },
+      {
+        "label": "Forma canônica solicitada",
+        "value": "Canônica diagonal"
+      },
+      {
+        "label": "Matrizes canônicas",
+        "value": "Ac=[[-2, 0], [0, -1]], Bc=[-2.236; -1.414], Cc=[0.4472, -0.7071], Dc=[0]"
+      },
+      {
+        "label": "Ganho K",
+        "value": "—"
+      },
+      {
+        "label": "Ganho L",
+        "value": "—"
+      }
+    ],
+    "module": "state_space",
+    "success": true,
+    "svg": {
+      "$asset": "assets/57aed8a55dac65ee42e0f65492427f241b9ffdcc4d214830b10569663115f909.svg",
+      "bytes": 20292,
+      "encoding": "utf-8",
+      "sha256": "57aed8a55dac65ee42e0f65492427f241b9ffdcc4d214830b10569663115f909"
+    },
+    "title": "Espaço de Estados"
+  },
+  "source": "tests/test_state_space.py:51"
+}

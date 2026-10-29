@@ -1,0 +1,335 @@
+{
+  "id": "controller_test_case_3_proportional_example_1_0",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "P",
+    "mp": 10.0,
+    "plant_expr": "1 / (s * (s + 1) * (s + 2))",
+    "points": 250,
+    "settling_criterion": "2",
+    "ts": 10.0,
+    "xi": 0.591
+  },
+  "module": "controller",
+  "output": {
+    "description": "Controlador Proporcional (P) — Gc(s) = Kp",
+    "details": {
+      "after": {
+        "overshoot_percent": 12.345475752561086,
+        "peak": 1.1234547575256109,
+        "peak_time": 6.4035681196028,
+        "rise_time": 2.784160052001217,
+        "settling_time": 9.651754846937553,
+        "steady_state_value": 1.0
+      },
+      "angle_contributions": [
+        {
+          "angle_deg": 126.22800338924073,
+          "label": "Polo G (s = 0)",
+          "multiplicity": 1,
+          "root": {
+            "im": 0.0,
+            "re": 0.0
+          },
+          "total_angle_deg": 126.22800338924073,
+          "type": "plant_pole"
+        },
+        {
+          "angle_deg": 42.300658407218464,
+          "label": "Polo G (s = -1)",
+          "multiplicity": 1,
+          "root": {
+            "im": 0.0,
+            "re": -1.0
+          },
+          "total_angle_deg": 42.300658407218464,
+          "type": "plant_pole"
+        },
+        {
+          "angle_deg": 18.841264027040275,
+          "label": "Polo G (s = -2)",
+          "multiplicity": 1,
+          "root": {
+            "im": 0.0,
+            "re": -2.0
+          },
+          "total_angle_deg": 18.841264027040275,
+          "type": "plant_pole"
+        }
+      ],
+      "before": {
+        "overshoot_percent": 14.455452721548578,
+        "peak": 1.1445545272154858,
+        "peak_time": 6.03234677933597,
+        "rise_time": 2.6913547169345096,
+        "settling_time": 12.435914898938771,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -2.3076149332766,
+          "text": "-2.3076+0j"
+        },
+        {
+          "im": 0.5314062572984745,
+          "re": -0.34619253336170114,
+          "text": "-0.34619+0.53141j"
+        },
+        {
+          "im": -0.5314062572984745,
+          "re": -0.34619253336170114,
+          "text": "-0.34619-0.53141j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -2.3247179572447454,
+          "text": "-2.3247+0j"
+        },
+        {
+          "im": 0.5622795120623002,
+          "re": -0.3376410213776273,
+          "text": "-0.33764+0.56228j"
+        },
+        {
+          "im": -0.5622795120623002,
+          "re": -0.3376410213776273,
+          "text": "-0.33764-0.56228j"
+        }
+      ],
+      "controller_parameters": {
+        "K": 0.9282193701188297,
+        "controller_type": "P",
+        "criterion_pct": 2,
+        "e_atual": 0.0,
+        "e_novo": 0.0,
+        "im": 0.5459705965881618,
+        "im_theoretical": 0.5459705965881618,
+        "kp": 0.9282193701188297,
+        "lgr_branch_re": null,
+        "mp": 10.0,
+        "re": 0.4,
+        "re_theoretical": 0.4,
+        "ts": 10.0,
+        "wn": 0.6768189509306262,
+        "xi": 0.591
+      },
+      "controller_type": "P",
+      "design_label": "Controlador Proporcional (P) — Gc(s) = Kp",
+      "design_type": "p",
+      "feedback_latex": null,
+      "forward_latex_factored": "G(s) = \\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}",
+      "gc_latex": "G_c(s) = K_p = 0{,}9282",
+      "gma_expanded_latex": "G_{ma}(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s}",
+      "gma_factored_latex": "G_{ma}(s) = G_c(s)G(s) = K_p = 0{,}9282 \\cdot \\left(\\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}\\right)",
+      "input_type": "step",
+      "plant_latex_expanded": "G(s) = \\frac{1}{s^{3} + 3 s^{2} + 2 s}",
+      "plant_latex_factored": "G(s) = \\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}",
+      "settling_criterion": 2,
+      "stable": true,
+      "steps": [
+        {
+          "description": "Análise em malha fechada com realimentação unitária e entrada degrau unitário r(s) = 1/s.",
+          "equations": [
+            "G(s) = \\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}",
+            "T(s) = \\frac{1.0}{1.0 s^{3} + 3.0 s^{2} + 2.0 s + 1.0}",
+            "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 0{,}6559\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}5148",
+            "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0"
+          ],
+          "notes": [
+            "Polos de G(s): s = 0, s = -1, s = -2",
+            "Zeros de G(s): nenhum"
+          ],
+          "number": 1,
+          "title": "Análise da Planta e Sistema Sem Controlador"
+        },
+        {
+          "description": "Cálculo de ξ, ωn e dos polos dominantes s = -Re ± Im·j pelo critério de 2%.",
+          "equations": [
+            "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 10\\% \\iff \\xi = 0{,}591",
+            "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 10\\text{ s} \\implies \\xi\\omega_n = 0{,}4 \\implies \\omega_n = \\frac{0{,}4}{0{,}591} = 0{,}6768\\text{ rad/s}",
+            "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -0{,}4 \\pm 0{,}546j"
+          ],
+          "notes": [
+            "Parte real desejada: Re = ξ·ωn = 0,4",
+            "Parte imaginária desejada: Im = ωn·√(1 - ξ²) = 0,546"
+          ],
+          "number": 2,
+          "title": "Especificações Transitórias e Polos Dominantes Desejados"
+        },
+        {
+          "description": "Verificação da geometria do LGR da planta para alocação por ganho proporcional Kp.",
+          "equations": [
+            "s = -0{,}4 \\pm 0{,}546j"
+          ],
+          "notes": [
+            "Polo dominante utilizado diretamente: s = -0,4 ± 0,546j."
+          ],
+          "number": 3,
+          "title": "Localização do Polo Dominante sobre o LGR"
+        },
+        {
+          "description": "Isolamento do ganho proporcional Kp a partir da equação característica 1 + Kp·G(s) = 0.",
+          "equations": [
+            "\\left|s\\right| = \\sqrt{(-0{,}4)^2 + (0{,}546)^2} = 0{,}6768",
+            "\\left|(s + 1)\\right| = \\sqrt{(0{,}6)^2 + (0{,}546)^2} = 0{,}8112",
+            "\\left|(s + 2)\\right| = \\sqrt{(1{,}6)^2 + (0{,}546)^2} = 1{,}691",
+            "1 + K_p G(s) = 0 \\implies K_p = \\left|\\frac{1}{G(s)}\\right| = \\frac{0{,}9282}{1} = 0{,}9282"
+          ],
+          "notes": [
+            "Ganho proporcional: Kp = 0,9282"
+          ],
+          "number": 4,
+          "title": "Condição de Módulo e Cálculo de Kp"
+        },
+        {
+          "description": "Função do controlador Gc(s), malha aberta compensada Gma(s) = Gc(s)G(s) e erro final e(∞).",
+          "equations": [
+            "G_c(s) = K_p = 0{,}9282",
+            "G_{ma}(s) = G_c(s)G(s) = K_p = 0{,}9282 \\cdot \\left(\\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}\\right)",
+            "G_{ma}(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s}",
+            "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0"
+          ],
+          "notes": [
+            "Estabilidade em malha fechada: Estável",
+            "Erro em regime permanente antes: 0 → depois: 0"
+          ],
+          "number": 5,
+          "title": "Funções de Transferência Finais e Erro em Regime Permanente"
+        }
+      ],
+      "tc_latex": "T(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s + 0.92822}",
+      "uncompensated": {
+        "closed_loop_den": [
+          1.0,
+          3.0,
+          2.0,
+          1.0
+        ],
+        "closed_loop_latex": "T(s) = \\frac{1.0}{1.0 s^{3} + 3.0 s^{2} + 2.0 s + 1.0}",
+        "closed_loop_num": [
+          1.0
+        ],
+        "closed_loop_poles": [
+          {
+            "im": 0.0,
+            "re": -2.3247179572447454,
+            "text": "-2.3247+0j"
+          },
+          {
+            "im": 0.5622795120623005,
+            "re": -0.3376410213776272,
+            "text": "-0.33764+0.56228j"
+          },
+          {
+            "im": -0.5622795120623005,
+            "re": -0.3376410213776272,
+            "text": "-0.33764-0.56228j"
+          }
+        ],
+        "mp": 15.160411461863827,
+        "stable": true,
+        "steady_state_error": 0.0,
+        "steady_state_error_latex": "0",
+        "steady_state_error_raw": 0.0,
+        "ts_2pct": 11.846901729177889,
+        "ts_5pct": 8.885176296883417,
+        "wn": 0.655865618097142,
+        "xi": 0.5148021363846188
+      },
+      "warning": null,
+      "warnings": []
+    },
+    "image": {
+      "$asset": "assets/62bbbb84127d242ca055259cd011da02dfccc3e48e68d6968a27f9d030e0af56.png",
+      "bytes": 163273,
+      "encoding": "data:image/png;base64",
+      "sha256": "62bbbb84127d242ca055259cd011da02dfccc3e48e68d6968a27f9d030e0af56"
+    },
+    "latex": [
+      {
+        "label": "Controlador Gc(s)",
+        "value": "G_c(s) = K_p = 0{,}9282"
+      },
+      {
+        "label": "Malha Aberta Compensada Gma(s) = Gc(s)G(s)",
+        "value": "G_{ma}(s) = G_c(s)G(s) = K_p = 0{,}9282 \\cdot \\left(\\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}\\right)"
+      },
+      {
+        "label": "Malha Aberta Expandida",
+        "value": "G_{ma}(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s}"
+      },
+      {
+        "label": "Malha Fechada Compensada T(s)",
+        "value": "T(s) = \\frac{0.92822}{1.0 s^{3} + 3.0 s^{2} + 2.0 s + 0.92822}"
+      },
+      {
+        "label": "Planta Original G(s)",
+        "value": "G(s) = \\frac{1}{s \\left(s + 1\\right) \\left(s + 2\\right)}"
+      }
+    ],
+    "metrics": [
+      {
+        "header": "Síntese do Controlador"
+      },
+      {
+        "label": "Tipo de controlador",
+        "value": "P"
+      },
+      {
+        "label": "Polo dominante s",
+        "value": "-0,4 ± 0,546j"
+      },
+      {
+        "label": "Ganho proporcional (Kp)",
+        "value": "0.9282"
+      },
+      {
+        "header": "Especificações e Desempenho"
+      },
+      {
+        "label": "Amortecimento (ξ)",
+        "value": "0.591"
+      },
+      {
+        "label": "Frequência natural (ωn)",
+        "unit": "rad/s",
+        "value": "0.6768"
+      },
+      {
+        "label": "Tempo de acomodação ts(2%)",
+        "unit": "s",
+        "value": "10"
+      },
+      {
+        "label": "Sobressinal máximo (Mp)",
+        "unit": "%",
+        "value": "10"
+      },
+      {
+        "label": "Erro e(∞) sem controlador",
+        "value": "0"
+      },
+      {
+        "label": "Erro e(∞) compensado",
+        "value": "0"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/beea393d4fe54515d785795314d197e38cc491ce88bc3eba6194b2ce174de73a.svg",
+      "bytes": 46666,
+      "encoding": "utf-8",
+      "sha256": "beea393d4fe54515d785795314d197e38cc491ce88bc3eba6194b2ce174de73a"
+    },
+    "title": "Projeto de Controladores"
+  },
+  "source": "tests/test_controller_design.py:124"
+}

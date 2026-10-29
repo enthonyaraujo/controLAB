@@ -1,30 +1,30 @@
 # ControLAB — Sistemas de Controle
 
-Interface nativa em **Rust + egui/eframe**, engine científica em **Python** e
+Interface nativa em **Rust + egui/eframe**, engine científica em **Rust** e
 interpretador `.m` em **Rust** (`mscript`). O aplicativo não usa navegador,
 Electron, Capacitor, JavaScript, TypeScript, HTML ou CSS.
 
 [English](README.md) · [Interface e atalhos](native/README.md) · [Responsividade](docs/validation/native-responsive.md)
 
+A engine Python anterior foi retirada ao fim da migração e permanece no
+histórico Git. Seus resultados e gráficos estão congelados em `tests/reference/`
+e `cargo xtask parity` compara a engine Rust com eles.
+
 ## Executar no Linux
 
-Requer Rust/Cargo e Python com as bibliotecas científicas de `requirements.txt`.
+Requer Rust/Cargo e as bibliotecas gráficas de desenvolvimento usadas pelo
+eframe. Compile e execute com a engine científica Rust:
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-cargo build --workspace
-cargo run --bin controlab
+cargo build --locked --workspace
+CONTROLAB_SCIENTIFIC_BACKEND=rust cargo run --locked --bin controlab
 ```
 
-O workspace gera `controlab`, que já inclui o interpretador `.m`, em `target/debug/`. Para uma
-compilação otimizada, use `cargo build --release --workspace` e
-`cargo run --release --bin controlab`. `--offline` pode ser acrescentado quando
-as dependências Cargo já estiverem no cache. `./run.sh` usa o mesmo fluxo.
-
-O Python da `.venv` é detectado automaticamente. `CONTROLAB_PYTHON` seleciona
-outro interpretador.
-Nenhuma dependência é instalada automaticamente pelos scripts do aplicativo.
+O workspace gera `controlab`, que inclui o interpretador `.m`, em `target/debug/`;
+`controlab-engine` oferece transporte científico local por JSON-lines. Para uma
+compilação otimizada, acrescente `--release` ao build e à execução. `--offline`
+pode ser acrescentado quando as dependências Cargo já estiverem no cache.
+Nenhuma dependência é instalada automaticamente pelos comandos de build.
 
 ## Funcionalidades
 
@@ -37,59 +37,74 @@ Nenhuma dependência é instalada automaticamente pelos scripts do aplicativo.
 ## Pacote Linux independente
 
 ```bash
-.venv/bin/python -m pip install -r requirements-build.txt
-.venv/bin/python scripts/package_native.py --release
-env -u WAYLAND_DISPLAY WINIT_UNIX_BACKEND=x11 .venv/bin/python scripts/validate_native_bundle.py dist/native/controlab --ui
+cargo xtask package --release
+CONTROLAB_SCIENTIFIC_BACKEND=rust env -u WAYLAND_DISPLAY WINIT_UNIX_BACKEND=x11 cargo xtask validate-bundle dist/native/controlab --ui
 ```
 
-A pasta `dist/native/controlab` contém o aplicativo, runtime `.m`, Python e
-bibliotecas científicas. Copie a pasta inteira; somente o binário da interface
-não é uma distribuição completa. A máquina de destino precisa das bibliotecas
-gráficas do Linux e de uma glibc compatível com o sistema usado no build.
+A pasta `dist/native/controlab` contém a interface, o executável científico Rust
+e os recursos compartilhados; o runtime `.m` executa dentro da interface. Copie
+a pasta inteira. A validação exercita os seis módulos científicos, renderização
+de fórmulas, integridade dos recursos e, com `--ui`, interface nativa e scripts
+`.m`. A máquina de destino precisa das bibliotecas gráficas do Linux e de uma
+glibc compatível com o sistema usado no build.
 
 A saída deve estar vazia para preservar arquivos existentes; `--output` permite
-selecionar outra pasta.
+selecionar outra pasta. Use `--skip-build` somente após compilar o workspace
+com o perfil correspondente.
 
 ## Instaladores e releases
 
 O GitHub Actions (`.github/workflows/build-all.yml`) compila, testa e anexa como
-artefatos a cada push: `.deb`, `.rpm` e `.AppImage` (runner Ubuntu 24.04, glibc
-2.39+), instalador NSIS por usuário para Windows e APK Android (arm64-v8a). Uma
-tag `vX.Y.Z` aplica essa versão (`scripts/set_version.py`) e publica um GitHub
-Release com todos os arquivos. `native/Cargo.toml` é a fonte única da versão.
+artefatos nos pushes e pull requests configurados: `.deb`, `.rpm` e `.AppImage`
+(runner Ubuntu 24.04, glibc 2.39+), instalador NSIS por usuário para Windows e
+APK Android (arm64-v8a). Uma tag `vX.Y.Z` aplica essa versão com
+`cargo xtask version "$GITHUB_REF_NAME"` e publica um GitHub Release com todos
+os arquivos. `workspace.package.version` do `Cargo.toml` é a fonte única da versão.
 
 A partir de um pacote já gerado, com `dpkg-deb`, `rpmbuild`, `appimagetool` ou
 `makensis` instalados:
 
 ```bash
-python3 scripts/package_installers.py deb rpm appimage   # Linux
-python scripts/package_installers.py nsis                # Windows
+cargo xtask installers deb rpm appimage --bundle dist/native/controlab --output release  # Linux
+cargo xtask installers nsis --bundle dist/native/controlab --output release              # Windows
 ```
 
 Os instaladores ficam em `release/`. Os pacotes Linux instalam em `/opt/controlab`,
-com o comando `controlab`, entrada no menu e ícones. Sem os secrets
-`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e
-`ANDROID_KEY_PASSWORD`, o APK release é assinado com a chave debug do runner;
-instalar uma build nova sobre outra antiga exige desinstalar antes.
+com o comando `controlab`, entrada no menu e ícones. Android requer JDK 17,
+SDK/NDK Android e o alvo Rust `aarch64-linux-android`; o Gradle chama
+`cargo xtask android` para compilar a biblioteca Rust:
+
+```bash
+native/android/gradlew --project-dir native/android --no-daemon :app:assembleRelease -PnativeAbis=arm64-v8a
+```
+
+Sem os secrets `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`,
+`ANDROID_KEY_ALIAS` e `ANDROID_KEY_PASSWORD`, o APK release é assinado com a
+chave debug do runner; instalar uma build nova sobre outra antiga exige
+desinstalar antes.
 
 ## Estrutura e validação
 
 - `native/`: interface Rust, incluindo a ponte JSON dos scripts `.m` (`native/src/scripts.rs`).
-- `src/python/`: engine científica e transporte local por stdin/stdout, sem servidor HTTP.
+- `crates/control-engine/`: cálculos científicos Rust, renderização de fórmulas e transporte local por JSON-lines, sem servidor HTTP.
 - `assets/`: fontes, licenças, ícones e catálogo compartilhados; `manifest.json` registra seus hashes.
 - `crates/mscript/`: interpretador `.m` (arrays, modelos de controle, gráficos e documentos), executado dentro da interface.
-- `scripts/`: empacotamento, versão e verificações em Python; builds Rust pelo Cargo.
+- `xtask/`: empacotamento, instaladores, sincronização de versão, verificação de fontes, validação de pacotes e compilação Android em Rust.
+- `tests/reference/`: resultados, curvas e gráficos Python congelados, usados por `cargo xtask parity`.
 - `packaging/`: entrada de menu Linux, script NSIS do Windows e ícones dos instaladores.
 
 ```bash
-cargo test --workspace
-cargo clippy --workspace --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo fmt --all --check
-PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
-python3 scripts/check_native_sources.py
+cargo xtask check-sources
+cargo xtask parity
 ```
 
-O CI executa todos os testes Rust/Python e a verificação da interface no Linux;
-o job Windows valida a engine empacotada e uma instalação silenciosa. O APK é
-gerado no CI, mas não é executado em aparelho. Documentos e capturas da interface
-Electron/Capacitor removida ficam em `docs/history`.
+O CI executa as verificações do workspace Rust e da interface empacotada no
+Linux; o job Windows valida os seis módulos científicos, fórmulas e uma
+instalação silenciosa. O APK é gerado no CI, mas não é executado em aparelho.
+A paridade com a engine Python retirada é verificada por `cargo xtask parity`:
+valores numéricos com `atol=1e-9, rtol=1e-7`, textos exatos e os rótulos e
+cores de cada gráfico. Documentos e capturas da interface Electron/Capacitor
+removida ficam em `docs/history`.

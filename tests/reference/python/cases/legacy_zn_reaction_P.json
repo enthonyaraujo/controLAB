@@ -1,0 +1,178 @@
+{
+  "id": "legacy_zn_reaction_P",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "P",
+    "method": "zn_reaction",
+    "plant_expr": "1/(s*(s+1)*(s+5))",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "description": "Comparação da resposta ao degrau e do LGR antes e depois da compensação.",
+    "details": {
+      "after": {
+        "overshoot_percent": 18.964123411327872,
+        "peak": 1.1896412341132787,
+        "peak_time": 4.254321899351354,
+        "rise_time": 1.8120259941681698,
+        "settling_time": 9.690399881855864,
+        "steady_state_value": 1.0
+      },
+      "before": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9951444892119709,
+        "peak_time": 19.61715098034236,
+        "rise_time": 8.351076320948955,
+        "settling_time": 15.047694125483495,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -5.184387171407661,
+          "text": "-5.1844+0j"
+        },
+        {
+          "im": 0.7779725207674528,
+          "re": -0.4078064142961693,
+          "text": "-0.40781+0.77797j"
+        },
+        {
+          "im": -0.7779725207674528,
+          "re": -0.4078064142961693,
+          "text": "-0.40781-0.77797j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -5.0489173395223,
+          "text": "-5.0489+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.6431041321077906,
+          "text": "-0.6431+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.3079785283699039,
+          "text": "-0.30798+0j"
+        }
+      ],
+      "controller_parameters": {
+        "kcr": null,
+        "kd": 0.0,
+        "ki": 0.0,
+        "kp": 4.0,
+        "method_label": "Ziegler-Nichols — curva de reação",
+        "pcr": null,
+        "td": 0.0,
+        "ti": null,
+        "wcr": null
+      },
+      "design_label": "P por Ziegler-Nichols — curva de reação",
+      "design_type": "pid",
+      "frequency_margins_after": {
+        "gain_crossover_frequency": 0.6614721975065413,
+        "gain_margin_db": 17.501225267834002,
+        "phase_crossover_frequency": 2.23606797749979,
+        "phase_margin_deg": 48.980321247058725
+      },
+      "frequency_margins_before": {
+        "gain_crossover_frequency": 0.19611076348053946,
+        "gain_margin_db": 29.542425094393252,
+        "phase_crossover_frequency": 2.23606797749979,
+        "phase_margin_deg": 76.65838059590112
+      },
+      "kcr": null,
+      "pcr": null,
+      "plant_latex_expanded": "G(s) = \\frac{1}{s^{3} + 6 s^{2} + 5 s}",
+      "stable": true,
+      "warning": null,
+      "wcr": null
+    },
+    "image": {
+      "$asset": "assets/cbcb108a8694d1a33fa41461344681f00a07d71fbf0d8cd056050e162ea0e4ea.png",
+      "bytes": 217723,
+      "encoding": "data:image/png;base64",
+      "sha256": "cbcb108a8694d1a33fa41461344681f00a07d71fbf0d8cd056050e162ea0e4ea"
+    },
+    "latex": [
+      {
+        "label": "Planta",
+        "value": "\\frac{1}{s \\left(s + 1\\right) \\left(s + 5\\right)}"
+      },
+      {
+        "label": "Controlador",
+        "value": "C(s)=\\frac{4.0}{1.0}"
+      },
+      {
+        "label": "Malha fechada compensada",
+        "value": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Kp",
+        "value": "4"
+      },
+      {
+        "label": "Ki",
+        "value": "0"
+      },
+      {
+        "label": "Kd",
+        "value": "0"
+      },
+      {
+        "label": "Ti",
+        "unit": "",
+        "value": "—"
+      },
+      {
+        "label": "Td",
+        "unit": "s",
+        "value": "0"
+      },
+      {
+        "label": "Sobressinal (%OS)",
+        "unit": "%",
+        "value": "18.964123411327872"
+      },
+      {
+        "label": "Tempo de acomodação (ts)",
+        "unit": "s",
+        "value": "9.690399881855864"
+      },
+      {
+        "label": "Margem de ganho (MG)",
+        "unit": "dB",
+        "value": "17.501225267834002"
+      },
+      {
+        "label": "Margem de fase (MF)",
+        "unit": "°",
+        "value": "48.980321247058725"
+      },
+      {
+        "label": "Projeto",
+        "value": "P por Ziegler-Nichols — curva de reação"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/ac054bd031172c7a6e26439182a85433b6432d68947ac6073ca394879fbc2d9a.svg",
+      "bytes": 94929,
+      "encoding": "utf-8",
+      "sha256": "ac054bd031172c7a6e26439182a85433b6432d68947ac6073ca394879fbc2d9a"
+    },
+    "title": "Projeto de Controladores"
+  }
+}

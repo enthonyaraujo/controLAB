@@ -1,0 +1,11 @@
+{
+  "id": "unknown_action",
+  "input": {
+    "action": "unknown"
+  },
+  "module": "protocol",
+  "output": {
+    "error": "ValueError: Ação desconhecida: unknown",
+    "success": false
+  }
+}

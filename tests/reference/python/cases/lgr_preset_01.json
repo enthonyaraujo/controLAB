@@ -1,0 +1,201 @@
+{
+  "id": "lgr_preset_01",
+  "input": {
+    "action": "calculate",
+    "mode": "preset",
+    "preset_key": "Exemplo 2: Polos Complexos Conjugados e Ângulo de Partida"
+  },
+  "module": "lgr",
+  "output": {
+    "detalhes": {
+      "P": 3,
+      "Z": 0,
+      "angulos_assintotas": [
+        {
+          "graus": 59.99999999999999,
+          "k": 0,
+          "rad": 1.0471975511965976
+        },
+        {
+          "graus": 180.0,
+          "k": 1,
+          "rad": 3.141592653589793
+        },
+        {
+          "graus": 300.0,
+          "k": 2,
+          "rad": 5.235987755982989
+        }
+      ],
+      "angulos_chegada": [],
+      "angulos_partida": [
+        {
+          "angulo": -45.0,
+          "polo_str": "-1.00 +1.00j"
+        }
+      ],
+      "break_points": [],
+      "centroide": -0.6666666666666665,
+      "jw_cruzamentos": [
+        {
+          "K": 4.000000942285548,
+          "w": -1.4142135831876606
+        },
+        {
+          "K": 4.000000942285548,
+          "w": 1.4142135831876606
+        }
+      ],
+      "passo_a_passo": {
+        "passo_1_2_3": {
+          "P": 3,
+          "Z": 0,
+          "eq_caracteristica": "1 + K \\, G(s) = 0 \\iff (1.0 s^{3} + 2.0 s^{2} + 2.0 s) + K (1.0) = 0",
+          "eq_fatorada": "G(s) = \\frac{1.0}{2.0 s \\left(0.5 s^{2} + 1.0 s + 1.0\\right)}",
+          "eq_malha_aberta": "G(s) = \\frac{1.0}{1.0 s^{3} + 2.0 s^{2} + 2.0 s}",
+          "ramos": 3,
+          "segmentos_eixo_real": [
+            {
+              "contagem_direita": 0,
+              "intervalo": "(0, +\\infty)",
+              "motivo": "0 singularidades reais à direita (quantidade par)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 1,
+              "intervalo": "(-\\infty, 0)",
+              "motivo": "1 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            }
+          ],
+          "simetria_justificativa": "Como os coeficientes de N(s) e D(s) são estritamente reais, as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        },
+        "passo_4": {
+          "angulos_deduzidos": [
+            {
+              "formula": "\\theta_{0} = \\frac{(2(0) + 1) \\cdot 180^\\circ}{3} = \\frac{180^\\circ}{3} = 60.0^\\circ",
+              "graus": 60.0,
+              "k": 0
+            },
+            {
+              "formula": "\\theta_{1} = \\frac{(2(1) + 1) \\cdot 180^\\circ}{3} = \\frac{540^\\circ}{3} = 180.0^\\circ",
+              "graus": 180.0,
+              "k": 1
+            },
+            {
+              "formula": "\\theta_{2} = \\frac{(2(2) + 1) \\cdot 180^\\circ}{3} = \\frac{900^\\circ}{3} = 300.0^\\circ",
+              "graus": 300.0,
+              "k": 2
+            }
+          ],
+          "formula_angulos": "\\theta_k = \\frac{(2k + 1) \\cdot 180^\\circ}{P - Z}, \\quad k = 0, \\dots, (P - Z - 1)",
+          "formula_centroide": "\\sigma_a = \\frac{\\sum_{i=1}^P p_i - \\sum_{j=1}^Z z_j}{P - Z}",
+          "n_assintotas": 3,
+          "soma_polos_num": -1.9999999999999996,
+          "soma_zeros_num": 0.0,
+          "substituicao_centroide": "\\sigma_a = \\frac{(-2) - (0)}{3} = \\frac{-2.00}{3} = -0.667",
+          "tem_assintotas": true
+        },
+        "passo_5": {
+          "condicao": "N'(s)D(s) - N(s)D'(s) = 0",
+          "derivada_D": "3.0 s^{2} + 4.0 s + 2.0",
+          "derivada_N": "0",
+          "formula_derivada": "K(s) = -\\frac{D(s)}{N(s)} \\implies \\frac{dK}{ds} = -\\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0",
+          "polinomio_break": "- 3.0 s^{2} - 4.0 s - 2.0 = 0",
+          "raizes_analisadas": [
+            {
+              "motivo": "Raiz com parte imaginária (fora do eixo real)",
+              "s_str": "-0.67 ± j0.47",
+              "tipo": "complexa",
+              "valido": false
+            },
+            {
+              "motivo": "Raiz com parte imaginária (fora do eixo real)",
+              "s_str": "-0.67 ± j0.47",
+              "tipo": "complexa",
+              "valido": false
+            }
+          ]
+        },
+        "passo_6": {
+          "cruzamentos": [
+            {
+              "K": 4.000000942285548,
+              "K_str": "K_{crit} = 4.00",
+              "s_str": "s = \\pm j1.41",
+              "w": 1.4142135831876606
+            }
+          ],
+          "eq_caracteristica": "1.0 K + 1.0 s^{3} + 2.0 s^{2} + 2.0 s = 0",
+          "parte_imaginaria_eq": "- 1.0 w^{3} + 2.0 w = 0",
+          "parte_real_eq": "1.0 K - 2.0 w^{2} = 0",
+          "substituicao_jw": "s = j\\omega \\implies D(j\\omega) + K N(j\\omega) = 0",
+          "tem_cruzamento": true
+        },
+        "passo_7": {
+          "deducoes_chegada": [],
+          "deducoes_partida": [
+            {
+              "angulo_final": -45.0,
+              "calculo_substituicao": "\\theta_d = 180^\\circ + (0.0^\\circ) - (225.0^\\circ) = -45.0^\\circ",
+              "formula_aplicada": "\\theta_d = 180^\\circ + \\sum \\phi_z - \\sum \\theta_p",
+              "polo_str": "-1.00 +1.00j",
+              "soma_polos_graus": 225.0,
+              "soma_zeros_graus": 0.0,
+              "termos_polos": [
+                {
+                  "angulo": 90.0,
+                  "polo_str": "-1.00 -1.00j",
+                  "vetor_str": "+2.00j"
+                },
+                {
+                  "angulo": 135.0,
+                  "polo_str": "0.00",
+                  "vetor_str": "-1.00 +1.00j"
+                }
+              ],
+              "termos_zeros": []
+            }
+          ],
+          "tem_chegada": false,
+          "tem_partida": true
+        }
+      },
+      "polos": [
+        {
+          "im": 0.9999999999999998,
+          "re": -0.9999999999999998,
+          "str": "-1.00 +1.00j"
+        },
+        {
+          "im": -0.9999999999999998,
+          "re": -0.9999999999999998,
+          "str": "-1.00 -1.00j"
+        },
+        {
+          "im": 0.0,
+          "re": 0.0,
+          "str": "0.00"
+        }
+      ],
+      "ramos": 3,
+      "zeros": []
+    },
+    "image": {
+      "$asset": "assets/7b6fbce2f6bfe529715576792c4f22bdb60932a0b8025f62e4c7600a2bccc848.png",
+      "bytes": 124801,
+      "encoding": "data:image/png;base64",
+      "sha256": "7b6fbce2f6bfe529715576792c4f22bdb60932a0b8025f62e4c7600a2bccc848"
+    },
+    "latex_exp": "G(s) = \\frac{1.0}{1.0 s^{3} + 2.0 s^{2} + 2.0 s}",
+    "latex_fac": "G(s) = \\frac{1.0}{2.0 s \\left(0.5 s^{2} + 1.0 s + 1.0\\right)}",
+    "success": true,
+    "svg": {
+      "$asset": "assets/ea9fe0fc915e3f8b3655f010d76fb685eefaa9d8cb2e4a697e373d3a02620d6e.svg",
+      "bytes": 46213,
+      "encoding": "utf-8",
+      "sha256": "ea9fe0fc915e3f8b3655f010d76fb685eefaa9d8cb2e4a697e373d3a02620d6e"
+    }
+  },
+  "preset_id": "Exemplo 2: Polos Complexos Conjugados e Ângulo de Partida"
+}

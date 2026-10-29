@@ -1,0 +1,15 @@
+{
+  "id": "parse_desired_pole_7",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "1+1j"
+    ],
+    "method": "parse_desired_pole"
+  },
+  "module": "controller",
+  "output": {
+    "error": "ValueError: O polo dominante desejado deve ser complexo e estar no semiplano esquerdo (Re < 0, Im ≠ 0).",
+    "success": false
+  }
+}

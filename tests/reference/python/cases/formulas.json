@@ -1,0 +1,42 @@
+{
+  "id": "formulas",
+  "input": {
+    "action": "render_formulas",
+    "sources": [
+      "\\frac{1}{s+1}",
+      "\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}",
+      "\\unknowncommand{x}",
+      "",
+      7
+    ]
+  },
+  "module": "presentation",
+  "output": {
+    "depths": [
+      0.3673469387755102,
+      0.32608695652173914,
+      0,
+      0,
+      0
+    ],
+    "em": 48,
+    "images": [
+      {
+        "$asset": "assets/c7cd4db7a98907383b4c681c7bb5ac84556e7218b665918c3ec2bfad074fa45e.png",
+        "bytes": 1527,
+        "encoding": "base64",
+        "sha256": "c7cd4db7a98907383b4c681c7bb5ac84556e7218b665918c3ec2bfad074fa45e"
+      },
+      {
+        "$asset": "assets/c770c4e3db2cbda3fa166598b7c9dc2b89ffd8bf6ebe296192079af0a1f95c4f.png",
+        "bytes": 2210,
+        "encoding": "base64",
+        "sha256": "c770c4e3db2cbda3fa166598b7c9dc2b89ffd8bf6ebe296192079af0a1f95c4f"
+      },
+      null,
+      null,
+      null
+    ],
+    "success": true
+  }
+}

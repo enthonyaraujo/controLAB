@@ -1,0 +1,299 @@
+{
+  "id": "controller_test_lag_negative_plant_gain_0",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "lag",
+    "error_reduction_factor": 10,
+    "plant_expr": "-1/((s+0.5)(s+2))",
+    "points": 200
+  },
+  "module": "controller",
+  "output": {
+    "description": "Controlador por Atraso de Fase — Gc(s) = K(s+z)/(s+p)",
+    "details": {
+      "after": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9498506275458187,
+        "peak_time": 70.0565878978337,
+        "rise_time": 13.025596744823352,
+        "settling_time": 27.81140926597418,
+        "steady_state_value": 0.95
+      },
+      "angle_contributions": [],
+      "before": {
+        "overshoot_percent": null,
+        "peak": "∞",
+        "peak_time": "∞",
+        "rise_time": null,
+        "settling_time": null,
+        "steady_state_value": null
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.5625321163300674,
+          "re": -1.1979032997462937,
+          "text": "-1.1979+0.56253j"
+        },
+        {
+          "im": -0.5625321163300674,
+          "re": -1.1979032997462937,
+          "text": "-1.1979-0.56253j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.11419340050741149,
+          "text": "-0.11419+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -2.5,
+          "text": "-2.5+0j"
+        },
+        {
+          "im": 0.0,
+          "re": 0.0,
+          "text": "0+0j"
+        }
+      ],
+      "controller_parameters": {
+        "K": -1.0,
+        "controller_type": "LAG",
+        "criterion_pct": 2,
+        "e_atual": "∞",
+        "e_novo": 0.05,
+        "im": 0.5625321163300674,
+        "kp": -1.0,
+        "mp": 0.12433173668973765,
+        "p": 0.01,
+        "re": 1.1979032997462937,
+        "reduction_factor": 10.0,
+        "ts": 3.3391676947940354,
+        "wn": 1.323410252886777,
+        "xi": 0.9051639860982542,
+        "z": 0.19,
+        "z_over_p": 19.0
+      },
+      "controller_type": "LAG",
+      "design_label": "Controlador por Atraso de Fase — Gc(s) = K(s+z)/(s+p)",
+      "design_type": "lag",
+      "feedback_latex": null,
+      "forward_latex_factored": "G(s) = \\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}",
+      "gc_latex": "G_c(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01}",
+      "gma_expanded_latex": "G_{ma}(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 1.025 s + 0.01}",
+      "gma_factored_latex": "G_{ma}(s) = G_c(s)G(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01} \\cdot \\left(\\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}\\right)",
+      "input_type": "step",
+      "plant_latex_expanded": "G(s) = \\frac{-1}{1.0 s^{2} + 2.5 s + 1.0}",
+      "plant_latex_factored": "G(s) = \\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}",
+      "settling_criterion": 2,
+      "stable": true,
+      "steps": [
+        {
+          "description": "Análise em malha fechada com realimentação unitária e entrada degrau unitário r(s) = 1/s.",
+          "equations": [
+            "G(s) = \\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}",
+            "T(s) = \\frac{-1.0}{1.0 s^{2} + 2.5 s}",
+            "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = \\infty"
+          ],
+          "notes": [
+            "Polos de G(s): s = -0,5, s = -2",
+            "Zeros de G(s): nenhum",
+            "A planta tem ganho negativo: o projeto é feito para -G(s) e o ganho do controlador resulta negativo."
+          ],
+          "number": 1,
+          "title": "Análise da Planta e Sistema Sem Controlador"
+        },
+        {
+          "description": "Redução do erro em regime permanente mantendo K para preservar a resposta transitória.",
+          "equations": [
+            "e_{\\text{atual}}(\\infty) = 0{,}5, \\quad \\text{Fator de redução} = 10 \\implies e_{\\text{novo}}(\\infty) = \\frac{0{,}5}{10} = 0{,}05",
+            "\\lim_{s \\to 0} s\\left(\\frac{1}{1 + G_c(s)G(s)}\\right)R(s) = e_{\\text{novo}}(\\infty) \\implies \\frac{1}{1 + K\\frac{z}{p}G(0)} = 0{,}05",
+            "\\frac{z}{p} = 19"
+          ],
+          "notes": [
+            "Ganho adotado: K = 1",
+            "Meta de erro em regime permanente: e(∞) = 0,05"
+          ],
+          "number": 2,
+          "title": "Especificação de Regime Permanente e Razão z/p"
+        },
+        {
+          "description": "Aloca-se o polo próximo à origem (p < z) para não alterar significativamente os ângulos do LGR.",
+          "equations": [
+            "p = 0{,}01",
+            "z = \\left(\\frac{z}{p}\\right) \\times p = 19 \\times 0{,}01 = 0{,}19",
+            "G_c(s) = \\frac{(s + 0{,}19)}{s + 0{,}01}"
+          ],
+          "notes": [
+            "Polo do controlador em s = -0,01 e zero em s = -0,19 (p < z)."
+          ],
+          "number": 3,
+          "title": "Alocação do Polo e Zero do Controlador por Atraso de Fase"
+        },
+        {
+          "description": "Como G(s) tem ganho negativo, o controlador recebe ganho negativo para que Gc(s)G(s) satisfaça a condição de 180°.",
+          "equations": [
+            "K_{G} = -1 < 0 \\implies K_c \\to -K_c"
+          ],
+          "notes": [
+            "Os ângulos e módulos foram calculados para -G(s); apenas o sinal do ganho do controlador muda."
+          ],
+          "number": 4,
+          "title": "Correção de Sinal para Planta com Ganho Negativo"
+        },
+        {
+          "description": "Função do controlador Gc(s), malha aberta compensada Gma(s) = Gc(s)G(s) e erro final e(∞).",
+          "equations": [
+            "G_c(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01}",
+            "G_{ma}(s) = G_c(s)G(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01} \\cdot \\left(\\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}\\right)",
+            "G_{ma}(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 1.025 s + 0.01}",
+            "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0{,}05"
+          ],
+          "notes": [
+            "Estabilidade em malha fechada: Estável",
+            "Erro em regime permanente antes: \\infty → depois: 0{,}05"
+          ],
+          "number": 5,
+          "title": "Funções de Transferência Finais e Erro em Regime Permanente"
+        }
+      ],
+      "tc_latex": "T(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 2.025 s + 0.2}",
+      "uncompensated": {
+        "closed_loop_den": [
+          1.0,
+          2.5,
+          0.0
+        ],
+        "closed_loop_latex": "T(s) = \\frac{-1.0}{1.0 s^{2} + 2.5 s}",
+        "closed_loop_num": [
+          -1.0
+        ],
+        "closed_loop_poles": [
+          {
+            "im": 0.0,
+            "re": -2.5,
+            "text": "-2.5+0j"
+          },
+          {
+            "im": 0.0,
+            "re": 0.0,
+            "text": "0+0j"
+          }
+        ],
+        "mp": null,
+        "stable": false,
+        "steady_state_error": "∞",
+        "steady_state_error_latex": "\\infty",
+        "steady_state_error_raw": "∞",
+        "ts_2pct": null,
+        "ts_5pct": null,
+        "wn": null,
+        "xi": null
+      },
+      "warning": null,
+      "warnings": []
+    },
+    "image": {
+      "$asset": "assets/afa930cdf6a9d8143afe85cb2fafd8c87bf1ec4b00affd53eb040596ccd6f5fd.png",
+      "bytes": 158837,
+      "encoding": "data:image/png;base64",
+      "sha256": "afa930cdf6a9d8143afe85cb2fafd8c87bf1ec4b00affd53eb040596ccd6f5fd"
+    },
+    "latex": [
+      {
+        "label": "Controlador Gc(s)",
+        "value": "G_c(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01}"
+      },
+      {
+        "label": "Malha Aberta Compensada Gma(s) = Gc(s)G(s)",
+        "value": "G_{ma}(s) = G_c(s)G(s) = \\frac{-(s + 0{,}19)}{s + 0{,}01} \\cdot \\left(\\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}\\right)"
+      },
+      {
+        "label": "Malha Aberta Expandida",
+        "value": "G_{ma}(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 1.025 s + 0.01}"
+      },
+      {
+        "label": "Malha Fechada Compensada T(s)",
+        "value": "T(s) = \\frac{1.0 s + 0.19}{1.0 s^{3} + 2.51 s^{2} + 2.025 s + 0.2}"
+      },
+      {
+        "label": "Planta Original G(s)",
+        "value": "G(s) = \\frac{-1}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 0.5\\right)}"
+      }
+    ],
+    "metrics": [
+      {
+        "header": "Síntese do Controlador"
+      },
+      {
+        "label": "Tipo de controlador",
+        "value": "LAG"
+      },
+      {
+        "label": "Polo dominante s",
+        "value": "-1,198 ± 0,5625j"
+      },
+      {
+        "label": "Ganho (K)",
+        "value": "-1"
+      },
+      {
+        "label": "Zero do controlador (z)",
+        "value": "0.19"
+      },
+      {
+        "label": "Polo do controlador (p)",
+        "value": "0.01"
+      },
+      {
+        "label": "Razão (z/p)",
+        "value": "19"
+      },
+      {
+        "header": "Especificações e Desempenho"
+      },
+      {
+        "label": "Amortecimento (ξ)",
+        "value": "0.9052"
+      },
+      {
+        "label": "Frequência natural (ωn)",
+        "unit": "rad/s",
+        "value": "1.323"
+      },
+      {
+        "label": "Tempo de acomodação ts(2%)",
+        "unit": "s",
+        "value": "3.339"
+      },
+      {
+        "label": "Sobressinal máximo (Mp)",
+        "unit": "%",
+        "value": "0.1243"
+      },
+      {
+        "label": "Erro e(∞) sem controlador",
+        "value": "∞"
+      },
+      {
+        "label": "Erro e(∞) compensado",
+        "value": "0,05"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/21cfb6c0aaff5643ec0dc27f7846de9a1dc8cf0421a707479f093bf45879eb00.svg",
+      "bytes": 42431,
+      "encoding": "utf-8",
+      "sha256": "21cfb6c0aaff5643ec0dc27f7846de9a1dc8cf0421a707479f093bf45879eb00"
+    },
+    "title": "Projeto de Controladores"
+  },
+  "source": "tests/test_controller_design.py:478"
+}

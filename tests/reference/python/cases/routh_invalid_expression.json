@@ -1,0 +1,12 @@
+{
+  "id": "routh_invalid_expression",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "x+1"
+  },
+  "module": "routh",
+  "output": {
+    "error": "ValueError: O grau do polinômio característico deve ser pelo menos 1.",
+    "success": false
+  }
+}

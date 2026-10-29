@@ -1,0 +1,16 @@
+{
+  "id": "parse_matrix_3",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "bad",
+      "A"
+    ],
+    "method": "parse_matrix"
+  },
+  "module": "state_space",
+  "output": {
+    "error": "ValueError: could not convert string to float: 'bad'",
+    "success": false
+  }
+}

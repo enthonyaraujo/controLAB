@@ -1,0 +1,183 @@
+{
+  "id": "legacy_zn_reaction_PI",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "PI",
+    "method": "zn_reaction",
+    "plant_expr": "1/(s*(s+1)*(s+5))",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "description": "Comparação da resposta ao degrau e do LGR antes e depois da compensação.",
+    "details": {
+      "after": {
+        "overshoot_percent": 62.10120816414894,
+        "peak": 1.6210120816414895,
+        "peak_time": 4.594586929148175,
+        "rise_time": 1.5843403203959228,
+        "settling_time": 20.279556101067808,
+        "steady_state_value": 1.0
+      },
+      "before": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9999891899764414,
+        "peak_time": 39.45007397785847,
+        "rise_time": 8.39700369809839,
+        "settling_time": 15.051233043761263,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -5.158078089650792,
+          "text": "-5.1581+0j"
+        },
+        {
+          "im": 0.6627266843260156,
+          "re": -0.20278795939622407,
+          "text": "-0.20279+0.66273j"
+        },
+        {
+          "im": -0.6627266843260156,
+          "re": -0.20278795939622407,
+          "text": "-0.20279-0.66273j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.43634599155674614,
+          "text": "-0.43635+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -5.0489173395223,
+          "text": "-5.0489+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.6431041321077906,
+          "text": "-0.6431+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.3079785283699039,
+          "text": "-0.30798+0j"
+        }
+      ],
+      "controller_parameters": {
+        "kcr": null,
+        "kd": 0.0,
+        "ki": 1.0810810810810811,
+        "kp": 3.6,
+        "method_label": "Ziegler-Nichols — curva de reação",
+        "pcr": null,
+        "td": 0.0,
+        "ti": 3.33,
+        "wcr": null
+      },
+      "design_label": "PI por Ziegler-Nichols — curva de reação",
+      "design_type": "pid",
+      "frequency_margins_after": {
+        "gain_crossover_frequency": 0.656321098012653,
+        "gain_margin_db": 14.535082477695859,
+        "phase_crossover_frequency": 1.7883506921737127,
+        "phase_margin_deg": 24.657627908062437
+      },
+      "frequency_margins_before": {
+        "gain_crossover_frequency": 0.19611076348053946,
+        "gain_margin_db": 29.542425094393252,
+        "phase_crossover_frequency": 2.23606797749979,
+        "phase_margin_deg": 76.65838059590112
+      },
+      "kcr": null,
+      "pcr": null,
+      "plant_latex_expanded": "G(s) = \\frac{1}{s^{3} + 6 s^{2} + 5 s}",
+      "stable": true,
+      "warning": null,
+      "wcr": null
+    },
+    "image": {
+      "$asset": "assets/131009fc466bf93119239c3a6080bed1dcdd788024a3f8f838b2b65784bbe904.png",
+      "bytes": 227154,
+      "encoding": "data:image/png;base64",
+      "sha256": "131009fc466bf93119239c3a6080bed1dcdd788024a3f8f838b2b65784bbe904"
+    },
+    "latex": [
+      {
+        "label": "Planta",
+        "value": "\\frac{1}{s \\left(s + 1\\right) \\left(s + 5\\right)}"
+      },
+      {
+        "label": "Controlador",
+        "value": "C(s)=\\frac{3.6 s + 1.081}{1.0 s}"
+      },
+      {
+        "label": "Malha fechada compensada",
+        "value": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Kp",
+        "value": "3.6"
+      },
+      {
+        "label": "Ki",
+        "value": "1.0811"
+      },
+      {
+        "label": "Kd",
+        "value": "0"
+      },
+      {
+        "label": "Ti",
+        "unit": "s",
+        "value": "3.33"
+      },
+      {
+        "label": "Td",
+        "unit": "s",
+        "value": "0"
+      },
+      {
+        "label": "Sobressinal (%OS)",
+        "unit": "%",
+        "value": "62.10120816414894"
+      },
+      {
+        "label": "Tempo de acomodação (ts)",
+        "unit": "s",
+        "value": "20.279556101067808"
+      },
+      {
+        "label": "Margem de ganho (MG)",
+        "unit": "dB",
+        "value": "14.535082477695859"
+      },
+      {
+        "label": "Margem de fase (MF)",
+        "unit": "°",
+        "value": "24.657627908062437"
+      },
+      {
+        "label": "Projeto",
+        "value": "PI por Ziegler-Nichols — curva de reação"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/fdf9e0407266a969a2f64a43b34a49e1da4b3196a1fd55f268120cfe5832f9e3.svg",
+      "bytes": 98495,
+      "encoding": "utf-8",
+      "sha256": "fdf9e0407266a969a2f64a43b34a49e1da4b3196a1fd55f268120cfe5832f9e3"
+    },
+    "title": "Projeto de Controladores"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "parse_matrix_2",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "[[0,1],[-2,-3]]",
+      "A"
+    ],
+    "method": "parse_matrix"
+  },
+  "module": "state_space",
+  "output": {
+    "success": true,
+    "value": [
+      [
+        0.0,
+        1.0
+      ],
+      [
+        -2.0,
+        -3.0
+      ]
+    ]
+  }
+}

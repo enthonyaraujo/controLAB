@@ -1,0 +1,104 @@
+{
+  "id": "lgr_catalog",
+  "input": {
+    "action": "presets"
+  },
+  "module": "lgr",
+  "output": {
+    "presets": [
+      {
+        "den": [
+          1.0,
+          5.0,
+          4.0,
+          0.0
+        ],
+        "desc": "Polos em 0, -1, -4 e Zero em -2. Apresenta ponto de partida (breakaway) e cruzamento com o eixo imaginário.",
+        "expr": "(s + 2) / (s * (s + 1) * (s + 4))",
+        "id": "Exemplo 1: 3ª Ordem com Breakaway e Cruzamento jω (Ogata)",
+        "num": [
+          1.0,
+          2.0
+        ],
+        "title": "Exemplo 1: 3ª Ordem com Breakaway e Cruzamento jω (Ogata)"
+      },
+      {
+        "den": [
+          1.0,
+          2.0,
+          2.0,
+          0.0
+        ],
+        "desc": "Polo na origem e par complexo conjugado (-1 ± 1j). Demonstra o cálculo exato do ângulo de partida theta_d.",
+        "expr": "1 / (s * (s^2 + 2*s + 2))",
+        "id": "Exemplo 2: Polos Complexos Conjugados e Ângulo de Partida",
+        "num": [
+          1.0
+        ],
+        "title": "Exemplo 2: Polos Complexos Conjugados e Ângulo de Partida"
+      },
+      {
+        "den": [
+          1.0,
+          4.0,
+          3.0,
+          0.0
+        ],
+        "desc": "Sistema com zero de fase não-mínima no semiplano direito (s = +2), atraindo um ramo para a região instável.",
+        "expr": "(s - 2) / (s * (s + 1) * (s + 3))",
+        "id": "Exemplo 3: Zero de Fase Não-Mínima (Semiplano Direito)",
+        "num": [
+          1.0,
+          -2.0
+        ],
+        "title": "Exemplo 3: Zero de Fase Não-Mínima (Semiplano Direito)"
+      },
+      {
+        "den": [
+          1.0,
+          1.0,
+          0.0
+        ],
+        "desc": "Dois polos (0, -1) e um zero (-2). Os ramos saem do eixo real e retornam a ele (break-in).",
+        "expr": "(s + 2) / (s * (s + 1))",
+        "id": "Exemplo 4: Sistema com Break-in e Breakaway",
+        "num": [
+          1.0,
+          2.0
+        ],
+        "title": "Exemplo 4: Sistema com Break-in e Breakaway"
+      },
+      {
+        "den": [
+          1.0,
+          6.0,
+          11.0,
+          6.0,
+          0.0
+        ],
+        "desc": "4 polos reais na origem e em -1, -2, -3. Quatro assíntotas simétricas a 45°, 135°, 225° e 315°.",
+        "expr": "1 / (s * (s + 1) * (s + 2) * (s + 3))",
+        "id": "Exemplo 5: 4ª Ordem com 4 Assíntotas",
+        "num": [
+          1.0
+        ],
+        "title": "Exemplo 5: 4ª Ordem com 4 Assíntotas"
+      },
+      {
+        "den": [
+          1.0,
+          2.0,
+          5.0
+        ],
+        "desc": "Par de polos conjugados em -1 ± 2j com ramos paralelos assintóticos verticais.",
+        "expr": "1 / (s^2 + 2*s + 5)",
+        "id": "Exemplo 6: Sistema de 2ª Ordem com Amortecimento",
+        "num": [
+          1.0
+        ],
+        "title": "Exemplo 6: Sistema de 2ª Ordem com Amortecimento"
+      }
+    ],
+    "success": true
+  }
+}

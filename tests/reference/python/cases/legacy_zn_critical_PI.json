@@ -1,0 +1,183 @@
+{
+  "id": "legacy_zn_critical_PI",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "PI",
+    "method": "zn_critical",
+    "plant_expr": "1/(s*(s+1)*(s+5))",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "description": "Comparação da resposta ao degrau e do LGR antes e depois da compensação.",
+    "details": {
+      "after": {
+        "overshoot_percent": 101.53158480643079,
+        "peak": 2.015315848064308,
+        "peak_time": 2.4096385542168672,
+        "rise_time": 0.963855421686747,
+        "settling_time": null,
+        "steady_state_value": 1.0
+      },
+      "before": {
+        "overshoot_percent": 0.0,
+        "peak": 0.9999999999999997,
+        "peak_time": 117.59036144578313,
+        "rise_time": 8.674698795180722,
+        "settling_time": 15.421686746987952,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -5.502594671021448,
+          "text": "-5.5026+0j"
+        },
+        {
+          "im": 1.4993666254887008,
+          "re": -0.015700835508379238,
+          "text": "-0.015701+1.4994j"
+        },
+        {
+          "im": -1.4993666254887008,
+          "re": -0.015700835508379238,
+          "text": "-0.015701-1.4994j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.46600365796179216,
+          "text": "-0.466+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -5.0489173395223,
+          "text": "-5.0489+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.6431041321077906,
+          "text": "-0.6431+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.3079785283699039,
+          "text": "-0.30798+0j"
+        }
+      ],
+      "controller_parameters": {
+        "kcr": 30.000000000000007,
+        "kd": 0.0,
+        "ki": 5.765276601679136,
+        "kp": 13.500000000000004,
+        "method_label": "Ziegler-Nichols — oscilação crítica (automático)",
+        "pcr": 2.8099258924162904,
+        "td": 0.0,
+        "ti": 2.3416049103469088,
+        "wcr": 2.23606797749979
+      },
+      "design_label": "PI por Ziegler-Nichols — oscilação crítica (automático)",
+      "design_type": "pid",
+      "frequency_margins_after": {
+        "gain_crossover_frequency": 1.4954157473456904,
+        "gain_margin_db": 0.6957938841814221,
+        "phase_crossover_frequency": 1.561299088483101,
+        "phase_margin_deg": 1.181853574009324
+      },
+      "frequency_margins_before": {
+        "gain_crossover_frequency": 0.19611076348053946,
+        "gain_margin_db": 29.542425094393252,
+        "phase_crossover_frequency": 2.23606797749979,
+        "phase_margin_deg": 76.65838059590112
+      },
+      "kcr": 30.000000000000007,
+      "pcr": 2.8099258924162904,
+      "plant_latex_expanded": "G(s) = \\frac{1}{s^{3} + 6 s^{2} + 5 s}",
+      "stable": true,
+      "warning": null,
+      "wcr": 2.23606797749979
+    },
+    "image": {
+      "$asset": "assets/7aace544a3eb91366ed876998ad6b70db7c536f468a3cd963e71f34ef416cf63.png",
+      "bytes": 263795,
+      "encoding": "data:image/png;base64",
+      "sha256": "7aace544a3eb91366ed876998ad6b70db7c536f468a3cd963e71f34ef416cf63"
+    },
+    "latex": [
+      {
+        "label": "Planta",
+        "value": "\\frac{1}{s \\left(s + 1\\right) \\left(s + 5\\right)}"
+      },
+      {
+        "label": "Controlador",
+        "value": "C(s)=\\frac{13.5 s + 5.765}{1.0 s}"
+      },
+      {
+        "label": "Malha fechada compensada",
+        "value": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Kp",
+        "value": "13.5"
+      },
+      {
+        "label": "Ki",
+        "value": "5.7653"
+      },
+      {
+        "label": "Kd",
+        "value": "0"
+      },
+      {
+        "label": "Ti",
+        "unit": "s",
+        "value": "2.3416"
+      },
+      {
+        "label": "Td",
+        "unit": "s",
+        "value": "0"
+      },
+      {
+        "label": "Sobressinal (%OS)",
+        "unit": "%",
+        "value": "101.53158480643079"
+      },
+      {
+        "label": "Tempo de acomodação (ts)",
+        "unit": "s",
+        "value": "Não definido"
+      },
+      {
+        "label": "Margem de ganho (MG)",
+        "unit": "dB",
+        "value": "0.6957938841814221"
+      },
+      {
+        "label": "Margem de fase (MF)",
+        "unit": "°",
+        "value": "1.181853574009324"
+      },
+      {
+        "label": "Projeto",
+        "value": "PI por Ziegler-Nichols — oscilação crítica (automático)"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/1fc810f2ecaa3ab9d8d01ecc0f65ea34b7db7150c23ef99d4cd3a97f2ad35e16.svg",
+      "bytes": 101912,
+      "encoding": "utf-8",
+      "sha256": "1fc810f2ecaa3ab9d8d01ecc0f65ea34b7db7150c23ef99d4cd3a97f2ad35e16"
+    },
+    "title": "Projeto de Controladores"
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "id": "state_space_test_bridge_dispatch_0",
+  "input": {
+    "A": "0, 1; -2, -3",
+    "B": "0; 1",
+    "C": "1, 0",
+    "D": "0",
+    "action": "state_space",
+    "mode": "matrices"
+  },
+  "module": "state_space",
+  "output": {
+    "description": "Conversão de modelos, testes estruturais, realimentação de estados e observador de ordem plena.",
+    "details": {
+      "A": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          -2.0,
+          -3.0
+        ]
+      ],
+      "B": [
+        [
+          0.0
+        ],
+        [
+          1.0
+        ]
+      ],
+      "C": [
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "D": [
+        [
+          0.0
+        ]
+      ],
+      "canonical": {
+        "A": [
+          [
+            -3.0,
+            -2.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "B": [
+          [
+            1.0
+          ],
+          [
+            0.0
+          ]
+        ],
+        "C": [
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "D": [
+          [
+            0.0
+          ]
+        ],
+        "label": "Canônica controlável",
+        "transformation": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ]
+      },
+      "controllability_matrix": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          -3.0
+        ]
+      ],
+      "controllability_rank": 2,
+      "feedback_poles": [],
+      "observability_matrix": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "observability_rank": 2,
+      "observer_error_poles": [],
+      "observer_gain": null,
+      "observer_method": null,
+      "original_poles": [
+        {
+          "im": 0.0,
+          "re": -1.0,
+          "text": "-1+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "text": "-2+0j"
+        }
+      ],
+      "source_latex": null,
+      "source_mode": "matrices",
+      "stable": true,
+      "state_feedback_gain": null,
+      "state_feedback_method": null,
+      "transfer_function": {
+        "denominator": [
+          1.0,
+          3.0,
+          2.0
+        ],
+        "latex": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+        "latex_expanded": "G(s) = \\frac{1.0}{1.0 s^{2} + 3.0 s + 2.0}",
+        "numerator": [
+          1.0000000000000018
+        ],
+        "siso": true
+      }
+    },
+    "image": {
+      "$asset": "assets/e0956422647e710849d413f0fa3a6ea94e04e60f67468ee9adc4b1be92078038.png",
+      "bytes": 55158,
+      "encoding": "data:image/png;base64",
+      "sha256": "e0956422647e710849d413f0fa3a6ea94e04e60f67468ee9adc4b1be92078038"
+    },
+    "latex": [
+      {
+        "label": "Modelo",
+        "value": "\\dot{x}=Ax+Bu,\\qquad y=Cx+Du"
+      },
+      {
+        "label": "Controlabilidade",
+        "value": "\\mathcal{C}=[B\\;AB\\;\\cdots\\;A^{n-1}B]"
+      },
+      {
+        "label": "Observabilidade",
+        "value": "\\mathcal{O}=[C^T\\;A^TC^T\\;\\cdots\\;(A^T)^{n-1}C^T]^T"
+      },
+      {
+        "label": "Função de transferência",
+        "value": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Autovalores de A",
+        "value": "-1; -2"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Controlabilidade (posto)",
+        "value": "2 / 2"
+      },
+      {
+        "label": "Observabilidade (posto)",
+        "value": "2 / 2"
+      },
+      {
+        "label": "Forma canônica solicitada",
+        "value": "Canônica controlável"
+      },
+      {
+        "label": "Matrizes canônicas",
+        "value": "Ac=[[-3, -2], [1, 0]], Bc=[1; 0], Cc=[0, 1], Dc=[0]"
+      },
+      {
+        "label": "Ganho K",
+        "value": "—"
+      },
+      {
+        "label": "Ganho L",
+        "value": "—"
+      }
+    ],
+    "module": "state_space",
+    "success": true,
+    "svg": {
+      "$asset": "assets/a5b00541e2558e071b72af14e29fc188aba7c0f55e22acf94405c83b26243a6d.svg",
+      "bytes": 20292,
+      "encoding": "utf-8",
+      "sha256": "a5b00541e2558e071b72af14e29fc188aba7c0f55e22acf94405c83b26243a6d"
+    },
+    "title": "Espaço de Estados"
+  },
+  "source": "tests/test_state_space.py:60"
+}

@@ -1,0 +1,358 @@
+{
+  "id": "controller_test_q7_pd_with_inner_velocity_loop_0",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "PD",
+    "plant_expr": "1/s / (1 + 2/s) * 5/(s(s+2))",
+    "points": 200,
+    "ts": 4,
+    "xi": 0.5
+  },
+  "module": "controller",
+  "output": {
+    "description": "Controlador Proporcional-Derivativo (PD) — Gc(s) = Kp(1 + τd·s)",
+    "details": {
+      "after": {
+        "overshoot_percent": 16.302614175174668,
+        "peak": 1.1630261417517467,
+        "peak_time": 1.809045226130655,
+        "rise_time": 0.8040201005025134,
+        "settling_time": 4.060301507537693,
+        "steady_state_value": 1.0
+      },
+      "angle_contributions": [
+        {
+          "angle_deg": 120.0,
+          "label": "Polo G (s = 0)",
+          "multiplicity": 1,
+          "root": {
+            "im": 0.0,
+            "re": 0.0
+          },
+          "total_angle_deg": 120.0,
+          "type": "plant_pole"
+        },
+        {
+          "angle_deg": 59.99999999999999,
+          "label": "Polo G (s = -2)",
+          "multiplicity": 2,
+          "root": {
+            "im": 0.0,
+            "re": -2.0
+          },
+          "total_angle_deg": 119.99999999999999,
+          "type": "plant_pole"
+        },
+        {
+          "angle_deg": 60.0,
+          "label": "Zero PD (s = -2)",
+          "multiplicity": 1,
+          "root": {
+            "im": 0.0,
+            "re": -2.0000000000000004
+          },
+          "total_angle_deg": 60.0,
+          "type": "controller_zero"
+        }
+      ],
+      "before": {
+        "overshoot_percent": 33.7199426988108,
+        "peak": 1.337199426988108,
+        "peak_time": 2.9748743718592996,
+        "rise_time": 1.20603015075377,
+        "settling_time": null,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -2.0000000000000058,
+          "text": "-2+0j"
+        },
+        {
+          "im": 1.7320508075688772,
+          "re": -0.999999999999999,
+          "text": "-1+1.7321j"
+        },
+        {
+          "im": -1.7320508075688772,
+          "re": -0.999999999999999,
+          "text": "-1-1.7321j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -3.241896563034481,
+          "text": "-3.2419+0j"
+        },
+        {
+          "im": 1.1826355600911544,
+          "re": -0.37905171848276087,
+          "text": "-0.37905+1.1826j"
+        },
+        {
+          "im": -1.1826355600911544,
+          "re": -0.37905171848276087,
+          "text": "-0.37905-1.1826j"
+        }
+      ],
+      "controller_parameters": {
+        "K": 1.6000000000000003,
+        "controller_type": "PD",
+        "criterion_pct": 2,
+        "e_atual": 0.0,
+        "e_novo": 0.0,
+        "im": 1.7320508075688772,
+        "kd": 0.7999999999999999,
+        "kp": 1.6000000000000003,
+        "mp": 16.303353482158048,
+        "re": 1.0,
+        "td": 0.4999999999999999,
+        "theta_z": 60.0,
+        "ts": 4.0,
+        "wn": 2.0,
+        "xi": 0.5,
+        "z": 2.0000000000000004
+      },
+      "controller_type": "PD",
+      "design_label": "Controlador Proporcional-Derivativo (PD) — Gc(s) = Kp(1 + τd·s)",
+      "design_type": "pd",
+      "feedback_latex": null,
+      "forward_latex_factored": "G(s) = \\frac{5}{s \\left(s + 2\\right)^{2}}",
+      "gc_latex": "G_c(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2)",
+      "gma_expanded_latex": "G_{ma}(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s}",
+      "gma_factored_latex": "G_{ma}(s) = G_c(s)G(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2) \\cdot \\left(\\frac{5}{s \\left(s + 2\\right)^{2}}\\right)",
+      "input_type": "step",
+      "plant_latex_expanded": "G(s) = \\frac{5}{s^{3} + 4 s^{2} + 4 s}",
+      "plant_latex_factored": "G(s) = \\frac{5}{s \\left(s + 2\\right)^{2}}",
+      "settling_criterion": 2,
+      "stable": true,
+      "steps": [
+        {
+          "description": "Análise em malha fechada com realimentação unitária e entrada degrau unitário r(s) = 1/s.",
+          "equations": [
+            "G(s) = \\frac{5}{s \\left(s + 2\\right)^{2}}",
+            "T(s) = \\frac{5.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s + 5.0}",
+            "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 1{,}242\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}3052",
+            "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 0"
+          ],
+          "notes": [
+            "Polos de G(s): s = 0, s = -2 (×2)",
+            "Zeros de G(s): nenhum"
+          ],
+          "number": 1,
+          "title": "Análise da Planta e Sistema Sem Controlador"
+        },
+        {
+          "description": "Cálculo de ξ, ωn e dos polos dominantes s = -Re ± Im·j pelo critério de 2%.",
+          "equations": [
+            "M_p(\\%) = \\left[e^{-(\\xi \\cdot \\pi / \\sqrt{1 - \\xi^2})}\\right] \\times 100 = 16{,}3\\% \\iff \\xi = 0{,}5",
+            "t_s(2\\%) = \\frac{4}{\\xi\\omega_n} = 4\\text{ s} \\implies \\xi\\omega_n = 1 \\implies \\omega_n = \\frac{1}{0{,}5} = 2\\text{ rad/s}",
+            "s = -\\xi\\omega_n \\pm \\omega_n\\sqrt{1 - \\xi^2}j = -1 \\pm 1{,}732j"
+          ],
+          "notes": [
+            "Parte real desejada: Re = ξ·ωn = 1",
+            "Parte imaginária desejada: Im = ωn·√(1 - ξ²) = 1,732"
+          ],
+          "number": 2,
+          "title": "Especificações Transitórias e Polos Dominantes Desejados"
+        },
+        {
+          "description": "Cálculo de θz pela condição de fase e determinação de z e τd = 1/z.",
+          "equations": [
+            "\\text{Polo } p_1: p_i = 0 < \\text{Re} (1) \\implies \\theta = 180^\\circ - \\tan^{-1}\\!\\left(\\frac{1{,}732}{1 - 0}\\right) = 180^\\circ - 60^\\circ = 120^\\circ",
+            "\\text{Polo } p_2: p_i = 2 > \\text{Re} (1) \\implies \\theta = \\tan^{-1}\\!\\left(\\frac{1{,}732}{2 - 1}\\right) = 60^\\circ \\implies 2 \\times 60^\\circ = 120^\\circ",
+            "\\theta_z = \\sum \\theta_{\\text{polos de } G} - \\sum \\theta_{\\text{zeros de } G} + 180^\\circ \\pmod{360^\\circ} = 240^\\circ - 0^\\circ - 180^\\circ = 60^\\circ",
+            "\\theta_{z} = 60^\\circ < 90^\\circ \\implies \\tan^{-1}\\!\\left(\\frac{1{,}732}{z - 1}\\right) = 60^\\circ \\implies z = \\frac{1{,}732 + 1 \\times \\tan(60^\\circ)}{\\tan(60^\\circ)} = 2",
+            "\\tau_d = \\frac{1}{z} = \\frac{1}{2} = 0{,}5\\text{ s}"
+          ],
+          "notes": [
+            "Ângulo exigido do zero: θz = 60°",
+            "Zero do controlador: z = 2 → τd = 0,5 s"
+          ],
+          "number": 3,
+          "title": "Condição de Fase no LGR, Zero z e Tempo Derivativo τd"
+        },
+        {
+          "description": "Aplicação de |Gma(s)| = |Kp(1 + τd·s)G(s)| = 1 no polo dominante.",
+          "equations": [
+            "\\left|1 + \\tau_d s\\right| = \\left|1 + 0{,}5(-1 + 1{,}732j)\\right| = \\sqrt{(0{,}5)^2 + (0{,}866)^2} = 1",
+            "\\left|s\\right| = \\sqrt{(-1)^2 + (1{,}732)^2} = 2",
+            "\\left|(s + 2)^2\\right| = \\sqrt{(1)^2 + (1{,}732)^2}^{2} = 4",
+            "\\left|G_{ma}(s)\\right| = \\left|K_p(1 + \\tau_d s)G(s)\\right| = 1 \\implies K_p = \\frac{8}{5} = 1{,}6"
+          ],
+          "notes": [
+            "Ganho proporcional: Kp = 1,6",
+            "Constante derivativa: τd = 0,5 s (Kd = Kp·τd = 0,8)"
+          ],
+          "number": 4,
+          "title": "Condição de Módulo e Cálculo de Kp"
+        },
+        {
+          "description": "Função do controlador Gc(s), malha aberta compensada Gma(s) = Gc(s)G(s) e erro final e(∞).",
+          "equations": [
+            "G_c(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2)",
+            "G_{ma}(s) = G_c(s)G(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2) \\cdot \\left(\\frac{5}{s \\left(s + 2\\right)^{2}}\\right)",
+            "G_{ma}(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s}",
+            "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s} = 0"
+          ],
+          "notes": [
+            "Estabilidade em malha fechada: Estável",
+            "Erro em regime permanente antes: 0 → depois: 0"
+          ],
+          "number": 5,
+          "title": "Funções de Transferência Finais e Erro em Regime Permanente"
+        }
+      ],
+      "tc_latex": "T(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 8.0 s + 8.0}",
+      "uncompensated": {
+        "closed_loop_den": [
+          1.0,
+          4.0,
+          4.0,
+          5.0
+        ],
+        "closed_loop_latex": "T(s) = \\frac{5.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s + 5.0}",
+        "closed_loop_num": [
+          5.0
+        ],
+        "closed_loop_poles": [
+          {
+            "im": 0.0,
+            "re": -3.24189656303448,
+            "text": "-3.2419+0j"
+          },
+          {
+            "im": 1.182635560091155,
+            "re": -0.3790517184827608,
+            "text": "-0.37905+1.1826j"
+          },
+          {
+            "im": -1.182635560091155,
+            "re": -0.3790517184827608,
+            "text": "-0.37905-1.1826j"
+          }
+        ],
+        "mp": 36.53404348449086,
+        "stable": true,
+        "steady_state_error": 0.0,
+        "steady_state_error_latex": "0",
+        "steady_state_error_raw": 0.0,
+        "ts_2pct": 10.552649691210723,
+        "ts_5pct": 7.914487268408043,
+        "wn": 1.2418965630344798,
+        "xi": 0.3052200398691633
+      },
+      "warning": null,
+      "warnings": []
+    },
+    "image": {
+      "$asset": "assets/71129e55ac0c5b8a630c7e82d3924153c532ee19a1f5b00efaa9f9e799c7c4a3.png",
+      "bytes": 172224,
+      "encoding": "data:image/png;base64",
+      "sha256": "71129e55ac0c5b8a630c7e82d3924153c532ee19a1f5b00efaa9f9e799c7c4a3"
+    },
+    "latex": [
+      {
+        "label": "Controlador Gc(s)",
+        "value": "G_c(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2)"
+      },
+      {
+        "label": "Malha Aberta Compensada Gma(s) = Gc(s)G(s)",
+        "value": "G_{ma}(s) = G_c(s)G(s) = 1{,}6(1 + 0{,}5s) = 1{,}6\\cdot 0{,}5(s + 2) \\cdot \\left(\\frac{5}{s \\left(s + 2\\right)^{2}}\\right)"
+      },
+      {
+        "label": "Malha Aberta Expandida",
+        "value": "G_{ma}(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s}"
+      },
+      {
+        "label": "Malha Fechada Compensada T(s)",
+        "value": "T(s) = \\frac{4.0 s + 8.0}{1.0 s^{3} + 4.0 s^{2} + 8.0 s + 8.0}"
+      },
+      {
+        "label": "Planta Original G(s)",
+        "value": "G(s) = \\frac{5}{s \\left(s + 2\\right)^{2}}"
+      }
+    ],
+    "metrics": [
+      {
+        "header": "Síntese do Controlador"
+      },
+      {
+        "label": "Tipo de controlador",
+        "value": "PD"
+      },
+      {
+        "label": "Polo dominante s",
+        "value": "-1 ± 1,732j"
+      },
+      {
+        "label": "Ganho proporcional (Kp)",
+        "value": "1.6"
+      },
+      {
+        "label": "Ganho derivativo (Kd)",
+        "value": "0.8"
+      },
+      {
+        "label": "Zero do controlador (z)",
+        "value": "2"
+      },
+      {
+        "label": "Tempo derivativo (τd)",
+        "unit": "s",
+        "value": "0.5"
+      },
+      {
+        "label": "Ângulo do zero (θz)",
+        "unit": "°",
+        "value": "60"
+      },
+      {
+        "header": "Especificações e Desempenho"
+      },
+      {
+        "label": "Amortecimento (ξ)",
+        "value": "0.5"
+      },
+      {
+        "label": "Frequência natural (ωn)",
+        "unit": "rad/s",
+        "value": "2"
+      },
+      {
+        "label": "Tempo de acomodação ts(2%)",
+        "unit": "s",
+        "value": "4"
+      },
+      {
+        "label": "Sobressinal máximo (Mp)",
+        "unit": "%",
+        "value": "16.3"
+      },
+      {
+        "label": "Erro e(∞) sem controlador",
+        "value": "0"
+      },
+      {
+        "label": "Erro e(∞) compensado",
+        "value": "0"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/a7c3ecd3a3b4272db67d236e0e380f67d7b3f97d814f0954ab586cb69b69173f.svg",
+      "bytes": 48326,
+      "encoding": "utf-8",
+      "sha256": "a7c3ecd3a3b4272db67d236e0e380f67d7b3f97d814f0954ab586cb69b69173f"
+    },
+    "title": "Projeto de Controladores"
+  },
+  "source": "tests/test_controller_design.py:460"
+}

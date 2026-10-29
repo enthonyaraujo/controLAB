@@ -1,22 +1,13 @@
 plugins {
     id 'com.android.application'
-    id 'com.chaquo.python'
 }
 
 // Select only installed Rust targets, e.g. -PnativeAbis=arm64-v8a,x86_64.
 def nativeAbis = providers.gradleProperty('nativeAbis').getOrElse('arm64-v8a').split(',').toList()
 def repositoryRoot = rootProject.file('../..')
-def canonicalRequirements = new File(repositoryRoot, 'requirements-android.txt')
-// The workspace Cargo.toml is the single version source (scripts/set_version.py).
+// The workspace Cargo.toml is the single version source (cargo xtask version).
 def appVersion = (new File(repositoryRoot, 'Cargo.toml').text =~ /(?m)^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"/)[0]
 def releaseKeystore = System.getenv('CONTROLAB_KEYSTORE')
-def generatedPython = layout.buildDirectory.dir('generated/python')
-def preparePythonAssets = tasks.register('preparePythonAssets', Sync) {
-    description = 'Package canonical fonts and translations for the Python engine'
-    from new File(repositoryRoot, 'assets')
-    into generatedPython.map { it.dir('controlab_assets') }
-}
-
 android {
     namespace 'br.com.enthony.controlab'
     compileSdk 36
@@ -55,29 +46,11 @@ android {
     }
 }
 
-chaquopy {
-    defaultConfig {
-        version '3.10'
-        // Formula rendering needs font paths on the filesystem. Importing this
-        // package extracts its data files before resource_paths resolves them.
-        extractPackages 'controlab_assets'
-        def buildPythonPath = System.getenv('LGR_ANDROID_PYTHON')
-        if (buildPythonPath) { buildPython buildPythonPath }
-        pip { install '-r', canonicalRequirements.absolutePath }
-    }
-    sourceSets {
-        main {
-            srcDirs = [new File(repositoryRoot, 'src/python').absolutePath,
-                       generatedPython.get().asFile.absolutePath]
-        }
-    }
-}
-
 ['debug', 'release'].each { variant ->
     def capitalized = variant.capitalize()
     def compileTask = tasks.register("compileNative${capitalized}", Exec) {
         group = 'build'
-        description = "Build the Rust UI and .m interpreter for ${variant}"
+        description = "Build the Rust UI, scientific engine and .m interpreter for ${variant}"
         workingDir rootProject.projectDir
         def output = layout.buildDirectory.dir("generated/native/${variant}")
         inputs.files(fileTree(new File(repositoryRoot, 'native')) {
@@ -90,12 +63,15 @@ chaquopy {
             include '**/*.rs', '**/Cargo.toml'
             exclude '**/target/**'
         })
-        inputs.file rootProject.file('build_native.py')
+        inputs.files(fileTree(new File(repositoryRoot, 'xtask')) {
+            include '**/*.rs', 'Cargo.toml'
+        })
         inputs.property('abis', nativeAbis.join(','))
         inputs.property('variant', variant)
         outputs.dir output
-        commandLine providers.gradleProperty('nativeBuildPython').getOrElse('python3'),
-            rootProject.file('build_native.py'), '--abis', nativeAbis.join(','),
+        commandLine 'cargo', 'run', '--locked', '--manifest-path',
+            new File(repositoryRoot, 'Cargo.toml').absolutePath, '-p', 'xtask', '--',
+            'android', '--abis', nativeAbis.join(','),
             '--profile', variant, '--output', output.get().asFile.absolutePath
         if (providers.gradleProperty('nativeOffline').getOrElse('false').toBoolean()) {
             args '--offline'
@@ -104,9 +80,4 @@ chaquopy {
     tasks.configureEach {
         if (name == "pre${capitalized}Build") { dependsOn compileTask }
     }
-}
-
-// Chaquopy consumes generated Python sources while merging each variant.
-tasks.configureEach {
-    if (name ==~ /merge.*PythonSources/) { dependsOn preparePythonAssets }
 }

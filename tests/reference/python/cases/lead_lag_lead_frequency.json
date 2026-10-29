@@ -1,0 +1,132 @@
+{
+  "id": "lead_lag_lead_frequency",
+  "input": {
+    "action": "controller_design",
+    "compensator_type": "lead",
+    "design_domain": "frequency",
+    "design_type": "lead_lag",
+    "plant_expr": "1/(s+1)",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "description": "Comparação da resposta ao degrau e do LGR antes e depois da compensação.",
+    "details": {
+      "after": {
+        "overshoot_percent": 1.6653345369377348e-14,
+        "peak": 0.16666666666666669,
+        "peak_time": 6.29718875502008,
+        "rise_time": 0.35341365461847385,
+        "settling_time": 0.6746987951807228,
+        "steady_state_value": 0.16666666666666666
+      },
+      "before": {
+        "overshoot_percent": 0.0,
+        "peak": 0.4999999437324126,
+        "peak_time": 8.0,
+        "rise_time": 1.0923694779116466,
+        "settling_time": 1.9598393574297186,
+        "steady_state_value": 0.5
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -6.0,
+          "text": "-6+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -1.0,
+          "text": "-1+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "text": "-2+0j"
+        }
+      ],
+      "controller_parameters": null,
+      "design_label": "Compensador por avanço de fase — referência Bode",
+      "design_type": "lead_lag",
+      "frequency_margins_after": {
+        "gain_crossover_frequency": null,
+        "gain_margin_db": "∞",
+        "phase_crossover_frequency": null,
+        "phase_margin_deg": "∞"
+      },
+      "frequency_margins_before": {
+        "gain_crossover_frequency": null,
+        "gain_margin_db": "∞",
+        "phase_crossover_frequency": null,
+        "phase_margin_deg": "∞"
+      },
+      "kcr": null,
+      "pcr": null,
+      "plant_latex_expanded": "G(s) = \\frac{1}{s + 1}",
+      "stable": true,
+      "warning": null,
+      "wcr": null
+    },
+    "image": {
+      "$asset": "assets/e7f3154452fa2b33c97805db36065afc47382e832b60d450dbec9eec0fc02a93.png",
+      "bytes": 192466,
+      "encoding": "data:image/png;base64",
+      "sha256": "e7f3154452fa2b33c97805db36065afc47382e832b60d450dbec9eec0fc02a93"
+    },
+    "latex": [
+      {
+        "label": "Planta",
+        "value": "\\frac{1}{s + 1}"
+      },
+      {
+        "label": "Controlador",
+        "value": "C(s)=\\frac{1.0 s + 1.0}{1.0 s + 5.0}"
+      },
+      {
+        "label": "Malha fechada compensada",
+        "value": "T_c(s)=\\frac{C(s)G(s)}{1+C(s)G(s)}"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Sobressinal (%OS)",
+        "unit": "%",
+        "value": "1.6653345369377348e-14"
+      },
+      {
+        "label": "Tempo de acomodação (ts)",
+        "unit": "s",
+        "value": "0.6746987951807228"
+      },
+      {
+        "label": "Margem de ganho (MG)",
+        "unit": "dB",
+        "value": "∞"
+      },
+      {
+        "label": "Margem de fase (MF)",
+        "unit": "°",
+        "value": "∞"
+      },
+      {
+        "label": "Projeto",
+        "value": "Compensador por avanço de fase — referência Bode"
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/bc5832d297f5cd35d25652224542533236a1750040c3c3b81157641f0d942839.svg",
+      "bytes": 90887,
+      "encoding": "utf-8",
+      "sha256": "bc5832d297f5cd35d25652224542533236a1750040c3c3b81157641f0d942839"
+    },
+    "title": "Projeto de Controladores"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "parse_coeffs_4",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "bad"
+    ],
+    "method": "parse_coeffs_str"
+  },
+  "module": "lgr",
+  "output": {
+    "error": "ValueError: could not convert string to float: 'bad'",
+    "success": false
+  }
+}

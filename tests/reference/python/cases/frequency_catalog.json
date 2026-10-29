@@ -1,0 +1,27 @@
+{
+  "id": "frequency_catalog",
+  "input": {
+    "action": "frequency_response_presets"
+  },
+  "module": "frequency",
+  "output": {
+    "presets": [
+      {
+        "expr": "1 / (s + 1)",
+        "id": "Primeira ordem",
+        "title": "Primeira ordem"
+      },
+      {
+        "expr": "25 / (s^2 + 4*s + 25)",
+        "id": "Segunda ordem",
+        "title": "Segunda ordem"
+      },
+      {
+        "expr": "10 / (s * (s + 2) * (s + 5))",
+        "id": "Tipo 1 com dois polos",
+        "title": "Tipo 1 com dois polos"
+      }
+    ],
+    "success": true
+  }
+}

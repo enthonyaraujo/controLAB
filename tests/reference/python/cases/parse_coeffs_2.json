@@ -1,0 +1,19 @@
+{
+  "id": "parse_coeffs_2",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "1e-3, -2, 0"
+    ],
+    "method": "parse_coeffs_str"
+  },
+  "module": "lgr",
+  "output": {
+    "success": true,
+    "value": [
+      0.001,
+      -2.0,
+      0.0
+    ]
+  }
+}

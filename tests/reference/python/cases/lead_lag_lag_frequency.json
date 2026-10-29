@@ -1,0 +1,16 @@
+{
+  "id": "lead_lag_lag_frequency",
+  "input": {
+    "action": "controller_design",
+    "compensator_type": "lag",
+    "design_domain": "frequency",
+    "design_type": "lead_lag",
+    "plant_expr": "1/(s+1)",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "error": "ValueError: Para atraso de fase, informe polo menor que o zero.",
+    "success": false
+  }
+}

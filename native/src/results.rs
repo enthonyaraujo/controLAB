@@ -1,6 +1,6 @@
 //! Result views of the previous renderer: striped tables, LaTeX cards, step panels, the
-//! Routh cards and the LGR memorial. TeX is typeset on demand by Python MathText with the
-//! KaTeX fonts, in white, and tinted here.
+//! Routh cards and the LGR memorial. TeX is typeset on demand by the engine's native
+//! composer with the KaTeX fonts, in white, and tinted here.
 use crate::kit::{self, fill, galley, hline};
 use crate::model::Module;
 use crate::texfmt::{display_number, fixed, list, raw, tex_to_text, text};
@@ -9,7 +9,7 @@ use eframe::egui::{self, Color32, Rect, Response, Sense, Stroke, Ui, pos2, vec2}
 use serde_json::{Value, json};
 use std::collections::{BTreeSet, HashMap, HashSet};
 
-/// Matches native_presentation.MAX_FORMULAS.
+/// Matches the engine's formula batch limit (formulas::render takes at most 200).
 const MAX_BATCH: usize = 200;
 /// Em size, in pixels, of the typeset images. MathText draws KaTeX glyphs about 13% smaller
 /// than the browser at the same nominal size (measured on identical formulas), so the

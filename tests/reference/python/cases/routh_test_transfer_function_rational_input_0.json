@@ -1,0 +1,211 @@
+{
+  "id": "routh_test_transfer_function_rational_input_0",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "(s + 2) / (s * (s + 1) * (s + 4))"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(5)(K + 4) - (1)(2 K)}{5}",
+        "power": "s",
+        "row": 2,
+        "value_latex": "\\frac{3 K}{5} + 4"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(\\frac{3 K}{5} + 4)(2 K) - (5)(0)}{\\frac{3 K}{5} + 4}",
+        "power": "s^{0}",
+        "row": 3,
+        "value_latex": "2 K"
+      }
+    ],
+    "char_poly_latex": "s^{3} + 5 s^{2} + (K + 4) s + 2 K = 0",
+    "coeffs_latex": [
+      "1",
+      "5",
+      "K + 4",
+      "2 K"
+    ],
+    "degree": 3,
+    "exact_roots": [],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "5"
+      },
+      {
+        "is_symbolic": true,
+        "sign": "expr",
+        "term_latex": "\\frac{3 K}{5} + 4"
+      },
+      {
+        "is_symbolic": true,
+        "sign": "expr",
+        "term_latex": "2 K"
+      }
+    ],
+    "input_str": "(s + 2) / (s * (s + 1) * (s + 4))",
+    "is_fraction": true,
+    "k_range": {
+      "conditions": [
+        {
+          "inequality_latex": "\\frac{3 K}{5} + 4 > 0",
+          "term_latex": "\\frac{3 K}{5} + 4"
+        },
+        {
+          "inequality_latex": "2 K > 0",
+          "term_latex": "2 K"
+        }
+      ],
+      "critical_k": [],
+      "has_k": true,
+      "marginal_cases": [],
+      "marginal_latex": "\\text{Nenhum ponto marginal em } K > 0",
+      "range_latex": "K > 0",
+      "stable_intervals": [
+        "K > 0"
+      ],
+      "stable_latex": "K > 0",
+      "unstable_intervals": [
+        "K < 0"
+      ],
+      "unstable_latex": "K < 0"
+    },
+    "plot_image": {
+      "$asset": "assets/25e2b96d7f61af1cdfb81fcbd899df144f77052c63865ef7d6741fc96e556d56.png",
+      "bytes": 52539,
+      "encoding": "data:image/png;base64",
+      "sha256": "25e2b96d7f61af1cdfb81fcbd899df144f77052c63865ef7d6741fc96e556d56"
+    },
+    "plot_svg": {
+      "$asset": "assets/622110f9b8f38ae7c33cee3fb15d410a77a8a57a092c3d2978c62502671cd4fd.svg",
+      "bytes": 23628,
+      "encoding": "utf-8",
+      "sha256": "622110f9b8f38ae7c33cee3fb15d410a77a8a57a092c3d2978c62502671cd4fd"
+    },
+    "rhp_poles": 0,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "K + 4",
+            "sign": ""
+          }
+        ],
+        "power": "s^{3}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "5",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "2 K",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "\\frac{3 K}{5} + 4",
+            "sign": "expr"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 2
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2 K",
+            "sign": "expr"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 3
+      }
+    ],
+    "sign_changes": 0,
+    "special_cases": [],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{3}$.",
+        "power": "s^{3}",
+        "values": [
+          "1",
+          "K + 4"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{2}$.",
+        "power": "s^{2}",
+        "values": [
+          "5",
+          "2 K"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s",
+        "values": [
+          "\\frac{3 K}{5} + 4",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "2 K",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "A estabilidade depende do ganho escalar K. Consulte a seção de Faixa de K para as desigualdades analíticas.",
+    "verdict": "Dependente de K"
+  },
+  "source": "tests/test_routh_hurwitz.py:104"
+}

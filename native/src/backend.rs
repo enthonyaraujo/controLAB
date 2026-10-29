@@ -11,6 +11,16 @@ use std::time::Duration;
 
 type Reply = (String, Result<Value, String>);
 
+fn request_timeout() -> Duration {
+    Duration::from_secs(
+        std::env::var("CONTROLAB_REQUEST_TIMEOUT")
+            .ok()
+            .and_then(|value| value.parse::<u64>().ok())
+            .unwrap_or(60)
+            .clamp(1, 300),
+    )
+}
+
 pub struct Backend {
     requests: mpsc::SyncSender<(String, Value)>,
     replies: mpsc::Receiver<Reply>,
@@ -31,7 +41,7 @@ impl Backend {
             .spawn(move || {
                 let mut scripts = crate::scripts::Scripts::default();
                 #[cfg(not(target_os = "android"))]
-                let mut process: Option<desktop::PythonProcess> = None;
+                let mut process: Option<desktop::ScientificProcess> = None;
                 while !worker_stop.load(Ordering::Relaxed) {
                     let (tag, payload) = match incoming.recv_timeout(Duration::from_millis(100)) {
                         Ok(request) => request,
@@ -42,12 +52,17 @@ impl Backend {
                         Ok(scripts.request(&payload))
                     } else {
                         #[cfg(target_os = "android")]
-                        let result = crate::android::request(&payload);
+                        let result = Ok(controlab_engine::dispatch::dispatch_with_control(
+                            &payload,
+                            worker_stop.clone(),
+                            request_timeout(),
+                        ));
                         #[cfg(not(target_os = "android"))]
                         let result = desktop::request(&mut process, payload, &worker_stop);
                         result
                     };
-                    if outgoing.send((tag, result)).is_err() {
+                    if worker_stop.load(Ordering::Relaxed) || outgoing.send((tag, result)).is_err()
+                    {
                         break;
                     }
                     ctx.request_repaint();
@@ -113,101 +128,99 @@ mod desktop {
     const SESSION_LOST: &str =
         "A sessão científica foi perdida. Execute novamente para iniciar uma nova sessão.";
 
-    pub(super) struct PythonProcess {
+    pub(super) struct ScientificProcess {
         child: Child,
         stdin: Arc<Mutex<ChildStdin>>,
         replies: mpsc::Receiver<Result<Value, String>>,
     }
 
-    fn bridge_path() -> Result<PathBuf, String> {
-        if let Some(path) = std::env::var_os("CONTROLAB_NATIVE_BRIDGE") {
-            let path = PathBuf::from(path);
-            return path
-                .canonicalize()
-                .map_err(|error| format!("Ponte Python indisponível: {error}"));
-        }
-        let mut candidates = Vec::new();
-        if let Ok(executable) = std::env::current_exe()
-            && let Some(directory) = executable.parent()
-        {
-            // Shipped layouts: bridge alongside executable or in python/ resources.
-            for relative in [
-                "native_bridge.py",
-                "python/native_bridge.py",
-                "resources/python/native_bridge.py",
-                "../Resources/python/native_bridge.py",
-            ] {
-                candidates.push(directory.join(relative));
-            }
-        }
-        candidates
-            .push(Path::new(env!("CARGO_MANIFEST_DIR")).join("../src/python/native_bridge.py"));
-        candidates
-            .into_iter()
-            .find(|path| path.is_file())
-            .ok_or_else(|| {
-                "Ponte Python não encontrada. Defina CONTROLAB_NATIVE_BRIDGE.".to_string()
-            })?
-            .canonicalize()
-            .map_err(|error| error.to_string())
+    #[derive(Debug, PartialEq, Eq)]
+    enum ScientificBackend {
+        Rust,
     }
 
-    fn python_path(bridge: &Path) -> PathBuf {
-        if let Some(path) = std::env::var_os("CONTROLAB_PYTHON") {
-            return path.into();
-        }
-        let name = if cfg!(windows) {
-            ".venv/Scripts/python.exe"
-        } else {
-            ".venv/bin/python"
-        };
-        // Prefer a Python environment bundled near the bridge, then the repo venv.
-        for root in bridge.ancestors().skip(1).take(4) {
-            let candidate = root.join(name);
-            if candidate.is_file() {
-                return candidate;
+    impl ScientificBackend {
+        fn parse(selection: Option<&str>) -> Result<Self, String> {
+            match selection.unwrap_or("rust") {
+                "rust" => Ok(Self::Rust),
+                "python" => Err("O backend Python foi removido. O serviço científico usa Rust; remova CONTROLAB_SCIENTIFIC_BACKEND ou defina rust.".into()),
+                other => Err(format!(
+                    "Backend científico desconhecido: {other}. Use rust."
+                )),
             }
         }
-        PathBuf::from(if cfg!(windows) { "python" } else { "python3" })
     }
 
-    fn packaged_engine(directory: &Path) -> Option<PathBuf> {
-        let name = if cfg!(windows) {
+    fn engine_name() -> &'static str {
+        if cfg!(windows) {
             "controlab-engine.exe"
         } else {
             "controlab-engine"
-        };
-        let path = directory.join("engine").join(name);
+        }
+    }
+
+    fn packaged_engine(directory: &Path) -> Option<PathBuf> {
+        let path = directory.join("engine").join(engine_name());
         path.is_file().then_some(path)
     }
 
-    impl PythonProcess {
+    fn rust_engine_path(
+        explicit: Option<PathBuf>,
+        executable_directory: Option<&Path>,
+        repository: &Path,
+    ) -> Result<PathBuf, String> {
+        if let Some(path) = explicit {
+            if !path.is_file() {
+                return Err(format!(
+                    "Engine Rust indisponível em {}. Confira CONTROLAB_ENGINE.",
+                    path.display()
+                ));
+            }
+            return path
+                .canonicalize()
+                .map_err(|error| format!("Engine Rust indisponível: {error}"));
+        }
+        if let Some(path) = executable_directory.and_then(packaged_engine) {
+            return Ok(path);
+        }
+        let profiles = if cfg!(debug_assertions) {
+            ["debug", "release"]
+        } else {
+            ["release", "debug"]
+        };
+        for profile in profiles {
+            let path = repository.join("target").join(profile).join(engine_name());
+            if path.is_file() {
+                return Ok(path);
+            }
+        }
+        Err("Engine Rust não encontrada. Compile com cargo build -p controlab-engine ou defina CONTROLAB_ENGINE.".into())
+    }
+
+    impl ScientificProcess {
         fn start() -> Result<Self, String> {
-            let engine = if let Some(path) = std::env::var_os("CONTROLAB_ENGINE") {
-                Some(
-                    PathBuf::from(path)
-                        .canonicalize()
-                        .map_err(|error| format!("Engine empacotada indisponível: {error}"))?,
-                )
-            } else {
-                std::env::current_exe()
-                    .ok()
-                    .and_then(|p| p.parent().and_then(packaged_engine))
+            let selection = match std::env::var("CONTROLAB_SCIENTIFIC_BACKEND") {
+                Ok(value) => Some(value),
+                Err(std::env::VarError::NotPresent) => None,
+                Err(_) => {
+                    return Err("CONTROLAB_SCIENTIFIC_BACKEND deve conter rust em UTF-8.".into());
+                }
             };
-            let mut command = if let Some(engine) = engine {
-                Command::new(engine)
-            } else {
-                let bridge = bridge_path()?;
-                let mut command = Command::new(python_path(&bridge));
-                command.arg("-u").arg(&bridge);
-                command
-            };
+            ScientificBackend::parse(selection.as_deref())?;
+            let executable = std::env::current_exe().ok();
+            let engine = rust_engine_path(
+                std::env::var_os("CONTROLAB_ENGINE").map(PathBuf::from),
+                executable.as_deref().and_then(Path::parent),
+                &Path::new(env!("CARGO_MANIFEST_DIR")).join(".."),
+            )?;
+            Self::spawn(Command::new(engine)).map_err(|error| format!("Backend Rust: {error}"))
+        }
+
+        fn spawn(mut command: Command) -> Result<Self, String> {
             command
                 .stdin(Stdio::piped())
                 .stdout(Stdio::piped())
-                .stderr(Stdio::inherit())
-                .env("PYTHONIOENCODING", "utf-8")
-                .env("MPLBACKEND", "Agg");
+                .stderr(Stdio::inherit());
             #[cfg(unix)]
             {
                 use std::os::unix::process::CommandExt;
@@ -219,7 +232,7 @@ mod desktop {
                 command.creation_flags(0x08000000);
             }
             let mut child = command.spawn().map_err(|error| {
-                format!("Não foi possível iniciar Python: {error}. Configure CONTROLAB_PYTHON.")
+                format!("Não foi possível iniciar o serviço científico: {error}.")
             })?;
             let stdin = Arc::new(Mutex::new(child.stdin.take().unwrap()));
             let stdout = child.stdout.take().unwrap();
@@ -233,9 +246,9 @@ mod desktop {
                         .take((MAX_REPLY + 2) as u64)
                         .read_until(b'\n', &mut line)
                     {
-                        Ok(0) => Err("Python encerrou a conexão.".into()),
+                        Ok(0) => Err("O serviço científico encerrou a conexão.".into()),
                         Ok(_) if line.len() > MAX_REPLY + 1 || !line.ends_with(b"\n") => {
-                            Err("Resposta Python inválida ou maior que 32 MiB.".into())
+                            Err("Resposta científica inválida ou maior que 32 MiB.".into())
                         }
                         Ok(_) => serde_json::from_slice::<Value>(&line)
                             .map_err(|error| format!("Resposta JSON inválida: {error}"))
@@ -243,10 +256,10 @@ mod desktop {
                                 if value.is_object() {
                                     Ok(value)
                                 } else {
-                                    Err("A resposta Python deve ser um objeto JSON.".into())
+                                    Err("A resposta científica deve ser um objeto JSON.".into())
                                 }
                             }),
-                        Err(error) => Err(format!("Falha ao ler Python: {error}")),
+                        Err(error) => Err(format!("Falha ao ler o serviço científico: {error}")),
                     };
                     let failed = result.is_err();
                     if outgoing.send(result).is_err() || failed {
@@ -262,12 +275,17 @@ mod desktop {
         }
 
         fn exchange(&mut self, payload: Value, stop: &AtomicBool) -> Result<Value, String> {
-            let seconds = std::env::var("CONTROLAB_REQUEST_TIMEOUT")
-                .ok()
-                .and_then(|value| value.parse::<u64>().ok())
-                .unwrap_or(60)
-                .clamp(1, 300);
-            let deadline = Instant::now() + Duration::from_secs(seconds);
+            self.exchange_timeout(payload, stop, request_timeout())
+        }
+
+        fn exchange_timeout(
+            &mut self,
+            payload: Value,
+            stop: &AtomicBool,
+            timeout: Duration,
+        ) -> Result<Value, String> {
+            let seconds = timeout.as_secs();
+            let deadline = Instant::now() + timeout;
             let mut body = serde_json::to_vec(&payload).map_err(|error| error.to_string())?;
             body.push(b'\n');
             let stdin = self.stdin.clone();
@@ -276,7 +294,7 @@ mod desktop {
             thread::spawn(move || {
                 let result = stdin
                     .lock()
-                    .map_err(|_| "Canal Python indisponível.".to_string())
+                    .map_err(|_| "Canal científico indisponível.".to_string())
                     .and_then(|mut pipe| {
                         pipe.write_all(&body)
                             .and_then(|_| pipe.flush())
@@ -292,12 +310,14 @@ mod desktop {
                     return Err(format!("Tempo de cálculo excedido ({seconds} s)."));
                 }
                 if let Ok(Err(error)) = write_result.try_recv() {
-                    return Err(format!("Falha ao enviar para Python: {error}"));
+                    return Err(format!(
+                        "Falha ao enviar para o serviço científico: {error}"
+                    ));
                 }
                 match self.replies.recv_timeout(Duration::from_millis(50)) {
                     Ok(response) => return response,
                     Err(mpsc::RecvTimeoutError::Disconnected) => {
-                        return Err("Python encerrou a conexão.".into());
+                        return Err("O serviço científico encerrou a conexão.".into());
                     }
                     Err(mpsc::RecvTimeoutError::Timeout) => {}
                 }
@@ -306,9 +326,18 @@ mod desktop {
     }
 
     pub(super) fn request(
-        process: &mut Option<PythonProcess>,
+        process: &mut Option<ScientificProcess>,
         payload: Value,
         stop: &AtomicBool,
+    ) -> Result<Value, String> {
+        request_with(process, payload, stop, ScientificProcess::start)
+    }
+
+    fn request_with(
+        process: &mut Option<ScientificProcess>,
+        payload: Value,
+        stop: &AtomicBool,
+        start: impl FnOnce() -> Result<ScientificProcess, String>,
     ) -> Result<Value, String> {
         if let Some(current) = process.as_mut() {
             match current.child.try_wait() {
@@ -320,7 +349,7 @@ mod desktop {
             }
         }
         if process.is_none() {
-            *process = Some(PythonProcess::start()?);
+            *process = Some(start()?);
         }
         let response = process.as_mut().unwrap().exchange(payload, stop);
         if let Err(error) = response {
@@ -330,7 +359,7 @@ mod desktop {
         response
     }
 
-    impl Drop for PythonProcess {
+    impl Drop for ScientificProcess {
         fn drop(&mut self) {
             #[cfg(unix)]
             {
@@ -366,7 +395,174 @@ mod desktop {
     }
     #[cfg(test)]
     mod packaged_tests {
+        #[test]
+        fn selection_is_explicit_and_invalid_modes_fail() {
+            assert_eq!(
+                ScientificBackend::parse(None).unwrap(),
+                ScientificBackend::Rust
+            );
+            assert_eq!(
+                ScientificBackend::parse(Some("rust")).unwrap(),
+                ScientificBackend::Rust
+            );
+            assert!(
+                ScientificBackend::parse(Some("python"))
+                    .unwrap_err()
+                    .contains("Rust")
+            );
+            assert!(ScientificBackend::parse(Some("unknown")).is_err());
+        }
+
+        #[test]
+        fn rust_discovery_checks_override_package_and_development_in_order() {
+            let root = std::env::temp_dir()
+                .join(format!("controlab-rust-discovery-{}", std::process::id()));
+            let executable_dir = root.join("app");
+            let repository = root.join("repo");
+            let name = engine_name();
+            std::fs::create_dir_all(executable_dir.join("engine")).unwrap();
+            std::fs::create_dir_all(repository.join("target/debug")).unwrap();
+            let bundled = executable_dir.join("engine").join(name);
+            let development = repository.join("target/debug").join(name);
+            assert!(rust_engine_path(None, Some(&executable_dir), &repository).is_err());
+            std::fs::write(&development, []).unwrap();
+            assert_eq!(
+                rust_engine_path(None, Some(&executable_dir), &repository).unwrap(),
+                development
+            );
+            std::fs::write(&bundled, []).unwrap();
+            assert_eq!(
+                rust_engine_path(None, Some(&executable_dir), &repository).unwrap(),
+                bundled
+            );
+            // An invalid explicit override must never select another engine or Python.
+            assert!(
+                rust_engine_path(
+                    Some(root.join("missing")),
+                    Some(&executable_dir),
+                    &repository
+                )
+                .is_err()
+            );
+            assert_eq!(
+                rust_engine_path(
+                    Some(development.clone()),
+                    Some(&executable_dir),
+                    &repository
+                )
+                .unwrap(),
+                development.canonicalize().unwrap()
+            );
+            std::fs::remove_dir_all(root).unwrap();
+        }
+
         use super::*;
+        #[cfg(unix)]
+        #[test]
+        fn json_lines_preserve_recoverable_errors_and_restart_after_transport_failure() {
+            let stop = AtomicBool::new(false);
+            let mut command = Command::new("sh");
+            command.arg("-c").arg(r#"read -r request; echo '{"success":true,"value":1}'; read -r request; echo '{"success":false,"error":"Invalid input"}'; read -r request; echo 'invalid JSON'; sleep 1"#);
+            let mut process = Some(ScientificProcess::spawn(command).unwrap());
+            let first = request_with(
+                &mut process,
+                serde_json::json!({"action":"preview"}),
+                &stop,
+                || panic!("must reuse worker"),
+            )
+            .unwrap();
+            assert_eq!(first["value"], 1);
+            let second = request_with(
+                &mut process,
+                serde_json::json!({"action":"invalid"}),
+                &stop,
+                || panic!("must reuse worker"),
+            )
+            .unwrap();
+            assert_eq!(second["success"], false);
+            assert!(
+                process.is_some(),
+                "Scientific errors must preserve the process"
+            );
+            assert!(
+                request_with(&mut process, serde_json::json!({}), &stop, || panic!(
+                    "must reuse worker"
+                ))
+                .is_err()
+            );
+            assert!(process.is_none(), "Malformed JSON must reset the transport");
+            let recovered = request_with(&mut process, serde_json::json!({}), &stop, || {
+                let mut command = Command::new("sh");
+                command
+                    .arg("-c")
+                    .arg(r#"read -r request; echo '{"success":true,"value":2}'; sleep 1"#);
+                ScientificProcess::spawn(command)
+            })
+            .unwrap();
+            assert_eq!(recovered["value"], 2);
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn shutdown_cancels_a_blocked_scientific_process() {
+            let mut command = Command::new("sh");
+            command.arg("-c").arg("sleep 120");
+            let mut process = Some(ScientificProcess::spawn(command).unwrap());
+            let stop = AtomicBool::new(true);
+            let started = Instant::now();
+            assert!(
+                request_with(&mut process, serde_json::json!({}), &stop, || panic!(
+                    "must reuse worker"
+                ))
+                .is_err()
+            );
+            assert!(process.is_none());
+            assert!(started.elapsed() < Duration::from_secs(3));
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn blocked_io_obeys_the_request_deadline() {
+            let mut command = Command::new("sh");
+            command.arg("-c").arg("sleep 120");
+            let mut process = ScientificProcess::spawn(command).unwrap();
+            let started = Instant::now();
+            let error = process
+                .exchange_timeout(
+                    serde_json::json!({}),
+                    &AtomicBool::new(false),
+                    Duration::from_millis(50),
+                )
+                .unwrap_err();
+            assert!(error.contains("Tempo de cálculo excedido"));
+            drop(process);
+            assert!(started.elapsed() < Duration::from_secs(3));
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn shutdown_during_a_request_interrupts_waiting_for_a_reply() {
+            let mut command = Command::new("sh");
+            command.arg("-c").arg("sleep 120");
+            let mut process = Some(ScientificProcess::spawn(command).unwrap());
+            let stop = Arc::new(AtomicBool::new(false));
+            let thread_stop = stop.clone();
+            let cancel = thread::spawn(move || {
+                thread::sleep(Duration::from_millis(50));
+                thread_stop.store(true, Ordering::Relaxed);
+            });
+            let started = Instant::now();
+            assert!(
+                request_with(&mut process, serde_json::json!({}), &stop, || panic!(
+                    "must reuse worker"
+                ))
+                .is_err()
+            );
+            cancel.join().unwrap();
+            assert!(process.is_none());
+            assert!(started.elapsed() < Duration::from_secs(3));
+        }
+
         #[test]
         fn engine_is_selected_only_from_its_dedicated_distribution_directory() {
             let root = std::env::temp_dir()

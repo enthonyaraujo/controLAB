@@ -1,0 +1,209 @@
+{
+  "id": "routh_test_python_bridge_dispatch_routh_1",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s^3 + 6*s^2 + 11*s + 6",
+    "theme": "dark"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(6)(11) - (1)(6)}{6}",
+        "power": "s",
+        "row": 2,
+        "value_latex": "10"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(10)(6) - (6)(0)}{10}",
+        "power": "s^{0}",
+        "row": 3,
+        "value_latex": "6"
+      }
+    ],
+    "char_poly_latex": "s^{3} + 6 s^{2} + 11 s + 6 = 0",
+    "coeffs_latex": [
+      "1",
+      "6",
+      "11",
+      "6"
+    ],
+    "degree": 3,
+    "exact_roots": [
+      {
+        "imag": 0.0,
+        "real": -3.0,
+        "str": "-3"
+      },
+      {
+        "imag": 0.0,
+        "real": -2.0,
+        "str": "-2"
+      },
+      {
+        "imag": 0.0,
+        "real": -1.0,
+        "str": "-1"
+      }
+    ],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "6"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "10"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "6"
+      }
+    ],
+    "input_str": "s^3 + 6*s^2 + 11*s + 6",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [],
+      "critical_k": [],
+      "has_k": false,
+      "range_latex": "Não aplicável (sem ganho K variável)"
+    },
+    "plot_image": {
+      "$asset": "assets/835a2a54d070ee46824ac25597863a4e708f0e43ee65d6a30272f16b3b57c4b0.png",
+      "bytes": 51952,
+      "encoding": "data:image/png;base64",
+      "sha256": "835a2a54d070ee46824ac25597863a4e708f0e43ee65d6a30272f16b3b57c4b0"
+    },
+    "plot_svg": {
+      "$asset": "assets/0a69fe9d2fdeeb4d368b45a01be4afe3ec5a54c14e0810d096caa1818950b5cb.svg",
+      "bytes": 19258,
+      "encoding": "utf-8",
+      "sha256": "0a69fe9d2fdeeb4d368b45a01be4afe3ec5a54c14e0810d096caa1818950b5cb"
+    },
+    "rhp_poles": 0,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "11",
+            "sign": ""
+          }
+        ],
+        "power": "s^{3}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "6",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "6",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "10",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 2
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "6",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 3
+      }
+    ],
+    "sign_changes": 0,
+    "special_cases": [],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{3}$.",
+        "power": "s^{3}",
+        "values": [
+          "1",
+          "11"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{2}$.",
+        "power": "s^{2}",
+        "values": [
+          "6",
+          "6"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s",
+        "values": [
+          "10",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "6",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "Todos os elementos da primeira coluna possuem o mesmo sinal (sem trocas de sinal). O sistema é BIBO estável e todas as raízes situam-se estritamente no semiplano esquerdo (LHP).",
+    "verdict": "Estável"
+  },
+  "source": "tests/test_routh_hurwitz.py:116"
+}

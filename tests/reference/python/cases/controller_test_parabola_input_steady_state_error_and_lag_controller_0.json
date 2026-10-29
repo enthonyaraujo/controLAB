@@ -1,0 +1,331 @@
+{
+  "id": "controller_test_parabola_input_steady_state_error_and_lag_controller_0",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "lag",
+    "error_reduction_factor": 10.0,
+    "input_type": "parabola",
+    "lag_gain": 1.0,
+    "lag_pole": 0.01,
+    "plant_expr": "2 * (s + 1) / (s^2 * (s + 2) * (s + 4))",
+    "points": 200
+  },
+  "module": "controller",
+  "output": {
+    "description": "Controlador por Atraso de Fase — Gc(s) = K(s+z)/(s+p)",
+    "details": {
+      "after": {
+        "overshoot_percent": 996.5868324098923,
+        "peak": 10.965868324098922,
+        "peak_time": 113.36683417085426,
+        "rise_time": 1.809045226130653,
+        "settling_time": null,
+        "steady_state_value": 1.0
+      },
+      "angle_contributions": [],
+      "before": {
+        "overshoot_percent": 91.39666795508134,
+        "peak": 1.9139666795508135,
+        "peak_time": 6.030150753768844,
+        "rise_time": 1.809045226130653,
+        "settling_time": null,
+        "steady_state_value": 1.0
+      },
+      "closed_loop_poles_after": [
+        {
+          "im": 0.0,
+          "re": -4.164904004297453,
+          "text": "-4.1649+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -1.78836951331991,
+          "text": "-1.7884+0j"
+        },
+        {
+          "im": 0.5266562359669408,
+          "re": 0.019971478849791738,
+          "text": "0.019971+0.52666j"
+        },
+        {
+          "im": -0.5266562359669408,
+          "re": 0.019971478849791738,
+          "text": "0.019971-0.52666j"
+        },
+        {
+          "im": 0.0,
+          "re": -0.09666944008222084,
+          "text": "-0.096669+0j"
+        }
+      ],
+      "closed_loop_poles_before": [
+        {
+          "im": 0.0,
+          "re": -4.168207063176546,
+          "text": "-4.1682+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -1.7784277307562284,
+          "text": "-1.7784+0j"
+        },
+        {
+          "im": 0.518738487894824,
+          "re": -0.02668260303361998,
+          "text": "-0.026683+0.51874j"
+        },
+        {
+          "im": -0.518738487894824,
+          "re": -0.02668260303361998,
+          "text": "-0.026683-0.51874j"
+        }
+      ],
+      "controller_parameters": {
+        "K": 1.0,
+        "controller_type": "LAG",
+        "criterion_pct": 2,
+        "e_atual": 4.0,
+        "e_novo": 0.4,
+        "im": 1.0,
+        "kp": 1.0,
+        "mp": 4.3213918263772255,
+        "p": 0.01,
+        "re": 1.0,
+        "reduction_factor": 10.0,
+        "ts": 4.0,
+        "wn": 1.4142135623730951,
+        "xi": 0.7071067811865475,
+        "z": 0.1,
+        "z_over_p": 10.0
+      },
+      "controller_type": "LAG",
+      "design_label": "Controlador por Atraso de Fase — Gc(s) = K(s+z)/(s+p)",
+      "design_type": "lag",
+      "feedback_latex": null,
+      "forward_latex_factored": "G(s) = \\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}",
+      "gc_latex": "G_c(s) = \\frac{(s + 0{,}1)}{s + 0{,}01}",
+      "gma_expanded_latex": "G_{ma}(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 0.08 s^{2}}",
+      "gma_factored_latex": "G_{ma}(s) = G_c(s)G(s) = \\frac{(s + 0{,}1)}{s + 0{,}01} \\cdot \\left(\\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}\\right)",
+      "input_type": "parabola",
+      "plant_latex_expanded": "G(s) = \\frac{2 s + 2}{s^{4} + 6 s^{3} + 8 s^{2}}",
+      "plant_latex_factored": "G(s) = \\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}",
+      "settling_criterion": 2,
+      "stable": false,
+      "steps": [
+        {
+          "description": "Análise em malha fechada com realimentação unitária e entrada parábola unitária r(s) = 1/s³.",
+          "equations": [
+            "G(s) = \\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}",
+            "T(s) = \\frac{2.0 s + 2.0}{1.0 s^{4} + 6.0 s^{3} + 8.0 s^{2} + 2.0 s + 2.0}",
+            "s^2 + 2\\xi\\omega_n s + \\omega_n^2 \\implies \\omega_{n,\\text{atual}} = 0{,}5194\\text{ rad/s}, \\quad \\xi_{\\text{atual}} = 0{,}05137",
+            "e_{\\text{atual}}(\\infty) = \\lim_{s \\to 0} s\\left(\\frac{1}{1 + G(s)}\\right)R(s) = 4"
+          ],
+          "notes": [
+            "Polos de G(s): s = 0 (×2), s = -2, s = -4",
+            "Zeros de G(s): s = -1"
+          ],
+          "number": 1,
+          "title": "Análise da Planta e Sistema Sem Controlador"
+        },
+        {
+          "description": "Redução do erro em regime permanente mantendo K para preservar a resposta transitória.",
+          "equations": [
+            "e_{\\text{atual}}(\\infty) = 4, \\quad \\text{Fator de redução} = 10 \\implies e_{\\text{novo}}(\\infty) = \\frac{4}{10} = 0{,}4",
+            "\\lim_{s \\to 0} s\\left(\\frac{1}{1 + G_c(s)G(s)}\\right)R(s) = e_{\\text{novo}}(\\infty)",
+            "\\frac{z}{p} = 10"
+          ],
+          "notes": [
+            "Ganho adotado: K = 1",
+            "Meta de erro em regime permanente: e(∞) = 0,4"
+          ],
+          "number": 2,
+          "title": "Especificação de Regime Permanente e Razão z/p"
+        },
+        {
+          "description": "Aloca-se o polo próximo à origem (p < z) para não alterar significativamente os ângulos do LGR.",
+          "equations": [
+            "p = 0{,}01",
+            "z = \\left(\\frac{z}{p}\\right) \\times p = 10 \\times 0{,}01 = 0{,}1",
+            "G_c(s) = \\frac{(s + 0{,}1)}{s + 0{,}01}"
+          ],
+          "notes": [
+            "Polo do controlador em s = -0,01 e zero em s = -0,1 (p < z)."
+          ],
+          "number": 3,
+          "title": "Alocação do Polo e Zero do Controlador por Atraso de Fase"
+        },
+        {
+          "description": "Função do controlador Gc(s), malha aberta compensada Gma(s) = Gc(s)G(s) e erro final e(∞).",
+          "equations": [
+            "G_c(s) = \\frac{(s + 0{,}1)}{s + 0{,}01}",
+            "G_{ma}(s) = G_c(s)G(s) = \\frac{(s + 0{,}1)}{s + 0{,}01} \\cdot \\left(\\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}\\right)",
+            "G_{ma}(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 0.08 s^{2}}",
+            "e(\\infty) = \\lim_{s \\to 0} s \\left(\\frac{1}{1 + G_{ma}(s)}\\right) \\frac{1}{s^3} = 0{,}4"
+          ],
+          "notes": [
+            "Estabilidade em malha fechada: Instável",
+            "Erro em regime permanente antes: 4 → depois: 0{,}4",
+            "Malha fechada instável com estes parâmetros."
+          ],
+          "number": 4,
+          "title": "Funções de Transferência Finais e Erro em Regime Permanente"
+        }
+      ],
+      "tc_latex": "T(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 2.08 s^{2} + 2.2 s + 0.2}",
+      "uncompensated": {
+        "closed_loop_den": [
+          1.0,
+          6.0,
+          8.0,
+          2.0,
+          2.0
+        ],
+        "closed_loop_latex": "T(s) = \\frac{2.0 s + 2.0}{1.0 s^{4} + 6.0 s^{3} + 8.0 s^{2} + 2.0 s + 2.0}",
+        "closed_loop_num": [
+          2.0,
+          2.0
+        ],
+        "closed_loop_poles": [
+          {
+            "im": 0.0,
+            "re": -4.168207063176543,
+            "text": "-4.1682+0j"
+          },
+          {
+            "im": 0.0,
+            "re": -1.7784277307562257,
+            "text": "-1.7784+0j"
+          },
+          {
+            "im": 0.5187384878948237,
+            "re": -0.026682603033619745,
+            "text": "-0.026683+0.51874j"
+          },
+          {
+            "im": -0.5187384878948237,
+            "re": -0.026682603033619745,
+            "text": "-0.026683-0.51874j"
+          }
+        ],
+        "mp": 85.07851720533593,
+        "stable": true,
+        "steady_state_error": 4.0,
+        "steady_state_error_latex": "4",
+        "steady_state_error_raw": 4.0,
+        "ts_2pct": 149.91041147522415,
+        "ts_5pct": 112.4328086064181,
+        "wn": 0.519424277568981,
+        "xi": 0.051369572401390534
+      },
+      "warning": "Malha fechada instável com estes parâmetros.",
+      "warnings": [
+        "Malha fechada instável com estes parâmetros."
+      ]
+    },
+    "image": {
+      "$asset": "assets/50a9c83e500883691ae3f5e35a5bda4a43d8bc9a0ab1eece3c11d9114cd55c86.png",
+      "bytes": 155137,
+      "encoding": "data:image/png;base64",
+      "sha256": "50a9c83e500883691ae3f5e35a5bda4a43d8bc9a0ab1eece3c11d9114cd55c86"
+    },
+    "latex": [
+      {
+        "label": "Controlador Gc(s)",
+        "value": "G_c(s) = \\frac{(s + 0{,}1)}{s + 0{,}01}"
+      },
+      {
+        "label": "Malha Aberta Compensada Gma(s) = Gc(s)G(s)",
+        "value": "G_{ma}(s) = G_c(s)G(s) = \\frac{(s + 0{,}1)}{s + 0{,}01} \\cdot \\left(\\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}\\right)"
+      },
+      {
+        "label": "Malha Aberta Expandida",
+        "value": "G_{ma}(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 0.08 s^{2}}"
+      },
+      {
+        "label": "Malha Fechada Compensada T(s)",
+        "value": "T(s) = \\frac{2.0 s^{2} + 2.2 s + 0.2}{1.0 s^{5} + 6.01 s^{4} + 8.06 s^{3} + 2.08 s^{2} + 2.2 s + 0.2}"
+      },
+      {
+        "label": "Planta Original G(s)",
+        "value": "G(s) = \\frac{2 \\left(s + 1\\right)}{s^{2} \\left(s + 2\\right) \\left(s + 4\\right)}"
+      }
+    ],
+    "metrics": [
+      {
+        "header": "Síntese do Controlador"
+      },
+      {
+        "label": "Tipo de controlador",
+        "value": "LAG"
+      },
+      {
+        "label": "Polo dominante s",
+        "value": "-1 ± 1j"
+      },
+      {
+        "label": "Ganho (K)",
+        "value": "1"
+      },
+      {
+        "label": "Zero do controlador (z)",
+        "value": "0.1"
+      },
+      {
+        "label": "Polo do controlador (p)",
+        "value": "0.01"
+      },
+      {
+        "label": "Razão (z/p)",
+        "value": "10"
+      },
+      {
+        "header": "Especificações e Desempenho"
+      },
+      {
+        "label": "Amortecimento (ξ)",
+        "value": "0.7071"
+      },
+      {
+        "label": "Frequência natural (ωn)",
+        "unit": "rad/s",
+        "value": "1.414"
+      },
+      {
+        "label": "Tempo de acomodação ts(2%)",
+        "unit": "s",
+        "value": "4"
+      },
+      {
+        "label": "Sobressinal máximo (Mp)",
+        "unit": "%",
+        "value": "4.321"
+      },
+      {
+        "label": "Erro e(∞) sem controlador",
+        "value": "4"
+      },
+      {
+        "label": "Erro e(∞) compensado",
+        "value": "0,4"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Instável"
+      },
+      {
+        "label": "Aviso",
+        "value": "Malha fechada instável com estes parâmetros."
+      }
+    ],
+    "module": "controller_design",
+    "success": true,
+    "svg": {
+      "$asset": "assets/a5c9e3c4fe359ebd953c61a0b3e47cfb15183f448819240b1d8578770bf1937c.svg",
+      "bytes": 47265,
+      "encoding": "utf-8",
+      "sha256": "a5c9e3c4fe359ebd953c61a0b3e47cfb15183f448819240b1d8578770bf1937c"
+    },
+    "title": "Projeto de Controladores"
+  },
+  "source": "tests/test_controller_design.py:269"
+}

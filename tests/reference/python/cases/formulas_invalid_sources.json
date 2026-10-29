@@ -1,0 +1,12 @@
+{
+  "id": "formulas_invalid_sources",
+  "input": {
+    "action": "render_formulas",
+    "sources": "x"
+  },
+  "module": "presentation",
+  "output": {
+    "error": "ValueError: sources deve ser uma lista de fórmulas TeX.",
+    "success": false
+  }
+}
