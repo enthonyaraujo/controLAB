@@ -3,7 +3,7 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Não lançado]
+## [6.1.0] - 2026-10-29
 
 ### Alterado
 - **Interface:** a barra superior deixa de exibir o nome ControLAB e passa a ter apenas **Início** e **Apps**. Os seis módulos viram apps, listados na galeria Apps (no tablet e no celular, a lateral e a barra inferior seguem as mesmas duas seções).
