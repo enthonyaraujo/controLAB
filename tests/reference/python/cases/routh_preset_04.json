@@ -1,0 +1,325 @@
+{
+  "id": "routh_preset_04",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s^4 + 2*s^3 + 6*s^2 + 8*s + 8"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(2)(6) - (1)(8)}{2}",
+        "power": "s^{2}",
+        "row": 2,
+        "value_latex": "2"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(2)(8) - (1)(0)}{2}",
+        "power": "s^{2}",
+        "row": 2,
+        "value_latex": "8"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(2)(8) - (2)(8)}{2}",
+        "power": "s",
+        "row": 3,
+        "value_latex": "0"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(2)(0) - (2)(0)}{2}",
+        "power": "s",
+        "row": 3,
+        "value_latex": "0"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(4)(8) - (2)(0)}{4}",
+        "power": "s^{0}",
+        "row": 4,
+        "value_latex": "8"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(4)(0) - (2)(0)}{4}",
+        "power": "s^{0}",
+        "row": 4,
+        "value_latex": "0"
+      }
+    ],
+    "char_poly_latex": "s^{4} + 2 s^{3} + 6 s^{2} + 8 s + 8 = 0",
+    "coeffs_latex": [
+      "1",
+      "2",
+      "6",
+      "8",
+      "8"
+    ],
+    "degree": 4,
+    "exact_roots": [
+      {
+        "imag": 2.0,
+        "real": -0.0,
+        "str": "-5.551e-17 + 2j"
+      },
+      {
+        "imag": -2.0,
+        "real": -0.0,
+        "str": "-5.551e-17 - 2j"
+      },
+      {
+        "imag": 1.0,
+        "real": -1.0,
+        "str": "-1 + 1j"
+      },
+      {
+        "imag": -1.0,
+        "real": -1.0,
+        "str": "-1 - 1j"
+      }
+    ],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "2"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "2"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "4"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "8"
+      }
+    ],
+    "input_str": "s^4 + 2*s^3 + 6*s^2 + 8*s + 8",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [],
+      "critical_k": [],
+      "has_k": false,
+      "range_latex": "Não aplicável (sem ganho K variável)"
+    },
+    "plot_image": {
+      "$asset": "assets/64967fa54c88c9a9ab8ec6acd74d8fd1e319044866929dfbb7fa35753c358c10.png",
+      "bytes": 62410,
+      "encoding": "data:image/png;base64",
+      "sha256": "64967fa54c88c9a9ab8ec6acd74d8fd1e319044866929dfbb7fa35753c358c10"
+    },
+    "plot_svg": {
+      "$asset": "assets/d906e67a21c07dd875f3f82832a5b551ccbc1b0db86a74352ed4c02762d9a415.svg",
+      "bytes": 23411,
+      "encoding": "utf-8",
+      "sha256": "d906e67a21c07dd875f3f82832a5b551ccbc1b0db86a74352ed4c02762d9a415"
+    },
+    "rhp_poles": 0,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "6",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "8",
+            "sign": ""
+          }
+        ],
+        "power": "s^{4}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "8",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{3}",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "8",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 2
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "4",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 3
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "8",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 4
+      }
+    ],
+    "sign_changes": 0,
+    "special_cases": [
+      {
+        "aux_deriv_latex": "4 s",
+        "aux_poly_latex": "2 s^{2} + 8",
+        "desc": "Linha de zeros detectada em $s^{1}$. Polinômio auxiliar: $A(s) = 2 s^{2} + 8$. Derivada substituída: $\\frac{dA}{ds} = 4 s$.",
+        "power": "s^{1}",
+        "type": "row_of_zeros"
+      }
+    ],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{4}$.",
+        "power": "s^{4}",
+        "values": [
+          "1",
+          "6",
+          "8"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{3}$.",
+        "power": "s^{3}",
+        "values": [
+          "2",
+          "8",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{2}",
+        "values": [
+          "2",
+          "8",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s",
+        "values": [
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha de zeros detectada em $s^{1}$. Polinômio auxiliar: $A(s) = 2 s^{2} + 8$. Derivada substituída: $\\frac{dA}{ds} = 4 s$.",
+        "power": "s^{1} (Ajustada)",
+        "values": [
+          "4",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "8",
+          "0",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "Não ocorrem trocas de sinal fora da linha de zeros, indicando a existência de pares de polos puramente imaginários sobre o eixo jω (sem amortecimento). O sistema oscila com amplitude sustentada.",
+    "verdict": "Marginalmente Estável"
+  },
+  "preset_id": "Exemplo 5: 4ª Ordem com Linha de Zeros (Marginalmente Estável)"
+}

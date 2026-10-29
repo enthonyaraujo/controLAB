@@ -1,0 +1,22 @@
+{
+  "id": "preview_scientific",
+  "input": {
+    "action": "preview",
+    "expr": "1e-3(s + 2)/(s(s + 1))"
+  },
+  "module": "lgr",
+  "output": {
+    "den": [
+      1.0,
+      1.0,
+      0.0
+    ],
+    "latex_exp": "G(s) = \\frac{0.001 s + 0.002}{s^{2} + s}",
+    "latex_fac": "G(s) = \\frac{0.002 \\left(0.5 s + 1.0\\right)}{s \\left(s + 1\\right)}",
+    "num": [
+      0.001,
+      0.002
+    ],
+    "success": true
+  }
+}

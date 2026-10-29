@@ -1,0 +1,37 @@
+{
+  "id": "routh_test_python_bridge_dispatch_routh_2",
+  "input": {
+    "action": "routh_evaluate_k",
+    "expr": "s^3 + 3*s^2 + 2*s + K",
+    "k_val": 3.0
+  },
+  "module": "routh",
+  "output": {
+    "jw_count": 0,
+    "k_val": 3.0,
+    "roots": [
+      {
+        "imag": 0.0,
+        "real": -2.6717,
+        "str": "-2.672",
+        "zone": "SPE"
+      },
+      {
+        "imag": 1.0469,
+        "real": -0.1642,
+        "str": "-0.1642 + 1.047j",
+        "zone": "SPE"
+      },
+      {
+        "imag": -1.0469,
+        "real": -0.1642,
+        "str": "-0.1642 - 1.047j",
+        "zone": "SPE"
+      }
+    ],
+    "spd_count": 0,
+    "success": true,
+    "verdict": "Estável"
+  },
+  "source": "tests/test_routh_hurwitz.py:125"
+}

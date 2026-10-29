@@ -1,0 +1,372 @@
+{
+  "id": "routh_preset_05",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s^5 + 2*s^4 + 2*s^3 + 4*s^2 + 11*s + 10"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(2)(2) - (1)(4)}{2}",
+        "power": "s^{3}",
+        "row": 2,
+        "value_latex": "0"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(2)(11) - (1)(10)}{2}",
+        "power": "s^{3}",
+        "row": 2,
+        "value_latex": "6"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(\\varepsilon)(4) - (2)(6)}{\\varepsilon}",
+        "power": "s^{2}",
+        "row": 3,
+        "value_latex": "4 - \\frac{12}{\\varepsilon}"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(\\varepsilon)(10) - (2)(0)}{\\varepsilon}",
+        "power": "s^{2}",
+        "row": 3,
+        "value_latex": "10"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(4 - \\frac{12}{\\varepsilon})(6) - (\\varepsilon)(10)}{4 - \\frac{12}{\\varepsilon}}",
+        "power": "s",
+        "row": 4,
+        "value_latex": "\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(4 - \\frac{12}{\\varepsilon})(0) - (\\varepsilon)(0)}{4 - \\frac{12}{\\varepsilon}}",
+        "power": "s",
+        "row": 4,
+        "value_latex": "0"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)})(10) - (4 - \\frac{12}{\\varepsilon})(0)}{\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}}",
+        "power": "s^{0}",
+        "row": 5,
+        "value_latex": "10"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)})(0) - (4 - \\frac{12}{\\varepsilon})(0)}{\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}}",
+        "power": "s^{0}",
+        "row": 5,
+        "value_latex": "0"
+      }
+    ],
+    "char_poly_latex": "s^{5} + 2 s^{4} + 2 s^{3} + 4 s^{2} + 11 s + 10 = 0",
+    "coeffs_latex": [
+      "1",
+      "2",
+      "2",
+      "4",
+      "11",
+      "10"
+    ],
+    "degree": 5,
+    "exact_roots": [
+      {
+        "imag": 1.4561,
+        "real": 0.895,
+        "str": "0.895 + 1.456j"
+      },
+      {
+        "imag": -1.4561,
+        "real": 0.895,
+        "str": "0.895 - 1.456j"
+      },
+      {
+        "imag": 1.0375,
+        "real": -1.2407,
+        "str": "-1.241 + 1.038j"
+      },
+      {
+        "imag": -1.0375,
+        "real": -1.2407,
+        "str": "-1.241 - 1.038j"
+      },
+      {
+        "imag": 0.0,
+        "real": -1.3087,
+        "str": "-1.309"
+      }
+    ],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "2"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "0",
+        "term_latex": "\\varepsilon"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "-",
+        "term_latex": "4 - \\frac{12}{\\varepsilon}"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "10"
+      }
+    ],
+    "input_str": "s^5 + 2*s^4 + 2*s^3 + 4*s^2 + 11*s + 10",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [],
+      "critical_k": [],
+      "has_k": false,
+      "range_latex": "Não aplicável (sem ganho K variável)"
+    },
+    "plot_image": {
+      "$asset": "assets/c01bfb51f5f11a3fcfe101c17a15ff09c18f0ee85a15dc3516839a19bf6c767c.png",
+      "bytes": 69641,
+      "encoding": "data:image/png;base64",
+      "sha256": "c01bfb51f5f11a3fcfe101c17a15ff09c18f0ee85a15dc3516839a19bf6c767c"
+    },
+    "plot_svg": {
+      "$asset": "assets/72ba976b63d06d40d6a691db0238d652dd378399de4508e03b5b746abc3de310.svg",
+      "bytes": 24324,
+      "encoding": "utf-8",
+      "sha256": "72ba976b63d06d40d6a691db0238d652dd378399de4508e03b5b746abc3de310"
+    },
+    "rhp_poles": 2,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "2",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "11",
+            "sign": ""
+          }
+        ],
+        "power": "s^{5}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "4",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "10",
+            "sign": ""
+          }
+        ],
+        "power": "s^{4}",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "\\varepsilon",
+            "sign": "0"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "6",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{3}",
+        "row_index": 2
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "4 - \\frac{12}{\\varepsilon}",
+            "sign": "-"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "10",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 3
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 4
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "10",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 5
+      }
+    ],
+    "sign_changes": 2,
+    "special_cases": [
+      {
+        "desc": "Primeiro elemento nulo em $s^{3}$. Substituído por termo infinitesimal positivo $\\varepsilon > 0$.",
+        "power": "s^{3}",
+        "type": "zero_first_element"
+      }
+    ],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{5}$.",
+        "power": "s^{5}",
+        "values": [
+          "1",
+          "2",
+          "11"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{4}$.",
+        "power": "s^{4}",
+        "values": [
+          "2",
+          "4",
+          "10"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{3}",
+        "values": [
+          "0",
+          "6",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{2}",
+        "values": [
+          "4 - \\frac{12}{\\varepsilon}",
+          "10",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s",
+        "values": [
+          "\\frac{- \\varepsilon \\left(5 \\varepsilon - 12\\right) - 36}{2 \\left(\\varepsilon - 3\\right)}",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "10",
+          "0",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "Ocorrem 2 troca(s) de sinal na primeira coluna da tabela de Routh, o que indica exatamente 2 polo(s) em malha fechada no semiplano direito (RHP).",
+    "verdict": "Instável"
+  },
+  "preset_id": "Exemplo 6: 5ª Ordem de Alta Complexidade"
+}

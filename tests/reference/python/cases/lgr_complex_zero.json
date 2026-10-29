@@ -1,0 +1,218 @@
+{
+  "id": "lgr_complex_zero",
+  "input": {
+    "action": "calculate",
+    "expr": "(s^2+6s+12)/(s*(s+2)^2)"
+  },
+  "module": "lgr",
+  "output": {
+    "detalhes": {
+      "P": 3,
+      "Z": 2,
+      "angulos_assintotas": [
+        {
+          "graus": 180.0,
+          "k": 0,
+          "rad": 3.141592653589793
+        }
+      ],
+      "angulos_chegada": [
+        {
+          "angulo": 120.0,
+          "zero_str": "-3.00 +1.73j"
+        }
+      ],
+      "angulos_partida": [],
+      "break_points": [
+        {
+          "K": 0.1474746371311787,
+          "s": -0.8505138522259551
+        }
+      ],
+      "centroide": 2.0000000000000018,
+      "jw_cruzamentos": [],
+      "passo_a_passo": {
+        "passo_1_2_3": {
+          "P": 3,
+          "Z": 2,
+          "eq_caracteristica": "1 + K \\, G(s) = 0 \\iff (1.0 s^{3} + 4.0 s^{2} + 4.0 s) + K (1.0 s^{2} + 6.0 s + 12.0) = 0",
+          "eq_fatorada": "G(s) = \\frac{12.0 \\left(0.0833333333333333 s^{2} + 0.5 s + 1.0\\right)}{4.0 s \\left(0.5 s + 1.0\\right)^{2}}",
+          "eq_malha_aberta": "G(s) = \\frac{1.0 s^{2} + 6.0 s + 12.0}{1.0 s^{3} + 4.0 s^{2} + 4.0 s}",
+          "ramos": 3,
+          "segmentos_eixo_real": [
+            {
+              "contagem_direita": 0,
+              "intervalo": "(0, +\\infty)",
+              "motivo": "0 singularidades reais à direita (quantidade par)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 1,
+              "intervalo": "(-2, 0)",
+              "motivo": "1 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            },
+            {
+              "contagem_direita": 2,
+              "intervalo": "(-2, -2)",
+              "motivo": "2 singularidade(s) real(is) à direita (par: fora do LGR)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 3,
+              "intervalo": "(-\\infty, -2)",
+              "motivo": "3 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            }
+          ],
+          "simetria_justificativa": "Como os coeficientes de N(s) e D(s) são estritamente reais, as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        },
+        "passo_4": {
+          "angulos_deduzidos": [
+            {
+              "formula": "\\theta_{0} = \\frac{(2(0) + 1) \\cdot 180^\\circ}{1} = \\frac{180^\\circ}{1} = 180.0^\\circ",
+              "graus": 180.0,
+              "k": 0
+            }
+          ],
+          "formula_angulos": "\\theta_k = \\frac{(2k + 1) \\cdot 180^\\circ}{P - Z}, \\quad k = 0, \\dots, (P - Z - 1)",
+          "formula_centroide": "\\sigma_a = \\frac{\\sum_{i=1}^P p_i - \\sum_{j=1}^Z z_j}{P - Z}",
+          "n_assintotas": 1,
+          "soma_polos_num": -4.0,
+          "soma_zeros_num": -6.000000000000002,
+          "substituicao_centroide": "\\sigma_a = \\frac{(-4) - (-6)}{1} = \\frac{2.00}{1} = 2.000",
+          "tem_assintotas": true
+        },
+        "passo_5": {
+          "condicao": "N'(s)D(s) - N(s)D'(s) = 0",
+          "derivada_D": "3.0 s^{2} + 8.0 s + 4.0",
+          "derivada_N": "2.0 s + 6.0",
+          "formula_derivada": "K(s) = -\\frac{D(s)}{N(s)} \\implies \\frac{dK}{ds} = -\\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0",
+          "polinomio_break": "- 1.0 s^{4} - 12.0 s^{3} - 56.0 s^{2} - 96.0 s - 48.0 = 0",
+          "raizes_analisadas": [
+            {
+              "motivo": "Raiz com parte imaginária (fora do eixo real)",
+              "s_str": "-4.57 ± j2.70",
+              "tipo": "complexa",
+              "valido": false
+            },
+            {
+              "motivo": "Raiz com parte imaginária (fora do eixo real)",
+              "s_str": "-4.57 ± j2.70",
+              "tipo": "complexa",
+              "valido": false
+            },
+            {
+              "K": -0.0,
+              "motivo": "Descartado: $K = -0.00 \\le 0$ (requer ganho positivo)",
+              "s_str": "-2.000",
+              "s_val": -2.0000000000000084,
+              "tipo": "real",
+              "valido": false
+            },
+            {
+              "K": 0.1474746371311787,
+              "motivo": "Ponto de Quebra Válido ($K = 0.15 > 0$ e pertence ao LGR)",
+              "s_str": "-0.851",
+              "s_val": -0.8505138522259551,
+              "tipo": "real",
+              "valido": true
+            }
+          ]
+        },
+        "passo_6": {
+          "cruzamentos": [],
+          "eq_caracteristica": "1.0 K s^{2} + 6.0 K s + 12.0 K + 1.0 s^{3} + 4.0 s^{2} + 4.0 s = 0",
+          "parte_imaginaria_eq": "6.0 K w - 1.0 w^{3} + 4.0 w = 0",
+          "parte_real_eq": "- 1.0 K w^{2} + 12.0 K - 4.0 w^{2} = 0",
+          "substituicao_jw": "s = j\\omega \\implies D(j\\omega) + K N(j\\omega) = 0",
+          "tem_cruzamento": false
+        },
+        "passo_7": {
+          "deducoes_chegada": [
+            {
+              "angulo_final": 120.0,
+              "calculo_substituicao": "\\theta_a = 180^\\circ + (390.0^\\circ) - (90.0^\\circ) = 120.0^\\circ",
+              "formula_aplicada": "\\theta_a = 180^\\circ + \\sum \\phi_p - \\sum \\theta_z",
+              "soma_polos_graus": 390.0,
+              "soma_zeros_graus": 90.0,
+              "termos_polos": [
+                {
+                  "angulo": 120.00000000000001,
+                  "polo_str": "-2.00",
+                  "vetor_str": "-1.00 +1.73j"
+                },
+                {
+                  "angulo": 120.00000000000001,
+                  "polo_str": "-2.00",
+                  "vetor_str": "-1.00 +1.73j"
+                },
+                {
+                  "angulo": 150.0,
+                  "polo_str": "0.00",
+                  "vetor_str": "-3.00 +1.73j"
+                }
+              ],
+              "termos_zeros": [
+                {
+                  "angulo": 90.0,
+                  "vetor_str": "+3.46j",
+                  "zero_str": "-3.00 -1.73j"
+                }
+              ],
+              "zero_str": "-3.00 +1.73j"
+            }
+          ],
+          "deducoes_partida": [],
+          "tem_chegada": true,
+          "tem_partida": false
+        }
+      },
+      "polos": [
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "str": "-2.00"
+        },
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "str": "-2.00"
+        },
+        {
+          "im": 0.0,
+          "re": 0.0,
+          "str": "0.00"
+        }
+      ],
+      "ramos": 3,
+      "zeros": [
+        {
+          "im": 1.7320508075688779,
+          "re": -3.000000000000001,
+          "str": "-3.00 +1.73j"
+        },
+        {
+          "im": -1.7320508075688779,
+          "re": -3.000000000000001,
+          "str": "-3.00 -1.73j"
+        }
+      ]
+    },
+    "image": {
+      "$asset": "assets/ad0769fc261aaa82c4d92f5be5f843894c71012e93760468e93c3bf527b931f8.png",
+      "bytes": 114171,
+      "encoding": "data:image/png;base64",
+      "sha256": "ad0769fc261aaa82c4d92f5be5f843894c71012e93760468e93c3bf527b931f8"
+    },
+    "latex_exp": "G(s) = \\frac{s^{2} + 6 s + 12}{s^{3} + 4 s^{2} + 4 s}",
+    "latex_fac": "G(s) = \\frac{s^{2} + 6 s + 12}{s \\left(s + 2\\right)^{2}}",
+    "success": true,
+    "svg": {
+      "$asset": "assets/7a28781c249e551cbb280a94d8ec4767309333bfa4eca2065831731b34eff128.svg",
+      "bytes": 41047,
+      "encoding": "utf-8",
+      "sha256": "7a28781c249e551cbb280a94d8ec4767309333bfa4eca2065831731b34eff128"
+    }
+  }
+}

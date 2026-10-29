@@ -1,0 +1,14 @@
+{
+  "id": "time_test_improper_system_raises_error_0",
+  "input": {
+    "action": "time_response",
+    "expr": "2s",
+    "points": 250
+  },
+  "module": "time",
+  "output": {
+    "error": "ValueError: A função de transferência deve ser própria (grau do numerador ≤ grau do denominador) para análise temporal.",
+    "success": false
+  },
+  "source": "tests/test_time_response.py:36"
+}

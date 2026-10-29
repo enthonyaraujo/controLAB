@@ -1,0 +1,12 @@
+{
+  "id": "time_invalid_threshold",
+  "input": {
+    "action": "time_response",
+    "settling_threshold": 0.1
+  },
+  "module": "time",
+  "output": {
+    "error": "ValueError: O critério de acomodação deve ser 0,02 ou 0,05.",
+    "success": false
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "preview_empty",
+  "input": {
+    "action": "preview",
+    "expr": ""
+  },
+  "module": "lgr",
+  "output": {
+    "error": "ValueError: A expressão não pode estar vazia.",
+    "success": false
+  }
+}

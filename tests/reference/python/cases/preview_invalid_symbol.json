@@ -1,0 +1,12 @@
+{
+  "id": "preview_invalid_symbol",
+  "input": {
+    "action": "preview",
+    "expr": "unsupported(s)"
+  },
+  "module": "lgr",
+  "output": {
+    "error": "ValueError: A expressão contém símbolos não suportados. Use números, s, parênteses e os operadores +, -, *, / ou ^.",
+    "success": false
+  }
+}

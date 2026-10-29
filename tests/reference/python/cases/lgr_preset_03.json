@@ -1,0 +1,164 @@
+{
+  "id": "lgr_preset_03",
+  "input": {
+    "action": "calculate",
+    "mode": "preset",
+    "preset_key": "Exemplo 4: Sistema com Break-in e Breakaway"
+  },
+  "module": "lgr",
+  "output": {
+    "detalhes": {
+      "P": 2,
+      "Z": 1,
+      "angulos_assintotas": [
+        {
+          "graus": 180.0,
+          "k": 0,
+          "rad": 3.141592653589793
+        }
+      ],
+      "angulos_chegada": [],
+      "angulos_partida": [],
+      "break_points": [
+        {
+          "K": 5.82842712474619,
+          "s": -3.414213562373095
+        },
+        {
+          "K": 0.1715728752538099,
+          "s": -0.585786437626905
+        }
+      ],
+      "centroide": 1.0,
+      "jw_cruzamentos": [],
+      "passo_a_passo": {
+        "passo_1_2_3": {
+          "P": 2,
+          "Z": 1,
+          "eq_caracteristica": "1 + K \\, G(s) = 0 \\iff (1.0 s^{2} + 1.0 s) + K (1.0 s + 2.0) = 0",
+          "eq_fatorada": "G(s) = \\frac{2.0 \\left(0.5 s + 1.0\\right)}{1.0 s \\left(s + 1\\right)}",
+          "eq_malha_aberta": "G(s) = \\frac{1.0 s + 2.0}{1.0 s^{2} + 1.0 s}",
+          "ramos": 2,
+          "segmentos_eixo_real": [
+            {
+              "contagem_direita": 0,
+              "intervalo": "(0, +\\infty)",
+              "motivo": "0 singularidades reais à direita (quantidade par)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 1,
+              "intervalo": "(-1, 0)",
+              "motivo": "1 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            },
+            {
+              "contagem_direita": 2,
+              "intervalo": "(-2, -1)",
+              "motivo": "2 singularidade(s) real(is) à direita (par: fora do LGR)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 3,
+              "intervalo": "(-\\infty, -2)",
+              "motivo": "3 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            }
+          ],
+          "simetria_justificativa": "Como os coeficientes de N(s) e D(s) são estritamente reais, as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        },
+        "passo_4": {
+          "angulos_deduzidos": [
+            {
+              "formula": "\\theta_{0} = \\frac{(2(0) + 1) \\cdot 180^\\circ}{1} = \\frac{180^\\circ}{1} = 180.0^\\circ",
+              "graus": 180.0,
+              "k": 0
+            }
+          ],
+          "formula_angulos": "\\theta_k = \\frac{(2k + 1) \\cdot 180^\\circ}{P - Z}, \\quad k = 0, \\dots, (P - Z - 1)",
+          "formula_centroide": "\\sigma_a = \\frac{\\sum_{i=1}^P p_i - \\sum_{j=1}^Z z_j}{P - Z}",
+          "n_assintotas": 1,
+          "soma_polos_num": -1.0,
+          "soma_zeros_num": -2.0,
+          "substituicao_centroide": "\\sigma_a = \\frac{(-1) - (-2)}{1} = \\frac{1.00}{1} = 1.000",
+          "tem_assintotas": true
+        },
+        "passo_5": {
+          "condicao": "N'(s)D(s) - N(s)D'(s) = 0",
+          "derivada_D": "2.0 s + 1.0",
+          "derivada_N": "1.0",
+          "formula_derivada": "K(s) = -\\frac{D(s)}{N(s)} \\implies \\frac{dK}{ds} = -\\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0",
+          "polinomio_break": "- 1.0 s^{2} - 4.0 s - 2.0 = 0",
+          "raizes_analisadas": [
+            {
+              "K": 5.82842712474619,
+              "motivo": "Ponto de Quebra Válido ($K = 5.83 > 0$ e pertence ao LGR)",
+              "s_str": "-3.414",
+              "s_val": -3.414213562373095,
+              "tipo": "real",
+              "valido": true
+            },
+            {
+              "K": 0.1715728752538099,
+              "motivo": "Ponto de Quebra Válido ($K = 0.17 > 0$ e pertence ao LGR)",
+              "s_str": "-0.586",
+              "s_val": -0.585786437626905,
+              "tipo": "real",
+              "valido": true
+            }
+          ]
+        },
+        "passo_6": {
+          "cruzamentos": [],
+          "eq_caracteristica": "1.0 K s + 2.0 K + 1.0 s^{2} + 1.0 s = 0",
+          "parte_imaginaria_eq": "1.0 K w + 1.0 w = 0",
+          "parte_real_eq": "2.0 K - 1.0 w^{2} = 0",
+          "substituicao_jw": "s = j\\omega \\implies D(j\\omega) + K N(j\\omega) = 0",
+          "tem_cruzamento": false
+        },
+        "passo_7": {
+          "deducoes_chegada": [],
+          "deducoes_partida": [],
+          "tem_chegada": false,
+          "tem_partida": false
+        }
+      },
+      "polos": [
+        {
+          "im": 0.0,
+          "re": -1.0,
+          "str": "-1.00"
+        },
+        {
+          "im": 0.0,
+          "re": 0.0,
+          "str": "0.00"
+        }
+      ],
+      "ramos": 2,
+      "zeros": [
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "str": "-2.00"
+        }
+      ]
+    },
+    "image": {
+      "$asset": "assets/af235e81978dfb91097d309d754d9f5fcd5249e0825f79628244e0ceabb77c4c.png",
+      "bytes": 112250,
+      "encoding": "data:image/png;base64",
+      "sha256": "af235e81978dfb91097d309d754d9f5fcd5249e0825f79628244e0ceabb77c4c"
+    },
+    "latex_exp": "G(s) = \\frac{1.0 s + 2.0}{1.0 s^{2} + 1.0 s}",
+    "latex_fac": "G(s) = \\frac{2.0 \\left(0.5 s + 1.0\\right)}{1.0 s \\left(s + 1\\right)}",
+    "success": true,
+    "svg": {
+      "$asset": "assets/25d0915dce1c7030d79a6ea117f0e4ea71fcb045acd235319512c2aa6879dd7b.svg",
+      "bytes": 35240,
+      "encoding": "utf-8",
+      "sha256": "25d0915dce1c7030d79a6ea117f0e4ea71fcb045acd235319512c2aa6879dd7b"
+    }
+  },
+  "preset_id": "Exemplo 4: Sistema com Break-in e Breakaway"
+}

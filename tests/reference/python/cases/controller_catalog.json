@@ -1,0 +1,99 @@
+{
+  "id": "controller_catalog",
+  "input": {
+    "action": "controller_presets"
+  },
+  "module": "controller",
+  "output": {
+    "presets": [
+      {
+        "controller_type": "lead",
+        "id": "Avanço de Fase — G(s) = 5 / (s(s+1))",
+        "input_type": "step",
+        "mp": 16.0,
+        "plant_expr": "5 / (s * (s + 1))",
+        "settling_criterion": "2",
+        "title": "Avanço de Fase — G(s) = 5 / (s(s+1))",
+        "ts": 2.0,
+        "xi": 0.5
+      },
+      {
+        "controller_type": "lag",
+        "error_reduction_factor": 10.0,
+        "id": "Atraso de Fase — G(s) = 1 / ((s+0.5)(s+2))",
+        "input_type": "step",
+        "lag_gain": 1.0,
+        "lag_pole": 0.01,
+        "plant_expr": "1 / ((s + 0.5) * (s + 2))",
+        "settling_criterion": "2",
+        "title": "Atraso de Fase — G(s) = 1 / ((s+0.5)(s+2))"
+      },
+      {
+        "controller_type": "P",
+        "id": "Proporcional (P) Ex. 1 — G(s) = 1 / (s(s+1)(s+2))",
+        "input_type": "step",
+        "mp": 10.0,
+        "plant_expr": "1 / (s * (s + 1) * (s + 2))",
+        "settling_criterion": "2",
+        "title": "Proporcional (P) Ex. 1 — G(s) = 1 / (s(s+1)(s+2))",
+        "ts": 10.0,
+        "xi": 0.591
+      },
+      {
+        "controller_type": "P",
+        "id": "Proporcional (P) Ex. 2 — G(s) = 1 / ((s+1)(s+5))",
+        "input_type": "step",
+        "mp": 10.0,
+        "plant_expr": "1 / ((s + 1) * (s + 5))",
+        "settling_criterion": "2",
+        "title": "Proporcional (P) Ex. 2 — G(s) = 1 / ((s+1)(s+5))",
+        "ts": 2.0,
+        "xi": 0.591
+      },
+      {
+        "controller_type": "PD",
+        "id": "Proporcional-Derivativo (PD) Ex. 1 — G(s) = 40 / (s(s+2))",
+        "input_type": "step",
+        "mp": 25.0,
+        "plant_expr": "40 / (s * (s + 2))",
+        "settling_criterion": "2",
+        "title": "Proporcional-Derivativo (PD) Ex. 1 — G(s) = 40 / (s(s+2))",
+        "ts": 1.0,
+        "xi": 0.4
+      },
+      {
+        "controller_type": "PD",
+        "id": "Proporcional-Derivativo (PD) Ex. 2 — G(s) = 1 / (s(s+4)(s+6))",
+        "input_type": "step",
+        "plant_expr": "1 / (s * (s + 4) * (s + 6))",
+        "settling_criterion": "2",
+        "title": "Proporcional-Derivativo (PD) Ex. 2 — G(s) = 1 / (s(s+4)(s+6))",
+        "wn": 5.0,
+        "xi": 0.456
+      },
+      {
+        "controller_type": "PI",
+        "id": "Proporcional-Integral (PI) Ex. 1 — G(s) = 10 / ((s+2)(s+5))",
+        "input_type": "step",
+        "mp": 0.63,
+        "plant_expr": "10 / ((s + 2) * (s + 5))",
+        "settling_criterion": "5",
+        "title": "Proporcional-Integral (PI) Ex. 1 — G(s) = 10 / ((s+2)(s+5))",
+        "ts": 1.5,
+        "xi": 0.857
+      },
+      {
+        "controller_type": "PI",
+        "id": "Proporcional-Integral (PI) Ex. 2 — G(s) = 1 / (s(s+4))",
+        "input_type": "ramp",
+        "mp": 10.0,
+        "plant_expr": "1 / (s * (s + 4))",
+        "settling_criterion": "5",
+        "title": "Proporcional-Integral (PI) Ex. 2 — G(s) = 1 / (s(s+4))",
+        "ts": 2.0,
+        "xi": 0.6
+      }
+    ],
+    "success": true
+  }
+}

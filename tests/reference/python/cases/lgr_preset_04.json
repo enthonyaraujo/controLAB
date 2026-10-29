@@ -1,0 +1,228 @@
+{
+  "id": "lgr_preset_04",
+  "input": {
+    "action": "calculate",
+    "mode": "preset",
+    "preset_key": "Exemplo 5: 4ª Ordem com 4 Assíntotas"
+  },
+  "module": "lgr",
+  "output": {
+    "detalhes": {
+      "P": 4,
+      "Z": 0,
+      "angulos_assintotas": [
+        {
+          "graus": 45.0,
+          "k": 0,
+          "rad": 0.7853981633974483
+        },
+        {
+          "graus": 135.0,
+          "k": 1,
+          "rad": 2.356194490192345
+        },
+        {
+          "graus": 225.0,
+          "k": 2,
+          "rad": 3.9269908169872414
+        },
+        {
+          "graus": 315.0,
+          "k": 3,
+          "rad": 5.497787143782138
+        }
+      ],
+      "angulos_chegada": [],
+      "angulos_partida": [],
+      "break_points": [
+        {
+          "K": 1.0000000000000064,
+          "s": -2.618033988749894
+        },
+        {
+          "K": 1.0,
+          "s": -0.3819660112501049
+        }
+      ],
+      "centroide": -1.4999999999999996,
+      "jw_cruzamentos": [
+        {
+          "K": 10.000001708024442,
+          "w": 0.9999999782062934
+        },
+        {
+          "K": 10.000001708024442,
+          "w": -0.9999999782062934
+        }
+      ],
+      "passo_a_passo": {
+        "passo_1_2_3": {
+          "P": 4,
+          "Z": 0,
+          "eq_caracteristica": "1 + K \\, G(s) = 0 \\iff (1.0 s^{4} + 6.0 s^{3} + 11.0 s^{2} + 6.0 s) + K (1.0) = 0",
+          "eq_fatorada": "G(s) = \\frac{1.0}{6.0 s \\left(0.333333333333333 s + 1.0\\right) \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+          "eq_malha_aberta": "G(s) = \\frac{1.0}{1.0 s^{4} + 6.0 s^{3} + 11.0 s^{2} + 6.0 s}",
+          "ramos": 4,
+          "segmentos_eixo_real": [
+            {
+              "contagem_direita": 0,
+              "intervalo": "(0, +\\infty)",
+              "motivo": "0 singularidades reais à direita (quantidade par)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 1,
+              "intervalo": "(-1, 0)",
+              "motivo": "1 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            },
+            {
+              "contagem_direita": 2,
+              "intervalo": "(-2, -1)",
+              "motivo": "2 singularidade(s) real(is) à direita (par: fora do LGR)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 3,
+              "intervalo": "(-3, -2)",
+              "motivo": "3 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            },
+            {
+              "contagem_direita": 4,
+              "intervalo": "(-\\infty, -3)",
+              "motivo": "4 singularidade(s) real(is) à direita (par: fora do LGR)",
+              "pertence": false
+            }
+          ],
+          "simetria_justificativa": "Como os coeficientes de N(s) e D(s) são estritamente reais, as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        },
+        "passo_4": {
+          "angulos_deduzidos": [
+            {
+              "formula": "\\theta_{0} = \\frac{(2(0) + 1) \\cdot 180^\\circ}{4} = \\frac{180^\\circ}{4} = 45.0^\\circ",
+              "graus": 45.0,
+              "k": 0
+            },
+            {
+              "formula": "\\theta_{1} = \\frac{(2(1) + 1) \\cdot 180^\\circ}{4} = \\frac{540^\\circ}{4} = 135.0^\\circ",
+              "graus": 135.0,
+              "k": 1
+            },
+            {
+              "formula": "\\theta_{2} = \\frac{(2(2) + 1) \\cdot 180^\\circ}{4} = \\frac{900^\\circ}{4} = 225.0^\\circ",
+              "graus": 225.0,
+              "k": 2
+            },
+            {
+              "formula": "\\theta_{3} = \\frac{(2(3) + 1) \\cdot 180^\\circ}{4} = \\frac{1260^\\circ}{4} = 315.0^\\circ",
+              "graus": 315.0,
+              "k": 3
+            }
+          ],
+          "formula_angulos": "\\theta_k = \\frac{(2k + 1) \\cdot 180^\\circ}{P - Z}, \\quad k = 0, \\dots, (P - Z - 1)",
+          "formula_centroide": "\\sigma_a = \\frac{\\sum_{i=1}^P p_i - \\sum_{j=1}^Z z_j}{P - Z}",
+          "n_assintotas": 4,
+          "soma_polos_num": -5.999999999999998,
+          "soma_zeros_num": 0.0,
+          "substituicao_centroide": "\\sigma_a = \\frac{(-6) - (0)}{4} = \\frac{-6.00}{4} = -1.500",
+          "tem_assintotas": true
+        },
+        "passo_5": {
+          "condicao": "N'(s)D(s) - N(s)D'(s) = 0",
+          "derivada_D": "4.0 s^{3} + 18.0 s^{2} + 22.0 s + 6.0",
+          "derivada_N": "0",
+          "formula_derivada": "K(s) = -\\frac{D(s)}{N(s)} \\implies \\frac{dK}{ds} = -\\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0",
+          "polinomio_break": "- 4.0 s^{3} - 18.0 s^{2} - 22.0 s - 6.0 = 0",
+          "raizes_analisadas": [
+            {
+              "K": 1.0000000000000064,
+              "motivo": "Ponto de Quebra Válido ($K = 1.00 > 0$ e pertence ao LGR)",
+              "s_str": "-2.618",
+              "s_val": -2.618033988749894,
+              "tipo": "real",
+              "valido": true
+            },
+            {
+              "K": -0.5625000000000002,
+              "motivo": "Descartado: $K = -0.56 \\le 0$ (requer ganho positivo)",
+              "s_str": "-1.500",
+              "s_val": -1.5000000000000007,
+              "tipo": "real",
+              "valido": false
+            },
+            {
+              "K": 1.0,
+              "motivo": "Ponto de Quebra Válido ($K = 1.00 > 0$ e pertence ao LGR)",
+              "s_str": "-0.382",
+              "s_val": -0.3819660112501049,
+              "tipo": "real",
+              "valido": true
+            }
+          ]
+        },
+        "passo_6": {
+          "cruzamentos": [
+            {
+              "K": 10.000001708024442,
+              "K_str": "K_{crit} = 10.00",
+              "s_str": "s = \\pm j1.00",
+              "w": 0.9999999782062934
+            }
+          ],
+          "eq_caracteristica": "1.0 K + 1.0 s^{4} + 6.0 s^{3} + 11.0 s^{2} + 6.0 s = 0",
+          "parte_imaginaria_eq": "- 6.0 w^{3} + 6.0 w = 0",
+          "parte_real_eq": "1.0 K + 1.0 w^{4} - 11.0 w^{2} = 0",
+          "substituicao_jw": "s = j\\omega \\implies D(j\\omega) + K N(j\\omega) = 0",
+          "tem_cruzamento": true
+        },
+        "passo_7": {
+          "deducoes_chegada": [],
+          "deducoes_partida": [],
+          "tem_chegada": false,
+          "tem_partida": false
+        }
+      },
+      "polos": [
+        {
+          "im": 0.0,
+          "re": -3.000000000000001,
+          "str": "-3.00"
+        },
+        {
+          "im": 0.0,
+          "re": -1.999999999999998,
+          "str": "-2.00"
+        },
+        {
+          "im": 0.0,
+          "re": -0.9999999999999996,
+          "str": "-1.00"
+        },
+        {
+          "im": 0.0,
+          "re": 0.0,
+          "str": "0.00"
+        }
+      ],
+      "ramos": 4,
+      "zeros": []
+    },
+    "image": {
+      "$asset": "assets/cc977852a00c22d0184814019bb26ffe89a41abd95acae1b652b2f4b8e03b4bc.png",
+      "bytes": 148308,
+      "encoding": "data:image/png;base64",
+      "sha256": "cc977852a00c22d0184814019bb26ffe89a41abd95acae1b652b2f4b8e03b4bc"
+    },
+    "latex_exp": "G(s) = \\frac{1.0}{1.0 s^{4} + 6.0 s^{3} + 11.0 s^{2} + 6.0 s}",
+    "latex_fac": "G(s) = \\frac{1.0}{6.0 s \\left(0.333333333333333 s + 1.0\\right) \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+    "success": true,
+    "svg": {
+      "$asset": "assets/ddde1bf42d000d3750138095b74e753319b5cfa4764439f88c696e38789f8d62.svg",
+      "bytes": 46669,
+      "encoding": "utf-8",
+      "sha256": "ddde1bf42d000d3750138095b74e753319b5cfa4764439f88c696e38789f8d62"
+    }
+  },
+  "preset_id": "Exemplo 5: 4ª Ordem com 4 Assíntotas"
+}

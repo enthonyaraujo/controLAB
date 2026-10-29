@@ -1,0 +1,227 @@
+{
+  "id": "routh_test_degree_3_with_k_range_0",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s^3 + 3*s^2 + 2*s + K"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(3)(2) - (1)(K)}{3}",
+        "power": "s",
+        "row": 2,
+        "value_latex": "2 - \\frac{K}{3}"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(2 - \\frac{K}{3})(K) - (3)(0)}{2 - \\frac{K}{3}}",
+        "power": "s^{0}",
+        "row": 3,
+        "value_latex": "K"
+      }
+    ],
+    "char_poly_latex": "s^{3} + 3 s^{2} + 2 s + K = 0",
+    "coeffs_latex": [
+      "1",
+      "3",
+      "2",
+      "K"
+    ],
+    "degree": 3,
+    "exact_roots": [],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "3"
+      },
+      {
+        "is_symbolic": true,
+        "sign": "expr",
+        "term_latex": "2 - \\frac{K}{3}"
+      },
+      {
+        "is_symbolic": true,
+        "sign": "expr",
+        "term_latex": "K"
+      }
+    ],
+    "input_str": "s^3 + 3*s^2 + 2*s + K",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [
+        {
+          "inequality_latex": "2 - \\frac{K}{3} > 0",
+          "term_latex": "2 - \\frac{K}{3}"
+        },
+        {
+          "inequality_latex": "K > 0",
+          "term_latex": "K"
+        }
+      ],
+      "critical_k": [
+        {
+          "k_latex": "6",
+          "k_val": 6.0,
+          "omega_latex": "\\omega_{osc} = 1.414 \\text{ rad/s}",
+          "omega_osc": 1.4142
+        }
+      ],
+      "has_k": true,
+      "marginal_cases": [
+        {
+          "k_latex": "K = 6",
+          "k_val": 6.0,
+          "omega_latex": "\\omega_{osc} = 1.414 \\text{ rad/s}",
+          "omega_osc": 1.4142,
+          "poles_latex": "s = \\pm 1.414 j"
+        }
+      ],
+      "marginal_latex": "K = 6 \\; (\\omega_{osc} = 1.414 \\text{ rad/s})",
+      "range_latex": "0 < K < 6",
+      "stable_intervals": [
+        "0 < K < 6"
+      ],
+      "stable_latex": "0 < K < 6",
+      "unstable_intervals": [
+        "K < 0",
+        "K > 6"
+      ],
+      "unstable_latex": "K < 0 \\quad \\text{ou} \\quad K > 6"
+    },
+    "plot_image": {
+      "$asset": "assets/72150c676d505ea04fb917cc326277408696fa73fd0c27345cebb4c0b932fedc.png",
+      "bytes": 73478,
+      "encoding": "data:image/png;base64",
+      "sha256": "72150c676d505ea04fb917cc326277408696fa73fd0c27345cebb4c0b932fedc"
+    },
+    "plot_svg": {
+      "$asset": "assets/f637301111466a79eb2bbe2f6e3270a6550a52d572099cb7c00117ddf84ad467.svg",
+      "bytes": 29562,
+      "encoding": "utf-8",
+      "sha256": "f637301111466a79eb2bbe2f6e3270a6550a52d572099cb7c00117ddf84ad467"
+    },
+    "rhp_poles": 0,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "2",
+            "sign": ""
+          }
+        ],
+        "power": "s^{3}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "3",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "K",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2 - \\frac{K}{3}",
+            "sign": "expr"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 2
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "K",
+            "sign": "expr"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 3
+      }
+    ],
+    "sign_changes": 0,
+    "special_cases": [],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{3}$.",
+        "power": "s^{3}",
+        "values": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{2}$.",
+        "power": "s^{2}",
+        "values": [
+          "3",
+          "K"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s",
+        "values": [
+          "2 - \\frac{K}{3}",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "K",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "A estabilidade depende do ganho escalar K. Consulte a seção de Faixa de K para as desigualdades analíticas.",
+    "verdict": "Dependente de K"
+  },
+  "source": "tests/test_routh_hurwitz.py:52"
+}

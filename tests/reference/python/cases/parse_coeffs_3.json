@@ -1,0 +1,15 @@
+{
+  "id": "parse_coeffs_3",
+  "input": {
+    "action": "__core__",
+    "args": [
+      ""
+    ],
+    "method": "parse_coeffs_str"
+  },
+  "module": "lgr",
+  "output": {
+    "error": "ValueError: A lista de coeficientes não pode estar vazia.",
+    "success": false
+  }
+}

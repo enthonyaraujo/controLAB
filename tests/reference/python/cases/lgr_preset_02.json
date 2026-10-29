@@ -1,0 +1,189 @@
+{
+  "id": "lgr_preset_02",
+  "input": {
+    "action": "calculate",
+    "mode": "preset",
+    "preset_key": "Exemplo 3: Zero de Fase Não-Mínima (Semiplano Direito)"
+  },
+  "module": "lgr",
+  "output": {
+    "detalhes": {
+      "P": 3,
+      "Z": 1,
+      "angulos_assintotas": [
+        {
+          "graus": 90.0,
+          "k": 0,
+          "rad": 1.5707963267948966
+        },
+        {
+          "graus": 270.0,
+          "k": 1,
+          "rad": 4.71238898038469
+        }
+      ],
+      "angulos_chegada": [],
+      "angulos_partida": [],
+      "break_points": [
+        {
+          "K": 0.507177189239316,
+          "s": -2.1135376108773674
+        }
+      ],
+      "centroide": -3.0,
+      "jw_cruzamentos": [],
+      "passo_a_passo": {
+        "passo_1_2_3": {
+          "P": 3,
+          "Z": 1,
+          "eq_caracteristica": "1 + K \\, G(s) = 0 \\iff (1.0 s^{3} + 4.0 s^{2} + 3.0 s) + K (1.0 s - 2.0) = 0",
+          "eq_fatorada": "G(s) = \\frac{2.0 \\left(0.5 s - 1.0\\right)}{3.0 s \\left(0.333333333333333 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+          "eq_malha_aberta": "G(s) = \\frac{1.0 s - 2.0}{1.0 s^{3} + 4.0 s^{2} + 3.0 s}",
+          "ramos": 3,
+          "segmentos_eixo_real": [
+            {
+              "contagem_direita": 0,
+              "intervalo": "(2, +\\infty)",
+              "motivo": "0 singularidades reais à direita (quantidade par)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 1,
+              "intervalo": "(0, 2)",
+              "motivo": "1 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            },
+            {
+              "contagem_direita": 2,
+              "intervalo": "(-1, 0)",
+              "motivo": "2 singularidade(s) real(is) à direita (par: fora do LGR)",
+              "pertence": false
+            },
+            {
+              "contagem_direita": 3,
+              "intervalo": "(-3, -1)",
+              "motivo": "3 singularidade(s) real(is) à direita (ímpar: no LGR)",
+              "pertence": true
+            },
+            {
+              "contagem_direita": 4,
+              "intervalo": "(-\\infty, -3)",
+              "motivo": "4 singularidade(s) real(is) à direita (par: fora do LGR)",
+              "pertence": false
+            }
+          ],
+          "simetria_justificativa": "Como os coeficientes de N(s) e D(s) são estritamente reais, as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        },
+        "passo_4": {
+          "angulos_deduzidos": [
+            {
+              "formula": "\\theta_{0} = \\frac{(2(0) + 1) \\cdot 180^\\circ}{2} = \\frac{180^\\circ}{2} = 90.0^\\circ",
+              "graus": 90.0,
+              "k": 0
+            },
+            {
+              "formula": "\\theta_{1} = \\frac{(2(1) + 1) \\cdot 180^\\circ}{2} = \\frac{540^\\circ}{2} = 270.0^\\circ",
+              "graus": 270.0,
+              "k": 1
+            }
+          ],
+          "formula_angulos": "\\theta_k = \\frac{(2k + 1) \\cdot 180^\\circ}{P - Z}, \\quad k = 0, \\dots, (P - Z - 1)",
+          "formula_centroide": "\\sigma_a = \\frac{\\sum_{i=1}^P p_i - \\sum_{j=1}^Z z_j}{P - Z}",
+          "n_assintotas": 2,
+          "soma_polos_num": -4.0,
+          "soma_zeros_num": 2.0,
+          "substituicao_centroide": "\\sigma_a = \\frac{(-4) - (2)}{2} = \\frac{-6.00}{2} = -3.000",
+          "tem_assintotas": true
+        },
+        "passo_5": {
+          "condicao": "N'(s)D(s) - N(s)D'(s) = 0",
+          "derivada_D": "3.0 s^{2} + 8.0 s + 3.0",
+          "derivada_N": "1.0",
+          "formula_derivada": "K(s) = -\\frac{D(s)}{N(s)} \\implies \\frac{dK}{ds} = -\\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0",
+          "polinomio_break": "- 2.0 s^{3} + 2.0 s^{2} + 16.0 s + 6.0 = 0",
+          "raizes_analisadas": [
+            {
+              "K": -68.24716231142531,
+              "motivo": "Descartado: $K = -68.25 \\le 0$ (requer ganho positivo)",
+              "s_str": "3.517",
+              "s_val": 3.517113231838394,
+              "tipo": "real",
+              "valido": false
+            },
+            {
+              "K": 0.507177189239316,
+              "motivo": "Ponto de Quebra Válido ($K = 0.51 > 0$ e pertence ao LGR)",
+              "s_str": "-2.114",
+              "s_val": -2.1135376108773674,
+              "tipo": "real",
+              "valido": true
+            },
+            {
+              "K": -0.26001487781401034,
+              "motivo": "Descartado: $K = -0.26 \\le 0$ (requer ganho positivo)",
+              "s_str": "-0.404",
+              "s_val": -0.40357562096102856,
+              "tipo": "real",
+              "valido": false
+            }
+          ]
+        },
+        "passo_6": {
+          "cruzamentos": [],
+          "eq_caracteristica": "1.0 K s - 2.0 K + 1.0 s^{3} + 4.0 s^{2} + 3.0 s = 0",
+          "parte_imaginaria_eq": "1.0 K w - 1.0 w^{3} + 3.0 w = 0",
+          "parte_real_eq": "- 2.0 K - 4.0 w^{2} = 0",
+          "substituicao_jw": "s = j\\omega \\implies D(j\\omega) + K N(j\\omega) = 0",
+          "tem_cruzamento": false
+        },
+        "passo_7": {
+          "deducoes_chegada": [],
+          "deducoes_partida": [],
+          "tem_chegada": false,
+          "tem_partida": false
+        }
+      },
+      "polos": [
+        {
+          "im": 0.0,
+          "re": -3.0,
+          "str": "-3.00"
+        },
+        {
+          "im": 0.0,
+          "re": -1.0,
+          "str": "-1.00"
+        },
+        {
+          "im": 0.0,
+          "re": 0.0,
+          "str": "0.00"
+        }
+      ],
+      "ramos": 3,
+      "zeros": [
+        {
+          "im": 0.0,
+          "re": 2.0,
+          "str": "2.00"
+        }
+      ]
+    },
+    "image": {
+      "$asset": "assets/3c5e0e65c4351638806018cb62eea7c0f3ca4eb06d82980400f54810b8431a46.png",
+      "bytes": 100693,
+      "encoding": "data:image/png;base64",
+      "sha256": "3c5e0e65c4351638806018cb62eea7c0f3ca4eb06d82980400f54810b8431a46"
+    },
+    "latex_exp": "G(s) = \\frac{1.0 s - 2.0}{1.0 s^{3} + 4.0 s^{2} + 3.0 s}",
+    "latex_fac": "G(s) = \\frac{2.0 \\left(0.5 s - 1.0\\right)}{3.0 s \\left(0.333333333333333 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+    "success": true,
+    "svg": {
+      "$asset": "assets/babed6d84302efc50b9b33fff113ee11ecc727b6875c27aa477b038d28db5927.svg",
+      "bytes": 33212,
+      "encoding": "utf-8",
+      "sha256": "babed6d84302efc50b9b33fff113ee11ecc727b6875c27aa477b038d28db5927"
+    }
+  },
+  "preset_id": "Exemplo 3: Zero de Fase Não-Mínima (Semiplano Direito)"
+}

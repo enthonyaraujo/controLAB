@@ -1,0 +1,508 @@
+{
+  "id": "routh_test_degree_5_and_high_order_1",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s^6 + s^5 + 5*s^4 + 3*s^3 + 2*s^2 + 8*s + 4"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(1)(5) - (1)(3)}{1}",
+        "power": "s^{4}",
+        "row": 2,
+        "value_latex": "2"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(1)(2) - (1)(8)}{1}",
+        "power": "s^{4}",
+        "row": 2,
+        "value_latex": "-6"
+      },
+      {
+        "col": 2,
+        "formula": "\\frac{(1)(4) - (1)(0)}{1}",
+        "power": "s^{4}",
+        "row": 2,
+        "value_latex": "4"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(2)(3) - (1)(-6)}{2}",
+        "power": "s^{3}",
+        "row": 3,
+        "value_latex": "6"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(2)(8) - (1)(4)}{2}",
+        "power": "s^{3}",
+        "row": 3,
+        "value_latex": "6"
+      },
+      {
+        "col": 2,
+        "formula": "\\frac{(2)(0) - (1)(0)}{2}",
+        "power": "s^{3}",
+        "row": 3,
+        "value_latex": "0"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(6)(-6) - (2)(6)}{6}",
+        "power": "s^{2}",
+        "row": 4,
+        "value_latex": "-8"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(6)(4) - (2)(0)}{6}",
+        "power": "s^{2}",
+        "row": 4,
+        "value_latex": "4"
+      },
+      {
+        "col": 2,
+        "formula": "\\frac{(6)(0) - (2)(0)}{6}",
+        "power": "s^{2}",
+        "row": 4,
+        "value_latex": "0"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(-8)(6) - (6)(4)}{-8}",
+        "power": "s",
+        "row": 5,
+        "value_latex": "9"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(-8)(0) - (6)(0)}{-8}",
+        "power": "s",
+        "row": 5,
+        "value_latex": "0"
+      },
+      {
+        "col": 2,
+        "formula": "\\frac{(-8)(0) - (6)(0)}{-8}",
+        "power": "s",
+        "row": 5,
+        "value_latex": "0"
+      },
+      {
+        "col": 0,
+        "formula": "\\frac{(9)(4) - (-8)(0)}{9}",
+        "power": "s^{0}",
+        "row": 6,
+        "value_latex": "4"
+      },
+      {
+        "col": 1,
+        "formula": "\\frac{(9)(0) - (-8)(0)}{9}",
+        "power": "s^{0}",
+        "row": 6,
+        "value_latex": "0"
+      },
+      {
+        "col": 2,
+        "formula": "\\frac{(9)(0) - (-8)(0)}{9}",
+        "power": "s^{0}",
+        "row": 6,
+        "value_latex": "0"
+      }
+    ],
+    "char_poly_latex": "s^{6} + s^{5} + 5 s^{4} + 3 s^{3} + 2 s^{2} + 8 s + 4 = 0",
+    "coeffs_latex": [
+      "1",
+      "1",
+      "5",
+      "3",
+      "2",
+      "8",
+      "4"
+    ],
+    "degree": 6,
+    "exact_roots": [
+      {
+        "imag": 2.1567,
+        "real": -0.3496,
+        "str": "-0.3496 + 2.157j"
+      },
+      {
+        "imag": -2.1567,
+        "real": -0.3496,
+        "str": "-0.3496 - 2.157j"
+      },
+      {
+        "imag": 1.022,
+        "real": 0.6382,
+        "str": "0.6382 + 1.022j"
+      },
+      {
+        "imag": -1.022,
+        "real": 0.6382,
+        "str": "0.6382 - 1.022j"
+      },
+      {
+        "imag": 0.0,
+        "real": -1.0,
+        "str": "-1"
+      },
+      {
+        "imag": 0.0,
+        "real": -0.5771,
+        "str": "-0.5771"
+      }
+    ],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "2"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "6"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "-",
+        "term_latex": "-8"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "9"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "4"
+      }
+    ],
+    "input_str": "s^6 + s^5 + 5*s^4 + 3*s^3 + 2*s^2 + 8*s + 4",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [],
+      "critical_k": [],
+      "has_k": false,
+      "range_latex": "Não aplicável (sem ganho K variável)"
+    },
+    "plot_image": {
+      "$asset": "assets/5f04a572eca8f50532c75b5941c8a99ba585344fb21464adc612784454050cd6.png",
+      "bytes": 68133,
+      "encoding": "data:image/png;base64",
+      "sha256": "5f04a572eca8f50532c75b5941c8a99ba585344fb21464adc612784454050cd6"
+    },
+    "plot_svg": {
+      "$asset": "assets/61a696cff3733902a5895ddf7b3b60c4e230ab0849f9fa8dd5de549f4ef03e6c.svg",
+      "bytes": 24578,
+      "encoding": "utf-8",
+      "sha256": "61a696cff3733902a5895ddf7b3b60c4e230ab0849f9fa8dd5de549f4ef03e6c"
+    },
+    "rhp_poles": 2,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "5",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "2",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "4",
+            "sign": ""
+          }
+        ],
+        "power": "s^{6}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "3",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "8",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{5}",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "-6",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "4",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{4}",
+        "row_index": 2
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "6",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "6",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{3}",
+        "row_index": 3
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "-8",
+            "sign": "-"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "4",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 4
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "9",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 5
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "4",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 2,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          },
+          {
+            "col": 3,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 6
+      }
+    ],
+    "sign_changes": 2,
+    "special_cases": [],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{6}$.",
+        "power": "s^{6}",
+        "values": [
+          "1",
+          "5",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{5}$.",
+        "power": "s^{5}",
+        "values": [
+          "1",
+          "3",
+          "8",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{4}",
+        "values": [
+          "2",
+          "-6",
+          "4",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{3}",
+        "values": [
+          "6",
+          "6",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{2}",
+        "values": [
+          "-8",
+          "4",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s",
+        "values": [
+          "9",
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "4",
+          "0",
+          "0",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "Ocorrem 2 troca(s) de sinal na primeira coluna da tabela de Routh, o que indica exatamente 2 polo(s) em malha fechada no semiplano direito (RHP).",
+    "verdict": "Instável"
+  },
+  "source": "tests/test_routh_hurwitz.py:99"
+}

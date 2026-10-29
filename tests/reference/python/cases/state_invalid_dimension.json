@@ -1,0 +1,12 @@
+{
+  "id": "state_invalid_dimension",
+  "input": {
+    "A": "[[1,2,3]]",
+    "action": "state_space"
+  },
+  "module": "state_space",
+  "output": {
+    "error": "ValueError: A matriz A deve ser quadrada.",
+    "success": false
+  }
+}

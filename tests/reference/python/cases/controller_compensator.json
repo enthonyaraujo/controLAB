@@ -1,0 +1,14 @@
+{
+  "id": "controller_compensator",
+  "input": {
+    "action": "controller_design",
+    "design_type": "compensator",
+    "plant_expr": "1/(s+1)",
+    "points": 250
+  },
+  "module": "controller",
+  "output": {
+    "error": "ValueError: A condição de fase resultou em um polo p = -10 fora do semiplano esquerdo. Ajuste as especificações ou a posição do zero z.",
+    "success": false
+  }
+}

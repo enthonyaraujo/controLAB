@@ -1,0 +1,148 @@
+{
+  "id": "lgr_preset_05",
+  "input": {
+    "action": "calculate",
+    "mode": "preset",
+    "preset_key": "Exemplo 6: Sistema de 2ª Ordem com Amortecimento"
+  },
+  "module": "lgr",
+  "output": {
+    "detalhes": {
+      "P": 2,
+      "Z": 0,
+      "angulos_assintotas": [
+        {
+          "graus": 90.0,
+          "k": 0,
+          "rad": 1.5707963267948966
+        },
+        {
+          "graus": 270.0,
+          "k": 1,
+          "rad": 4.71238898038469
+        }
+      ],
+      "angulos_chegada": [],
+      "angulos_partida": [
+        {
+          "angulo": 90.0,
+          "polo_str": "-1.00 +2.00j"
+        }
+      ],
+      "break_points": [],
+      "centroide": -1.0,
+      "jw_cruzamentos": [],
+      "passo_a_passo": {
+        "passo_1_2_3": {
+          "P": 2,
+          "Z": 0,
+          "eq_caracteristica": "1 + K \\, G(s) = 0 \\iff (1.0 s^{2} + 2.0 s + 5.0) + K (1.0) = 0",
+          "eq_fatorada": "G(s) = \\frac{1.0}{5.0 \\left(0.2 s^{2} + 0.4 s + 1.0\\right)}",
+          "eq_malha_aberta": "G(s) = \\frac{1.0}{1.0 s^{2} + 2.0 s + 5.0}",
+          "ramos": 2,
+          "segmentos_eixo_real": [],
+          "simetria_justificativa": "Como os coeficientes de N(s) e D(s) são estritamente reais, as raízes complexas de D(s) + K N(s) = 0 ocorrem obrigatoriamente em pares conjugados, garantindo simetria reflexiva ao longo do eixo real."
+        },
+        "passo_4": {
+          "angulos_deduzidos": [
+            {
+              "formula": "\\theta_{0} = \\frac{(2(0) + 1) \\cdot 180^\\circ}{2} = \\frac{180^\\circ}{2} = 90.0^\\circ",
+              "graus": 90.0,
+              "k": 0
+            },
+            {
+              "formula": "\\theta_{1} = \\frac{(2(1) + 1) \\cdot 180^\\circ}{2} = \\frac{540^\\circ}{2} = 270.0^\\circ",
+              "graus": 270.0,
+              "k": 1
+            }
+          ],
+          "formula_angulos": "\\theta_k = \\frac{(2k + 1) \\cdot 180^\\circ}{P - Z}, \\quad k = 0, \\dots, (P - Z - 1)",
+          "formula_centroide": "\\sigma_a = \\frac{\\sum_{i=1}^P p_i - \\sum_{j=1}^Z z_j}{P - Z}",
+          "n_assintotas": 2,
+          "soma_polos_num": -2.0,
+          "soma_zeros_num": 0.0,
+          "substituicao_centroide": "\\sigma_a = \\frac{(-2) - (0)}{2} = \\frac{-2.00}{2} = -1.000",
+          "tem_assintotas": true
+        },
+        "passo_5": {
+          "condicao": "N'(s)D(s) - N(s)D'(s) = 0",
+          "derivada_D": "2.0 s + 2.0",
+          "derivada_N": "0",
+          "formula_derivada": "K(s) = -\\frac{D(s)}{N(s)} \\implies \\frac{dK}{ds} = -\\frac{D'(s)N(s) - D(s)N'(s)}{N(s)^2} = 0",
+          "polinomio_break": "- 2.0 s - 2.0 = 0",
+          "raizes_analisadas": [
+            {
+              "K": -4.0,
+              "motivo": "Descartado: $K = -4.00 \\le 0$ (requer ganho positivo)",
+              "s_str": "-1.000",
+              "s_val": -1.0,
+              "tipo": "real",
+              "valido": false
+            }
+          ]
+        },
+        "passo_6": {
+          "cruzamentos": [],
+          "eq_caracteristica": "1.0 K + 1.0 s^{2} + 2.0 s + 5.0 = 0",
+          "parte_imaginaria_eq": "2.0 w = 0",
+          "parte_real_eq": "1.0 K - 1.0 w^{2} + 5.0 = 0",
+          "substituicao_jw": "s = j\\omega \\implies D(j\\omega) + K N(j\\omega) = 0",
+          "tem_cruzamento": false
+        },
+        "passo_7": {
+          "deducoes_chegada": [],
+          "deducoes_partida": [
+            {
+              "angulo_final": 90.0,
+              "calculo_substituicao": "\\theta_d = 180^\\circ + (0.0^\\circ) - (90.0^\\circ) = 90.0^\\circ",
+              "formula_aplicada": "\\theta_d = 180^\\circ + \\sum \\phi_z - \\sum \\theta_p",
+              "polo_str": "-1.00 +2.00j",
+              "soma_polos_graus": 90.0,
+              "soma_zeros_graus": 0.0,
+              "termos_polos": [
+                {
+                  "angulo": 90.0,
+                  "polo_str": "-1.00 -2.00j",
+                  "vetor_str": "+4.00j"
+                }
+              ],
+              "termos_zeros": []
+            }
+          ],
+          "tem_chegada": false,
+          "tem_partida": true
+        }
+      },
+      "polos": [
+        {
+          "im": 2.0,
+          "re": -1.0,
+          "str": "-1.00 +2.00j"
+        },
+        {
+          "im": -2.0,
+          "re": -1.0,
+          "str": "-1.00 -2.00j"
+        }
+      ],
+      "ramos": 2,
+      "zeros": []
+    },
+    "image": {
+      "$asset": "assets/4b2409fd8024edcdc6d038db520fff91222b018fd5dd01fe2fe59dc77ab6499f.png",
+      "bytes": 86664,
+      "encoding": "data:image/png;base64",
+      "sha256": "4b2409fd8024edcdc6d038db520fff91222b018fd5dd01fe2fe59dc77ab6499f"
+    },
+    "latex_exp": "G(s) = \\frac{1.0}{1.0 s^{2} + 2.0 s + 5.0}",
+    "latex_fac": "G(s) = \\frac{1.0}{5.0 \\left(0.2 s^{2} + 0.4 s + 1.0\\right)}",
+    "success": true,
+    "svg": {
+      "$asset": "assets/2f07b7ffc40b2be2b113eee5e49dab71f6dbdfcb95394934f2259e6237124b84.svg",
+      "bytes": 33991,
+      "encoding": "utf-8",
+      "sha256": "2f07b7ffc40b2be2b113eee5e49dab71f6dbdfcb95394934f2259e6237124b84"
+    }
+  },
+  "preset_id": "Exemplo 6: Sistema de 2ª Ordem com Amortecimento"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "state_space_catalog",
+  "input": {
+    "action": "state_space_presets"
+  },
+  "module": "state_space",
+  "output": {
+    "presets": [
+      {
+        "A": "[[0, 1], [-2, -3]]",
+        "B": "[[0], [1]]",
+        "C": "[[1, 0]]",
+        "D": "[[0]]",
+        "id": "Segunda ordem controlável",
+        "title": "Segunda ordem controlável"
+      },
+      {
+        "A": "[[0, 1], [-4, 0]]",
+        "B": "[[0], [1]]",
+        "C": "[[1, 0]]",
+        "D": "[[0]]",
+        "id": "Oscilador harmônico",
+        "title": "Oscilador harmônico"
+      }
+    ],
+    "success": true
+  }
+}

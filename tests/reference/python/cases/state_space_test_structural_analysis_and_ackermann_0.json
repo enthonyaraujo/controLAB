@@ -1,0 +1,263 @@
+{
+  "id": "state_space_test_structural_analysis_and_ackermann_0",
+  "input": {
+    "A": "[[0, 1], [-2, -3]]",
+    "B": "[[0], [1]]",
+    "C": "[[1, 0]]",
+    "D": "[[0]]",
+    "action": "state_space",
+    "desired_poles": "-4, -5",
+    "observer_poles": "-6, -7"
+  },
+  "module": "state_space",
+  "output": {
+    "description": "Conversão de modelos, testes estruturais, realimentação de estados e observador de ordem plena.",
+    "details": {
+      "A": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          -2.0,
+          -3.0
+        ]
+      ],
+      "B": [
+        [
+          0.0
+        ],
+        [
+          1.0
+        ]
+      ],
+      "C": [
+        [
+          1.0,
+          0.0
+        ]
+      ],
+      "D": [
+        [
+          0.0
+        ]
+      ],
+      "canonical": {
+        "A": [
+          [
+            -3.0,
+            -2.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ],
+        "B": [
+          [
+            1.0
+          ],
+          [
+            0.0
+          ]
+        ],
+        "C": [
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "D": [
+          [
+            0.0
+          ]
+        ],
+        "label": "Canônica controlável",
+        "transformation": [
+          [
+            0.0,
+            1.0
+          ],
+          [
+            1.0,
+            0.0
+          ]
+        ]
+      },
+      "controllability_matrix": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          1.0,
+          -3.0
+        ]
+      ],
+      "controllability_rank": 2,
+      "feedback_poles": [
+        {
+          "im": 0.0,
+          "re": -4.000000000000001,
+          "text": "-4+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -4.999999999999999,
+          "text": "-5+0j"
+        }
+      ],
+      "observability_matrix": [
+        [
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "observability_rank": 2,
+      "observer_error_poles": [
+        {
+          "im": 0.0,
+          "re": -7.000000000000002,
+          "text": "-7+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -5.999999999999998,
+          "text": "-6+0j"
+        }
+      ],
+      "observer_gain": [
+        [
+          10.0
+        ],
+        [
+          10.0
+        ]
+      ],
+      "observer_method": "Ackermann dual — Luenberger",
+      "original_poles": [
+        {
+          "im": 0.0,
+          "re": -1.0,
+          "text": "-1+0j"
+        },
+        {
+          "im": 0.0,
+          "re": -2.0,
+          "text": "-2+0j"
+        }
+      ],
+      "source_latex": null,
+      "source_mode": "matrices",
+      "stable": true,
+      "state_feedback_gain": [
+        [
+          18.0,
+          6.0
+        ]
+      ],
+      "state_feedback_method": "Fórmula de Ackermann",
+      "transfer_function": {
+        "denominator": [
+          1.0,
+          3.0,
+          2.0
+        ],
+        "latex": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}",
+        "latex_expanded": "G(s) = \\frac{1.0}{1.0 s^{2} + 3.0 s + 2.0}",
+        "numerator": [
+          1.0000000000000018
+        ],
+        "siso": true
+      }
+    },
+    "image": {
+      "$asset": "assets/3f2681533df418e7843e8d24514b46face145860e8b5a0675a1fbc2a2cb04aa0.png",
+      "bytes": 57808,
+      "encoding": "data:image/png;base64",
+      "sha256": "3f2681533df418e7843e8d24514b46face145860e8b5a0675a1fbc2a2cb04aa0"
+    },
+    "latex": [
+      {
+        "label": "Modelo",
+        "value": "\\dot{x}=Ax+Bu,\\qquad y=Cx+Du"
+      },
+      {
+        "label": "Controlabilidade",
+        "value": "\\mathcal{C}=[B\\;AB\\;\\cdots\\;A^{n-1}B]"
+      },
+      {
+        "label": "Observabilidade",
+        "value": "\\mathcal{O}=[C^T\\;A^TC^T\\;\\cdots\\;(A^T)^{n-1}C^T]^T"
+      },
+      {
+        "label": "Função de transferência",
+        "value": "\\frac{1.0}{2.0 \\left(0.5 s + 1.0\\right) \\left(1.0 s + 1.0\\right)}"
+      },
+      {
+        "label": "Realimentação de estados",
+        "value": "K=\\left[\\begin{matrix}18.0 & 6.0\\end{matrix}\\right]"
+      },
+      {
+        "label": "Ganho do observador",
+        "value": "L=\\left[\\begin{matrix}10.0\\\\10.0\\end{matrix}\\right]"
+      }
+    ],
+    "metrics": [
+      {
+        "label": "Autovalores de A",
+        "value": "-1; -2"
+      },
+      {
+        "label": "Estabilidade",
+        "value": "Estável"
+      },
+      {
+        "label": "Controlabilidade (posto)",
+        "value": "2 / 2"
+      },
+      {
+        "label": "Observabilidade (posto)",
+        "value": "2 / 2"
+      },
+      {
+        "label": "Forma canônica solicitada",
+        "value": "Canônica controlável"
+      },
+      {
+        "label": "Matrizes canônicas",
+        "value": "Ac=[[-3, -2], [1, 0]], Bc=[1; 0], Cc=[0, 1], Dc=[0]"
+      },
+      {
+        "label": "Ganho K",
+        "value": "[18, 6]"
+      },
+      {
+        "label": "Ganho L",
+        "value": "[10; 10]"
+      },
+      {
+        "label": "Realimentação",
+        "value": "Fórmula de Ackermann"
+      },
+      {
+        "label": "Observador",
+        "value": "Ackermann dual — Luenberger"
+      }
+    ],
+    "module": "state_space",
+    "success": true,
+    "svg": {
+      "$asset": "assets/01affa4f470b1f81df8fc534384f28ae4d94b660944235c050b84d9cae7ccab6.svg",
+      "bytes": 22369,
+      "encoding": "utf-8",
+      "sha256": "01affa4f470b1f81df8fc534384f28ae4d94b660944235c050b84d9cae7ccab6"
+    },
+    "title": "Espaço de Estados"
+  },
+  "source": "tests/test_state_space.py:19"
+}

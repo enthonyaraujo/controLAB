@@ -1,0 +1,15 @@
+{
+  "id": "parse_desired_pole_6",
+  "input": {
+    "action": "__core__",
+    "args": [
+      ""
+    ],
+    "method": "parse_desired_pole"
+  },
+  "module": "controller",
+  "output": {
+    "success": true,
+    "value": null
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "parse_desired_pole_8",
+  "input": {
+    "action": "__core__",
+    "args": [
+      "-1"
+    ],
+    "method": "parse_desired_pole"
+  },
+  "module": "controller",
+  "output": {
+    "error": "ValueError: Polo desejado inválido. Use o formato -Re + Im·j, ex.: -1+1j ou -1+sqrt(3)j.",
+    "success": false
+  }
+}

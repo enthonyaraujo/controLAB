@@ -1,6 +1,6 @@
 [workspace]
-members = ["native", "crates/mscript"]
-default-members = ["native", "crates/mscript"]
+members = ["native", "crates/mscript", "crates/control-engine", "xtask"]
+default-members = ["native", "crates/mscript", "crates/control-engine", "xtask"]
 resolver = "3"
 
 # scripts/set_version.py updates this version, shared by every crate.

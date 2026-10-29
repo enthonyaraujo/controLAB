@@ -1,0 +1,12 @@
+{
+  "id": "controller_invalid_type",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "unknown"
+  },
+  "module": "controller",
+  "output": {
+    "error": "ValueError: Tipo de controlador não suportado: unknown",
+    "success": false
+  }
+}

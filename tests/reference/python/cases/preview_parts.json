@@ -1,0 +1,25 @@
+{
+  "id": "preview_parts",
+  "input": {
+    "action": "preview",
+    "denominator": "s(s+1)(s+4)",
+    "mode": "parts",
+    "numerator": "s+2"
+  },
+  "module": "lgr",
+  "output": {
+    "den": [
+      1.0,
+      5.0,
+      4.0,
+      0.0
+    ],
+    "latex_exp": "G(s) = \\frac{s + 2}{s^{3} + 5 s^{2} + 4 s}",
+    "latex_fac": "G(s) = \\frac{s + 2}{s \\left(s + 1\\right) \\left(s + 4\\right)}",
+    "num": [
+      1.0,
+      2.0
+    ],
+    "success": true
+  }
+}

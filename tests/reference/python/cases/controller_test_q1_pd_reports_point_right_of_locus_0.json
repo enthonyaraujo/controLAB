@@ -1,0 +1,18 @@
+{
+  "id": "controller_test_q1_pd_reports_point_right_of_locus_0",
+  "input": {
+    "action": "controller_design",
+    "controller_type": "PD",
+    "plant_expr": "1/((s+0.2)*(s+0.644))",
+    "points": 200,
+    "primary_freq_spec": "wn",
+    "wn": 0.706,
+    "xi": 0.456
+  },
+  "module": "controller",
+  "output": {
+    "error": "ValueError: A condição de fase exige que o zero do controlador contribua com -16.16°, o que um único elemento real no semiplano esquerdo não consegue. O ponto desejado fica à direita do LGR: use PI ou Atraso de Fase.",
+    "success": false
+  },
+  "source": "tests/test_controller_design.py:377"
+}

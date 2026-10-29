@@ -1,0 +1,16 @@
+{
+  "id": "state_uncontrollable",
+  "input": {
+    "A": "[[-1,0],[0,-2]]",
+    "B": "[[1],[0]]",
+    "C": "[[1,0]]",
+    "D": "[[0]]",
+    "action": "state_space",
+    "desired_poles": "-3,-4"
+  },
+  "module": "state_space",
+  "output": {
+    "error": "ValueError: System not controllable to working precision.",
+    "success": false
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "preview_unknown_mode",
+  "input": {
+    "action": "preview",
+    "mode": "unknown"
+  },
+  "module": "lgr",
+  "output": {
+    "error": "ValueError: Modo desconhecido: unknown",
+    "success": false
+  }
+}

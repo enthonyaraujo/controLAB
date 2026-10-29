@@ -1,0 +1,48 @@
+{
+  "id": "routh_catalog",
+  "input": {
+    "action": "routh_presets"
+  },
+  "module": "routh",
+  "output": {
+    "presets": [
+      {
+        "desc": "Sistema de 3ª ordem em malha fechada. Determina a faixa analítica 0 < K < 6 e ganho crítico K_crit = 6.",
+        "expr": "1 / (s * (s + 1) * (s + 2))",
+        "id": "Exemplo 1: 3ª Ordem com Faixa de Ganho K (Ogata)",
+        "title": "Exemplo 1: 3ª Ordem com Faixa de Ganho K (Ogata)"
+      },
+      {
+        "desc": "Polinômio cúbico sem trocas de sinal na 1ª coluna. Todos os polos no semiplano esquerdo (LHP).",
+        "expr": "s^3 + 6*s^2 + 11*s + 6",
+        "id": "Exemplo 2: 3ª Ordem Estável (Numérico)",
+        "title": "Exemplo 2: 3ª Ordem Estável (Numérico)"
+      },
+      {
+        "desc": "Duas trocas de sinal na primeira coluna (+, +, -, +), indicando 2 polos no semiplano direito.",
+        "expr": "s^3 + s^2 + 2*s + 24",
+        "id": "Exemplo 3: 3ª Ordem Instável (2 Raízes no RHP)",
+        "title": "Exemplo 3: 3ª Ordem Instável (2 Raízes no RHP)"
+      },
+      {
+        "desc": "Elemento zero na linha s², contornado via limite infinitesimal com ε > 0.",
+        "expr": "s^4 + s^3 + 2*s^2 + 2*s + 3",
+        "id": "Exemplo 4: 4ª Ordem com Primeiro Elemento Nulo (Caso ε)",
+        "title": "Exemplo 4: 4ª Ordem com Primeiro Elemento Nulo (Caso ε)"
+      },
+      {
+        "desc": "Linha nula em s¹, gerando polinômio auxiliar A(s) = 2s² + 8 e polos puramente imaginários em ±2j.",
+        "expr": "s^4 + 2*s^3 + 6*s^2 + 8*s + 8",
+        "id": "Exemplo 5: 4ª Ordem com Linha de Zeros (Marginalmente Estável)",
+        "title": "Exemplo 5: 4ª Ordem com Linha de Zeros (Marginalmente Estável)"
+      },
+      {
+        "desc": "Sistema de 5ª ordem com caso especial de elemento nulo e 2 trocas de sinal.",
+        "expr": "s^5 + 2*s^4 + 2*s^3 + 4*s^2 + 11*s + 10",
+        "id": "Exemplo 6: 5ª Ordem de Alta Complexidade",
+        "title": "Exemplo 6: 5ª Ordem de Alta Complexidade"
+      }
+    ],
+    "success": true
+  }
+}

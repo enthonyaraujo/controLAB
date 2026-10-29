@@ -1,0 +1,12 @@
+{
+  "id": "preview_zero_denominator",
+  "input": {
+    "action": "preview",
+    "expr": "1/0"
+  },
+  "module": "lgr",
+  "output": {
+    "error": "TypeError: Cannot convert complex to float",
+    "success": false
+  }
+}

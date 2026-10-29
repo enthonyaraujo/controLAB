@@ -1,0 +1,164 @@
+{
+  "id": "routh_test_degree_1_and_2_2",
+  "input": {
+    "action": "routh_hurwitz",
+    "expr": "s^2 + 3*s + 2"
+  },
+  "module": "routh",
+  "output": {
+    "cell_details": [
+      {
+        "col": 0,
+        "formula": "\\frac{(3)(2) - (1)(0)}{3}",
+        "power": "s^{0}",
+        "row": 2,
+        "value_latex": "2"
+      }
+    ],
+    "char_poly_latex": "s^{2} + 3 s + 2 = 0",
+    "coeffs_latex": [
+      "1",
+      "3",
+      "2"
+    ],
+    "degree": 2,
+    "exact_roots": [
+      {
+        "imag": 0.0,
+        "real": -2.0,
+        "str": "-2"
+      },
+      {
+        "imag": 0.0,
+        "real": -1.0,
+        "str": "-1"
+      }
+    ],
+    "first_col_signs": [
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "1"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "3"
+      },
+      {
+        "is_symbolic": false,
+        "sign": "+",
+        "term_latex": "2"
+      }
+    ],
+    "input_str": "s^2 + 3*s + 2",
+    "is_fraction": false,
+    "k_range": {
+      "conditions": [],
+      "critical_k": [],
+      "has_k": false,
+      "range_latex": "Não aplicável (sem ganho K variável)"
+    },
+    "plot_image": {
+      "$asset": "assets/34dcd98c15c357a96b44044337574f45dea98b87befccf6a8886e7d3b0b764fb.png",
+      "bytes": 56850,
+      "encoding": "data:image/png;base64",
+      "sha256": "34dcd98c15c357a96b44044337574f45dea98b87befccf6a8886e7d3b0b764fb"
+    },
+    "plot_svg": {
+      "$asset": "assets/797016f2474c4ef9fe36ffdd0a9da79ca9a8fb58410b6b544bb271f1e7d3af2b.svg",
+      "bytes": 21569,
+      "encoding": "utf-8",
+      "sha256": "797016f2474c4ef9fe36ffdd0a9da79ca9a8fb58410b6b544bb271f1e7d3af2b"
+    },
+    "rhp_poles": 0,
+    "routh_table": [
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "1",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "2",
+            "sign": ""
+          }
+        ],
+        "power": "s^{2}",
+        "row_index": 0
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "3",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s",
+        "row_index": 1
+      },
+      {
+        "cells": [
+          {
+            "col": 0,
+            "is_first_col": true,
+            "latex": "2",
+            "sign": "+"
+          },
+          {
+            "col": 1,
+            "is_first_col": false,
+            "latex": "0",
+            "sign": ""
+          }
+        ],
+        "power": "s^{0}",
+        "row_index": 2
+      }
+    ],
+    "sign_changes": 0,
+    "special_cases": [],
+    "steps": [
+      {
+        "desc": "Primeira linha formada pelos coeficientes de potências de mesma paridade de $s^{2}$.",
+        "power": "s^{2}",
+        "values": [
+          "1",
+          "2"
+        ]
+      },
+      {
+        "desc": "Segunda linha formada pelos coeficientes de potências alternadas a partir de $s^{1}$.",
+        "power": "s^{1}",
+        "values": [
+          "3",
+          "0"
+        ]
+      },
+      {
+        "desc": "Linha calculada a partir dos determinantes das duas linhas anteriores.",
+        "power": "s^{0}",
+        "values": [
+          "2",
+          "0"
+        ]
+      }
+    ],
+    "success": true,
+    "summary": "Todos os elementos da primeira coluna possuem o mesmo sinal (sem trocas de sinal). O sistema é BIBO estável e todas as raízes situam-se estritamente no semiplano esquerdo (LHP).",
+    "verdict": "Estável"
+  },
+  "source": "tests/test_routh_hurwitz.py:25"
+}

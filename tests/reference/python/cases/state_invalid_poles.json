@@ -1,0 +1,12 @@
+{
+  "id": "state_invalid_poles",
+  "input": {
+    "action": "state_space",
+    "desired_poles": "-1"
+  },
+  "module": "state_space",
+  "output": {
+    "error": "ValueError: A realimentação de estados exige exatamente 2 polos.",
+    "success": false
+  }
+}
