@@ -1,129 +1,95 @@
-# <img src="src/renderer/app-icon.svg" width="24" height="24" align="absmiddle"> <strong>ControLAB — Suíte de Sistemas de Controle</strong>
+# ControLAB — Sistemas de Controle
 
-[English](README.md) | **Português (Brasil)**
+Interface nativa em **Rust + egui/eframe**, engine científica em **Python** e
+interpretador `.m` em **Rust** (`mscript`). O aplicativo não usa navegador,
+Electron, Capacitor, JavaScript, TypeScript, HTML ou CSS.
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Electron](https://img.shields.io/badge/Electron-44.1.0-47848F.svg?logo=electron&logoColor=white)](https://www.electronjs.org/)
-[![KaTeX](https://img.shields.io/badge/KaTeX-Offline%20Math-00d1b2.svg)](https://katex.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Linux%20%7C%20Windows%20%7C%20Web-lightgrey.svg)
+[English](README.md) · [Interface e atalhos](native/README.md) · [Responsividade](docs/validation/native-responsive.md)
 
----
+## Executar no Linux
 
-<p align="center">
-  <a href="docs/screenshots/preview_dark.png">
-    <img src="docs/screenshots/preview_dark.png" alt="Hub principal de módulos do ControLAB v3.1.1" width="100%">
-  </a>
-  <br>
-</p>
-
-<p align="center">
-  <a href="docs/screenshots/preview_white.png">
-    <img src="docs/screenshots/preview_white.png" alt="Hub principal de módulos do ControLAB v3.1.1" width="100%">
-  </a>
-  <br>
-</p>
-
----
-
-## Instalação e Download
-
-Para obter a versão mais recente, acesse a página de [GitHub Releases](https://github.com/enthonyaraujo/controlab/releases) e baixe o pacote correspondente ao seu sistema operacional:
-
-- **Windows:** Instalador independente (`.exe`, NSIS). Instala o aplicativo diretamente no sistema operacional, cria atalhos na Área de Trabalho e no Menu Iniciar e permite a desinstalação nativa pelo Painel de Controle.
-- **Linux:** Pacotes nativos para Debian/Ubuntu (`.deb`), Fedora/Red Hat/openSUSE (`.rpm`) e um pacote universal independente (`.AppImage`).
-- **Android:** Aplicativo nativo compilado como pacote `.apk`, com um motor Python embarcado via Chaquopy, permitindo o funcionamento totalmente offline em smartphones e tablets.
-
----
-
-## Desenvolvimento e Estrutura do Projeto
-
-- `src/python/`: Arquivos-fonte canônicos dos motores matemáticos, utilitários, ponte JSON e servidor web.
-- `src/main/`, `src/preload/` e `src/renderer/`: Aplicativo Electron e interface compartilhada com as versões Web e Android.
-- `android/app/src/main/python/`: Cópias usadas pelo Chaquopy, sincronizadas por `node scripts/sync-mobile.js`. Faça as alterações nos arquivos originais em `src/python/`.
-- `scripts/`: Scripts de execução, sincronização, empacotamento e validação do aplicativo.
-- `tests/`: Testes de Python e do renderer.
-- `docs/test-systembars/`: Evidências da matriz de testes do Android geradas por `scripts/test-systembars-matrix.js`, com os resultados armazenados em `resultado-matriz.json`.
-
-Com as dependências instaladas, execute `npm start` para abrir o Electron, `npm run web` para abrir a versão no navegador ou `npm run web:mobile` para permitir o acesso pela rede local.
-
-Execute `npm test` para rodar as verificações de JavaScript e os testes de Python. O executor `scripts/run-python.js` adiciona `src/python/` ao `PYTHONPATH`, inclusive nos subprocessos dos testes.
-
-Para rodar os testes diretamente no Linux, use:
-
-`PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests`
-
-A CLI de Routh-Hurwitz continua disponível por:
-
-`node scripts/run-python.js src/python/routh_hurwitz.py "s^2 + 3*s + 2"`
-
-Ou:
-
-`./run.sh --cli "s^2 + 3*s + 2"`
-
-As antigas interfaces Streamlit/Tkinter e o iniciador interativo foram removidos.
-
-## Editor e Execução de Scripts .m
-
-A tela inicial oferece um navegador de arquivos, um editor com abas e realce de sintaxe, um console, um workspace de variáveis e a visualização de figuras.
-
-Abra um arquivo `.m` pelo diretório atual ou clicando em **Abrir**. Salve as alterações com **Salvar**. Pressione **F5** para executar o documento ativo.
-
-O console mantém as variáveis durante a mesma sessão. Por exemplo, depois de executar `A=[1 2;3 4];`, digite `det(A)` no console.
-
-**Limpar** remove todas as variáveis da sessão, enquanto **Limpar saída** limpa apenas a saída do console.
-
-Comandos como `plot(x,y)` e `step(G)` geram figuras que podem ser exportadas como arquivos SVG.
-
-A barra de navegação de diretórios oferece os controles **Voltar**, **Avançar**, **Subir um nível** e **Selecionar pasta**, além de opções para atualizar e editar o caminho atual.
-
-Atalhos de teclado:
-
-- **Alt+← / Alt+→:** Volta e avança no histórico de diretórios.
-- **Alt+↑:** Sobe um nível de diretório.
-
-No Electron, a seleção de pastas usa a caixa de diálogo nativa do sistema operacional. Na versão Web, o seletor de pastas navega pelos diretórios expostos pelo backend local.
-
-O motor de execução é uma cópia independente do núcleo Rust do openMAT, localizada em `vendor/openmat/`, com sua licença e procedência documentadas nesse diretório.
-
-O diretório original do projeto openMAT não é necessário para compilar ou executar o ControLAB.
-
-Durante o desenvolvimento, Rust e Cargo são necessários para compilar o motor, além das dependências de Python e Node.js já existentes:
+Requer Rust/Cargo e Python com as bibliotecas científicas de `requirements.txt`.
 
 ```bash
-npm run build:openmat
-npm start
-
-# Ou execute no navegador com o backend local:
-npm run web
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+cargo build --workspace
+cargo run --bin controlab
 ```
 
-A primeira compilação pode precisar baixar as dependências Rust especificadas em `Cargo.lock`. Depois que as dependências estiverem em cache, a compilação offline fica disponível com:
+O workspace gera `controlab`, que já inclui o interpretador `.m`, em `target/debug/`. Para uma
+compilação otimizada, use `cargo build --release --workspace` e
+`cargo run --release --bin controlab`. `--offline` pode ser acrescentado quando
+as dependências Cargo já estiverem no cache. `./run.sh` usa o mesmo fluxo.
 
-`npm run build:openmat -- --offline`
+O Python da `.venv` é detectado automaticamente. `CONTROLAB_PYTHON` seleciona
+outro interpretador.
+Nenhuma dependência é instalada automaticamente pelos scripts do aplicativo.
 
-O executável é gerado em `build/runtime/` e incluído nos pacotes do aplicativo desktop.
+## Funcionalidades
 
-Quem instala as versões pré-compiladas não precisa de Rust.
+- Resposta no tempo, estabilidade/Routh-Hurwitz, lugar das raízes, Bode/Nyquist,
+  controladores e espaço de estados.
+- Studio `.m` com arquivos, editor, console e variáveis persistentes na sessão.
+- Gráficos científicos, fórmulas, memoriais e exportação PNG/SVG.
+- Temas claro/escuro/sistema e layouts de celular, tablet e desktop.
 
-No Windows, feche o aplicativo antes de atualizar um executável que esteja em uso.
+## Pacote Linux independente
 
-### Testes e Validação
+```bash
+.venv/bin/python -m pip install -r requirements-build.txt
+.venv/bin/python scripts/package_native.py --release
+env -u WAYLAND_DISPLAY WINIT_UNIX_BACKEND=x11 .venv/bin/python scripts/validate_native_bundle.py dist/native/controlab --ui
+```
 
-Execute `npm test` para compilar o motor e rodar as verificações de JavaScript e Python.
+A pasta `dist/native/controlab` contém o aplicativo, runtime `.m`, Python e
+bibliotecas científicas. Copie a pasta inteira; somente o binário da interface
+não é uma distribuição completa. A máquina de destino precisa das bibliotecas
+gráficas do Linux e de uma glibc compatível com o sistema usado no build.
 
-Execute `npm run test:studio:browser` para testar o fluxo do editor usando um servidor local isolado e o Chromium já fornecido pelo Puppeteer.
+A saída deve estar vazia para preservar arquivos existentes; `--output` permite
+selecionar outra pasta.
 
-O teste no navegador não instala navegadores adicionais.
+## Instaladores e releases
 
-### Implementação Atual e Limitações
+O GitHub Actions (`.github/workflows/build-all.yml`) compila, testa e anexa como
+artefatos a cada push: `.deb`, `.rpm` e `.AppImage` (runner Ubuntu 24.04, glibc
+2.39+), instalador NSIS por usuário para Windows e APK Android (arm64-v8a). Uma
+tag `vX.Y.Z` aplica essa versão (`scripts/set_version.py`) e publica um GitHub
+Release com todos os arquivos. `native/Cargo.toml` é a fonte única da versão.
 
-Os scripts `.m` rodam no Electron, na versão Web com backend local e no Android.
+A partir de um pacote já gerado, com `dpkg-deb`, `rpmbuild`, `appimagetool` ou
+`makensis` instalados:
 
-No Android, o motor é compilado com o Android NDK para `arm64-v8a` e `x86_64` e incluído no APK como `libcontrolab_runtime.so`, então os scripts rodam totalmente offline. As figuras são exibidas dentro do editor. Os módulos científicos em Python continuam funcionando de forma independente.
+```bash
+python3 scripts/package_installers.py deb rpm appimage   # Linux
+python scripts/package_installers.py nsis                # Windows
+```
 
-O interpretador oferece suporte ao subconjunto da linguagem MATLAB documentado em `vendor/openmat/README.md`.
+Os instaladores ficam em `release/`. Os pacotes Linux instalam em `/opt/controlab`,
+com o comando `controlab`, entrada no menu e ícones. Sem os secrets
+`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` e
+`ANDROID_KEY_PASSWORD`, o APK release é assinado com a chave debug do runner;
+instalar uma build nova sobre outra antiga exige desinstalar antes.
 
-Os scripts são limitados a **1 MiB**, e a execução está sujeita a limites de tempo, carga de trabalho, memória lógica e eventos.
+## Estrutura e validação
 
-As variáveis ficam disponíveis durante a sessão ativa, mas não são restauradas automaticamente depois que o aplicativo é fechado.
+- `native/`: interface Rust, incluindo a ponte JSON dos scripts `.m` (`native/src/scripts.rs`).
+- `src/python/`: engine científica e transporte local por stdin/stdout, sem servidor HTTP.
+- `assets/`: fontes, licenças, ícones e catálogo compartilhados; `manifest.json` registra seus hashes.
+- `crates/mscript/`: interpretador `.m` (arrays, modelos de controle, gráficos e documentos), executado dentro da interface.
+- `scripts/`: empacotamento, versão e verificações em Python; builds Rust pelo Cargo.
+- `packaging/`: entrada de menu Linux, script NSIS do Windows e ícones dos instaladores.
+
+```bash
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all --check
+PYTHONPATH=src/python .venv/bin/python -m unittest discover -s tests
+python3 scripts/check_native_sources.py
+```
+
+O CI executa todos os testes Rust/Python e a verificação da interface no Linux;
+o job Windows valida a engine empacotada e uma instalação silenciosa. O APK é
+gerado no CI, mas não é executado em aparelho. Documentos e capturas da interface
+Electron/Capacitor removida ficam em `docs/history`.

@@ -109,10 +109,8 @@ def register_local_fonts() -> bool:
     if _FONTS_REGISTERED:
         return True
 
-    search_roots = [
-        Path(__file__).resolve().parents[1] / "renderer" / "vendor" / "fonts",
-        Path(__file__).resolve().parent / "vendor" / "fonts",
-    ]
+    from resource_paths import asset_path
+    search_roots = [asset_path('fonts', family) for family in ('ibm-plex-sans', 'jetbrains-mono')]
 
     registered_any = False
     for root in search_roots:

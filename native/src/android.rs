@@ -1,0 +1,120 @@
+//! Android NativeActivity entry point and JNI transport to the canonical Python engine.
+
+use std::{path::PathBuf, sync::OnceLock};
+
+use android_activity::AndroidApp;
+use jni::{
+    JValue, JavaVM, jni_sig, jni_str,
+    objects::{JObject, JString},
+    refs::Global,
+};
+use serde_json::Value;
+
+struct Bridge {
+    vm: JavaVM,
+    // Application survives Activity recreation, and does not retain an obsolete window.
+    application: Global<JObject<'static>>,
+    files_dir: PathBuf,
+}
+
+static BRIDGE: OnceLock<Bridge> = OnceLock::new();
+
+fn initialize(app: &AndroidApp) -> Result<(), String> {
+    if BRIDGE.get().is_some() {
+        return Ok(());
+    }
+    // AndroidApp owns these JNI handles for the lifetime of this entry point.
+    let vm = unsafe { JavaVM::from_raw(app.vm_as_ptr().cast()) };
+    let (application, files_dir) = vm
+        .attach_current_thread(|env| -> jni::errors::Result<_> {
+            let raw_activity = app.activity_as_ptr() as jni::sys::jobject;
+            // Borrow android-activity's global reference; never delete its handle.
+            let activity = unsafe { env.as_cast_raw::<Global<JObject>>(&raw_activity)? };
+            let application = env
+                .call_method(
+                    &activity,
+                    jni_str!("getApplication"),
+                    jni_sig!("()Landroid/app/Application;"),
+                    &[],
+                )?
+                .l()?;
+            let directory = env
+                .call_method(
+                    &application,
+                    jni_str!("getFilesDir"),
+                    jni_sig!("()Ljava/io/File;"),
+                    &[],
+                )?
+                .l()?;
+            let path = env
+                .call_method(
+                    &directory,
+                    jni_str!("getAbsolutePath"),
+                    jni_sig!("()Ljava/lang/String;"),
+                    &[],
+                )?
+                .l()?;
+            let path = env.cast_local::<JString>(path)?.try_to_string(env)?;
+            Ok((env.new_global_ref(application)?, PathBuf::from(path)))
+        })
+        .map_err(|error| format!("Inicialização JNI: {error}"))?;
+    let _ = BRIDGE.set(Bridge {
+        vm,
+        application,
+        files_dir,
+    });
+    Ok(())
+}
+
+/// Persistent private storage, scoped to the app rather than the process environment.
+pub fn config_dir() -> Option<PathBuf> {
+    BRIDGE.get().map(|bridge| bridge.files_dir.join("config"))
+}
+
+/// Default script directory survives cache cleanup and requires no broad storage permission.
+pub fn workspace_dir() -> Option<PathBuf> {
+    BRIDGE
+        .get()
+        .map(|bridge| bridge.files_dir.join("ControLAB"))
+}
+
+/// Dispatch one JSON request on a backend worker, attaching it to Android's JVM.
+/// Each attachment has its own local frame; no JNI local references escape the call.
+pub fn request(payload: &Value) -> Result<Value, String> {
+    let bridge = BRIDGE.get().ok_or("Ponte Android ainda não inicializada")?;
+    let payload = serde_json::to_string(payload).map_err(|error| error.to_string())?;
+    let response = bridge
+        .vm
+        .attach_current_thread(|env| -> jni::errors::Result<String> {
+            let argument = env.new_string(payload)?;
+            let value = env
+                .call_method(
+                    &bridge.application,
+                    jni_str!("dispatchJson"),
+                    jni_sig!("(Ljava/lang/String;)Ljava/lang/String;"),
+                    &[JValue::Object(&argument)],
+                )?
+                .l()?;
+            let result = env.cast_local::<JString>(value)?;
+            result.try_to_string(env)
+        })
+        .map_err(|error| format!("Ponte Python/JNI: {error}"))?;
+    serde_json::from_str(&response).map_err(|error| format!("Resposta Python inválida: {error}"))
+}
+
+/// Entry called by android-activity's NativeActivity glue, independent of a WebView.
+#[unsafe(no_mangle)]
+fn android_main(app: AndroidApp) {
+    if let Err(error) = initialize(&app) {
+        eprintln!("{error}");
+        return;
+    }
+    let options = eframe::NativeOptions {
+        android_app: Some(app),
+        ..Default::default()
+    };
+    if let Err(error) = eframe::run_native("ControLAB", options, Box::new(|cc| Ok(crate::app(cc))))
+    {
+        eprintln!("Interface Android: {error}");
+    }
+}

@@ -1,220 +1,279 @@
-name: Multiplatform Build & Release (Android, Windows, Linux)
+name: Multiplatform Build & Release (Linux, Windows, Android)
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
+    branches: [main, enthony/migrate-rust]
+    tags: ['v*']
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   # =========================================================================
-  # 1. BUILD LINUX (.deb, .rpm, .AppImage)
+  # 1. LINUX (.deb, .rpm, .AppImage)
   # =========================================================================
-  build-linux:
-    name: Build Linux (deb, rpm, AppImage)
-    runs-on: ubuntu-latest
-
+  linux:
+    name: Linux (deb, rpm, AppImage)
+    # The packages require the glibc of this image (2.39) or newer.
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src/python
+      CONTROLAB_PYTHON: python
     steps:
-      - name: Checkout repositório
-        uses: actions/checkout@v4
-
-      - name: Configurar Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Instalar ferramentas do sistema (rpm)
-        run: |
-          sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/*azure*.list || true
-          sudo apt-get update -o Acquire::Retries=3 || true
-          sudo apt-get install -y --no-install-recommends rpm || true
+      - uses: actions/checkout@v5
 
       - name: Sincronizar versão com a Git Tag
         if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 scripts/set_version.py "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Bibliotecas gráficas, display headless e ferramentas de pacote
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          npm version "$TAG_VERSION" --no-git-tag-version --allow-same-version
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libxi-dev libxrandr-dev libgl1-mesa-dev libxkbcommon-dev libwayland-dev \
+            xvfb xauth rpm desktop-file-utils
 
-      - name: Instalar dependências Node e Python
+      - name: Rust stable
         run: |
-          npm ci
-          python -m pip install --upgrade pip uv
-          uv pip install -r requirements.txt -r requirements-build.txt --system
+          rustup update stable
+          rustup default stable
 
-      - name: Testar suíte de integridade
-        run: npm test
+      - uses: Swatinem/rust-cache@v2
 
-      - name: Compilar pacotes Linux (deb, rpm, AppImage)
-        run: npm run package:linux
+      - name: Dependências Python científicas e de build
+        run: python -m pip install -r requirements.txt -r requirements-build.txt
 
-      - name: Salvar artefatos Linux
-        uses: actions/upload-artifact@v4
+      - name: Rejeitar fontes de frontend e Node
+        run: python scripts/check_native_sources.py
+
+      - name: Compilar o workspace nativo
+        run: cargo build --locked --release --workspace
+
+      - name: Testes de regressão Rust e Python
+        run: |
+          cargo test --locked --workspace
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo fmt --all --check
+          python -m unittest discover -s tests
+          desktop-file-validate packaging/linux/controlab.desktop
+
+      - name: Gerar o pacote nativo independente
+        run: python scripts/package_native.py --release --skip-build
+
+      - name: Executar engine e interface empacotadas sem fontes ou Python de desenvolvimento
+        run: xvfb-run -a env LIBGL_ALWAYS_SOFTWARE=1 WINIT_UNIX_BACKEND=x11 python scripts/validate_native_bundle.py dist/native/controlab --ui
+
+      - name: Instalar appimagetool
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/appimagetool" \
+            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$RUNNER_TEMP/appimagetool"
+          echo "APPIMAGETOOL=$RUNNER_TEMP/appimagetool" >> "$GITHUB_ENV"
+
+      - name: Gerar pacotes Linux (deb, rpm, AppImage)
+        env:
+          # Runners have no FUSE: AppImages extract themselves instead of mounting.
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: python scripts/package_installers.py deb rpm appimage --output release
+
+      - name: Verificar pacotes instalados
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: '1'
+        run: |
+          sudo apt-get install -y ./release/ControLAB-*.deb
+          test "$(readlink -f /usr/bin/controlab)" = /opt/controlab/controlab
+          env -u PYTHONPATH python scripts/validate_native_bundle.py /opt/controlab
+          rpm -qpi release/ControLAB-*.rpm
+          rpm -qpR release/ControLAB-*.rpm
+          cd "$RUNNER_TEMP"
+          "$GITHUB_WORKSPACE"/release/ControLAB-*.AppImage --appimage-extract > /dev/null
+          python "$GITHUB_WORKSPACE/scripts/validate_native_bundle.py" squashfs-root/opt/controlab
+
+      - uses: actions/upload-artifact@v4
         with:
           name: ControLAB-Linux
           path: |
-            release/*.AppImage
             release/*.deb
             release/*.rpm
+            release/*.AppImage
           if-no-files-found: error
 
   # =========================================================================
-  # 2. BUILD WINDOWS (Instalador .exe NSIS)
+  # 2. WINDOWS (instalador .exe NSIS)
   # =========================================================================
-  build-windows:
-    name: Build Windows (Instalador .exe NSIS)
+  windows:
+    name: Windows (instalador NSIS)
     runs-on: windows-latest
-
     steps:
-      - name: Checkout repositório
-        uses: actions/checkout@v4
-
-      - name: Configurar Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - uses: actions/checkout@v5
 
       - name: Sincronizar versão com a Git Tag
         if: startsWith(github.ref, 'refs/tags/v')
+        run: python scripts/set_version.py "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Rust stable
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Dependências Python científicas e de build
+        run: python -m pip install -r requirements.txt -r requirements-build.txt
+
+      - name: Compilar o workspace nativo
+        run: cargo build --locked --release --workspace
+
+      - name: Gerar o pacote nativo independente
+        run: python scripts/package_native.py --release --skip-build
+
+      - name: Executar a engine empacotada sem fontes ou Python de desenvolvimento
+        run: python scripts/validate_native_bundle.py dist/native/controlab
+
+      - name: Instalar NSIS
+        run: |
+          if ! command -v makensis > /dev/null; then
+            choco install nsis -y --no-progress
+          fi
+          echo 'C:\Program Files (x86)\NSIS' >> "$GITHUB_PATH"
+
+      - name: Gerar instalador Windows (.exe)
+        run: python scripts/package_installers.py nsis --output release
+
+      - name: Verificar instalação silenciosa
         shell: pwsh
         run: |
-          $tagVersion = $env:GITHUB_REF_NAME.TrimStart('v')
-          npm version $tagVersion --no-git-tag-version --allow-same-version
+          $installer = Get-ChildItem release\ControLAB-*.exe | Select-Object -First 1
+          $target = Join-Path $env:RUNNER_TEMP 'ControLAB'
+          Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$target" -Wait
+          python scripts/validate_native_bundle.py $target
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Start-Process -FilePath (Join-Path $target 'uninstall.exe') -ArgumentList '/S' -Wait
 
-      - name: Instalar dependências Node e Python
-        shell: pwsh
-        run: |
-          npm ci
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r requirements-build.txt
-
-      - name: Compilar instalador Windows (.exe)
-        shell: pwsh
-        run: npm run package:windows
-
-      - name: Salvar artefatos Windows
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: ControLAB-Windows
           path: release/*.exe
           if-no-files-found: error
 
   # =========================================================================
-  # 3. BUILD ANDROID (.apk com Chaquopy)
+  # 3. ANDROID (.apk: interface Rust + Chaquopy)
   # =========================================================================
-  build-android:
-    name: Build Android (APK com Chaquopy)
-    runs-on: ubuntu-latest
-
+  android:
+    name: Android (APK)
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repositório
-        uses: actions/checkout@v4
-
-      - name: Configurar Java 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
-
-      - name: Configurar Python 3.10 (Chaquopy)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Configurar Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
+      - uses: actions/checkout@v5
 
       - name: Sincronizar versão com a Git Tag
         if: startsWith(github.ref, 'refs/tags/v')
+        run: python3 scripts/set_version.py "$GITHUB_REF_NAME"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Python 3.10 (Chaquopy)
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      - name: Rust stable com alvo Android
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          npm version "$TAG_VERSION" --no-git-tag-version --allow-same-version
+          rustup update stable
+          rustup default stable
+          rustup target add aarch64-linux-android
 
-      - name: Instalar dependências Node
-        run: npm ci
+      - uses: Swatinem/rust-cache@v2
+        with:
+          # build_native.py shares this target directory between both Cargo workspaces.
+          workspaces: . -> build/native-android
 
-      - name: Configurar Rust para o motor .m do Android
-        run: rustup target add aarch64-linux-android x86_64-linux-android
-
-      - name: Dar permissão e inicializar Gradle Wrapper com retentativas
+      - name: Chave de assinatura (opcional)
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          chmod +x android/gradlew
-          cd android
-          for i in 1 2 3 4 5; do
-            echo "Tentativa $i de inicializar Gradle Wrapper..."
-            ./gradlew --version && break || sleep 5
-          done
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "::warning::Secret ANDROID_KEYSTORE_BASE64 ausente: APK assinado com a chave debug do runner."
+            exit 0
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          {
+            echo "CONTROLAB_KEYSTORE=$RUNNER_TEMP/release.jks"
+            echo "CONTROLAB_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "CONTROLAB_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+            echo "CONTROLAB_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
+          } >> "$GITHUB_ENV"
 
       - name: Compilar APK Android
-        run: npm run mobile:apk
+        run: |
+          export LGR_ANDROID_PYTHON="$(command -v python)"
+          chmod +x native/android/gradlew
+          native/android/gradlew --project-dir native/android --no-daemon :app:assembleRelease \
+            -PnativeAbis=arm64-v8a -PnativeBuildPython="$LGR_ANDROID_PYTHON"
 
       - name: Renomear APK para distribuição
         run: |
-          mkdir -p release-apk
-          VERSION="${GITHUB_REF_NAME:-v5.0.0}"
-          cp android/app/build/outputs/apk/debug/app-debug.apk "release-apk/ControLAB-${VERSION}-android.apk"
+          VERSION="$(python3 scripts/set_version.py)"
+          mkdir -p release
+          cp native/android/app/build/outputs/apk/release/app-release.apk "release/ControLAB-v${VERSION}-android.apk"
 
-      - name: Salvar artefatos Android (APK)
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: ControLAB-Android-APK
-          path: release-apk/*.apk
+          path: release/*.apk
           if-no-files-found: error
 
   # =========================================================================
-  # 4. CRIAR RELEASE AUTOMÁTICO NO GITHUB (QUANDO CRIADA UMA TAG v*)
+  # 4. RELEASE NO GITHUB (TAGS v*)
   # =========================================================================
   publish-release:
     name: Publicar GitHub Release
-    needs: [build-linux, build-windows, build-android]
+    needs: [linux, windows, android]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
-      - name: Baixar todos os artefatos
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          path: all-releases
+          path: release
+          merge-multiple: true
 
-      - name: Agrupar arquivos
-        run: |
-          mkdir -p dist
-          find all-releases -type f \( -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" -o -name "*.exe" -o -name "*.apk" \) -exec cp {} dist/ \;
-          ls -lh dist/
+      - run: ls -lh release
 
-      - name: Criar ou Atualizar GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
-          name: "${{ github.ref_name }}"
+          name: ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}
-          files: dist/*
+          files: release/*
           generate_release_notes: true

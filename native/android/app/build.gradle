@@ -1,0 +1,112 @@
+plugins {
+    id 'com.android.application'
+    id 'com.chaquo.python'
+}
+
+// Select only installed Rust targets, e.g. -PnativeAbis=arm64-v8a,x86_64.
+def nativeAbis = providers.gradleProperty('nativeAbis').getOrElse('arm64-v8a').split(',').toList()
+def repositoryRoot = rootProject.file('../..')
+def canonicalRequirements = new File(repositoryRoot, 'requirements-android.txt')
+// The workspace Cargo.toml is the single version source (scripts/set_version.py).
+def appVersion = (new File(repositoryRoot, 'Cargo.toml').text =~ /(?m)^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"/)[0]
+def releaseKeystore = System.getenv('CONTROLAB_KEYSTORE')
+def generatedPython = layout.buildDirectory.dir('generated/python')
+def preparePythonAssets = tasks.register('preparePythonAssets', Sync) {
+    description = 'Package canonical fonts and translations for the Python engine'
+    from new File(repositoryRoot, 'assets')
+    into generatedPython.map { it.dir('controlab_assets') }
+}
+
+android {
+    namespace 'br.com.enthony.controlab'
+    compileSdk 36
+    defaultConfig {
+        applicationId 'br.com.enthony.lgrstudio'
+        minSdk 24
+        targetSdk 36
+        versionCode appVersion[1].toInteger() * 10000 + appVersion[2].toInteger() * 100 + appVersion[3].toInteger()
+        versionName "${appVersion[1]}.${appVersion[2]}.${appVersion[3]}"
+        ndk { abiFilters.addAll(nativeAbis) }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    signingConfigs {
+        if (releaseKeystore) {
+            release {
+                storeFile file(releaseKeystore)
+                storePassword System.getenv('CONTROLAB_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('CONTROLAB_KEY_ALIAS')
+                keyPassword System.getenv('CONTROLAB_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            // Without a release key the APK is still installable, signed with the debug key.
+            signingConfig releaseKeystore ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+    sourceSets {
+        debug.jniLibs.srcDir layout.buildDirectory.dir('generated/native/debug')
+        release.jniLibs.srcDir layout.buildDirectory.dir('generated/native/release')
+    }
+}
+
+chaquopy {
+    defaultConfig {
+        version '3.10'
+        // Formula rendering needs font paths on the filesystem. Importing this
+        // package extracts its data files before resource_paths resolves them.
+        extractPackages 'controlab_assets'
+        def buildPythonPath = System.getenv('LGR_ANDROID_PYTHON')
+        if (buildPythonPath) { buildPython buildPythonPath }
+        pip { install '-r', canonicalRequirements.absolutePath }
+    }
+    sourceSets {
+        main {
+            srcDirs = [new File(repositoryRoot, 'src/python').absolutePath,
+                       generatedPython.get().asFile.absolutePath]
+        }
+    }
+}
+
+['debug', 'release'].each { variant ->
+    def capitalized = variant.capitalize()
+    def compileTask = tasks.register("compileNative${capitalized}", Exec) {
+        group = 'build'
+        description = "Build the Rust UI and .m interpreter for ${variant}"
+        workingDir rootProject.projectDir
+        def output = layout.buildDirectory.dir("generated/native/${variant}")
+        inputs.files(fileTree(new File(repositoryRoot, 'native')) {
+            include '**/*.rs', '**/Cargo.toml', 'modules.json'
+            exclude 'android/**', '**/target/**'
+        })
+        inputs.files(new File(repositoryRoot, 'Cargo.toml'), new File(repositoryRoot, 'Cargo.lock'))
+        inputs.files(fileTree(new File(repositoryRoot, 'assets')))
+        inputs.files(fileTree(new File(repositoryRoot, 'crates')) {
+            include '**/*.rs', '**/Cargo.toml'
+            exclude '**/target/**'
+        })
+        inputs.file rootProject.file('build_native.py')
+        inputs.property('abis', nativeAbis.join(','))
+        inputs.property('variant', variant)
+        outputs.dir output
+        commandLine providers.gradleProperty('nativeBuildPython').getOrElse('python3'),
+            rootProject.file('build_native.py'), '--abis', nativeAbis.join(','),
+            '--profile', variant, '--output', output.get().asFile.absolutePath
+        if (providers.gradleProperty('nativeOffline').getOrElse('false').toBoolean()) {
+            args '--offline'
+        }
+    }
+    tasks.configureEach {
+        if (name == "pre${capitalized}Build") { dependsOn compileTask }
+    }
+}
+
+// Chaquopy consumes generated Python sources while merging each variant.
+tasks.configureEach {
+    if (name ==~ /merge.*PythonSources/) { dependsOn preparePythonAssets }
+}

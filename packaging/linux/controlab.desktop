@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=ControLAB
+GenericName=Control Systems Engineering
+GenericName[pt_BR]=Engenharia de Sistemas de Controle
+Comment=Interactive suite for control systems engineering
+Comment[pt_BR]=Suíte interativa e didática de Engenharia e Sistemas de Controle
+Exec=controlab
+Icon=controlab
+Terminal=false
+Categories=Education;Engineering;
+Keywords=control;root locus;lgr;routh;bode;pid;state space;
+StartupWMClass=controlab

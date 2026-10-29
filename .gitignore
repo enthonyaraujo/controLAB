@@ -2,17 +2,14 @@
 __pycache__/
 *.py[cod]
 
-node_modules/
-npm-debug.log*
-
 graphify-out/
 .pytest_cache/
 .coverage
 htmlcov/
 
+# Build outputs (Cargo/PyInstaller/Android/packaging)
+/build/
 dist/
-build/python/
-build/pyinstaller/
 release/
 release-apk/
 *.AppImage
@@ -24,24 +21,20 @@ release-apk/
 *.apk
 *.aab
 
-# Android & Gradle
+# Gradle da integração Android nativa
 .gradle/
-android/.gradle/
-android/build/
-android/app/build/
-android/app/src/main/assets/
-android/capacitor-cordova-android-plugins/
 
 .DS_Store
 Thumbs.db
 .agents/
 
-# Motor .m compilado (fontes em vendor/openmat)
-build/openmat/
-build/runtime/
-build/openmat-android/
-android/app/src/main/jniLibs/
-vendor/openmat/target/
-
 # Configuração local do Claude Code
 .claude/
+
+# Interface nativa Rust
+native/android/.gradle/
+native/android/app/build/
+native/android/app/src/main/jniLibs/
+
+# Cargo workspace
+/target/
