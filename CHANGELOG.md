@@ -3,7 +3,7 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Não publicado]
+## [6.0.1] - 2026-10-29
 
 ### Corrigido
 - **Android:** a interface deixa de ficar sob a barra de status, a barra de navegação (gestos ou 3 botões), o recorte da câmera e o teclado virtual. A janela continua edge-to-edge (targetSdk 36): só os fundos do cabeçalho, da navegação e das laterais se estendem até as bordas, e os ícones das barras do sistema acompanham o contraste dessas cores. O desktop não muda.

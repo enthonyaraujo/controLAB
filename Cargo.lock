@@ -341,7 +341,7 @@ dependencies = [
 
 [[package]]
 name = "controlab-native"
-version = "6.0.0"
+version = "6.0.1"
 dependencies = [
  "android-activity",
  "base64",
@@ -1275,7 +1275,7 @@ dependencies = [
 
 [[package]]
 name = "mscript"
-version = "6.0.0"
+version = "6.0.1"
 
 [[package]]
 name = "naga"
