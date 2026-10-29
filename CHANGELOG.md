@@ -3,7 +3,7 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Não lançado]
+## [6.0.0] - 2026-10-28
 
 ### Alterado
 - **Interface nativa em Rust:** a interface Electron/Capacitor foi substituída por um aplicativo Rust (egui/eframe) para Linux, Windows e Android, sem navegador, WebView, HTML, CSS ou JavaScript. A identidade visual (IBM Plex Sans, JetBrains Mono, ícones, abas, ribbons, painéis, Studio `.m`, temas e escala) foi preservada.

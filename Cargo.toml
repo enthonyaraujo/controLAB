@@ -5,6 +5,6 @@ resolver = "3"
 
 # scripts/set_version.py updates this version, shared by every crate.
 [workspace.package]
-version = "5.0.0"
+version = "6.0.0"
 license = "MIT"
 edition = "2024"
