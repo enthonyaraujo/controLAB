@@ -505,7 +505,7 @@ dependencies = [
 
 [[package]]
 name = "blocklab-core"
-version = "6.1.0"
+version = "6.2.0"
 dependencies = [
  "num-bigint",
  "num-integer",
@@ -519,7 +519,7 @@ dependencies = [
 
 [[package]]
 name = "blocklab-gui"
-version = "6.1.0"
+version = "6.2.0"
 dependencies = [
  "blocklab-core",
  "eframe",
@@ -735,7 +735,7 @@ dependencies = [
 
 [[package]]
 name = "controlab-engine"
-version = "6.1.0"
+version = "6.2.0"
 dependencies = [
  "base64",
  "latex-rust",
@@ -753,7 +753,7 @@ dependencies = [
 
 [[package]]
 name = "controlab-native"
-version = "6.1.0"
+version = "6.2.0"
 dependencies = [
  "android-activity",
  "base64",
@@ -1963,7 +1963,7 @@ dependencies = [
 
 [[package]]
 name = "mscript"
-version = "6.1.0"
+version = "6.2.0"
 
 [[package]]
 name = "naga"
@@ -4635,7 +4635,7 @@ checksum = "ec7a2a501ed189703dba8b08142f057e887dfc4b2cc4db2d343ac6376ba3e0b9"
 
 [[package]]
 name = "xtask"
-version = "6.1.0"
+version = "6.2.0"
 dependencies = [
  "base64",
  "controlab-engine",

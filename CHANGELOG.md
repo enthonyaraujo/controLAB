@@ -3,6 +3,12 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [6.2.0] - 2026-10-30
+
+- **Iterface:** Alteração na palheta de cor do modo dark;
+- **Diagrama de Blocos:** Adicção de uma novo App para fazer redução de diagrama de blocos.
+
+
 ## [6.1.0] - 2026-10-29
 
 ### Alterado

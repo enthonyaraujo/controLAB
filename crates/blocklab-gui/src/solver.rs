@@ -106,6 +106,14 @@ impl Solver {
     }
 }
 
+impl Drop for Solver {
+    fn drop(&mut self) {
+        if let Some(token) = &self.running {
+            token.cancel();
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -152,13 +160,5 @@ mod tests {
         s.request(&examples::series(), || {});
         s.request(&examples::parallel(), || {});
         assert_eq!(wait(&mut s).unwrap().transfer.to_string(), "G1 + G2");
-    }
-}
-
-impl Drop for Solver {
-    fn drop(&mut self) {
-        if let Some(token) = &self.running {
-            token.cancel();
-        }
     }
 }

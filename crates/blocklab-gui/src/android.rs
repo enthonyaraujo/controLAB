@@ -17,7 +17,7 @@ use crate::{android_insets, app, files, prefs};
 // código inseguro acusa). O outro ponto liberado é a JNI de
 // `android_insets`.
 #[allow(unsafe_code)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn android_main(android: AndroidApp) {
     if let Some(dir) = android
         .external_data_path()
