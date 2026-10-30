@@ -5,7 +5,7 @@ resolver = "3"
 
 # `cargo xtask version` updates this version, shared by every crate.
 [workspace.package]
-version = "6.2.0"
+version = "1.0.0"
 license = "MIT"
 edition = "2024"
 
