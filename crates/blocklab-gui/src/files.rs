@@ -109,7 +109,7 @@ pub fn pick_save(_title: &str, _filter: &str, ext: &str, suggested: &str) -> Opt
 pub fn pick_open() -> Option<PathBuf> {
     rfd::FileDialog::new()
         .set_title("Abrir diagrama")
-        .add_filter("Diagrama BlockLab (JSON)", &["json"])
+        .add_filter("Diagrama ControLAB (JSON)", &["json"])
         .pick_file()
 }
 

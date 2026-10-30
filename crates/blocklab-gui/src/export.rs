@@ -84,7 +84,7 @@ pub fn to_svg(d: &Diagram) -> String {
         w = b.width(),
         h = b.height()
     );
-    let _ = writeln!(out, "  <!-- Gerado pelo BlockLab -->");
+    let _ = writeln!(out, "  <!-- Gerado pelo ControLAB -->");
     let _ = writeln!(
         out,
         r#"  <rect x="{:.1}" y="{:.1}" width="{:.1}" height="{:.1}" fill="{BACKGROUND}"/>"#,

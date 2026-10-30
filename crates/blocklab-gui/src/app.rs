@@ -156,9 +156,6 @@ pub struct App {
     /// Véu escuro atrás das barras do sistema (Android abaixo da API 30 no
     /// tema claro, onde os ícones das barras não podem ficar escuros).
     pub bar_scrim: bool,
-    /// Lê os recuos do Android e acerta a cor dos ícones das barras.
-    #[cfg(target_os = "android")]
-    pub insets: Option<crate::android_insets::Tracker>,
     /// Recuos simulados no computador (`--safe-area`, para capturas).
     pub simulated_safe_area: Option<SafeArea>,
     frame: u64,
@@ -218,8 +215,6 @@ impl App {
             browse: None,
             safe_area: SafeArea::default(),
             bar_scrim: false,
-            #[cfg(target_os = "android")]
-            insets: None,
             simulated_safe_area: None,
             frame: 0,
         }
@@ -746,12 +741,6 @@ impl eframe::App for App {
     /// Entrega ao egui a área segura do Android: daí em diante a `Ui` raiz,
     /// os painéis, menus e diálogos ficam dentro de `ctx.content_rect()`.
     fn raw_input_hook(&mut self, _ctx: &egui::Context, _raw_input: &mut egui::RawInput) {
-        #[cfg(target_os = "android")]
-        if let Some(tracker) = &mut self.insets {
-            self.safe_area = tracker.update(_ctx, _raw_input);
-            self.bar_scrim = tracker.legacy_bars && _ctx.theme() == egui::Theme::Light;
-            _raw_input.safe_area_insets = Some(self.safe_area.to_egui());
-        }
         if let Some(simulated) = self.simulated_safe_area {
             self.safe_area = simulated;
             _raw_input.safe_area_insets = Some(simulated.to_egui());

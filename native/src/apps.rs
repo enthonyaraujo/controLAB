@@ -137,6 +137,7 @@ impl Controlab {
                         if app_card(ui, p, rect, id, *icon, title, desc).clicked() {
                             if *id == "block-diagram" {
                                 self.block_open = true;
+                                #[cfg(not(target_os = "android"))]
                                 ui.ctx().send_viewport_cmd_to(
                                     egui::ViewportId::from_hash_of("block-diagram"),
                                     egui::ViewportCommand::Focus,

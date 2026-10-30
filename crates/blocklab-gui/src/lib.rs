@@ -1,8 +1,4 @@
-//! BlockLab: a interface (eframe/egui) como biblioteca.
-//!
-//! No computador quem a usa é o executável (`src/main.rs`, com a linha de
-//! comando); no Android, o APK carrega esta biblioteca e chama
-//! `android_main` (`src/android.rs`).
+//! Interface gráfica (eframe/egui) do módulo Diagrama de Blocos do ControLAB.
 
 pub mod app;
 mod canvas;
@@ -26,11 +22,6 @@ pub mod safe_area;
 mod solver;
 pub mod theme;
 mod view;
-
-#[cfg(all(target_os = "android", feature = "standalone-apk"))]
-mod android;
-#[cfg(target_os = "android")]
-pub mod android_insets;
 
 #[cfg(test)]
 mod ui_tests;

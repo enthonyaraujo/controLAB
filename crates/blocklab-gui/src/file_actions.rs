@@ -98,6 +98,7 @@ impl App {
         match action {
             Pending::Close => {
                 self.allow_close = true;
+                #[cfg(not(target_os = "android"))]
                 ctx.send_viewport_cmd(ViewportCommand::Close);
             }
             Pending::New => self.reset(Diagram::new(), None),
@@ -229,10 +230,13 @@ impl App {
             self.request(ctx, Pending::Open(Some(p)));
         }
 
-        let title = self.window_title();
-        if title != self.title {
-            ctx.send_viewport_cmd(ViewportCommand::Title(title.clone()));
-            self.title = title;
+        #[cfg(not(target_os = "android"))]
+        {
+            let title = self.window_title();
+            if title != self.title {
+                ctx.send_viewport_cmd(ViewportCommand::Title(title.clone()));
+                self.title = title;
+            }
         }
     }
 

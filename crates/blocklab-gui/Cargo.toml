@@ -1,7 +1,7 @@
 [package]
 autobins = false
 name = "blocklab-gui"
-description = "Interface gráfica do BlockLab (eframe/egui)"
+description = "Interface gráfica do Diagrama de Blocos do ControLAB (eframe/egui)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,15 +9,9 @@ license.workspace = true
 [lints]
 workspace = true
 
-# A interface é uma biblioteca: o executável de computador (src/main.rs)
-# a usa, e no Android ela vira a `libblocklab_gui.so` que o APK carrega
-# (src/android.rs).
 [lib]
 name = "blocklab_gui"
-crate-type = ["lib", "cdylib"]
-
-[features]
-standalone-apk = []
+crate-type = ["lib"]
 
 
 
@@ -60,26 +54,3 @@ winit = { version = "0.30.13", default-features = false, features = [
 
 [dev-dependencies]
 egui_kittest = { version = "0.36", features = ["eframe"] }
-
-# Empacotamento com android/build-apk.sh (cargo-apk; ver README).
-[package.metadata.android]
-package = "io.github.blocklab"
-apk_name = "blocklab"
-build_targets = ["aarch64-linux-android"]
-# Ícone do inicializador (gerado a partir de src/icon.rs).
-resources = "android/res"
-
-[package.metadata.android.sdk]
-min_sdk_version = 26
-target_sdk_version = 34
-
-[package.metadata.android.application]
-label = "BlockLab"
-icon = "@mipmap/ic_launcher"
-theme = "@android:style/Theme.DeviceDefault.NoActionBar"
-
-[package.metadata.android.application.activity]
-# Girar a tela ou abrir o teclado não recria a atividade (o egui só
-# redimensiona).
-config_changes = "orientation|screenSize|screenLayout|keyboardHidden|keyboard|navigation|density|uiMode"
-launch_mode = "singleTask"

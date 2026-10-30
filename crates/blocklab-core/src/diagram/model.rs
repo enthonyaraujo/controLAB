@@ -196,7 +196,7 @@ pub enum LoadError {
     #[error("JSON inválido: {0}")]
     Json(#[from] serde_json::Error),
     #[error(
-        "o arquivo é da versão {found} do formato, e este BlockLab só lê até a \
+        "o arquivo é da versão {found} do formato, e esta versão do ControLAB só lê até a \
          versão {supported}; atualize o programa"
     )]
     NewerVersion { found: u32, supported: u32 },

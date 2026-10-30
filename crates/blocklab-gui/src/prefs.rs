@@ -92,7 +92,11 @@ pub fn default_path() -> Option<PathBuf> {
     } else {
         env("XDG_CONFIG_HOME").or_else(|| env("HOME").map(|h| h.join(".config")))
     }?;
-    Some(base.join("blocklab").join("preferencias.txt"))
+    Some(
+        base.join("controlab-native")
+            .join("diagrams")
+            .join("preferences.txt"),
+    )
 }
 
 #[cfg(test)]

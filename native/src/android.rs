@@ -86,6 +86,9 @@ fn android_main(app: AndroidApp) {
         eprintln!("{error}");
         return;
     }
+    if let Some(dir) = workspace_dir() {
+        blocklab_gui::files::set_data_dir(dir.join("diagrams"));
+    }
     insets::attach(&app);
     let options = eframe::NativeOptions {
         android_app: Some(app),

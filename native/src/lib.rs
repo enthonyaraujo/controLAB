@@ -1254,7 +1254,12 @@ impl eframe::App for Controlab {
                 self.pick(None, "open");
             }
         }
+        #[cfg(not(target_os = "android"))]
         self.frame(ui);
+        #[cfg(target_os = "android")]
+        if !self.block_open {
+            self.frame(ui);
+        }
         if ctx.input(|i| i.viewport().close_requested())
             && !self.allow_close
             && let Some(editor) = self.block_editor.as_mut().filter(|e| e.is_dirty())
@@ -1273,9 +1278,7 @@ impl eframe::App for Controlab {
                     blocklab_core::format::Mode::Symbolic,
                 );
                 app.show_home();
-                if let Some(path) =
-                    dirs::config_dir().map(|p| p.join("controlab-native/diagrams/preferences.txt"))
-                {
+                if let Some(path) = diagram_preferences_path() {
                     app.prefs = blocklab_gui::prefs::Prefs::load(&path);
                     app.prefs_path = Some(path);
                 }
@@ -1292,27 +1295,50 @@ impl eframe::App for Controlab {
                 }
                 app
             });
-            let mut closed = false;
-            ctx.show_viewport_immediate(
-                egui::ViewportId::from_hash_of("block-diagram"),
-                egui::ViewportBuilder::default()
-                    .with_title("controLAB — Diagrama de Blocos")
-                    .with_inner_size([1100.0, 760.0]),
-                |ctx, _| {
-                    egui::CentralPanel::default().show(ctx, |ui| {
-                        eframe::App::ui(editor, ui, _frame);
-                    });
-                    closed = editor.allow_close
-                        || ctx.input(|i| i.viewport().close_requested())
-                            && (!editor.is_dirty() || editor.allow_close);
-                },
-            );
+            #[cfg(target_os = "android")]
+            let closed = {
+                self.zoom = 1.0;
+                if (ctx.zoom_factor() - 1.0).abs() > 0.001 {
+                    ctx.set_zoom_factor(1.0);
+                    ctx.request_repaint();
+                }
+                editor.safe_area = blocklab_gui::safe_area::SafeArea {
+                    top: self.safe_area.top,
+                    bottom: self.safe_area.bottom.max(self.safe_area.ime),
+                    left: self.safe_area.left,
+                    right: self.safe_area.right,
+                };
+                eframe::App::ui(editor, ui, _frame);
+                let surface = blocklab_gui::theme::tokens(ui.visuals()).surface;
+                self.insets.bar_icons(surface, surface);
+                editor.allow_close
+            };
+            #[cfg(not(target_os = "android"))]
+            let closed = {
+                let mut closed = false;
+                ctx.show_viewport_immediate(
+                    egui::ViewportId::from_hash_of("block-diagram"),
+                    egui::ViewportBuilder::default()
+                        .with_title("controLAB — Diagrama de Blocos")
+                        .with_inner_size([1100.0, 760.0]),
+                    |ctx, _| {
+                        egui::CentralPanel::default().show(ctx, |ui| {
+                            eframe::App::ui(editor, ui, _frame);
+                        });
+                        closed = editor.allow_close
+                            || ctx.input(|i| i.viewport().close_requested())
+                                && (!editor.is_dirty() || editor.allow_close);
+                    },
+                );
+                closed
+            };
             if !closed && self.block_exit_requested && editor.pending.is_none() {
                 self.block_exit_requested = false;
             }
             if closed {
                 self.block_open = false;
                 self.block_editor = None;
+                self.apply_theme(&ctx);
                 if self.block_exit_requested {
                     self.block_exit_requested = false;
                     ctx.send_viewport_cmd(egui::ViewportCommand::Close);
@@ -1414,6 +1440,17 @@ fn preferences_path() -> Option<std::path::PathBuf> {
     #[cfg(not(target_os = "android"))]
     {
         dirs::config_dir().map(|p| p.join("controlab-native/preferences.json"))
+    }
+}
+
+fn diagram_preferences_path() -> Option<std::path::PathBuf> {
+    #[cfg(target_os = "android")]
+    {
+        android::config_dir().map(|p| p.join("diagrams/preferences.txt"))
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        dirs::config_dir().map(|p| p.join("controlab-native/diagrams/preferences.txt"))
     }
 }
 
