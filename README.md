@@ -1,4 +1,9 @@
-# ControLAB
+
+<h1>
+  <img src="assets/icons/app-icon.png" width="32" height="32" align="absmiddle" alt="ControLAB Logo">
+  ControLAB
+</h1>
+
 
 Software para análise, simulação e projeto de **Sistemas de Controle**, desenvolvido em **Rust** com interface nativa em **egui/eframe**.
 
