@@ -198,6 +198,7 @@ enum ToastKind {
 }
 
 /// Result of an OS file dialog running on a helper thread.
+#[cfg_attr(target_os = "android", allow(dead_code))]
 enum Picked {
     Open(std::path::PathBuf),
     Save(std::path::PathBuf),
@@ -248,6 +249,7 @@ pub struct Controlab {
     started: f64,
     update: Option<overlays::UpdateState>,
     confirm: Option<(String, String)>,
+    #[cfg_attr(target_os = "android", allow(dead_code))]
     screenshot_requested: bool,
     quit_confirm: bool,
     allow_close: bool,

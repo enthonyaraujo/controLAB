@@ -30,7 +30,7 @@ export CARGO_APK_RELEASE_KEYSTORE_PASSWORD=android
 export RUSTFLAGS="-Clink-arg=-Wl,-z,max-page-size=16384"
 
 cd "$(dirname "$0")/.."
-cargo apk build --release --lib
+cargo apk build --release --lib --features standalone-apk
 
 apk="../../target/release/apk/blocklab.apk"
 if [[ $# -ge 1 ]]; then

@@ -27,10 +27,10 @@ mod solver;
 pub mod theme;
 mod view;
 
-#[cfg(target_os = "android")]
+#[cfg(all(target_os = "android", feature = "standalone-apk"))]
 mod android;
 #[cfg(target_os = "android")]
-mod android_insets;
+pub mod android_insets;
 
 #[cfg(test)]
 mod ui_tests;

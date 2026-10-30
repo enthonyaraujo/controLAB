@@ -41,6 +41,7 @@ impl Formulas {
     pub fn typeset(&self) -> usize {
         self.images.values().filter(|image| image.is_some()).count()
     }
+    #[cfg_attr(target_os = "android", allow(dead_code))]
     pub fn busy(&self) -> bool {
         self.in_flight.is_some() || !self.wanted.is_empty()
     }

@@ -16,6 +16,9 @@ workspace = true
 name = "blocklab_gui"
 crate-type = ["lib", "cdylib"]
 
+[features]
+standalone-apk = []
+
 
 
 [dependencies]
