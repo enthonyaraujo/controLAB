@@ -4,6 +4,7 @@
   ControLAB
 </h1>
 
+[🇧🇷 Português](README.md) | [🇺🇸 English](README_EN.md)
 
 Software para análise, simulação e projeto de **Sistemas de Controle**, desenvolvido em **Rust** com interface nativa em **egui/eframe**.
 
