@@ -26,88 +26,18 @@ Software for the analysis, simulation, and design of **Control Systems**, develo
 
 ## Interface & Modules
 
-ControLAB provides a modern, responsive, and native desktop interface designed for analytical calculation, dynamic simulation, and controller synthesis. Explore the application screens and analysis modules below (click on any image to open in high resolution):
-
-### 1. `.m` Studio & Command Window
-Integrated environment featuring an interactive command line, workspace variable inspection, and `.m` script execution powered by the `mscript` interpreter.
-
-<p align="center">
-  <a href="docs/screenshots/01-studio.png">
-    <img src="docs/screenshots/01-studio.png" alt="ControLAB Studio & Command Window" width="100%">
-  </a>
-</p>
-
-### 2. Applications Hub
-Central launchpad offering quick access to all linear control system analysis and design tools.
-
-<p align="center">
-  <a href="docs/screenshots/02-apps-hub.png">
-    <img src="docs/screenshots/02-apps-hub.png" alt="Applications Hub" width="100%">
-  </a>
-</p>
-
-### 3. Block Diagrams
-Visual block diagram editor and viewer featuring automated reduction, Mason's Gain Formula computation, and closed-loop transfer function derivation.
-
-<p align="center">
-  <a href="docs/screenshots/03-block-diagram.png">
-    <img src="docs/screenshots/03-block-diagram.png" alt="Block Diagrams and Mason's Rule" width="100%">
-  </a>
-</p>
-
-### 4. Time-Domain Response
-Transient and steady-state simulation for step, ramp, and impulse inputs, with automated computation of transient metrics (overshoot $\%OS$, peak time $t_p$, rise time $t_r$, and settling time $t_s$) and steady-state error constants ($K_p, K_v, K_a$).
-
-<p align="center">
-  <a href="docs/screenshots/04-time-response.png">
-    <img src="docs/screenshots/04-time-response.png" alt="Time-Domain Response" width="100%">
-  </a>
-</p>
-
-### 5. Stability Analysis
-Stability assessment via parametric Routh-Hurwitz criterion as a function of gain $K$, identification of stability regimes (stable, marginally stable, and unstable), and root mapping in the complex $s$-plane.
-
-<p align="center">
-  <a href="docs/screenshots/05-stability.png">
-    <img src="docs/screenshots/05-stability.png" alt="Stability Analysis and Routh-Hurwitz" width="100%">
-  </a>
-</p>
-
-### 6. Root Locus (LGR)
-Evans root locus plotting displaying open-loop poles, zeros, asymptotes with centroid ($\sigma_a$), breakaway/break-in points, classical rules, and step-by-step derivation.
-
-<p align="center">
-  <a href="docs/screenshots/06-root-locus.png">
-    <img src="docs/screenshots/06-root-locus.png" alt="Root Locus (LGR)" width="100%">
-  </a>
-</p>
-
-### 7. Frequency Response (Bode & Nyquist)
-Asymptotic and exact Bode plots (magnitude in dB and phase in degrees) and complete Nyquist polar plots, featuring exact gain margin ($GM$) and phase margin ($PM$) calculations, crossover frequencies, and time-domain performance estimates.
-
-<p align="center">
-  <a href="docs/screenshots/07-frequency-response.png">
-    <img src="docs/screenshots/07-frequency-response.png" alt="Frequency Response - Bode and Nyquist" width="100%">
-  </a>
-</p>
-
-### 8. Controller Design
-Analytical synthesis of classical compensators and controllers (Phase Lead, Phase Lag, P, PD, PI, PID), featuring simultaneous compensated root locus visualization, step response comparison before and after compensation, and detailed calculations.
-
-<p align="center">
-  <a href="docs/screenshots/08-controllers.png">
-    <img src="docs/screenshots/08-controllers.png" alt="Controller Design and Compensation" width="100%">
-  </a>
-</p>
-
-### 9. State-Space Representation
-Continuous-time state-space matrix modeling $(\mathbf{A}, \mathbf{B}, \mathbf{C}, \mathbf{D})$, canonical form transformations, controllability and observability rank tests, pole placement state feedback $(\mathbf{A} - \mathbf{B}\mathbf{K})$ via Ackermann's formula, and Luenberger observer design.
-
-<p align="center">
-  <a href="docs/screenshots/09-state-space.png">
-    <img src="docs/screenshots/09-state-space.png" alt="State-Space Modeling and Feedback" width="100%">
-  </a>
-</p>
+| | |
+|:---:|:---:|
+| ![.m Studio](docs/screenshots/01-studio.png) | ![Applications Hub](docs/screenshots/02-apps-hub.png) |
+| **.m Studio & Command Window** | **Applications Hub** |
+| ![Block Diagrams](docs/screenshots/03-block-diagram.png) | ![Time-Domain Response](docs/screenshots/04-time-response.png) |
+| **Block Diagrams** | **Time-Domain Response** |
+| ![Stability Analysis](docs/screenshots/05-stability.png) | ![Root Locus](docs/screenshots/06-root-locus.png) |
+| **Stability Analysis (Routh-Hurwitz)** | **Root Locus (RL)** |
+| ![Frequency Response](docs/screenshots/07-frequency-response.png) | ![Controller Design](docs/screenshots/08-controllers.png) |
+| **Frequency Response (Bode & Nyquist)** | **Controller Design** |
+| ![State-Space Representation](docs/screenshots/09-state-space.png) | |
+| **State-Space Representation** | |
 
 ## Getting Started
 
