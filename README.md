@@ -4,7 +4,8 @@
   ControLAB
 </h1>
 
-[🇧🇷 Português](README.md) | [🇺🇸 English](README_EN.md)
+> [!WARNING]
+> O ControLAB ainda está em desenvolvimento. Os valores calculados podem conter erros e devem ser verificados antes de qualquer uso.
 
 Software para análise, simulação e projeto de **Sistemas de Controle**, desenvolvido em **Rust** com interface nativa em **egui/eframe**.
 
