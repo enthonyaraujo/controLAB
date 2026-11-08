@@ -278,6 +278,49 @@
         }
       },
       {
+        "name": "pid_zeros_mode",
+        "label": "Alocação dos zeros do PID",
+        "type": "select",
+        "value": "cancel",
+        "help": "Escolha como definir os dois zeros do PID: por cancelamento de polo da planta, zeros reais e iguais (duplo) ou zeros distintos (PI-PD).",
+        "options": [
+          [
+            "cancel",
+            "1. Cancelamento de polo — z₁ cancela polo da planta e z₂ via LGR"
+          ],
+          [
+            "equal",
+            "2. Zeros reais e iguais (duplo) — z₁ = z₂ = z₀ (divide ângulo por 2)"
+          ],
+          [
+            "distinct",
+            "3. Zeros distintos (PI-PD) — z_i fixo/especificado e z_d via LGR"
+          ]
+        ],
+        "when": {
+          "controller_type": [
+            "PID"
+          ]
+        }
+      },
+      {
+        "name": "pid_cancel_pole",
+        "label": "Polo a cancelar com z₁ (opcional)",
+        "type": "number",
+        "value": "",
+        "min": "0.0001",
+        "placeholder": "Vazio = automático (polo estável mais lento)",
+        "help": "Magnitude positiva |p| do polo real estável a cancelar (ex.: 1 para polo em s = -1). Se vazio, cancela o polo real estável mais lento da planta.",
+        "when": {
+          "controller_type": [
+            "PID"
+          ],
+          "pid_zeros_mode": [
+            "cancel"
+          ]
+        }
+      },
+      {
         "name": "pid_pi_zero",
         "label": "Zero da parte PI z_i (opcional)",
         "type": "number",
@@ -288,6 +331,9 @@
         "when": {
           "controller_type": [
             "PID"
+          ],
+          "pid_zeros_mode": [
+            "distinct"
           ]
         }
       },

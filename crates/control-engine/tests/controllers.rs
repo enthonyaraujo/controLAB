@@ -42,3 +42,79 @@ fn classical_pid_manual_parameters_and_endpoint() {
     );
     assert_eq!(r["module"], "controller_design");
 }
+
+#[test]
+fn pid_design_question_5_cancellation_and_equal_zeros() {
+    // G(s) = 1 / (s^3 + 10s^2 + 17s + 8), ts(2%) = 1, xi = 0.4
+    // Modo 1: Cancelamento de polo
+    let r_cancel = controllers::analyze(&json!({
+        "action": "controller_design",
+        "plant_expr": "1/(s^3 + 10s^2 + 17s + 8)",
+        "controller_type": "PID",
+        "pid_zeros_mode": "cancel",
+        "ts": 1.0,
+        "xi": 0.4,
+        "settling_criterion": "2"
+    })).unwrap();
+    let p_cancel = &r_cancel["details"]["controller_parameters"];
+    assert!((p_cancel["kp"].as_f64().unwrap() - 200.0).abs() < 1e-3);
+    assert!((p_cancel["ki"].as_f64().unwrap() - 100.0).abs() < 1e-3);
+    assert!((p_cancel["kd"].as_f64().unwrap() - 100.0).abs() < 1e-3);
+    assert!((p_cancel["zi"].as_f64().unwrap() - 1.0).abs() < 1e-3);
+    assert!((p_cancel["z"].as_f64().unwrap() - 1.0).abs() < 1e-3);
+
+    // Modo 2: Zeros reais e iguais (duplo)
+    let r_equal = controllers::analyze(&json!({
+        "action": "controller_design",
+        "plant_expr": "1/(s^3 + 10s^2 + 17s + 8)",
+        "controller_type": "PID",
+        "pid_zeros_mode": "equal",
+        "ts": 1.0,
+        "xi": 0.4,
+        "settling_criterion": "2"
+    })).unwrap();
+    let p_equal = &r_equal["details"]["controller_parameters"];
+    assert!((p_equal["kp"].as_f64().unwrap() - 200.0).abs() < 1e-3);
+    assert!((p_equal["ki"].as_f64().unwrap() - 100.0).abs() < 1e-3);
+    assert!((p_equal["kd"].as_f64().unwrap() - 100.0).abs() < 1e-3);
+    assert!((p_equal["zi"].as_f64().unwrap() - 1.0).abs() < 1e-3);
+    assert!((p_equal["z"].as_f64().unwrap() - 1.0).abs() < 1e-3);
+}
+
+#[test]
+fn pid_design_question_2_cancellation_and_equal_zeros() {
+    // Inverted pendulum: G(s) = -20 / (s^2 - 20), xi = 0.7, wn = 6.57
+    // Modo 1: Cancelamento de polo estável em s = -sqrt(20) ~ -4.4721
+    let r_cancel = controllers::analyze(&json!({
+        "action": "controller_design",
+        "plant_expr": "-20 / (s^2 - 20)",
+        "controller_type": "PID",
+        "pid_zeros_mode": "cancel",
+        "wn": 6.57,
+        "xi": 0.7,
+        "settling_criterion": "2"
+    })).unwrap();
+    let p_cancel = &r_cancel["details"]["controller_parameters"];
+    assert!((p_cancel["kp"].as_f64().unwrap() - (-5.215)).abs() < 1e-2);
+    assert!((p_cancel["ki"].as_f64().unwrap() - (-9.652)).abs() < 1e-2);
+    assert!((p_cancel["kd"].as_f64().unwrap() - (-0.6835)).abs() < 1e-2);
+    assert!((p_cancel["zi"].as_f64().unwrap() - 20.0f64.sqrt()).abs() < 1e-3);
+    assert!((p_cancel["z"].as_f64().unwrap() - 3.158).abs() < 1e-2);
+
+    // Modo 2: Zeros reais e iguais (duplo)
+    let r_equal = controllers::analyze(&json!({
+        "action": "controller_design",
+        "plant_expr": "-20 / (s^2 - 20)",
+        "controller_type": "PID",
+        "pid_zeros_mode": "equal",
+        "wn": 6.57,
+        "xi": 0.7,
+        "settling_criterion": "2"
+    })).unwrap();
+    let p_equal = &r_equal["details"]["controller_parameters"];
+    assert!((p_equal["kp"].as_f64().unwrap() - (-5.335)).abs() < 1e-2);
+    assert!((p_equal["ki"].as_f64().unwrap() - (-10.22)).abs() < 1e-2);
+    assert!((p_equal["kd"].as_f64().unwrap() - (-0.6966)).abs() < 1e-2);
+    assert!((p_equal["zi"].as_f64().unwrap() - 3.83).abs() < 1e-2);
+    assert!((p_equal["z"].as_f64().unwrap() - 3.83).abs() < 1e-2);
+}

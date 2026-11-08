@@ -519,7 +519,7 @@ fn controller_latex(kind: &str, p: &Value) -> Result<String> {
             },
         );
     }
-    Ok(text(&template(
+    let mut raw = text(&template(
         match kind {
             "LEAD" => 699,
             "LAG" => 705,
@@ -531,7 +531,22 @@ fn controller_latex(kind: &str, p: &Value) -> Result<String> {
             _ => 726,
         },
         &c,
-    )?))
+    )?);
+    if kind == "PID" {
+        raw = raw.replace("+ -", "- ");
+        raw = raw.replace("+ \\frac{-", "- \\frac{");
+        if !p["zi"].is_null() && !p["z"].is_null() {
+            let zi = n(&p["zi"]);
+            let zd = n(&p["z"]);
+            if (zi - zd).abs() < 1e-4 && zi > 0. {
+                let z_str = fmt(&p["z"], 4, true);
+                let double_factor = format!("(s + {z_str})(s + {z_str})");
+                let squared = format!("(s + {z_str})^2");
+                raw = raw.replace(&double_factor, &squared);
+            }
+        }
+    }
+    Ok(raw)
 }
 fn uncompensated(tf: &TransferFunction, mode: &str) -> Result<Value> {
     let cl = tf.feedback(&TransferFunction::scalar(1.), -1.)?;
@@ -1168,199 +1183,492 @@ fn universal(p: &Value, forward: &TransferFunction) -> Result<Value> {
             "PD" | "PI" | "PID" => {
                 let is_pd = kind == "PD";
                 let is_pid = kind == "PID";
-                assign(
-                    &mut c,
-                    "design_label",
-                    if is_pd {
-                        1256
-                    } else if is_pid {
-                        1514
-                    } else {
-                        1390
-                    },
-                )?;
+                let pid_mode = if is_pid {
+                    p.get("pid_zeros_mode")
+                        .and_then(|v| v.as_str())
+                        .map(|s| s.trim().to_lowercase())
+                        .unwrap_or_else(|| {
+                            if optional(p, "pid_cancel_pole").ok().flatten().is_some() {
+                                "cancel".into()
+                            } else {
+                                "distinct".into()
+                            }
+                        })
+                } else {
+                    "distinct".into()
+                };
+                let is_equal = is_pid
+                    && matches!(
+                        pid_mode.as_str(),
+                        "equal" | "iguais" | "zero_duplo" | "duplo" | "reais_iguais" | "zeros_iguais"
+                    );
+                let is_cancel = is_pid
+                    && matches!(
+                        pid_mode.as_str(),
+                        "cancel" | "cancellation" | "cancelamento" | "polo_zero" | "cancel_pole"
+                    );
+
+                if is_equal {
+                    set(
+                        &mut c,
+                        "design_label",
+                        "Controlador PID (Zeros Reais e Iguais) — Gc(s) = Kp + Ki/s + Kd·s = K(s + z0)²/s",
+                    );
+                } else if is_cancel {
+                    set(
+                        &mut c,
+                        "design_label",
+                        "Controlador PID (Cancelamento de Polo) — Gc(s) = Kp + Ki/s + Kd·s = K(s + z1)(s + z2)/s",
+                    );
+                } else {
+                    assign(
+                        &mut c,
+                        "design_label",
+                        if is_pd {
+                            1256
+                        } else if is_pid {
+                            1514
+                        } else {
+                            1390
+                        },
+                    )?;
+                }
                 let mut total = poles.clone();
                 if !is_pd {
                     let mut raw = poles_raw.clone();
                     raw.push(C::new(0., 0.));
                     total = groups(raw);
                 }
-                let zi = if is_pid {
-                    optional(p, "pid_pi_zero")?
-                        .filter(|v| *v > 0.)
-                        .unwrap_or(re / 10.)
-                } else {
-                    0.
-                };
-                let zi_info = angle(C::new(-zi, 0.), re, im)?;
-                if is_pid {
-                    put(&mut c, "zi_val", zi);
-                    set(&mut c, "zi_angle", zi_info.clone());
-                    assign(&mut c, "angle_eqs", 1523)?;
-                    add_contribution(
-                        &mut c,
-                        "controller_zero",
-                        format!("Zero PI (s = -{})", fmt(&json!(zi), 4, false)),
-                        C::new(-zi, 0.),
-                        1,
-                        n(&zi_info["angle_deg"]),
-                    );
-                }
-                let sump = add_angles(
-                    &mut c,
-                    &total,
-                    (re, im),
-                    false,
-                    !is_pd,
-                    &kind,
-                    if is_pd {
-                        1264
-                    } else if is_pid {
-                        1543
+
+                if is_equal {
+                    let sump = add_angles(&mut c, &total, (re, im), false, true, &kind, 1543)?;
+                    let sumz = add_angles(&mut c, &zeros, (re, im), true, false, &kind, 1561)?;
+                    put(&mut c, "sum_poles_g", sump);
+                    put(&mut c, "sum_poles_total", sump);
+                    put(&mut c, "sum_zeros_g", sumz);
+                    let raw_zeros_angle = (sump - sumz + 180.).rem_euclid(360.);
+                    let total_theta = if raw_zeros_angle < 1e-4 {
+                        360.
                     } else {
-                        1404
-                    },
-                )?;
-                let sumz = add_angles(
-                    &mut c,
-                    &zeros,
-                    (re, im),
-                    true,
-                    false,
-                    &kind,
-                    if is_pd {
-                        1280
-                    } else if is_pid {
-                        1561
-                    } else {
-                        1423
-                    },
-                )?;
-                put(&mut c, "sum_poles_g", sump);
-                put(&mut c, "sum_poles_total", sump);
-                put(&mut c, "sum_zeros_g", sumz);
-                let raw = sump - sumz + 180. - if is_pid { n(&zi_info["angle_deg"]) } else { 0. };
-                let on_locus = is_pd && ((raw + 180.).rem_euclid(360.) - 180.).abs() < 1e-3;
-                let (theta, z, td) = if on_locus {
-                    (0., None, 0.)
-                } else {
-                    let theta = math::required_single_angle(raw, "z")?;
-                    let info = position(theta, re, im, if is_pid { "z_d" } else { "z" })?;
-                    let z = n(&info["pos"]);
-                    if z <= 0. {
-                        let error = if is_pid {
-                            format!(
-                                "A condição de fase resultou em z_d = {} <= 0. Ajuste o zero z_i da parte PI ou as especificações.",
-                                values::general(z, 4)
-                            )
-                        } else if is_pd {
-                            format!(
-                                "A condição de fase resultou em z = {} <= 0. Verifique as especificações transitórias.",
-                                values::general(z, 4)
-                            )
-                        } else {
-                            format!(
-                                "A condição de fase resultou em z = {} <= 0. Ajuste as especificações transitórias.",
-                                values::general(z, 4)
-                            )
-                        };
-                        return Err(error);
+                        raw_zeros_angle
+                    };
+                    let theta_z = total_theta / 2.0;
+                    let info = position(theta_z, re, im, "z_0")?;
+                    let z0 = n(&info["pos"]);
+                    if z0 <= 0. {
+                        return Err(format!(
+                            "A condição de fase para zeros reais e iguais resultou em z_0 = {} <= 0. Ajuste as especificações transitórias.",
+                            values::general(z0, 4)
+                        ));
                     }
-                    set(&mut c, "pos_z_info", info);
-                    (theta, Some(z), 1. / z)
-                };
-                put(&mut c, "theta_z", theta);
-                set(
-                    &mut c,
-                    "z_val",
-                    z.map(values::number).unwrap_or(Value::Null),
-                );
-                put(&mut c, "td_val", td);
-                put(&mut c, "ti_val", td);
-                if let Some(z) = z {
+                    set(&mut c, "pos_z_info", info.clone());
+                    put(&mut c, "theta_z", theta_z);
+                    put(&mut c, "zi_val", z0);
+                    put(&mut c, "zd_val", z0);
+                    set(&mut c, "z_val", json!(z0));
                     add_contribution(
                         &mut c,
                         "controller_zero",
-                        format!(
-                            "Zero {} (s = -{})",
-                            if is_pid || is_pd { "PD" } else { "PI" },
-                            fmt(&json!(z), 4, false)
-                        ),
-                        C::new(-z, 0.),
-                        1,
-                        theta,
+                        format!("Zero duplo (s = -{}) (×2)", fmt(&json!(z0), 4, false)),
+                        C::new(-z0, 0.),
+                        2,
+                        theta_z,
                     );
-                }
-                if is_pid {
-                    put(&mut c, "zd_val", z.unwrap());
-                    append(&mut c, "angle_eqs", 1586, true)?;
-                    append(&mut c, "steps", 1590, false)?;
-                } else if is_pd {
-                    append(
-                        &mut c,
-                        "angle_eqs",
-                        if on_locus { 1297 } else { 1321 },
-                        true,
-                    )?;
-                    assign(&mut c, "step3_notes", if on_locus { 1301 } else { 1326 })?;
-                    append(&mut c, "steps", 1331, false)?;
-                } else {
-                    append(&mut c, "angle_eqs", 1450, true)?;
-                    append(&mut c, "steps", 1456, false)?;
-                }
-                let mut a = vec![];
-                if is_pid {
-                    a.push(extra_magnitude(dom, zi)?);
-                }
-                if !is_pd {
-                    a.push(extra_magnitude(dom, z.unwrap())?);
-                }
-                a.extend(group_magnitudes(dom, &zeros)?);
-                let b = group_magnitudes(dom, &total)?;
-                let pd = C::new(1., 0.) + td * dom;
-                let multiplier = if is_pd { pd.norm() } else { 1. };
-                let k = set_magnitudes(&mut c, a, b, gain * multiplier);
-                if is_pd {
-                    let kp = k;
-                    put(&mut c, "kp_val", kp);
-                    put(&mut c, "kd_val", kp * td);
-                    set(&mut c, "pd_factor", root(pd));
-                    put(&mut c, "pd_mag", pd.norm());
-                    let eq = format!(
-                        "\\left|1 + \\tau_d s\\right| = \\left|1 + {}(-{} + {}j)\\right| = \\sqrt{{({})^2 + ({})^2}} = {}",
-                        fmt(&json!(td), 4, true),
-                        fmt(&json!(re), 4, true),
-                        fmt(&json!(im), 4, true),
-                        fmt(&json!(pd.re), 4, true),
-                        fmt(&json!(pd.im), 4, true),
-                        fmt(&json!(pd.norm()), 4, true)
+                    let eq1 = format!(
+                        "\\theta_{{z,\\text{{total}}}} = \\sum \\theta_{{\\text{{polos}}}} - \\sum \\theta_{{\\text{{zeros}}}} + 180^\\circ \\pmod{{360^\\circ}} = {}^\\circ - {}^\\circ + 180^\\circ = {}^\\circ",
+                        fmt(&json!(sump), 4, true),
+                        fmt(&json!(sumz), 4, true),
+                        fmt(&json!(total_theta), 4, true)
                     );
-                    set(&mut c, "pd_factor_eq", eq);
-                    assign(&mut c, "mag_eqs", 1354)?;
-                    append(&mut c, "mag_eqs", 1355, false)?;
-                    append(&mut c, "steps", 1358, false)?;
-                    params(&mut c, 1370)?;
-                    controller = TransferFunction::new(vec![kp * td, kp], vec![1.])?;
-                } else if is_pid {
-                    let zd = z.unwrap();
+                    let eq2 = format!(
+                        "\\theta_{{z_0}} = \\frac{{\\theta_{{z,\\text{{total}}}}}}{{2}} = \\frac{{{}^\\circ}}{{2}} = {}^\\circ",
+                        fmt(&json!(total_theta), 4, true),
+                        fmt(&json!(theta_z), 4, true)
+                    );
+                    c.get_mut("angle_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(json!(eq1));
+                    c.get_mut("angle_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(json!(eq2));
+                    c.get_mut("angle_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(info["formula_latex"].clone());
+                    let step3 = json!({
+                        "number": 3,
+                        "title": "Condição de Fase no LGR e Zeros Reais e Iguais do PID",
+                        "description": "O controlador PID é configurado com dois zeros reais e iguais em s = -z_0: Gc(s) = K(s + z_0)² / s. Cada zero contribui com metade do ângulo necessário.",
+                        "equations": get(&c, "angle_eqs"),
+                        "notes": [
+                            format!("Zero duplo: z_1 = z_2 = z_0 = {} (cada zero com θ = {}°)", fmt(&json!(z0), 4, false), fmt(&json!(theta_z), 4, false)),
+                        ]
+                    });
+                    c.get_mut("steps")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(step3);
+
+                    let mut a = vec![extra_magnitude(dom, z0)?, extra_magnitude(dom, z0)?];
+                    a.extend(group_magnitudes(dom, &zeros)?);
+                    let b = group_magnitudes(dom, &total)?;
+                    let k = set_magnitudes(&mut c, a, b, gain);
+                    let kp = 2.0 * k * z0;
+                    let ki = k * z0 * z0;
+                    let kd = k;
                     put(&mut c, "k_val", k);
-                    put(&mut c, "kp_val", k * (zi + zd));
-                    put(&mut c, "ki_val", k * zi * zd);
-                    put(&mut c, "kd_val", k);
+                    put(&mut c, "kp_val", kp);
+                    put(&mut c, "ki_val", ki);
+                    put(&mut c, "kd_val", kd);
+                    assign(&mut c, "mag_eqs", 1616)?;
+                    let num_mag = num(&c, "num_mag_prod");
+                    let den_mag = num(&c, "den_mag_prod");
+                    let mag_eq1 = format!(
+                        "\\left|\\frac{{K(s + {})^2}}{{s}}G(s)\\right| = 1 \\implies K = \\frac{{{}}}{{{}}} = {}",
+                        fmt(&json!(z0), 4, true),
+                        fmt(&json!(den_mag), 4, true),
+                        fmt(&json!(num_mag), 4, true),
+                        fmt(&json!(k), 4, true)
+                    );
+                    let mag_eq2 = format!(
+                        "K_p = 2 K z_0 = {}, \\quad K_i = K z_0^2 = {}, \\quad K_d = K = {}",
+                        fmt(&json!(kp), 4, true),
+                        fmt(&json!(ki), 4, true),
+                        fmt(&json!(kd), 4, true)
+                    );
+                    c.get_mut("mag_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(json!(mag_eq1));
+                    c.get_mut("mag_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(json!(mag_eq2));
+                    let step4 = json!({
+                        "number": 4,
+                        "title": "Condição de Módulo e Ganhos Kp, Ki e Kd",
+                        "description": "Aplicação de |Gma(s)| = 1 no polo dominante e expansão K(s+z_0)²/s = Kp + Ki/s + Kd·s.",
+                        "equations": get(&c, "mag_eqs"),
+                        "notes": [
+                            format!("Kp = {}, Ki = {}, Kd = {}", fmt(&json!(kp), 4, false), fmt(&json!(ki), 4, false), fmt(&json!(kd), 4, false)),
+                        ]
+                    });
+                    c.get_mut("steps")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(step4);
+                    params(&mut c, 1632)?;
+                    controller = TransferFunction::new(vec![k, kp, ki], vec![1., 0.])?;
+                } else if is_cancel {
+                    let cancel_spec = optional(p, "pid_cancel_pole")?
+                        .filter(|v| *v > 0.)
+                        .or_else(|| optional(p, "pid_pi_zero").ok().flatten().filter(|v| *v > 0.));
+                    let z1 = match cancel_spec {
+                        Some(val) => val,
+                        None => {
+                            let mut candidates: Vec<f64> = poles_raw
+                                .iter()
+                                .filter(|r| r.im.abs() < 1e-5 && r.re < -1e-5)
+                                .map(|r| -r.re)
+                                .collect();
+                            candidates.sort_by(|a, b| a.total_cmp(b));
+                            if candidates.is_empty() {
+                                return Err("A planta não possui polos reais estáveis no semiplano esquerdo para cancelamento. Utilize zeros reais e iguais ou informe z_1 manualmente.".into());
+                            }
+                            candidates[0]
+                        }
+                    };
+                    let z1_info = angle(C::new(-z1, 0.), re, im)?;
+                    let theta_z1 = n(&z1_info["angle_deg"]);
+                    put(&mut c, "zi_val", z1);
+                    set(&mut c, "zi_angle", z1_info.clone());
+                    add_contribution(
+                        &mut c,
+                        "controller_zero",
+                        format!("Zero z_1 (cancela polo s = -{})", fmt(&json!(z1), 4, false)),
+                        C::new(-z1, 0.),
+                        1,
+                        theta_z1,
+                    );
+                    let sump = add_angles(&mut c, &total, (re, im), false, true, &kind, 1543)?;
+                    let sumz = add_angles(&mut c, &zeros, (re, im), true, false, &kind, 1561)?;
+                    put(&mut c, "sum_poles_g", sump);
+                    put(&mut c, "sum_poles_total", sump);
+                    put(&mut c, "sum_zeros_g", sumz);
+                    let raw = sump - sumz + 180. - theta_z1;
+                    let theta_z2 = math::required_single_angle(raw, "z")?;
+                    let info2 = position(theta_z2, re, im, "z_2")?;
+                    let z2 = n(&info2["pos"]);
+                    if z2 <= 0. {
+                        return Err(format!(
+                            "A condição de fase resultou em z_2 = {} <= 0 ao cancelar o polo s = -{}. Ajuste as especificações transitórias ou o polo a cancelar.",
+                            values::general(z2, 4),
+                            values::general(z1, 4)
+                        ));
+                    }
+                    add_contribution(
+                        &mut c,
+                        "controller_zero",
+                        format!("Zero z_2 (s = -{})", fmt(&json!(z2), 4, false)),
+                        C::new(-z2, 0.),
+                        1,
+                        theta_z2,
+                    );
+                    put(&mut c, "zd_val", z2);
+                    set(&mut c, "z_val", json!(z2));
+                    put(&mut c, "theta_z", theta_z2);
+                    set(&mut c, "pos_z_info", info2.clone());
+
+                    let cancel_eq = format!(
+                        "\\text{{Zero }} z_1 \\text{{ alocado para cancelar polo da planta em }} s = -{}: {}",
+                        fmt(&json!(z1), 4, false),
+                        text(&z1_info["formula_latex"])
+                    );
+                    c.get_mut("angle_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .insert(0, json!(cancel_eq));
+                    let eq_zd = format!(
+                        "\\theta_{{z_2}} = \\sum \\theta_{{\\text{{polos}}}} - \\sum \\theta_{{\\text{{zeros}}}} - \\theta_{{z_1}} + 180^\\circ \\pmod{{360^\\circ}} = {}^\\circ - {}^\\circ - {}^\\circ + 180^\\circ = {}^\\circ",
+                        fmt(&json!(sump), 4, true),
+                        fmt(&json!(sumz), 4, true),
+                        fmt(&json!(theta_z1), 4, true),
+                        fmt(&json!(theta_z2), 4, true)
+                    );
+                    c.get_mut("angle_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(json!(eq_zd));
+                    c.get_mut("angle_eqs")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(info2["formula_latex"].clone());
+                    let step3 = json!({
+                        "number": 3,
+                        "title": "Condição de Fase no LGR e Zeros z₁ e z₂ do PID (Cancelamento de Polo)",
+                        "description": "O controlador PID é projetado com cancelamento de polo: o zero z₁ cancela um polo real estável da planta e o zero z₂ é obtido pela condição de fase.",
+                        "equations": get(&c, "angle_eqs"),
+                        "notes": [
+                            format!("Zero z_1 (cancelamento): z_1 = {} (cancela polo em s = -{})", fmt(&json!(z1), 4, false), fmt(&json!(z1), 4, false)),
+                            format!("Zero z_2 (calculado por fase): z_2 = {} (θ = {}°)", fmt(&json!(z2), 4, false), fmt(&json!(theta_z2), 4, false)),
+                        ]
+                    });
+                    c.get_mut("steps")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(step3);
+
+                    let mut a = vec![extra_magnitude(dom, z1)?, extra_magnitude(dom, z2)?];
+                    a.extend(group_magnitudes(dom, &zeros)?);
+                    let b = group_magnitudes(dom, &total)?;
+                    let k = set_magnitudes(&mut c, a, b, gain);
+                    let kp = k * (z1 + z2);
+                    let ki = k * z1 * z2;
+                    let kd = k;
+                    put(&mut c, "k_val", k);
+                    put(&mut c, "kp_val", kp);
+                    put(&mut c, "ki_val", ki);
+                    put(&mut c, "kd_val", kd);
                     assign(&mut c, "mag_eqs", 1616)?;
                     append(&mut c, "mag_eqs", 1617, true)?;
                     append(&mut c, "steps", 1621, false)?;
                     params(&mut c, 1632)?;
-                    controller =
-                        TransferFunction::new(vec![k, k * (zi + zd), k * zi * zd], vec![1., 0.])?;
+                    controller = TransferFunction::new(vec![k, kp, ki], vec![1., 0.])?;
                 } else {
-                    put(&mut c, "kp_val", k);
-                    put(&mut c, "ki_val", k * z.unwrap());
-                    assign(&mut c, "mag_eqs", 1478)?;
-                    append(&mut c, "mag_eqs", 1479, false)?;
-                    append(&mut c, "steps", 1482, false)?;
-                    params(&mut c, 1494)?;
-                    controller = TransferFunction::new(vec![k, k * z.unwrap()], vec![1., 0.])?;
+                    let zi = if is_pid {
+                        optional(p, "pid_pi_zero")?
+                            .filter(|v| *v > 0.)
+                            .unwrap_or(re / 10.)
+                    } else {
+                        0.
+                    };
+                    let zi_info = angle(C::new(-zi, 0.), re, im)?;
+                    if is_pid {
+                        put(&mut c, "zi_val", zi);
+                        set(&mut c, "zi_angle", zi_info.clone());
+                        assign(&mut c, "angle_eqs", 1523)?;
+                        add_contribution(
+                            &mut c,
+                            "controller_zero",
+                            format!("Zero PI (s = -{})", fmt(&json!(zi), 4, false)),
+                            C::new(-zi, 0.),
+                            1,
+                            n(&zi_info["angle_deg"]),
+                        );
+                    }
+                    let sump = add_angles(
+                        &mut c,
+                        &total,
+                        (re, im),
+                        false,
+                        !is_pd,
+                        &kind,
+                        if is_pd {
+                            1264
+                        } else if is_pid {
+                            1543
+                        } else {
+                            1404
+                        },
+                    )?;
+                    let sumz = add_angles(
+                        &mut c,
+                        &zeros,
+                        (re, im),
+                        true,
+                        false,
+                        &kind,
+                        if is_pd {
+                            1280
+                        } else if is_pid {
+                            1561
+                        } else {
+                            1423
+                        },
+                    )?;
+                    put(&mut c, "sum_poles_g", sump);
+                    put(&mut c, "sum_poles_total", sump);
+                    put(&mut c, "sum_zeros_g", sumz);
+                    let raw =
+                        sump - sumz + 180. - if is_pid { n(&zi_info["angle_deg"]) } else { 0. };
+                    let on_locus = is_pd && ((raw + 180.).rem_euclid(360.) - 180.).abs() < 1e-3;
+                    let (theta, z, td) = if on_locus {
+                        (0., None, 0.)
+                    } else {
+                        let theta = math::required_single_angle(raw, "z")?;
+                        let info = position(theta, re, im, if is_pid { "z_d" } else { "z" })?;
+                        let z = n(&info["pos"]);
+                        if z <= 0. {
+                            let error = if is_pid {
+                                format!(
+                                    "A condição de fase resultou em z_d = {} <= 0. Ajuste o zero z_i da parte PI ou as especificações.",
+                                    values::general(z, 4)
+                                )
+                            } else if is_pd {
+                                format!(
+                                    "A condição de fase resultou em z = {} <= 0. Verifique as especificações transitórias.",
+                                    values::general(z, 4)
+                                )
+                            } else {
+                                format!(
+                                    "A condição de fase resultou em z = {} <= 0. Ajuste as especificações transitórias.",
+                                    values::general(z, 4)
+                                )
+                            };
+                            return Err(error);
+                        }
+                        set(&mut c, "pos_z_info", info);
+                        (theta, Some(z), 1. / z)
+                    };
+                    put(&mut c, "theta_z", theta);
+                    set(
+                        &mut c,
+                        "z_val",
+                        z.map(values::number).unwrap_or(Value::Null),
+                    );
+                    put(&mut c, "td_val", td);
+                    put(&mut c, "ti_val", td);
+                    if let Some(z) = z {
+                        add_contribution(
+                            &mut c,
+                            "controller_zero",
+                            format!(
+                                "Zero {} (s = -{})",
+                                if is_pid || is_pd { "PD" } else { "PI" },
+                                fmt(&json!(z), 4, false)
+                            ),
+                            C::new(-z, 0.),
+                            1,
+                            theta,
+                        );
+                    }
+                    if is_pid {
+                        put(&mut c, "zd_val", z.unwrap());
+                        append(&mut c, "angle_eqs", 1586, true)?;
+                        append(&mut c, "steps", 1590, false)?;
+                    } else if is_pd {
+                        append(
+                            &mut c,
+                            "angle_eqs",
+                            if on_locus { 1297 } else { 1321 },
+                            true,
+                        )?;
+                        assign(&mut c, "step3_notes", if on_locus { 1301 } else { 1326 })?;
+                        append(&mut c, "steps", 1331, false)?;
+                    } else {
+                        append(&mut c, "angle_eqs", 1450, true)?;
+                        append(&mut c, "steps", 1456, false)?;
+                    }
+                    let mut a = vec![];
+                    if is_pid {
+                        a.push(extra_magnitude(dom, zi)?);
+                    }
+                    if !is_pd {
+                        a.push(extra_magnitude(dom, z.unwrap())?);
+                    }
+                    a.extend(group_magnitudes(dom, &zeros)?);
+                    let b = group_magnitudes(dom, &total)?;
+                    let pd = C::new(1., 0.) + td * dom;
+                    let multiplier = if is_pd { pd.norm() } else { 1. };
+                    let k = set_magnitudes(&mut c, a, b, gain * multiplier);
+                    if is_pd {
+                        let kp = k;
+                        put(&mut c, "kp_val", kp);
+                        put(&mut c, "kd_val", kp * td);
+                        set(&mut c, "pd_factor", root(pd));
+                        put(&mut c, "pd_mag", pd.norm());
+                        let eq = format!(
+                            "\\left|1 + \\tau_d s\\right| = \\left|1 + {}(-{} + {}j)\\right| = \\sqrt{{({})^2 + ({})^2}} = {}",
+                            fmt(&json!(td), 4, true),
+                            fmt(&json!(re), 4, true),
+                            fmt(&json!(im), 4, true),
+                            fmt(&json!(pd.re), 4, true),
+                            fmt(&json!(pd.im), 4, true),
+                            fmt(&json!(pd.norm()), 4, true)
+                        );
+                        set(&mut c, "pd_factor_eq", eq);
+                        assign(&mut c, "mag_eqs", 1354)?;
+                        append(&mut c, "mag_eqs", 1355, false)?;
+                        append(&mut c, "steps", 1358, false)?;
+                        params(&mut c, 1370)?;
+                        controller = TransferFunction::new(vec![kp * td, kp], vec![1.])?;
+                    } else if is_pid {
+                        let zd = z.unwrap();
+                        put(&mut c, "k_val", k);
+                        put(&mut c, "kp_val", k * (zi + zd));
+                        put(&mut c, "ki_val", k * zi * zd);
+                        put(&mut c, "kd_val", k);
+                        assign(&mut c, "mag_eqs", 1616)?;
+                        append(&mut c, "mag_eqs", 1617, true)?;
+                        append(&mut c, "steps", 1621, false)?;
+                        params(&mut c, 1632)?;
+                        controller = TransferFunction::new(
+                            vec![k, k * (zi + zd), k * zi * zd],
+                            vec![1., 0.],
+                        )?;
+                    } else {
+                        put(&mut c, "kp_val", k);
+                        put(&mut c, "ki_val", k * z.unwrap());
+                        assign(&mut c, "mag_eqs", 1478)?;
+                        append(&mut c, "mag_eqs", 1479, false)?;
+                        append(&mut c, "steps", 1482, false)?;
+                        params(&mut c, 1494)?;
+                        controller =
+                            TransferFunction::new(vec![k, k * z.unwrap()], vec![1., 0.])?;
+                    }
                 }
             }
             _ => {
@@ -1453,12 +1761,12 @@ fn plot_universal(
     c: &Context,
 ) -> Result<(String, String)> {
     use crate::time_response::{Chart, Key, Marker, svg_document};
-    let width = 1652.;
-    let height = 756.;
+    let width = 960.;
+    let height = 1180.;
     let mut left = Chart::new(
         width,
         height,
-        (110., 45., 620., 600.),
+        (100., 48., 760., 450.),
         "Eixo Real (σ)",
         "Eixo Imaginário (jω)",
         false,
@@ -1511,14 +1819,22 @@ fn plot_universal(
     );
     left.line(&[0., 0.], &[-sy, sy], "#64748B", 0.8, "");
     if im > 0. {
-        for a in get(c, "angle_contributions").as_array().unwrap() {
+        let contribs = get(c, "angle_contributions");
+        let angles = contribs.as_array().unwrap();
+        for (idx, a) in angles.iter().enumerate() {
             let root = &a["root"];
             let rr = n(&root["re"]);
             let ri = n(&root["im"]);
             left.line(&[rr, -re], &[ri, im], DOMINANT, 1., "5 4");
+            let t_frac = match idx % 4 {
+                0 => 0.44,
+                1 => 0.70,
+                2 => 0.30,
+                _ => 0.56,
+            };
             left.label(
-                0.55 * rr - 0.45 * re,
-                0.55 * ri + 0.45 * im,
+                t_frac * rr - (1.0 - t_frac) * re,
+                t_frac * ri + (1.0 - t_frac) * im,
                 &format!("{}°", fmt(&a["angle_deg"], 3, false)),
                 0.,
                 -3.,
@@ -1546,14 +1862,38 @@ fn plot_universal(
             Key::Marker(Marker::Ring),
         ));
     }
-    if !p["z"].is_null() {
-        let z = -n(&p["z"]);
-        left.marker(z, 0., Marker::Disc, "black", 6.5);
-        legend.push((
-            format!("Zero Gc (-z = {})", fmt(&json!(z), 4, false)),
-            "black",
-            Key::Marker(Marker::Disc),
-        ));
+    let is_equal_zeros = !p["zi"].is_null()
+        && !p["z"].is_null()
+        && (n(&p["zi"]) - n(&p["z"])).abs() < 1e-4;
+    if is_equal_zeros {
+        if !p["z"].is_null() {
+            let z = -n(&p["z"]);
+            left.marker(z, 0., Marker::Disc, "black", 7.0);
+            legend.push((
+                format!("Zero duplo Gc (-z = {}) (×2)", fmt(&json!(z), 4, false)),
+                "black",
+                Key::Marker(Marker::Disc),
+            ));
+        }
+    } else {
+        if !p["zi"].is_null() && !p["z"].is_null() {
+            let zi = -n(&p["zi"]);
+            left.marker(zi, 0., Marker::Disc, "black", 6.5);
+            legend.push((
+                format!("Zero z1 Gc (-z = {})", fmt(&json!(zi), 4, false)),
+                "black",
+                Key::Marker(Marker::Disc),
+            ));
+        }
+        if !p["z"].is_null() {
+            let z = -n(&p["z"]);
+            left.marker(z, 0., Marker::Disc, "black", 6.5);
+            legend.push((
+                format!("Zero Gc (-z = {})", fmt(&json!(z), 4, false)),
+                "black",
+                Key::Marker(Marker::Disc),
+            ));
+        }
     }
     if !p["p"].is_null() {
         let pole = -n(&p["p"]);
@@ -1585,7 +1925,7 @@ fn plot_universal(
     let mut right = Chart::new(
         width,
         height,
-        (900., 45., 650., 600.),
+        (100., 638., 760., 450.),
         "Tempo (s)",
         "Saída y(t)",
         false,
@@ -1598,7 +1938,12 @@ fn plot_universal(
             _ => 1.,
         })
         .collect::<Vec<_>>();
-    right.autobounds(t, &[before, after, &reference]);
+    let uncomp_diverges = before.iter().any(|v| !v.is_finite() || v.abs() > 100.0);
+    if uncomp_diverges {
+        right.autobounds(t, &[after, &reference]);
+    } else {
+        right.autobounds(t, &[before, after, &reference]);
+    }
     right.axes();
     right.line(t, &reference, "black", 1.2, "2 3");
     right.line(t, before, "#64748B", 1.6, "6 4");
@@ -1618,7 +1963,7 @@ fn plot_universal(
         _ => "Resposta ao Degrau Unitário",
     };
     let body = format!(
-        "{}{}<text x=\"420\" y=\"24\" text-anchor=\"middle\">Lugar Geométrico das Raízes e Ângulos θ</text><text x=\"1225\" y=\"24\" text-anchor=\"middle\">{title}</text>",
+        "{}{}<text x=\"480\" y=\"26\" text-anchor=\"middle\">Lugar Geométrico das Raízes e Ângulos θ</text><text x=\"480\" y=\"618\" text-anchor=\"middle\">{title}</text>",
         left.svg, right.svg
     );
     let svg = svg_document(width, height, &body);
@@ -1700,7 +2045,9 @@ fn finish_universal(
     let factored = format!(
         "G_{{ma}}(s) = {loop_label} = {} \\cdot \\left({plant_clean}\\right)",
         gc.replace("G_c(s) = ", "")
-    );
+    )
+    .replace("+ -", "- ")
+    .replace("+ \\frac{-", "- \\frac{");
     let expanded =
         tf_latex(&rounded_tf(&loop_tf, 5, 0.), true, false).replace("G(s) = ", "G_{ma}(s) = ");
     let tc = tf_latex(&rounded_tf(&comp_cl, 5, 0.), true, false).replace("G(s) = ", "T(s) = ");
@@ -1714,6 +2061,21 @@ fn finish_universal(
     set(&mut c, "err_after", err.clone());
     set(&mut c, "compensated_stable", stable);
     append(&mut c, "steps", 1722, false)?;
+    if let Some(steps) = c.get_mut("steps").and_then(|v| v.as_array_mut()) {
+        for step in steps {
+            if let Some(eqs) = step.get_mut("equations").and_then(|v| v.as_array_mut()) {
+                for eq in eqs {
+                    if let Some(s) = eq.as_str() {
+                        let cleaned = s
+                            .replace("+ -", "- ")
+                            .replace("+ \\frac{-", "- \\frac{")
+                            .replace("- -", "+ ");
+                        *eq = json!(cleaned);
+                    }
+                }
+            }
+        }
+    }
     let end = optional(p, "final_time")?;
     let t = simulation::time_vector(&comp_cl, end, crate::time_response::points(p)?)?;
     let input = match mode.as_str() {
@@ -1751,7 +2113,54 @@ fn finish_universal(
         }
         "P" => append(&mut c, "metric_rows", 1930, false)?,
         "PD" => append(&mut c, "metric_rows", 1932, true)?,
-        "PID" => append(&mut c, "metric_rows", 1940, true)?,
+        "PID" => {
+            let pid_mode = p
+                .get("pid_zeros_mode")
+                .and_then(|v| v.as_str())
+                .unwrap_or("distinct");
+            let is_equal = matches!(
+                pid_mode,
+                "equal" | "iguais" | "zero_duplo" | "duplo" | "reais_iguais" | "zeros_iguais"
+            );
+            let is_cancel = matches!(
+                pid_mode,
+                "cancel" | "cancellation" | "cancelamento" | "polo_zero" | "cancel_pole"
+            );
+            if is_equal {
+                let rows = json!([
+                    {"label": "Ganho proporcional (Kp)", "value": fmt(&cp["kp"], 4, false)},
+                    {"label": "Ganho integral (Ki)", "value": fmt(&cp["ki"], 4, false)},
+                    {"label": "Ganho derivativo (Kd)", "value": fmt(&cp["kd"], 4, false)},
+                    {"label": "Zero duplo do controlador (z₀)", "value": fmt(&cp["z"], 4, false)},
+                    {"label": "Ângulo de cada zero (θz)", "unit": "°", "value": fmt(&cp["theta_z"], 4, false)},
+                ]);
+                for row in rows.as_array().unwrap() {
+                    c.get_mut("metric_rows")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(row.clone());
+                }
+            } else if is_cancel {
+                let rows = json!([
+                    {"label": "Ganho proporcional (Kp)", "value": fmt(&cp["kp"], 4, false)},
+                    {"label": "Ganho integral (Ki)", "value": fmt(&cp["ki"], 4, false)},
+                    {"label": "Ganho derivativo (Kd)", "value": fmt(&cp["kd"], 4, false)},
+                    {"label": "Zero z₁ (cancela polo da planta)", "value": fmt(&cp["zi"], 4, false)},
+                    {"label": "Zero z₂ (calculado via LGR)", "value": fmt(&cp["z"], 4, false)},
+                    {"label": "Ângulo do zero z₂ (θz₂)", "unit": "°", "value": fmt(&cp["theta_z"], 4, false)},
+                ]);
+                for row in rows.as_array().unwrap() {
+                    c.get_mut("metric_rows")
+                        .unwrap()
+                        .as_array_mut()
+                        .unwrap()
+                        .push(row.clone());
+                }
+            } else {
+                append(&mut c, "metric_rows", 1940, true)?;
+            }
+        }
         "PI" => append(&mut c, "metric_rows", 1949, true)?,
         _ => {}
     }
@@ -1761,9 +2170,11 @@ fn finish_universal(
         append(&mut c, "metric_rows", 1967, false)?;
     }
     let details = json!({"design_type":kind.to_lowercase(),"controller_type":kind,"design_label":get(&c,"design_label"),"input_type":mode,"settling_criterion":cp["criterion_pct"],"stable":stable,"warning":warning,"controller_parameters":cp,"uncompensated":get(&c,"uncomp"),"angle_contributions":get(&c,"angle_contributions"),"steps":get(&c,"steps"),"gc_latex":gc,"gma_factored_latex":factored,"gma_expanded_latex":expanded,"tc_latex":tc,"plant_latex_factored":get(&c,"plant_latex_factored"),"plant_latex_expanded":get(&c,"plant_latex_expanded"),"forward_latex_factored":get(&c,"forward_latex_factored"),"feedback_latex":get(&c,"feedback_latex"),"warnings":warnings,"before":mb,"after":ma,"closed_loop_poles_before":values::complex_list(&uncomp_cl.poles()?),"closed_loop_poles_after":values::complex_list(&comp_poles)});
+    let gc_clean = gc.replace("+ -", "- ").replace("+ \\frac{-", "- \\frac{");
+    let factored_clean = factored.replace("+ -", "- ").replace("+ \\frac{-", "- \\frac{");
     let mut latex = vec![
-        json!({"label":"Controlador Gc(s)","value":gc}),
-        json!({"label":format!("Malha Aberta Compensada Gma(s) = {}",if feedback.is_some(){"Gc(s)G(s)H(s)"}else{"Gc(s)G(s)"}),"value":factored}),
+        json!({"label":"Controlador Gc(s)","value":gc_clean}),
+        json!({"label":format!("Malha Aberta Compensada Gma(s) = {}",if feedback.is_some(){"Gc(s)G(s)H(s)"}else{"Gc(s)G(s)"}),"value":factored_clean}),
         json!({"label":"Malha Aberta Expandida","value":expanded}),
         json!({"label":"Malha Fechada Compensada T(s)","value":tc}),
         json!({"label":"Planta Original G(s)","value":get(&c,"forward_latex_factored")}),
