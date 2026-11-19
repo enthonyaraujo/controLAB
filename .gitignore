@@ -38,3 +38,6 @@ native/android/app/src/main/jniLibs/
 
 # Cargo workspace
 /target/
+
+# Artefatos locais e logs intermediários de validação
+/artifacts/
