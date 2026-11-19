@@ -22,6 +22,7 @@ A validação cobre o escopo específico dos módulos de controle linear contín
 | [`benchmarks.md`](benchmarks.md) | Metodologia, ambiente e resultados de desempenho Rust (`--release`) vs motor Python legado (`be79347`) |
 | [`final-acceptance.md`](final-acceptance.md) | Síntese de aceitação, cobertura real dos testes, limitações matemáticas conhecidas e análise de riscos |
 | [`validation-matrix.csv`](validation-matrix.csv) | Matriz completa das 42 configurações auditadas com status separado nas 4 categorias |
+| [`references/`](references/README.md) | Scripts independentes de geração em MATLAB R2022b (`.m`), saídas JSON de referência e resultados consolidados dos benchmarks (`benchmark-results.json`) |
 
 ---
 
