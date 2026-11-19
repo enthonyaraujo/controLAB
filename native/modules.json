@@ -148,6 +148,87 @@
         "showControllerFormula": true
       },
       {
+        "name": "synthesis_mode",
+        "label": "Modo de Síntese",
+        "type": "select",
+        "value": "lgr_classic",
+        "help": "Diferencia a síntese clássica por alocação de polos via LGR do refinamento numérico sobre a resposta temporal real e da seleção automática do controlador mais simples.",
+        "options": [
+          [
+            "lgr_classic",
+            "1. Clássico via LGR (alocação de polos) + verificação real"
+          ],
+          [
+            "temporal_refined",
+            "2. Refinamento numérico por restrições temporais (Mp, ts, ess)"
+          ],
+          [
+            "auto_simplest",
+            "3. Seleção automática do controlador mais simples (P → PI → PD → Lead → PID)"
+          ]
+        ]
+      },
+      {
+        "name": "ts_constraint",
+        "label": "Restrição de ts",
+        "type": "select",
+        "value": "at_most",
+        "help": "Define se o tempo de acomodação solicitado é um limite superior (ts ≤ valor) ou uma meta de igualdade (ts = valor).",
+        "options": [
+          [
+            "at_most",
+            "Limite superior (ts ≤ valor)"
+          ],
+          [
+            "equal",
+            "Igualdade (ts = valor)"
+          ]
+        ],
+        "when": {
+          "controller_type": [
+            "lead",
+            "P",
+            "PD",
+            "PI",
+            "PID"
+          ]
+        }
+      },
+      {
+        "name": "xi_constraint",
+        "label": "Restrição de ξ",
+        "type": "select",
+        "value": "auto",
+        "help": "Define se ξ é tratado automaticamente (igualdade quando informado sem Mp), igualdade obrigatória, limite mínimo (ξ ≥ valor) ou estimativa didática opcional.",
+        "options": [
+          [
+            "auto",
+            "Automático (igualdade se sem Mp)"
+          ],
+          [
+            "equal",
+            "Igualdade obrigatória (ξ = valor)"
+          ],
+          [
+            "at_least",
+            "Limite mínimo obrigatório (ξ ≥ valor)"
+          ],
+          [
+            "estimate",
+            "Estimativa didática opcional"
+          ]
+        ],
+        "when": {
+          "controller_type": [
+            "lead",
+            "P",
+            "PD",
+            "PI",
+            "PID"
+          ]
+        }
+      },
+      {
         "name": "input_type",
         "label": "Entrada R(s)",
         "type": "select",

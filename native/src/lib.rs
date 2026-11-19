@@ -340,6 +340,18 @@ impl Controlab {
                 && app.schema.contains_key(&page)
             {
                 app.page = page.clone();
+                if let Ok(raw_vals) = std::env::var("CONTROLAB_SCREENSHOT_VALUES")
+                    && let Ok(Value::Object(map)) = serde_json::from_str::<Value>(&raw_vals)
+                    && let Some(analysis) = app.analyses.get_mut(&page)
+                {
+                    for (k, v) in map {
+                        let s = v
+                            .as_str()
+                            .map(str::to_owned)
+                            .unwrap_or_else(|| v.to_string());
+                        analysis.values.insert(k, s);
+                    }
+                }
                 if std::env::var_os("CONTROLAB_SCREENSHOT_EMPTY").is_none() {
                     app.calculate(&page, 1080.0);
                 }
@@ -489,6 +501,9 @@ impl Controlab {
             Ok(mut payload) => {
                 payload["response_type"] = json!(a.response);
                 payload["language"] = json!("pt-BR");
+                if id == "controllers" {
+                    payload["verify_requirements"] = json!(true);
+                }
                 if plot_width > 100.0 {
                     payload["width"] = json!(plot_width.round());
                 }
@@ -595,9 +610,15 @@ impl Controlab {
         a.pan = egui::Vec2::ZERO;
         a.result = reply;
         let expr = a.values.get(field).cloned().unwrap_or_default();
+        let requirements_failed = tag == "controllers"
+            && a.result["details"]["verification"]["requirements_passed"].as_bool() == Some(false);
         let message = match tag {
             "routh" => "Estabilidade calculada com sucesso!".to_owned(),
             "lgr" => "LGR calculado e traçado com sucesso!".to_owned(),
+            "controllers" if requirements_failed => {
+                "Controlador calculado, mas especificações obrigatórias não foram atendidas."
+                    .to_owned()
+            }
             _ => format!("{title} concluída."),
         };
         let name = if expr.is_empty() { title } else { expr.clone() };
@@ -609,7 +630,14 @@ impl Controlab {
             kind: "math".into(),
             timestamp: unix_millis(),
         });
-        self.toast(message, ToastKind::Success);
+        self.toast(
+            message,
+            if requirements_failed {
+                ToastKind::Error
+            } else {
+                ToastKind::Success
+            },
+        );
     }
 
     fn finish_script(&mut self, tag: &str, reply: Value, success: bool, error: String) {
