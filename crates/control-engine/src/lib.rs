@@ -1,6 +1,7 @@
 //! Scientific Rust engine. The UI remains on the Python engine until parity gates pass.
 
 pub mod controller_math;
+pub mod controller_synthesis;
 pub mod controllers;
 pub mod dispatch;
 mod exact_transfer;

@@ -55,7 +55,8 @@ fn pid_design_question_5_cancellation_and_equal_zeros() {
         "ts": 1.0,
         "xi": 0.4,
         "settling_criterion": "2"
-    })).unwrap();
+    }))
+    .unwrap();
     let p_cancel = &r_cancel["details"]["controller_parameters"];
     assert!((p_cancel["kp"].as_f64().unwrap() - 200.0).abs() < 1e-3);
     assert!((p_cancel["ki"].as_f64().unwrap() - 100.0).abs() < 1e-3);
@@ -72,7 +73,8 @@ fn pid_design_question_5_cancellation_and_equal_zeros() {
         "ts": 1.0,
         "xi": 0.4,
         "settling_criterion": "2"
-    })).unwrap();
+    }))
+    .unwrap();
     let p_equal = &r_equal["details"]["controller_parameters"];
     assert!((p_equal["kp"].as_f64().unwrap() - 200.0).abs() < 1e-3);
     assert!((p_equal["ki"].as_f64().unwrap() - 100.0).abs() < 1e-3);
@@ -93,7 +95,8 @@ fn pid_design_question_2_cancellation_and_equal_zeros() {
         "wn": 6.57,
         "xi": 0.7,
         "settling_criterion": "2"
-    })).unwrap();
+    }))
+    .unwrap();
     let p_cancel = &r_cancel["details"]["controller_parameters"];
     assert!((p_cancel["kp"].as_f64().unwrap() - (-5.215)).abs() < 1e-2);
     assert!((p_cancel["ki"].as_f64().unwrap() - (-9.652)).abs() < 1e-2);
@@ -110,7 +113,8 @@ fn pid_design_question_2_cancellation_and_equal_zeros() {
         "wn": 6.57,
         "xi": 0.7,
         "settling_criterion": "2"
-    })).unwrap();
+    }))
+    .unwrap();
     let p_equal = &r_equal["details"]["controller_parameters"];
     assert!((p_equal["kp"].as_f64().unwrap() - (-5.335)).abs() < 1e-2);
     assert!((p_equal["ki"].as_f64().unwrap() - (-10.22)).abs() < 1e-2);
