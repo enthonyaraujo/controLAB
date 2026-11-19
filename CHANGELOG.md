@@ -3,7 +3,9 @@
 Todas as mudanças relevantes e lançamentos da suíte ControLAB são documentados neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e este projeto segue [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
-## [Unreleased]
+## [1.1.0] - 2026-11-19
+
+Integração da validação científica, numérica, funcional, visual e de desempenho do motor nativo em Rust e da síntese de controladores orientada por restrições ([PR #1](https://github.com/enthonyaraujo/controLAB/pull/1)).
 
 ### Added
 
@@ -12,7 +14,7 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 - Semântica explícita para restrições de coeficiente de amortecimento (`DampingSpec::{Equal, AtLeast, DidacticEstimate}`), frequência natural (`NaturalFreqSpec::{Equal, AtLeast, OptionalEstimate}`), tempo de acomodação (`AtMost` / `Equal` com tolerância padrão uniforme de `±2%`, piso `0,02 s`) e dominância modal (identificação do polo/par de referência e razão de resíduos de Heaviside).
 - Classificação explícita de viabilidade (`Feasible`, `ProvenInfeasible`, `NotFoundWithinSearchBounds`) com provas algébricas de inviabilidade e diagnóstico de estruturas alternativas.
 - Painel de conformidade na interface nativa (`controlab-native`) com banner de status global (`CONFORME`, `CONFORME COM ALERTAS`, `NÃO CONFORME`), comparação `Solicitado × Teórico × Medido × Diferença`, marcações `[OBRIGATÓRIA]` vs `[ESTIMATIVA OPCIONAL]`, referência modal, motivos de não conformidade e advertências técnicas.
-- Documentação científica pública de validação e benchmarks em `docs/validation/`.
+- Documentação científica pública de validação, matriz de 42 configurações auditadas, referências independentes reproduzíveis do MATLAB R2022b e resultados consolidados de benchmarks em `docs/validation/` e `docs/validation/references/`.
 
 ### Changed
 
