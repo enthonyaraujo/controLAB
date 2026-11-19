@@ -430,6 +430,9 @@ fn scientific(ui: &mut Ui, view: &View, f: &mut Formulas) {
         } else {
             latex_grid(ui, view, f, latex);
         }
+        if view.id == "controllers" && r["details"]["verification"].is_object() {
+            verification_panel(ui, p, &r["details"]["verification"]);
+        }
         for (i, metric) in list(&r["metrics"]).iter().enumerate() {
             if let Some(header) = metric["header"].as_str() {
                 kit::group_header(ui, p, header);
@@ -449,6 +452,134 @@ fn scientific(ui: &mut Ui, view: &View, f: &mut Formulas) {
         }
     }
     steps_panel(ui, p, f, list(&r["details"]["steps"]));
+}
+
+/// Controller requirement verification banner, comparison table, and technical warnings.
+fn verification_panel(ui: &mut Ui, p: &Palette, verification: &Value) {
+    let passed = verification["requirements_passed"]
+        .as_bool()
+        .unwrap_or(false);
+    let overall = verification["overall_status"].as_str().unwrap_or("FAIL");
+    let (tone, headline) = match (passed, overall) {
+        (true, "PASS") => (p.stable, "CONFORME — Todas as especificações atendidas"),
+        (true, _) => (
+            p.marginal,
+            "CONFORME COM ALERTAS — Especificações atendidas (ver advertências)",
+        ),
+        (false, _) => (
+            p.unstable,
+            "NÃO CONFORME — Especificações obrigatórias não atendidas",
+        ),
+    };
+
+    ui.add_space(6.0);
+    kit::frame(tone.bg, tone.border, 5, 8).show(ui, |ui| {
+        ui.set_width(ui.available_width());
+        let g = kit::wrapped(
+            ui,
+            headline,
+            sans(12.5, Weight::Bold),
+            tone.fg,
+            ui.available_width().max(40.0),
+        );
+        let (rect, _) = ui.allocate_exact_size(g.size(), Sense::hover());
+        ui.painter().galley(rect.min, g, tone.fg);
+
+        let failed = list(&verification["failed_requirements"]);
+        if !passed && !failed.is_empty() {
+            ui.add_space(4.0);
+            let reasons: Vec<&str> = failed.iter().filter_map(|v| v.as_str()).collect();
+            let detail = format!("Motivos de não conformidade: {}", reasons.join("; "));
+            let gd = kit::wrapped(
+                ui,
+                &detail,
+                sans(11.3, Weight::Regular),
+                p.text,
+                ui.available_width().max(40.0),
+            );
+            let (rd, _) = ui.allocate_exact_size(gd.size(), Sense::hover());
+            ui.painter().galley(rd.min, gd, p.text);
+        }
+    });
+
+    if let Some(modal) = verification.get("modal_analysis").filter(|v| v.is_object())
+        && let Some(pole_lbl) = modal["damping_pole_label"].as_str()
+    {
+        ui.add_space(4.0);
+        let mut ref_line = format!("Referência modal para ξ e ωn: {pole_lbl}");
+        if let Some(rr) = modal["non_dominant_residue_ratio"].as_f64() {
+            ref_line.push_str(&format!(" | razão de resíduos não dominantes: {:.3}", rr));
+        }
+        kit::striped_row(ui, p, 0, "Polo(s) de referência (ξ/ωn)", &ref_line);
+    }
+
+    let checks = list(&verification["checks"]);
+    if !checks.is_empty() {
+        ui.add_space(6.0);
+        kit::group_header(ui, p, "VERIFICAÇÃO DE ESPECIFICAÇÕES (SOLICITADO × REAL)");
+        for (idx, ck) in checks.iter().enumerate() {
+            let label = ck["label"].as_str().unwrap_or("Requisito");
+            let req = ck["requested"].as_str().unwrap_or("—");
+            let theo = ck["theoretical"].as_str().unwrap_or("—");
+            let meas = ck["measured"].as_str().unwrap_or("—");
+            let diff = ck["difference"].as_str().unwrap_or("—");
+            let status = ck["status"].as_str().unwrap_or("FAIL");
+            let mandatory = ck["mandatory"].as_bool().unwrap_or(true);
+            let kind_tag = if mandatory {
+                "[OBRIGATÓRIA]"
+            } else {
+                "[ESTIMATIVA OPCIONAL]"
+            };
+            let badge_label = match status {
+                "PASS" => "ATENDIDO",
+                "WARNING" => "ALERTA",
+                _ => "NÃO ATENDIDO",
+            };
+            let summary = if theo != "—" && theo != req {
+                format!(
+                    "{meas} {kind_tag} (sol.: {req} | teór.: {theo} | dif.: {diff}) — {badge_label}"
+                )
+            } else if diff != "—" {
+                format!("{meas} {kind_tag} (sol.: {req} | dif.: {diff}) — {badge_label}")
+            } else {
+                format!("{meas} {kind_tag} — {badge_label}")
+            };
+            kit::striped_row(ui, p, idx, label, &summary);
+        }
+    }
+
+    let warnings = list(&verification["warnings"]);
+    if !warnings.is_empty() {
+        ui.add_space(6.0);
+        kit::frame(p.marginal.bg, p.marginal.border, 5, 8).show(ui, |ui| {
+            ui.set_width(ui.available_width());
+            let title = kit::wrapped(
+                ui,
+                "ADVERTÊNCIAS TÉCNICAS (DOMINÂNCIA, CANCELAMENTOS E APROXIMAÇÕES)",
+                sans(11.2, Weight::Bold),
+                p.marginal.fg,
+                ui.available_width().max(40.0),
+            );
+            let (r, _) = ui.allocate_exact_size(title.size(), Sense::hover());
+            ui.painter().galley(r.min, title, p.marginal.fg);
+            ui.add_space(4.0);
+            for w in warnings {
+                if let Some(text_w) = w.as_str() {
+                    let g = kit::wrapped(
+                        ui,
+                        &format!("• {text_w}"),
+                        sans(11.5, Weight::Regular),
+                        p.text,
+                        ui.available_width().max(40.0),
+                    );
+                    let (rw, _) = ui.allocate_exact_size(g.size(), Sense::hover());
+                    ui.painter().galley(rw.min, g, p.text);
+                    ui.add_space(2.0);
+                }
+            }
+        });
+    }
+    ui.add_space(6.0);
 }
 
 /// `.scientific-latex-grid`: two columns of cards; the last odd card spans both.

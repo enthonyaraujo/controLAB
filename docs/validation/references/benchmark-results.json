@@ -1,0 +1,171 @@
+{
+  "environment": {
+    "os": "Linux-7.3.4-300.fc45.x86_64-x86_64-with-glibc2.44",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13420H",
+    "logical_cores": 12,
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+    "legacy_python": "Python 3.12.14",
+    "legacy_commit": "be79347",
+    "rust_commit": "c32b2d4 (branch test/academic-validation)",
+    "profile": "release (optimized)"
+  },
+  "benchmarks": [
+    {
+      "id": "tf_preview_parsing",
+      "description": "Transfer function parsing, symbolic cancellation & LaTeX formatting (5 expressions)",
+      "batch_size": 5,
+      "rust_release": {
+        "iterations": 25,
+        "median_ms": 8.831,
+        "p95_ms": 14.507,
+        "mean_ms": 9.44,
+        "min_ms": 6.952,
+        "max_ms": 14.89,
+        "stdev_ms": 2.213,
+        "peak_rss_mb": 6.04
+      },
+      "legacy_python": {
+        "iterations": 25,
+        "median_ms": 33.248,
+        "p95_ms": 36.04,
+        "mean_ms": 33.686,
+        "min_ms": 32.312,
+        "max_ms": 36.79,
+        "stdev_ms": 1.262,
+        "peak_rss_mb": 68.83
+      },
+      "speedup_median_x": 3.76
+    },
+    {
+      "id": "routh_stability_roots",
+      "description": "Routh-Hurwitz symbolic array, critical gains & polynomial root locus (Eq. 10, 15, 18)",
+      "batch_size": 3,
+      "rust_release": {
+        "iterations": 10,
+        "median_ms": 88.117,
+        "p95_ms": 98.062,
+        "mean_ms": 90.341,
+        "min_ms": 86.591,
+        "max_ms": 101.808,
+        "stdev_ms": 4.68,
+        "peak_rss_mb": 21.58
+      },
+      "legacy_python": {
+        "iterations": 10,
+        "median_ms": 1109.787,
+        "p95_ms": 1182.455,
+        "mean_ms": 1116.676,
+        "min_ms": 1048.147,
+        "max_ms": 1191.964,
+        "stdev_ms": 45.24,
+        "peak_rss_mb": 242.54
+      },
+      "speedup_median_x": 12.59
+    },
+    {
+      "id": "lgr_generation",
+      "description": "Root Locus 7-step derivation + 10,001-gain root trajectory + figure (Eq. 3, 10, 15)",
+      "batch_size": 3,
+      "rust_release": {
+        "iterations": 10,
+        "median_ms": 212.736,
+        "p95_ms": 229.808,
+        "mean_ms": 214.752,
+        "min_ms": 203.017,
+        "max_ms": 233.427,
+        "stdev_ms": 11.116,
+        "peak_rss_mb": 27.26
+      },
+      "legacy_python": {
+        "iterations": 10,
+        "median_ms": 2742.2,
+        "p95_ms": 2803.931,
+        "mean_ms": 2732.384,
+        "min_ms": 2636.268,
+        "max_ms": 2811.49,
+        "stdev_ms": 55.749,
+        "peak_rss_mb": 270.16
+      },
+      "speedup_median_x": 12.89
+    },
+    {
+      "id": "time_response_simulation",
+      "description": "Continuous time response (step, ramp, impulse, 900 pts) + metrics (Q3, Q5, Q8)",
+      "batch_size": 3,
+      "rust_release": {
+        "iterations": 12,
+        "median_ms": 221.497,
+        "p95_ms": 247.22,
+        "mean_ms": 226.524,
+        "min_ms": 216.058,
+        "max_ms": 254.941,
+        "stdev_ms": 11.681,
+        "peak_rss_mb": 20.55
+      },
+      "legacy_python": {
+        "iterations": 12,
+        "median_ms": 1371.912,
+        "p95_ms": 1515.148,
+        "mean_ms": 1381.996,
+        "min_ms": 1286.242,
+        "max_ms": 1529.956,
+        "stdev_ms": 77.376,
+        "peak_rss_mb": 235.79
+      },
+      "speedup_median_x": 6.19
+    },
+    {
+      "id": "controller_synthesis",
+      "description": "Controller synthesis via LGR + step deductions + before/after simulation (Q1 PI, Q4 PI, Q6 PD, Q8 PI)",
+      "batch_size": 4,
+      "rust_release": {
+        "iterations": 10,
+        "median_ms": 257.621,
+        "p95_ms": 271.585,
+        "mean_ms": 258.371,
+        "min_ms": 249.612,
+        "max_ms": 277.231,
+        "stdev_ms": 8.066,
+        "peak_rss_mb": 98.82
+      },
+      "legacy_python": {
+        "iterations": 10,
+        "median_ms": 2321.291,
+        "p95_ms": 2391.064,
+        "mean_ms": 2308.402,
+        "min_ms": 2207.397,
+        "max_ms": 2398.421,
+        "stdev_ms": 70.616,
+        "peak_rss_mb": 230.93
+      },
+      "speedup_median_x": 9.01
+    },
+    {
+      "id": "full_19_lgr_suite",
+      "description": "Complete execution of all 19 LGR academic exercises (19 x 10,001 gains + 19 figures)",
+      "batch_size": 19,
+      "rust_release": {
+        "iterations": 5,
+        "median_ms": 1049.032,
+        "p95_ms": 1118.143,
+        "mean_ms": 1065.235,
+        "min_ms": 1036.87,
+        "max_ms": 1132.002,
+        "stdev_ms": 38.465,
+        "peak_rss_mb": 26.68
+      },
+      "legacy_python": {
+        "iterations": 5,
+        "median_ms": 16263.502,
+        "p95_ms": 16421.908,
+        "mean_ms": 16177.538,
+        "min_ms": 15887.676,
+        "max_ms": 16430.305,
+        "stdev_ms": 258.433,
+        "peak_rss_mb": 291.97
+      },
+      "speedup_median_x": 15.5
+    }
+  ]
+}

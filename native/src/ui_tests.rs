@@ -1072,3 +1072,90 @@ fn settings_updates_card_does_not_expand_into_empty_vertical_space() {
         );
     }
 }
+
+#[test]
+fn controller_verification_ui_flags_non_compliant_classic_and_approves_refined() {
+    let ctx = egui::Context::default();
+    let mut app = fixture(&ctx, false);
+    app.page = "controllers".into();
+
+    // 1. Q8 classic PI: numerically valid, but real Mp = 33.84% > 25% => UI MUST flag NÃO CONFORME.
+    {
+        let analysis = app.analyses.get_mut("controllers").unwrap();
+        analysis
+            .values
+            .insert("plant_expr".into(), "-7.2/(5*s + 1)".into());
+        analysis
+            .values
+            .insert("controller_type".into(), "PI".into());
+        analysis
+            .values
+            .insert("input_type".into(), "time_spec".into());
+        analysis.values.insert("ts".into(), "4".into());
+        analysis.values.insert("mp".into(), "25".into());
+        analysis.values.insert("xi".into(), String::new());
+        analysis.values.insert("wn".into(), String::new());
+        analysis
+            .values
+            .insert("synthesis_mode".into(), "lgr_classic".into());
+        analysis
+            .values
+            .insert("ts_constraint".into(), "at_most".into());
+    }
+    app.calculate("controllers", 1080.0);
+    wait(&mut app, &ctx, "controllers classic Q8", |a| {
+        let an = &a.analyses["controllers"];
+        !an.pending && an.result.is_object()
+    });
+    let classic_res = &app.analyses["controllers"].result;
+    assert_eq!(
+        classic_res["details"]["verification"]["requirements_passed"],
+        false
+    );
+    assert_eq!(
+        classic_res["details"]["verification"]["overall_status"],
+        "FAIL"
+    );
+
+    render_sized(&mut app, &ctx, 1920.0, 6000.0);
+    let classic_labels = render_sized(&mut app, &ctx, 1920.0, 6000.0);
+    assert!(
+        classic_labels.contains("NÃO CONFORME"),
+        "UI must display NÃO CONFORME banner for non-compliant Q8 classic PI"
+    );
+    assert!(
+        classic_labels.contains("VERIFICAÇÃO DE ESPECIFICAÇÕES")
+            && classic_labels.contains("NÃO ATENDIDO")
+            && classic_labels.contains("33,84")
+            && classic_labels.contains("[OBRIGATÓRIA]")
+            && classic_labels.contains("Motivos de não conformidade")
+            && classic_labels.contains("Polo(s) de referência (ξ/ωn)"),
+        "UI must display verification table with mandatory tags, non-compliance reasons, pole reference, and measured 33,84%"
+    );
+
+    // 2. Q8 refined PI: must satisfy all constraints and display CONFORME (with technical alerts).
+    {
+        let analysis = app.analyses.get_mut("controllers").unwrap();
+        analysis
+            .values
+            .insert("synthesis_mode".into(), "temporal_refined".into());
+        analysis.result = Value::Null;
+    }
+    app.calculate("controllers", 1080.0);
+    wait(&mut app, &ctx, "controllers refined Q8", |a| {
+        let an = &a.analyses["controllers"];
+        !an.pending && an.result.is_object()
+    });
+    let refined_res = &app.analyses["controllers"].result;
+    assert_eq!(
+        refined_res["details"]["verification"]["requirements_passed"],
+        true
+    );
+
+    render_sized(&mut app, &ctx, 1920.0, 6000.0);
+    let refined_labels = render_sized(&mut app, &ctx, 1920.0, 6000.0);
+    assert!(
+        refined_labels.contains("CONFORME") && !refined_labels.contains("NÃO CONFORME"),
+        "UI must display CONFORME banner and not NÃO CONFORME for compliant Q8 refined PI"
+    );
+}

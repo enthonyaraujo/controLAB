@@ -535,16 +535,6 @@ fn controller_latex(kind: &str, p: &Value) -> Result<String> {
     if kind == "PID" {
         raw = raw.replace("+ -", "- ");
         raw = raw.replace("+ \\frac{-", "- \\frac{");
-        if !p["zi"].is_null() && !p["z"].is_null() {
-            let zi = n(&p["zi"]);
-            let zd = n(&p["z"]);
-            if (zi - zd).abs() < 1e-4 && zi > 0. {
-                let z_str = fmt(&p["z"], 4, true);
-                let double_factor = format!("(s + {z_str})(s + {z_str})");
-                let squared = format!("(s + {z_str})^2");
-                raw = raw.replace(&double_factor, &squared);
-            }
-        }
     }
     Ok(raw)
 }
@@ -771,6 +761,14 @@ pub fn analyze(p: &Value) -> Result<Value> {
         .or_else(|| p["expr"].as_str().filter(|s| !s.is_empty()))
         .unwrap_or("5 / (s * (s + 1))");
     let plant = TransferFunction::parse(expr)?;
+    let synth_mode = p["synthesis_mode"]
+        .as_str()
+        .unwrap_or("")
+        .trim()
+        .to_lowercase();
+    if matches!(synth_mode.as_str(), "temporal_refined" | "auto_simplest") {
+        return analyze_constrained(p, &plant, &synth_mode);
+    }
     let method = p["method"].as_str().unwrap_or("").to_lowercase();
     if [
         "zn_critical",
@@ -788,6 +786,550 @@ pub fn analyze(p: &Value) -> Result<Value> {
         return legacy(p, &plant);
     }
     universal(p, &plant)
+}
+
+fn specs_from_payload(
+    p: &Value,
+    cp: Option<&Value>,
+) -> Result<crate::controller_synthesis::DesignSpecs> {
+    use crate::controller_synthesis::{
+        DampingSpec, DesignObjective, DesignSpecs, NaturalFreqSpec, SettlingSpec,
+        default_damping_tolerance, default_settling_tolerance, default_wn_tolerance,
+    };
+    let crit = p["settling_criterion"]
+        .as_str()
+        .map(str::to_owned)
+        .unwrap_or_else(|| p["settling_criterion"].to_string())
+        .replace('%', "");
+    let criterion_pct: u8 = if crit.trim() == "5" { 5 } else { 2 };
+
+    let desired_pole = math::desired_pole(&p["desired_pole"])?;
+    let explicit_mp = optional(p, "mp")?;
+    let explicit_ts = optional(p, "ts")?;
+    let explicit_xi = optional(p, "xi")?;
+    let explicit_wn = optional(p, "wn")?;
+
+    let objective = match p["design_objective"]
+        .as_str()
+        .unwrap_or("")
+        .trim()
+        .to_lowercase()
+        .as_str()
+    {
+        "pole_placement" | "poles" => DesignObjective::PolePlacement,
+        "temporal" | "temporal_constraints" | "time_domain" => {
+            DesignObjective::TimeDomainConstraints
+        }
+        _ => {
+            if desired_pole.is_some()
+                || (explicit_xi.is_some()
+                    && explicit_wn.is_some()
+                    && explicit_mp.is_none()
+                    && explicit_ts.is_none())
+            {
+                DesignObjective::PolePlacement
+            } else {
+                DesignObjective::TimeDomainConstraints
+            }
+        }
+    };
+
+    let theo_xi = explicit_xi
+        .or_else(|| cp.and_then(|v| v["xi"].as_f64()))
+        .or_else(|| {
+            explicit_mp
+                .filter(|&m| m > 0.0 && m < 100.0)
+                .and_then(|m| math::xi_from_mp(m).ok())
+        });
+    let theo_wn = explicit_wn
+        .or_else(|| cp.and_then(|v| v["wn"].as_f64()))
+        .or_else(|| {
+            theo_xi.zip(explicit_ts).map(|(x, ts)| {
+                let factor = if criterion_pct == 5 { 3.0 } else { 4.0 };
+                factor / (x * ts)
+            })
+        });
+    let theo_mp = theo_xi
+        .filter(|&x| x > 0.0 && x < 1.0)
+        .map(math::mp_from_xi)
+        .or_else(|| cp.and_then(|v| v["mp"].as_f64()));
+    let theo_ts = cp
+        .and_then(|v| v["ts"].as_f64())
+        .or(explicit_ts)
+        .or_else(|| {
+            theo_xi.zip(theo_wn).map(|(x, w)| {
+                let factor = if criterion_pct == 5 { 3.0 } else { 4.0 };
+                factor / (x * w)
+            })
+        });
+
+    // Only enforce overshoot Mp as a mandatory cap when Mp was explicitly requested
+    // (never silently replace an explicit xi equality with an Mp inequality).
+    let max_overshoot_pct = explicit_mp;
+
+    // Explicit damping ratio semantics:
+    // - "equal": mandatory equality |xi - target| <= xi_tol
+    // - "at_least": mandatory lower bound xi >= target
+    // - "estimate": optional didactic estimate (informational only)
+    // - "auto" (default): if xi was explicitly entered WITHOUT Mp, preserve equality ("equal");
+    //   if both Mp and xi were entered (didactic pairing), treat xi as didactic estimate unless overridden;
+    //   if only Mp was entered, treat derived xi as didactic estimate.
+    let xi_constraint_mode = p["xi_constraint"]
+        .as_str()
+        .unwrap_or("auto")
+        .trim()
+        .to_lowercase();
+    let xi_tol = optional(p, "xi_tolerance")?.unwrap_or_else(default_damping_tolerance);
+    let damping = match (explicit_xi, theo_xi) {
+        (Some(xi), _) => match xi_constraint_mode.as_str() {
+            "equal" | "igualdade" => Some(DampingSpec::Equal {
+                target: xi,
+                tolerance: xi_tol,
+            }),
+            "at_least" | "min" | "minimo" => Some(DampingSpec::AtLeast(xi)),
+            "estimate" | "didactic" | "estimativa" => Some(DampingSpec::DidacticEstimate(xi)),
+            _ => {
+                if explicit_mp.is_none() {
+                    Some(DampingSpec::Equal {
+                        target: xi,
+                        tolerance: xi_tol,
+                    })
+                } else {
+                    Some(DampingSpec::DidacticEstimate(xi))
+                }
+            }
+        },
+        (None, Some(xi)) => match xi_constraint_mode.as_str() {
+            "equal" | "igualdade" => Some(DampingSpec::Equal {
+                target: xi,
+                tolerance: xi_tol,
+            }),
+            "at_least" | "min" | "minimo" => Some(DampingSpec::AtLeast(xi)),
+            _ => Some(DampingSpec::DidacticEstimate(xi)),
+        },
+        (None, None) => None,
+    };
+
+    // Explicit natural frequency semantics:
+    let wn_constraint_mode = p["wn_constraint"]
+        .as_str()
+        .unwrap_or("auto")
+        .trim()
+        .to_lowercase();
+    let wn_tol_opt = optional(p, "wn_tolerance")?;
+    let natural_freq = match (explicit_wn, theo_wn) {
+        (Some(wn), _) => {
+            let tol = wn_tol_opt.unwrap_or_else(|| default_wn_tolerance(wn));
+            match wn_constraint_mode.as_str() {
+                "at_least" | "min" | "minimo" => Some(NaturalFreqSpec::AtLeast(wn)),
+                "estimate" | "estimativa" => Some(NaturalFreqSpec::OptionalEstimate(wn)),
+                _ => Some(NaturalFreqSpec::Equal {
+                    target: wn,
+                    tolerance: tol,
+                }),
+            }
+        }
+        (None, Some(wn)) => {
+            let tol = wn_tol_opt.unwrap_or_else(|| default_wn_tolerance(wn));
+            match wn_constraint_mode.as_str() {
+                "equal" | "igualdade" => Some(NaturalFreqSpec::Equal {
+                    target: wn,
+                    tolerance: tol,
+                }),
+                "at_least" | "min" | "minimo" => Some(NaturalFreqSpec::AtLeast(wn)),
+                _ => Some(NaturalFreqSpec::OptionalEstimate(wn)),
+            }
+        }
+        (None, None) => None,
+    };
+
+    let require_complex_dominance = p["require_complex_dominance"].as_bool().unwrap_or(false);
+
+    let ts_constraint_mode = p["ts_constraint"]
+        .as_str()
+        .unwrap_or("at_most")
+        .trim()
+        .to_lowercase();
+    let ts_tol_opt = optional(p, "ts_tolerance")?;
+    let settling_time = explicit_ts.or(theo_ts).map(|v| {
+        if ts_constraint_mode == "equal" {
+            let tol = ts_tol_opt.unwrap_or_else(|| default_settling_tolerance(v));
+            SettlingSpec::Equal {
+                target: v,
+                tolerance: tol,
+            }
+        } else {
+            SettlingSpec::AtMost(v)
+        }
+    });
+
+    let kind_str = p["controller_type"]
+        .as_str()
+        .unwrap_or("")
+        .trim()
+        .to_uppercase();
+    let require_zero_step_error = p["require_zero_error"]
+        .as_bool()
+        .unwrap_or(matches!(kind_str.as_str(), "PI" | "PID"));
+
+    let dom_pole = desired_pole.or_else(|| {
+        cp.and_then(|v| {
+            let re = v["re"].as_f64()?;
+            let im = v["im"].as_f64()?;
+            (re > 0.0 && im > 0.0).then_some(C::new(-re, im))
+        })
+    });
+
+    Ok(DesignSpecs {
+        objective,
+        max_overshoot_pct,
+        settling_time,
+        settling_criterion_pct: criterion_pct,
+        damping,
+        natural_freq,
+        require_complex_dominance,
+        require_zero_step_error,
+        desired_dominant_pole: dom_pole,
+        theoretical_xi: theo_xi,
+        theoretical_wn: theo_wn,
+        theoretical_mp_pct: theo_mp,
+        theoretical_ts_s: theo_ts,
+    })
+}
+
+fn analyze_constrained(p: &Value, forward: &TransferFunction, synth_mode: &str) -> Result<Value> {
+    use crate::controller_synthesis::{
+        ControllerStructure, synthesize_for_structure, synthesize_simplest,
+    };
+
+    let feedback = p["feedback_expr"]
+        .as_str()
+        .filter(|s| !s.trim().is_empty() && !matches!(s.trim(), "1" | "1.0"))
+        .map(TransferFunction::parse)
+        .transpose()?;
+    let plant = if let Some(h) = &feedback {
+        minreal(&forward.multiply(h)?)?
+    } else {
+        forward.clone()
+    };
+    let mode = steady_mode(p);
+    let specs = specs_from_payload(p, None)?;
+
+    let outcome = if synth_mode == "auto_simplest" {
+        synthesize_simplest(forward, feedback.as_ref(), &specs)?
+    } else {
+        let req_str = p["controller_type"].as_str().unwrap_or("PID");
+        let structure = ControllerStructure::parse(req_str).ok_or_else(|| {
+            format!("Refinamento numérico não suporta o controlador '{req_str}'. Use P, PI, PD, Lead ou PID.")
+        })?;
+        let mut res = synthesize_for_structure(forward, feedback.as_ref(), structure, &specs)?;
+        if !res.feasible {
+            // Also search alternative structures so the user receives explicit recommendations.
+            for alt in ControllerStructure::complexity_order() {
+                if alt == structure {
+                    continue;
+                }
+                if let Ok(alt_res) =
+                    synthesize_for_structure(forward, feedback.as_ref(), alt, &specs)
+                    && alt_res.feasible
+                    && let Some(c) = alt_res.selected
+                {
+                    res.alternatives.push(c);
+                    break;
+                }
+            }
+        }
+        res
+    };
+
+    let Some(chosen) = outcome.selected else {
+        let reasons = if outcome.infeasibility_reasons.is_empty() {
+            "Nenhuma estrutura de controlador satisfez as especificações solicitadas.".to_owned()
+        } else {
+            outcome.infeasibility_reasons.join(" ")
+        };
+        return Err(reasons);
+    };
+
+    let kind = chosen.structure.as_str().to_owned();
+    let controller = chosen.transfer.clone();
+    let loop_tf = controller.multiply(&plant)?;
+    let simulation_loop = if !loop_tf.is_proper() {
+        loop_tf.multiply(&TransferFunction::new(vec![1.], vec![0.001, 1.])?)?
+    } else {
+        loop_tf.clone()
+    };
+    let (uncomp_cl, comp_cl) = if let Some(h) = &feedback {
+        let mut f = controller.multiply(forward)?;
+        if !f.is_proper() {
+            f = f.multiply(&TransferFunction::new(vec![1.], vec![0.001, 1.])?)?;
+        }
+        (forward.feedback(h, -1.)?, f.feedback(h, -1.)?)
+    } else {
+        (
+            plant.feedback(&TransferFunction::scalar(1.), -1.)?,
+            simulation_loop.feedback(&TransferFunction::scalar(1.), -1.)?,
+        )
+    };
+
+    let comp_poles = comp_cl.poles()?;
+    let stable = chosen.verification.closed_loop_stable;
+    let uncomp = uncompensated(&plant, &mode)?;
+    let err = math::steady_state_error(&loop_tf.num, &loop_tf.den, &mode);
+    let end = optional(p, "final_time")?;
+    let t = simulation::time_vector(&comp_cl, end, crate::time_response::points(p)?)?;
+    let input = match mode.as_str() {
+        "ramp" => Input::Ramp,
+        "parabola" => Input::Parabolic,
+        _ => Input::Step,
+    };
+    let before = simulation::simulate(&uncomp_cl, &t, input)?;
+    let after = simulation::simulate(&comp_cl, &t, input)?;
+    let threshold = if specs.settling_criterion_pct == 5 {
+        0.05
+    } else {
+        0.02
+    };
+    let mb = metrics(&uncomp_cl, &t, threshold)?;
+    let ma = metrics(&comp_cl, &t, threshold)?;
+
+    let dom = chosen
+        .verification
+        .dominant_pole
+        .unwrap_or(C::new(-1.0, 0.0));
+    let mut cp = json!({
+        "kp": chosen.kp,
+        "ki": chosen.ki,
+        "kd": chosen.kd,
+        "K": chosen.k.unwrap_or(chosen.kp),
+        "z": chosen.z,
+        "zi": chosen.zi,
+        "p": chosen.p,
+        "td": if chosen.structure == ControllerStructure::PD && chosen.kp.abs() > 1e-12 {
+            json!(chosen.kd / chosen.kp)
+        } else {
+            Value::Null
+        },
+        "re": dom.re.abs(),
+        "im": dom.im.abs(),
+        "criterion_pct": specs.settling_criterion_pct,
+        "e_atual": uncomp["steady_state_error_raw"],
+        "e_novo": err["value"],
+    });
+    if let Some(mp) = chosen.verification.measured_overshoot_pct {
+        cp["mp"] = json!(mp);
+    }
+    if let Some(ts) = chosen.verification.measured_settling_time_s {
+        cp["ts"] = json!(ts);
+    }
+
+    let design_label = if synth_mode == "auto_simplest" {
+        format!("Síntese Automática ({kind}) — Controlador Mais Simples por Restrições Temporais")
+    } else {
+        format!("Síntese com Refinamento Numérico ({kind}) — Restrições Temporais Reais")
+    };
+
+    let gc_latex =
+        tf_latex(&rounded_tf(&controller, 5, 1e-9), true, false).replace("G(s) = ", "G_c(s) = ");
+    let expanded =
+        tf_latex(&rounded_tf(&loop_tf, 5, 0.), true, false).replace("G(s) = ", "G_{ma}(s) = ");
+    let tc = tf_latex(&rounded_tf(&comp_cl, 5, 0.), true, false).replace("G(s) = ", "T(s) = ");
+    let plant_fact = tf_latex(forward, true, true);
+    let plant_exp = tf_latex(forward, true, false);
+    let feedback_tex = feedback
+        .as_ref()
+        .map(|h| tf_latex(h, true, true).replace("G(s) = ", "H(s) = "))
+        .unwrap_or_default();
+
+    let mut c = Context::new();
+    set(&mut c, "controller_params", cp.clone());
+    set(&mut c, "angle_contributions", json!([]));
+    set(&mut c, "design_label", design_label.clone());
+    let (image, svg) = plot_universal(&plant, &loop_tf, &t, &before, &after, &mode, &c)?;
+
+    let mut rows = vec![
+        json!({"header": "SÍNTESE POR RESTRIÇÕES TEMPORAIS"}),
+        json!({"label": "Controlador selecionado", "value": kind}),
+        json!({"label": "Conformidade global", "value": if chosen.verification.requirements_passed { "Conforme (requisitos atendidos)" } else { "Não conforme (especificações violadas)" }}),
+        json!({"label": "Método utilizado", "value": chosen.method_used}),
+        json!({"label": "Ganho proporcional (Kp)", "value": fmt(&json!(chosen.kp), 5, false)}),
+    ];
+    if chosen.structure.has_integrator() {
+        rows.push(
+            json!({"label": "Ganho integral (Ki)", "value": fmt(&json!(chosen.ki), 5, false)}),
+        );
+    }
+    if matches!(
+        chosen.structure,
+        ControllerStructure::PD | ControllerStructure::PID
+    ) {
+        rows.push(
+            json!({"label": "Ganho derivativo (Kd)", "value": fmt(&json!(chosen.kd), 5, false)}),
+        );
+    }
+    if let Some(z) = chosen.z {
+        rows.push(json!({"label": "Zero do controlador (z)", "value": fmt(&json!(z), 5, false)}));
+    }
+    if let Some(zi) = chosen.zi {
+        rows.push(json!({"label": "Segundo zero (z₁)", "value": fmt(&json!(zi), 5, false)}));
+    }
+    if let Some(pole) = chosen.p
+        && chosen.structure == ControllerStructure::Lead
+    {
+        rows.push(
+            json!({"label": "Polo do controlador (p)", "value": fmt(&json!(pole), 5, false)}),
+        );
+    }
+    rows.push(json!({"header": "MÉTRICAS REAIS MEDIDAS (RESPOSTA TEMPORAL)"}));
+    if let Some(mp) = chosen.verification.measured_overshoot_pct {
+        rows.push(json!({"label": "Sobressinal real (Mp)", "unit": "%", "value": fmt(&json!(mp), 4, false)}));
+    }
+    if let Some(ts) = chosen.verification.measured_settling_time_s {
+        rows.push(json!({"label": format!("Tempo de acomodação real (ts {}%)", specs.settling_criterion_pct), "unit": "s", "value": fmt(&json!(ts), 4, false)}));
+    }
+    if let Some(y_ss) = chosen.verification.measured_steady_state_y {
+        rows.push(
+            json!({"label": "Valor estacionário y(∞)", "value": fmt(&json!(y_ss), 5, false)}),
+        );
+    }
+    if let Some(ea) = chosen.verification.summer_steady_state_error {
+        rows.push(
+            json!({"label": "Erro atuante no somador e_a(∞)", "value": fmt(&json!(ea), 5, false)}),
+        );
+    }
+    rows.push(
+        json!({"label": "Estabilidade", "value": if stable { "Estável" } else { "Instável" }}),
+    );
+
+    let mut steps = vec![json!({
+        "number": 1,
+        "title": "Seleção e Refinamento Numérico sobre a Resposta Temporal Real",
+        "description": format!(
+            "Avaliados {} candidatos por simulação temporal exata (exponencial matricial) verificando estabilidade interna, sobressinal real, tempo de acomodação definitivo ({}%) e erro estacionário.",
+            outcome.candidates_evaluated, specs.settling_criterion_pct
+        ),
+        "equations": [gc_latex.clone(), tc.clone()],
+        "notes": outcome.infeasibility_reasons.clone(),
+    })];
+    if !outcome.alternatives.is_empty() {
+        let alt_notes: Vec<String> = outcome
+            .alternatives
+            .iter()
+            .map(|a| {
+                format!(
+                    "Estrutura alternativa viável: {} (Kp={}, Ki={}, Kd={}, Mp={}%, ts={} s)",
+                    a.structure.as_str(),
+                    fmt(&json!(a.kp), 4, false),
+                    fmt(&json!(a.ki), 4, false),
+                    fmt(&json!(a.kd), 4, false),
+                    fmt(
+                        &json!(a.verification.measured_overshoot_pct.unwrap_or(0.0)),
+                        3,
+                        false
+                    ),
+                    fmt(
+                        &json!(a.verification.measured_settling_time_s.unwrap_or(0.0)),
+                        3,
+                        false
+                    ),
+                )
+            })
+            .collect();
+        steps.push(json!({
+            "number": 2,
+            "title": "Estruturas Alternativas Viáveis",
+            "description": "A estrutura solicitada não satisfez todas as restrições; alternativas mais capazes foram identificadas automaticamente.",
+            "equations": [],
+            "notes": alt_notes,
+        }));
+    }
+
+    let warning = if !chosen.verification.failed_requirements.is_empty() {
+        json!(format!(
+            "Requisitos não atendidos: {}.",
+            chosen.verification.failed_requirements.join("; ")
+        ))
+    } else if !chosen.verification.warnings.is_empty() {
+        json!(chosen.verification.warnings.join(" "))
+    } else {
+        Value::Null
+    };
+
+    let alt_json: Vec<Value> = outcome
+        .alternatives
+        .iter()
+        .map(|a| {
+            json!({
+                "controller_type": a.structure.as_str(),
+                "kp": a.kp,
+                "ki": a.ki,
+                "kd": a.kd,
+                "z": a.z,
+                "zi": a.zi,
+                "p": a.p,
+                "verification": a.verification.to_json(),
+            })
+        })
+        .collect();
+
+    let details = json!({
+        "design_type": kind.to_lowercase(),
+        "controller_type": kind,
+        "synthesis_mode": synth_mode,
+        "design_label": design_label,
+        "input_type": mode,
+        "settling_criterion": specs.settling_criterion_pct,
+        "stable": stable,
+        "warning": warning,
+        "controller_parameters": cp,
+        "uncompensated": uncomp,
+        "angle_contributions": [],
+        "steps": steps,
+        "gc_latex": gc_latex,
+        "gma_factored_latex": expanded,
+        "gma_expanded_latex": expanded,
+        "tc_latex": tc,
+        "plant_latex_factored": plant_fact,
+        "plant_latex_expanded": plant_exp,
+        "forward_latex_factored": plant_fact,
+        "feedback_latex": feedback_tex,
+        "warnings": chosen.verification.warnings,
+        "before": mb,
+        "after": ma,
+        "closed_loop_poles_before": values::complex_list(&uncomp_cl.poles()?),
+        "closed_loop_poles_after": values::complex_list(&comp_poles),
+        "verification": chosen.verification.to_json(),
+        "synthesis": {
+            "feasible": outcome.feasible,
+            "feasibility_class": outcome.feasibility_class.as_str(),
+            "method_used": chosen.method_used,
+            "candidates_evaluated": outcome.candidates_evaluated,
+            "infeasibility_reasons": outcome.infeasibility_reasons,
+            "alternatives": alt_json,
+        },
+    });
+
+    let mut latex = vec![
+        json!({"label": "Controlador Gc(s)", "value": gc_latex}),
+        json!({"label": "Malha Fechada Compensada T(s)", "value": tc}),
+        json!({"label": "Malha Aberta Expandida", "value": expanded}),
+        json!({"label": "Planta Original G(s)", "value": plant_fact}),
+    ];
+    if feedback.is_some() {
+        latex.push(json!({"label": "Realimentação H(s)", "value": feedback_tex}));
+    }
+
+    Ok(json!({
+        "success": true,
+        "module": "controller_design",
+        "title": "Projeto de Controladores",
+        "description": design_label,
+        "image": image,
+        "svg": svg,
+        "latex": latex,
+        "metrics": rows,
+        "details": details,
+    }))
 }
 fn universal(p: &Value, forward: &TransferFunction) -> Result<Value> {
     let mut c = Context::new();
@@ -1200,7 +1742,12 @@ fn universal(p: &Value, forward: &TransferFunction) -> Result<Value> {
                 let is_equal = is_pid
                     && matches!(
                         pid_mode.as_str(),
-                        "equal" | "iguais" | "zero_duplo" | "duplo" | "reais_iguais" | "zeros_iguais"
+                        "equal"
+                            | "iguais"
+                            | "zero_duplo"
+                            | "duplo"
+                            | "reais_iguais"
+                            | "zeros_iguais"
                     );
                 let is_cancel = is_pid
                     && matches!(
@@ -1369,9 +1916,15 @@ fn universal(p: &Value, forward: &TransferFunction) -> Result<Value> {
                     params(&mut c, 1632)?;
                     controller = TransferFunction::new(vec![k, kp, ki], vec![1., 0.])?;
                 } else if is_cancel {
-                    let cancel_spec = optional(p, "pid_cancel_pole")?
-                        .filter(|v| *v > 0.)
-                        .or_else(|| optional(p, "pid_pi_zero").ok().flatten().filter(|v| *v > 0.));
+                    let cancel_spec =
+                        optional(p, "pid_cancel_pole")?
+                            .filter(|v| *v > 0.)
+                            .or_else(|| {
+                                optional(p, "pid_pi_zero")
+                                    .ok()
+                                    .flatten()
+                                    .filter(|v| *v > 0.)
+                            });
                     let z1 = match cancel_spec {
                         Some(val) => val,
                         None => {
@@ -1666,8 +2219,7 @@ fn universal(p: &Value, forward: &TransferFunction) -> Result<Value> {
                         append(&mut c, "mag_eqs", 1479, false)?;
                         append(&mut c, "steps", 1482, false)?;
                         params(&mut c, 1494)?;
-                        controller =
-                            TransferFunction::new(vec![k, k * z.unwrap()], vec![1., 0.])?;
+                        controller = TransferFunction::new(vec![k, k * z.unwrap()], vec![1., 0.])?;
                     }
                 }
             }
@@ -1862,7 +2414,11 @@ fn plot_universal(
             Key::Marker(Marker::Ring),
         ));
     }
-    let is_equal_zeros = !p["zi"].is_null()
+    let dl = text(&get(c, "design_label"));
+    let is_new_pid_mode =
+        dl.contains("Zeros Reais e Iguais") || dl.contains("Cancelamento de Polo");
+    let is_equal_zeros = is_new_pid_mode
+        && !p["zi"].is_null()
         && !p["z"].is_null()
         && (n(&p["zi"]) - n(&p["z"])).abs() < 1e-4;
     if is_equal_zeros {
@@ -1876,7 +2432,7 @@ fn plot_universal(
             ));
         }
     } else {
-        if !p["zi"].is_null() && !p["z"].is_null() {
+        if is_new_pid_mode && !p["zi"].is_null() && !p["z"].is_null() {
             let zi = -n(&p["zi"]);
             left.marker(zi, 0., Marker::Disc, "black", 6.5);
             legend.push((
@@ -2169,9 +2725,33 @@ fn finish_universal(
     if !warning.is_null() {
         append(&mut c, "metric_rows", 1967, false)?;
     }
-    let details = json!({"design_type":kind.to_lowercase(),"controller_type":kind,"design_label":get(&c,"design_label"),"input_type":mode,"settling_criterion":cp["criterion_pct"],"stable":stable,"warning":warning,"controller_parameters":cp,"uncompensated":get(&c,"uncomp"),"angle_contributions":get(&c,"angle_contributions"),"steps":get(&c,"steps"),"gc_latex":gc,"gma_factored_latex":factored,"gma_expanded_latex":expanded,"tc_latex":tc,"plant_latex_factored":get(&c,"plant_latex_factored"),"plant_latex_expanded":get(&c,"plant_latex_expanded"),"forward_latex_factored":get(&c,"forward_latex_factored"),"feedback_latex":get(&c,"feedback_latex"),"warnings":warnings,"before":mb,"after":ma,"closed_loop_poles_before":values::complex_list(&uncomp_cl.poles()?),"closed_loop_poles_after":values::complex_list(&comp_poles)});
+    let mut details = json!({"design_type":kind.to_lowercase(),"controller_type":kind,"design_label":get(&c,"design_label"),"input_type":mode,"settling_criterion":cp["criterion_pct"],"stable":stable,"warning":warning,"controller_parameters":cp,"uncompensated":get(&c,"uncomp"),"angle_contributions":get(&c,"angle_contributions"),"steps":get(&c,"steps"),"gc_latex":gc,"gma_factored_latex":factored,"gma_expanded_latex":expanded,"tc_latex":tc,"plant_latex_factored":get(&c,"plant_latex_factored"),"plant_latex_expanded":get(&c,"plant_latex_expanded"),"forward_latex_factored":get(&c,"forward_latex_factored"),"feedback_latex":get(&c,"feedback_latex"),"warnings":warnings,"before":mb,"after":ma,"closed_loop_poles_before":values::complex_list(&uncomp_cl.poles()?),"closed_loop_poles_after":values::complex_list(&comp_poles)});
+    let want_verification =
+        p["verify_requirements"].as_bool() == Some(true) || p.get("synthesis_mode").is_some();
+    if want_verification {
+        let specs = specs_from_payload(p, Some(&cp))?;
+        let report =
+            crate::controller_synthesis::verify_controller(forward, feedback, &controller, &specs)?;
+        let report_json = report.to_json();
+        details["verification"] = report_json;
+        details["synthesis_mode"] = json!(
+            p["synthesis_mode"]
+                .as_str()
+                .filter(|s| !s.is_empty())
+                .unwrap_or("lgr_classic")
+        );
+        if !report.requirements_passed {
+            let failure_msg = format!(
+                "Projeto clássico por LGR não atende às especificações reais: {}.",
+                report.failed_requirements.join("; ")
+            );
+            details["warning"] = json!(failure_msg);
+        }
+    }
     let gc_clean = gc.replace("+ -", "- ").replace("+ \\frac{-", "- \\frac{");
-    let factored_clean = factored.replace("+ -", "- ").replace("+ \\frac{-", "- \\frac{");
+    let factored_clean = factored
+        .replace("+ -", "- ")
+        .replace("+ \\frac{-", "- \\frac{");
     let mut latex = vec![
         json!({"label":"Controlador Gc(s)","value":gc_clean}),
         json!({"label":format!("Malha Aberta Compensada Gma(s) = {}",if feedback.is_some(){"Gc(s)G(s)H(s)"}else{"Gc(s)G(s)"}),"value":factored_clean}),

@@ -59,6 +59,7 @@ jobs:
       - name: Testes e verificações Rust
         run: |
           cargo test --locked --workspace
+          cargo run --locked --release -p xtask -- parity
           cargo clippy --locked --workspace --all-targets -- -D warnings
           cargo fmt --all --check
           desktop-file-validate packaging/linux/controlab.desktop
